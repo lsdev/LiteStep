@@ -33,6 +33,7 @@
 
 #include "../litestep/resource.h"
 #include "../lsapi/lsapi.h"
+#include "localization.h"
 #include "safeptr.h"
 #include "safestr.h"
 
