@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SettingsFileParser.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
+#include <stdexcept>
 
 #if !defined(CSIDL_COMMON_ADMINTOOLS)
 #  define CSIDL_COMMON_ADMINTOOLS 0x002F
@@ -409,8 +410,7 @@ void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
 
 void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
 {
-	LPCSTR pszVariable;
-	CHAR szVariable[MAX_LINE_LENGTH + 1];
+    LPCSTR pszOriginalTemplate = pszTemplate;
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
 	LPSTR pszTempExpandedString = szTempExpandedString;
 	size_t stWorkLength = stLength;
@@ -434,7 +434,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				// This is a variable so we need to find the end of it:
 				//
                 ++pszTemplate;
-                pszVariable = pszTemplate;
+                
+                LPCSTR pszVariable = pszTemplate;
+                
                 while ((*pszTemplate != '$') && (*pszTemplate != '\0'))
                 {
                     ++pszTemplate;
@@ -444,8 +446,11 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 
 				if (*pszTemplate == '\0')
 				{
-					strncpy(pszTempExpandedString, pszVariable, pszTemplate - pszVariable);
-					bSucceeded = true;
+					bSucceeded = SUCCEEDED(
+                        StringCchCopyNEx(pszTempExpandedString,
+                        MAX_LINE_LENGTH - (pszTempExpandedString - szTempExpandedString),
+                        pszVariable, pszTemplate - pszVariable, NULL, NULL,
+                        STRSAFE_NULL_ON_FAILURE));
 				}
 				else
 				{
@@ -453,8 +458,12 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 					// We've found the end of the variable so copy it
 					// someplace usefull:
 					//
-					strncpy(szVariable, pszVariable, pszTemplate - pszVariable);
-                    szVariable[pszTemplate - pszVariable] = '\0';
+                    char szVariable[MAX_LINE_LENGTH];
+
+                    StringCchCopyNEx(szVariable, MAX_LINE_LENGTH, pszVariable,
+                        pszTemplate - pszVariable, NULL, NULL,
+                        STRSAFE_NULL_ON_FAILURE);
+
                     if (szVariable[0] != '\0')
                     {
                         //
@@ -475,17 +484,23 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                         else
                         {
 #ifdef LS_COMPAT_MATH
-                            int nValue = static_cast<int>(_MathEvaluate(szVariable));
-                            
-                            if (nValue != INT_MAX)
+                            try
                             {
+                                int nValue =
+                                    static_cast<int>(_MathEvaluate(szVariable));
+
                                 StringCchPrintf(pszTempExpandedString, stLength,
                                     "%d", nValue);
                                 
                                 bSucceeded = true;
                             }
-                            else
+                            catch (std::invalid_argument& ia)
                             {
+                                ErrorEx(LOCALIZE_THIS,
+                                    "Variable \"%s\" not defined.\n\n"
+                                    "Used in: %s",
+                                    ia.what(), pszOriginalTemplate);
+                                
                                 pszTempExpandedString[0] = '\0';
                             }
 #else
@@ -744,14 +759,25 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
         }
     }
     
-    TCHAR tzValue[MAX_LINE_LENGTH];
+    TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
     if(GetVariable(ptzInput, tzValue, MAX_LINE_LENGTH))
     {
-        double nTemp = _tcstod(tzValue, NULL);
-        return nTemp;
+        return _tcstod(tzValue, NULL);
     }
     else
     {
+        LPCTSTR ptzIter = ptzInput;
+        
+        while (*ptzIter != _T('\0'))
+        {
+            if (!isdigit(*ptzIter))
+            {
+                throw std::invalid_argument(ptzInput);
+            }
+
+            ++ptzIter;
+        }
+
         return _tcstod(ptzInput, NULL);
     }
 }
