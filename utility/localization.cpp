@@ -208,23 +208,129 @@ void Localization::LoadString(UINT uID, LPTSTR ptzBuffer, size_t cchMax)
 		{
 			if (::LoadString(GetModuleHandle(NULL), uID, ptzBuffer, cchMax) == 0)
 		 	{
-		 		ptzBuffer[0] = _T('\0');
-		 	}
-		}
-	}
+                ptzBuffer[0] = _T('\0');
+            }
+        }
+    }
 }
 
 
 int Localization::MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType)
 {
-	int nReturn = 0;
-	TCHAR tzCaption[MAX_LINE_LENGTH];
-	TCHAR tzText[MAX_LINE_LENGTH];
-	
-	LoadString(uText, tzText, MAX_LINE_LENGTH);
-	LoadString(uCaption, tzCaption, MAX_LINE_LENGTH);
-	
-	nReturn = ::MessageBox(hWnd, tzText, tzCaption, uType);
-	
-	return nReturn;
+    int nReturn = 0;
+    TCHAR tzCaption[MAX_LINE_LENGTH];
+    TCHAR tzText[MAX_LINE_LENGTH];
+    
+    LoadString(uText, tzText, MAX_LINE_LENGTH);
+    LoadString(uCaption, tzCaption, MAX_LINE_LENGTH);
+    
+    nReturn = ::MessageBox(hWnd, tzText, tzCaption, uType);
+    
+    return nReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// ResLocalizer
+//
+// Obtains strings from litestep.exe's resources.
+//
+class ResLocalizer
+{
+public:
+    static const TCHAR* GetString(UINT uId, TCHAR* ptzBuffer,
+        size_t cchBuffer, const TCHAR* ptzDefault)
+    {
+        ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
+        ASSERT_ISSTRING(ptzDefault);
+        
+        if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, cchBuffer) == 0)
+        {
+            HRESULT hr = StringCchCopy(ptzBuffer, cchBuffer, ptzDefault);
+            
+            if (FAILED(hr) && hr != STRSAFE_E_INSUFFICIENT_BUFFER)
+            {
+                *ptzBuffer = '\0';
+            }
+        }
+        
+        return ptzBuffer;
+    }
+};
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// LocalizerPolicy
+//
+// The functions below used to be part of a Localizer template configured with
+// a LocalizerPolicy; however following the KISS principle it was deprecated
+// for the time being.
+//
+typedef ResLocalizer LocalizerPolicy;
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// DoError
+//
+static int DoError(const TCHAR* ptzText, UINT uType = MB_OK)
+{
+    return MessageBox(NULL, ptzText, _T("LiteStep :: Error"),
+        MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND | uType);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// Error
+//
+void Error(UINT uId, const TCHAR* ptzDefault)
+{
+    ASSERT_ISSTRING(ptzDefault);
+    TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
+    
+    DoError(LocalizerPolicy::GetString(uId, tzBuffer,
+        MAX_LINE_LENGTH, ptzDefault));
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// ErrorEx
+//
+void ErrorEx(UINT uId, const TCHAR* ptzDefault, ...)
+{
+    ASSERT_ISSTRING(ptzDefault);
+    TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
+    TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
+    
+    const TCHAR* ptzFormat = LocalizerPolicy::GetString(uId, tzFormat,
+        MAX_LINE_LENGTH, ptzDefault);
+    
+    va_list vargs;
+    va_start(vargs, ptzDefault);
+    
+    HRESULT hr = E_FAIL;
+    
+    try
+    {
+        hr = StringCchVPrintf(tzBuffer, MAX_LINE_LENGTH, ptzFormat, vargs);
+    }
+    catch (...)
+    {
+        tzBuffer[0] = '\0';
+    }
+    
+    va_end(vargs);
+    
+    if (FAILED(hr) && hr != STRSAFE_E_INSUFFICIENT_BUFFER)
+    {
+        DoError(ptzDefault);
+    }
+    else
+    {
+        DoError(tzBuffer);
+    }
 }
