@@ -41,20 +41,12 @@ extern "C"
 {
 #endif  // __cplusplus
 
-	LSAPI void LitestepAPIInit();
-
 	LSAPI FILE* LCOpen (LPCSTR szPath);
 	LSAPI BOOL LCClose (FILE * f);
 	LSAPI BOOL LCReadNextCommand(FILE * pFile, LPSTR pszValue, size_t cchValue);
 	LSAPI BOOL LCReadNextConfig(FILE * pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
 	LSAPI BOOL LCReadNextLine(FILE * pFile, LPSTR pszValue, size_t cchValue);
 	LSAPI int LCTokenize (LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters);
-
-	LSAPI BOOL SetupRC(LPCSTR szPath);
-	LSAPI void CloseRC(void);
-
-	LSAPI BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath);
-	LSAPI void DeleteSettingsManager(void);
 
 	LSAPI int GetRCInt(LPCSTR lpKeyName, int nDefault);
 	LSAPI BOOL GetRCString(LPCSTR lpKeyName, LPSTR value, LPCSTR defStr, int maxLen);
@@ -98,11 +90,7 @@ extern "C"
 
 	LSAPI BOOL match(LPCSTR pattern, LPCSTR text);
 	LSAPI int matche(LPCSTR pattern, LPCSTR text);
-	// LSAPI BOOL is_pattern (char *pattern);
 	LSAPI BOOL is_valid_pattern(LPCSTR p, LPINT error_type);
-
-	LSAPI void setupVars(LPCSTR szLSPath);
-	LSAPI void setupBangs(void);
 
 	LSAPI void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText);
 	LSAPI void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...);
@@ -120,6 +108,12 @@ extern "C"
 	LSAPI int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal);
 	LSAPI int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal);
 
+    // for internal use only
+    LSAPI BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath);
+    LSAPI void DeleteSettingsManager(void);
+    LSAPI void SetupBangs(void);
+    LSAPI void ClearBangs(void);
+    
 #ifdef  __cplusplus
 };
 #endif  // __cplusplus
