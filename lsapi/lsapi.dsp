@@ -259,10 +259,6 @@ SOURCE=.\lsapidefines.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\lsdebug.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\lsMultiMon.h
 # End Source File
 # Begin Source File
