@@ -648,58 +648,57 @@ BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_
 // leave it alone as long as it works exactly like the old function.
 double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
 {
-    int nBlock = 0;
-	size_t stStart = 0;
+    int nCount, nBlock = 0, nStart;
     
     PathRemoveBlanks(ptzInput);
-    size_t stLen = _tcslen(ptzInput);
-
-    for (size_t stCount = 0; stCount <= stLen; ++stCount)
+    int nLen = _tcslen(ptzInput);
+    
+    for (nCount = 0; nCount <= nLen; nCount++)
     {
-        if ((ptzInput[stCount] == _T('(')) && (++nBlock == 1))
+        if ((ptzInput[nCount] == _T('(')) && (++nBlock == 1))
         {
-            stStart = stCount;
+            nStart = nCount;
         }
-        else if ((ptzInput[stCount] == _T(')')) && !--nBlock && !stStart &&
-                 (stCount == (stLen - 1)))
+        else if ((ptzInput[nCount] == _T(')')) && !--nBlock && !nStart &&
+            (nCount == (nLen - 1)))
         {
             // one pair of parentheses surrounding the whole expression		
-            ptzInput[stCount] = 0;
+            ptzInput[nCount] = 0;
             return _MathEvaluate(ptzInput + 1);
         }
     }
-
+    
     char rcSign[4] = { _T('+'), _T('-'), _T('*'), _T('/') };
-
-	for(int nSign = 0; nSign < 4; nSign++)
+    
+    for(int nSign = 0; nSign < 4; nSign++)
     {
-        for(size_t stCount = stLen; stCount >= 0; --stCount)
+        for(nCount = nLen; nCount >= 0; nCount--)
         {
-            if(ptzInput[stCount] == _T('('))
+            if(ptzInput[nCount] == _T('('))
             {
                 ++nBlock;
             }
-            else if(ptzInput[stCount] == _T(')'))
+            else if(ptzInput[nCount] == _T(')'))
             {
                 --nBlock;
             }
-            else if((ptzInput[stCount] == rcSign[nSign]) && !nBlock)
+            else if((ptzInput[nCount] == rcSign[nSign]) && !nBlock)
             {
-                ptzInput[stCount] = 0;
+                ptzInput[nCount] = 0;
                 
                 switch(nSign)
                 {
-                    case 0: return _MathEvaluate(ptzInput) +
-                                _MathEvaluate(ptzInput + stCount + 1);
-
-                    case 1: return _MathEvaluate(ptzInput) -
-                                _MathEvaluate(ptzInput + stCount + 1);
-                        
-                    case 2: return _MathEvaluate(ptzInput) *
-                                _MathEvaluate(ptzInput + stCount + 1);
-                        
-                    case 3: return _MathEvaluate(ptzInput) /
-                                _MathEvaluate(ptzInput + stCount + 1);
+                case 0: return _MathEvaluate(ptzInput) +
+                            _MathEvaluate(ptzInput + nCount + 1);
+                    
+                case 1: return _MathEvaluate(ptzInput) -
+                            _MathEvaluate(ptzInput + nCount + 1);
+                    
+                case 2: return _MathEvaluate(ptzInput) *
+                            _MathEvaluate(ptzInput + nCount + 1);
+                    
+                case 3: return _MathEvaluate(ptzInput) /
+                            _MathEvaluate(ptzInput + nCount + 1);
                 }
             }
         }
