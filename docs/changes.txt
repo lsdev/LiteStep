@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Beta 1
+    LiteStep 0.24.7 Beta 2
     Prerelease Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -31,7 +31,8 @@
  - Modules are loaded and unloaded asynchronously (at the same time) if threaded.
    This should lead to faster start and recycle times if threading is used.
 
- - Removed support for PixmapPath (use LSImageFolder instead) and LSThemeFile.
+ - Removed support for PixmapPath (use LSImageFolder instead), ThemeFile,
+   LSThemeFile, and LSColorBGR.
  
  - Both the !alert and the !confirm MessageBoxes should now always have focus
    and appear ontop of the active window.
@@ -75,7 +76,7 @@
 
  - Finish build.txt.
 
- - Write new readme.txt.
+ - Merge this file and readme.txt.
 
 
 -- INDIE LS CHANGES ADDED TO 0.24.7 --------------------------------------------

@@ -1,91 +1,105 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Beta 1
+    LiteStep 0.24.7 Beta 2
     Readme/Release Notes
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
 -- PREFACE ---------------------------------------------------------------------
 
- Here's a little update from your friendly devteam. This build was supposed to
- be released as "RC 1", but a few bugs (including a very nasty threading bug)
- were discovered literally in the last minutes. We're not entirely sure that the
- bug was fixed, so it was decided to play safe and label this as a "Beta" and
- not as a "Release Candidate." It is assumed that you are familiar with the last
- 0.24.7 build, as the rest of this document will focus on the differences
- between that build and this beta.
+ Here's the next update from your friendly devteam. Once more it is assumed that
+ you are familiar with the last 0.24.7 build (Beta 1). If you are not familiar
+ with the 0.24.7 prerelease builds please check changes.txt before reading this
+ document.
+ Compared to Beta 1 this build fixes some of the most reported bugs. Both the
+ list of known bugs and the "what needs to be tested" section were updated, so
+ please read those again. It would be a great help if you could notify us if a
+ problem you reported is neither fixed nor included in the list of known bugs.
  For experienced users only; installation instructions are not included. As
  always, use at your own risk.
- This document only covers the most important issues, for details check (the
- rewritten yet slightly incomplete) changes.txt.
+ This document only covers the most important issues, for details check
+ changes.txt (still slightly incomplete).
 
 
--- CHANGES SINCE THE LAST BUILD ------------------------------------------------
+-- CHANGES SINCE BETA 1 --------------------------------------------------------
 
- Compared to Message's build from September you'll find very little new
- features, but a HUGE amount of compatibility fixes. Those fixes aren't
- mentioned in the changelog despite their importance, as 0.24.7 is supposed to
- be a drop-in replacement for 0.24.6; hence a compatibility fix is no "change"
- to be recorded in changes.txt.
- In addition to these mostly internal compatibility fixes the most important
- changes are:
+ - Fixed StartupRunner's handling of unquoted paths and of programs with command
+   line arguments.
 
- - Modules are no longer threaded by default, which leads to a drop in !recycle
-   and startup performance but ensures much better compatibility to modules not
-   prepared for threading (sadly the number of such modules is bigger than we
-   initially assumed). However startup/!recycle performance should still be
-   better than under 0.24.6.
+ - Fixed math evaluation not supporting zeroes or spaces.
 
- - Added basic math evaluation and even more basic logging support.
+ - Fixed LCReadNext* APIs not using case insensitive string comparison.
 
- - Fixed !reload, !refresh, and !reloadmodule.
+ - Fixed exceptions during module initialization not being propagated to
+   the ModuleManager.
 
- - More efficient graphics functions in lsapi.
-
- - There is one new step.rc setting called "LSNoAutoHideModules" which disables
-   the automatic module hiding if a fullscreen app is detected.
+ - Added a temporary aboutbox (after frequent requests from various parties via
+   Phil Stopford).
 
 
 -- WHAT NEEDS TO BE TESTED -----------------------------------------------------
+
+ If you can provide details about any of the issues below please don't hesitate
+ to send an email. :)
 
  - Ability to be used as a drop-in replacement for 0.24.6. You should not have
    to make any changes in your step.rc when upgrading from 0.24.6 or Indie LS,
    except to work around the missing features listed in changes.txt. If you
    experience any problems during this process please report them.
 
- - The fullscreen app detection. It seems to suffer from false positives, which
-   means it sometimes triggers and this hides all modules despite there being no
-   (visible) fullscreen app; for example while the Object Dock installer is
-   running. If you find other programs reprodcuably (and wrongly) triggering the
-   fullscreen app detection please let us know.
+ - Loading Liteman.dll with 0.24.7. This should NOT have any sideeffects.
 
- - !Reloadmodule.
+ - Threading.
 
- - !Recycle with three or more "threaded" modules.
+ - jKey (especially if used with vk104.txt).
 
- - jKey (especially if used with vk104.txt), LSMail, jAmpToo compatibility.
+ - LSMail - it can cause other modules to act very strangely. If you are loading
+   LSMail and there is a module showing unusual behavior try disabling LSMail.
+   In case that fixes the other module's behavior please include the name and
+   version of both modules in your bugreport.
+
+ - LSWChanger.
+
+ - Windows 9x compatibility. LS apparently does not load under Win95.
+
+ - Systray. Some icons appear to be missing.
+
+ - Loading ICQ Lite and/or Crazy Browser while LS is running.
 
 
 -- KNOWN PROBLEMS --------------------------------------------------------------
 
- This is NOT a complete list but should cover the most important points:
-
- - No aboutbox (or rather, no functional aboutbox).
+ - No fully functional aboutbox. The current MessageBox is a temporary solution.
 
  - -install/-uninstall command line switches not finished (and thus
-   disfunctional). The question has arisen whether this is even the job of
+   dysfunctional). The question has arisen whether this is even the job of
    litestep.exe or if it should be moved to a separate app. Please comment if
    you have any thoughts on this.
 
- - jKey, LSMail, and jAmpToo were a bit unstable at times.
+ - LSMail can interfere with other modules.
+
+ - Loading liteman may cause LS to freeze after locking the workstation.
 
  - Threading issues in (hopefully) rare circumstances.
+
+ - Fullscreen app detection suffers from false positives. Because of that it may
+   be disabled by default in the final release. Any thoughts?
+
+ - #include dependencies in lsapi.h make it very difficult to distribute lsapi.h
+   with a module's sourcecode.
+
+ - TrayService doesn't catch all icons. Blank entries in the systray.
+
+ - LS locks up if a PNG is used and libpng13.dll or zlib.dll is not present.
 
 
 -- FINAL WORDS -----------------------------------------------------------------
 
- Massive thanks to Phil Stopford for hosting the binaries, and to the testers,
- without you 0.24.7 would still only run a handful of themes. Please direct any
- suggestions/bug reports to ilmcuts@gmx.net and/or post on the LS Mailing List.
- Have fun.
+ Thanks to Phil Stopford for hosting the binaries, and to everyone for the
+ immensely use- and helpful feedback. I don't think I have ever received such
+ detailed bugreports before. You're definitely a huge help for shaping up
+ 0.24.7.
+ Please direct any suggestions/bug reports to ilmcuts@gmx.net and/or post on the
+ LS Mailing List.
+ Thanks for your support,
 
  The LiteStep Development Team.
