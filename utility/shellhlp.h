@@ -25,6 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include <shlobj.h>
 
-BOOL GetShellFolderPath(int nFolder, LPSTR szPath, size_t cchPath);
+BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath);
 
 #endif // __INCLUDE_SHELLHLP_H

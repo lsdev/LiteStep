@@ -27,21 +27,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Given a CLSID, returns the given shell folder
 // cchPath must be atleast equal to MAX_PATH
 //
-BOOL GetShellFolderPath(int nFolder, LPSTR szPath, size_t cchPath)
+BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath)
 {
 	// LPITEMIDLIST pidl;
 	// IMalloc *pMalloc;
 	// HRESULT hr;
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(szPath, cchPath) && (cchPath >= MAX_PATH))
+	if (IsValidStringPtr(tzPath, cchPath) && (cchPath >= MAX_PATH))
 	{
-        bReturn = SHGetSpecialFolderPath(NULL, szPath, nFolder, FALSE);
+        bReturn = SHGetSpecialFolderPath(NULL, tzPath, nFolder, FALSE);
 
         if (bReturn)
         {
-            PathAddBackslash(szPath);
-            PathQuoteSpaces(szPath);
+            PathAddBackslash(tzPath);
+            PathQuoteSpaces(tzPath);
         }
         
 /*        if (SUCCEEDED(SHGetMalloc(&pMalloc)))
