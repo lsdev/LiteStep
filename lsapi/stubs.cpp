@@ -4,18 +4,19 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {
 #ifdef LS_COMPAT_LOGGING
 
-    char szLogFile[MAX_PATH];
+    char szLogFile[MAX_PATH] = { 0 };
 	
     int nLogLevel = GetRCInt("LSLogLevel", 2);
-    GetRCString("LSLogFile", szLogFile, NULL, MAX_PATH);
-	
-	// Has a log file been assigned?
-	if(!szLogFile[0])
-		return FALSE;
+    
+    // Should this message be logged?
+    if(nLevel > nLogLevel)
+        return FALSE;
 
-	// Should this message be logged?
-	if(nLevel > nLogLevel)
-		return FALSE;
+    // Has a log file been assigned?
+    if(!GetRCString("LSLogFile", szLogFile, NULL, MAX_PATH))
+    {
+        return FALSE;
+    }
 
 	// If so, open it
 	HANDLE hLogFile = CreateFile(szLogFile, 
@@ -28,7 +29,9 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
     
     // Did open succeed?
     if(hLogFile == INVALID_HANDLE_VALUE)
+    {
         return FALSE;
+    }
     
     // Move to the end of the file
     SetFilePointer(hLogFile, 0, NULL, FILE_END);
