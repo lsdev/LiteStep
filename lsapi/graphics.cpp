@@ -32,13 +32,8 @@ void TransparentBltLSWorker(HDC hdcDst, int nXDest, int nYDest, int nWidth, int 
 // Since the transparent color for all LiteStep modules should be 0xFF00FF and we 
 // are going to assume a tolerance of 0x000000, we can ignore the clrTransp and
 // clrTolerence parameter and hard code the values for the High and Low RGB bytes
-// The original code can be enabled by using the TRANSP_TOLERANCE #define below.
-// This should only be done if full backwards compatibility is needed. Modules
-// that depend on the original functionality should implement this function
-// themselves.
-
-//#define TRANSP_TOLERANCE
-
+// The orginial code is commented out, if a module needs the removed functionality,
+// it should implement this function with the commented out code
 HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int xoffset, int yoffset)
 {
 	// start with a completely transparent rgn
@@ -88,7 +83,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 						bm32.bmWidthBytes++;
 					}
 
-#ifdef TRANSP_TOLERANCE
+#ifdef LS_COMPAT_TRANSPTOL
                     // get the limits for the colors
 					BYTE clrHiR = ( 0xff - GetRValue( clrTolerance ) > GetRValue( clrTransp ) ) ? GetRValue( clrTransp ) + GetRValue( clrTolerance ) : 0xff;
 					BYTE clrHiG = ( 0xff - GetGValue( clrTolerance ) > GetGValue( clrTransp ) ) ? GetGValue( clrTransp ) + GetGValue( clrTolerance ) : 0xff;
@@ -96,7 +91,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 					BYTE clrLoR = ( GetRValue( clrTolerance ) < GetRValue( clrTransp ) ) ? GetRValue( clrTransp ) - GetRValue( clrTolerance ) : 0x00;
 					BYTE clrLoG = ( GetGValue( clrTolerance ) < GetGValue( clrTransp ) ) ? GetGValue( clrTransp ) - GetGValue( clrTolerance ) : 0x00;
 					BYTE clrLoB = ( GetBValue( clrTolerance ) < GetBValue( clrTransp ) ) ? GetBValue( clrTransp ) - GetBValue( clrTolerance ) : 0x00;
-#endif // TRANSP_TOLERANCE
+#endif // LS_COMPAT_TRANSPTOL
 
 					// Copy the bitmap into the memory D
 					HBITMAP hbmOld = (HBITMAP)SelectObject(hdcTmp, hbm);
@@ -104,11 +99,11 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 					BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcTmp, 0, 0, SRCCOPY);
 
 					// Scan each bitmap row from bottom to top (the bitmap is inverted vertically
-#ifdef TRANSP_TOLERANCE
+#ifdef LS_COMPAT_TRANSPTOL
                     BYTE *p;
 #else
 					DWORD *p;
-#endif // TRANSP_TOLERANCE
+#endif // LS_COMPAT_TRANSPTOL
 					BYTE *p32 = (BYTE *)bm32.bmBits + (bm32.bmHeight - 1) * bm32.bmWidthBytes;
 					while (y < bm.bmHeight)
 					{
@@ -119,7 +114,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 							// loop through all transparent pixels...
 							while ( x < bm.bmWidth )
 							{
-#ifdef TRANSP_TOLERANCE
+#ifdef LS_COMPAT_TRANSPTOL
 								p = p32 + 4 * x;
 
 								//if the pixel is non-transparent
@@ -138,7 +133,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 								{
 									break;
 								}
-#endif // TRANSP_TOLERANCE
+#endif // LS_COMPAT_TRANSPTOL
 
 								x++;
 							}
@@ -147,7 +142,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 							// loop through all non transparent pixels
 							while ( x < bm.bmWidth )
 							{
-#ifdef TRANSP_TOLERANCE
+#ifdef LS_COMPAT_TRANSPTOL
 								p = p32 + 4 * x;
 
 								// if the pixel is transparent, then break
@@ -169,7 +164,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 								{
 									break;
 								}
-#endif // TRANSP_TOLERANCE
+#endif // LS_COMPAT_TRANSPTOL
 								
 								x++;
 							}

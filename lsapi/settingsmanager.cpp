@@ -522,13 +522,14 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 			FileInfo * pFileInfo = new FileInfo;
 			if (pFileInfo)
 			{
-				// once again for compatibility reasons:
-                // all files opened with LCOpen() use the same SettingsMap
-                // to make $evars$ from step.rc work in those files.
-                // the question is if this is a bug or a feature
-                // 0.24.6 voted for feature, which means we should stay
-                // compatible for now
-                pFileInfo->m_pSettingsMap = &m_SettingsMap; //new SettingsMap;
+#ifdef LS_COMPAT_LCOPEN
+                // In 0.24.6 all files opened with LCOpen() use the same
+                // SettingsMap to make $evars$ from step.rc work in those files
+                // the question is if this is a bug or a feature...
+                pFileInfo->m_pSettingsMap = &m_SettingsMap;
+#else
+                pFileInfo->m_pSettingsMap = new SettingsMap;
+#endif // LS_COMPAT_LCOPEN
 				pFileInfo->m_Count = 1;
 
 				FileParser fpParser(pFileInfo->m_pSettingsMap);
@@ -572,8 +573,9 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 			{
 				if (fmIt->second->m_Count == 1)
 				{
-					// no separate SettingsMaps for LCOpen, see above
-                    //delete fmIt->second->m_pSettingsMap;
+#ifndef LS_COMPAT_LCOPEN
+                    delete fmIt->second->m_pSettingsMap;
+#endif // !LS_COMPAT_LCOPEN
 					delete fmIt->second;
 				}
 				else
