@@ -20,28 +20,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "versioning.h"
-#include <shlwapi.h>
 
-DWORD GetDllVersionA(LPCSTR pszDllName)
+
+static DWORD GetDllVersionWorker(HINSTANCE hDll)
 {
+    DWORD dwVersion = 0;
 
-	HINSTANCE hDll;
-	DWORD dwVersion = 0;
+    if (hDll)
+    {
+        DLLGETVERSIONPROC pDllGetVersion;
 
-	hDll = LoadLibraryA(pszDllName);
+		pDllGetVersion =
+            (DLLGETVERSIONPROC)GetProcAddress(hDll, "DllGetVersion");
 
-	if (hDll)
-	{
-		DLLGETVERSIONPROC pDllGetVersion;
-
-		pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hDll, "DllGetVersion");
-
-		/*Because some DLLs may not implement this function, you
-		 *must test for it explicitly. Depending on the particular 
-		 *DLL, the lack of a DllGetVersion function may
-		 *be a useful indicator of the version.
-		*/
-		if (pDllGetVersion)
+		// Because some DLLs may not implement this function, you
+		// must test for it explicitly. Depending on the particular 
+		// DLL, the lack of a DllGetVersion function may
+		// be a useful indicator of the version.
+        if (pDllGetVersion)
 		{
 			DLLVERSIONINFO dvi;
 			HRESULT hr;
@@ -56,47 +52,25 @@ DWORD GetDllVersionA(LPCSTR pszDllName)
 			}
 		}
 
-		FreeLibrary(hDll);
-	}
-	return dwVersion;
+        FreeLibrary(hDll);
+    }
+
+    return dwVersion;
+}
+
+//
+// GetDllVersionA(LPCSTR pszDllName)
+//
+DWORD GetDllVersionA(LPCSTR pszDllName)
+{
+	return GetDllVersionWorker(LoadLibraryA(pszDllName));
 }
 
 
+//
+// GetDllVersionW(LPCWSTR pwzDllName)
+//
 DWORD GetDllVersionW(LPCWSTR pwzDllName)
 {
-
-	HINSTANCE hDll;
-	DWORD dwVersion = 0;
-
-	hDll = LoadLibraryW(pwzDllName);
-
-	if (hDll)
-	{
-		DLLGETVERSIONPROC pDllGetVersion;
-
-		pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hDll, "DllGetVersion");
-
-		/*Because some DLLs may not implement this function, you
-		 *must test for it explicitly. Depending on the particular 
-		 *DLL, the lack of a DllGetVersion function may
-		 *be a useful indicator of the version.
-		*/
-		if (pDllGetVersion)
-		{
-			DLLVERSIONINFO dvi;
-			HRESULT hr;
-
-			INIT_STRUCT_CBSIZE(dvi);
-
-			hr = (*pDllGetVersion)(&dvi);
-
-			if (SUCCEEDED(hr))
-			{
-				dwVersion = PACKVERSION(dvi.dwMajorVersion, dvi.dwMinorVersion);
-			}
-		}
-
-		FreeLibrary(hDll);
-	}
-	return dwVersion;
+    return GetDllVersionWorker(LoadLibraryW(pwzDllName));
 }
