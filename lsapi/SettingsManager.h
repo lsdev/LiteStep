@@ -76,7 +76,7 @@ public:
 	BOOL LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
 	BOOL LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_t cchValue);
 
-	void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, DWORD dwLength);
+	void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength);
 };
 
 #endif // __SETTINGSMANAGER_H
