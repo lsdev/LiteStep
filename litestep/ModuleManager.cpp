@@ -90,42 +90,41 @@ HRESULT ModuleManager::rStop()
 
 UINT ModuleManager::_LoadModules()
 {
-	int nReturn = 0;
-	char buffer[MAX_LINE_LENGTH];
-	FILE *f;
-	f = LCOpen(NULL);
+	UINT uReturn = 0;
+	char szLine[MAX_LINE_LENGTH];
+	
+    FILE* f = LCOpen(NULL);
 
 	if (f)
 	{
-		while (LCReadNextConfig(f, "LoadModule", buffer, MAX_LINE_LENGTH))
+		while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
 		{
-			char * lpszBuffers[4];
-			//char token1[MAX_PATH];
-			char token2[MAX_PATH];
-			char token3[MAX_PATH];
-			char token4[MAX_PATH];
+            // LCTokenize clears these buffers if necessary
+            char szToken1[MAX_LINE_LENGTH];
+            char szToken2[MAX_LINE_LENGTH];
+			char szToken3[MAX_LINE_LENGTH];
 
-			lpszBuffers[0] = NULL;
-			lpszBuffers[1] = token2;
-			lpszBuffers[2] = token3;
-			lpszBuffers[3] = token4;
-
-			if (LCTokenize (buffer, lpszBuffers, 4, NULL) >= 1)
+            // first buffer takes the "LoadModule" token
+            LPSTR lpszBuffers[] = { NULL, szToken1, szToken2, szToken3 };
+            
+			if (LCTokenize(szLine, lpszBuffers, 4, NULL) >= 2)
 			{
 				DWORD dwFlags = MODULE_THREADED;
 
-				if ((stricmp(token3, "notthreaded") == 0) || (stricmp(token4, "notthreaded") == 0))
+				if ((stricmp(szToken2, "notthreaded") == 0) ||
+                    (stricmp(szToken3, "notthreaded") == 0))
 				{
 					dwFlags &= ~(MODULE_THREADED);
 				}
-				else if ((stricmp(token3, "nopump") == 0) || (stricmp(token4, "nopump") == 0))
+				else if ((stricmp(szToken2, "nopump") == 0) ||
+                         (stricmp(szToken3, "nopump") == 0))
 				{
 					dwFlags |= MODULE_NOTPUMPED;
 				}
 
-				if (LoadModule(token2, dwFlags))
+				if (LoadModule(szToken1, dwFlags))
 				{
-					++nReturn;
+					++uReturn;
 				}
 			}
 		}
@@ -134,7 +133,7 @@ UINT ModuleManager::_LoadModules()
 		_StartModules();
 	}
 
-	return nReturn;
+	return uReturn;
 }
 
 
