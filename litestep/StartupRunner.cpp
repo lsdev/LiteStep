@@ -283,32 +283,27 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 				                       (LPBYTE)tzValueBuffer, &dwValueSize);
 				if (lResult == ERROR_MORE_DATA)
 				{
-					continue;
-				}
-				else if (lResult == ERROR_SUCCESS)
-				{
-					if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
-					{
-						SHELLEXECUTEINFO seiCommand;
+                    continue;
+                }
+                else if (lResult == ERROR_SUCCESS)
+                {
+                    if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
+                    {
+                        STARTUPINFO suInfo;
+                        PROCESS_INFORMATION procInfo;
+                        
+                        ZeroMemory(&suInfo, sizeof(suInfo));
+                        suInfo.cb = sizeof(suInfo);
+                        
+                        CreateProcess(NULL, tzValueBuffer, NULL, NULL, FALSE,
+                            NORMAL_PRIORITY_CLASS, NULL, NULL,
+                            &suInfo, &procInfo);
+/*                        
+                        SHELLEXECUTEINFO seiCommand;
 						LPSTR pszArgs;
 
 						memset(&seiCommand, 0, sizeof(seiCommand));
 						seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
-
-						// We are going to let ShellExecuteEx expand environment strings
-						// for us
-						/*if (dwType == REG_EXPAND_SZ)
-						{
-							DWORD dwResult;
-							char szTempBuffer[MAX_LINE_LENGTH];
-							StringCchCopy(szTempBuffer, MAX_LINE_LENGTH, szValueBuffer);
-
-							dwResult = ExpandEnvironmentStrings(szTempBuffer, szValueBuffer, MAX_LINE_LENGTH);
-							if ((dwResult > MAX_LINE_LENGTH) || (dwResult == 0))
-							{
-								continue;
-							}
-						}*/
 
 						if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
 						{
@@ -324,7 +319,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 							tzValueBuffer[pszArgs - tzValueBuffer - 1] = _T('\0');
 						}
 
-						PathUnquoteSpaces(tzValueBuffer);
+                        PathUnquoteSpaces(tzValueBuffer);
 
 						seiCommand.lpFile = tzValueBuffer;
 						seiCommand.lpParameters = pszArgs;
@@ -339,7 +334,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 							{
 								dwLoop--;
 							}
-						}
+						}*/
 					}
 				}
 				else
