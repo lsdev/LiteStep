@@ -143,7 +143,6 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 	Module * module = NULL;
 	LPSTR pszLowerLocation = _strlwr(_strdup(pszLocation));
 	BOOL bReturn = FALSE;
-	BOOL bContinue = TRUE;
 
 	ModuleMap::iterator it = m_ModuleMap.find(pszLowerLocation);
 	if (it == m_ModuleMap.end())
@@ -198,7 +197,7 @@ void ModuleManager::_StartModules()
 		CHAR szAppPath[MAX_PATH];
 		HRESULT hr;
 
-		hr = m_pILiteStep->get_Window((LONG*)hLiteStep);
+		hr = m_pILiteStep->get_Window((LONG*)&hLiteStep);
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pILiteStep->get_AppPath(szAppPath, MAX_PATH);
