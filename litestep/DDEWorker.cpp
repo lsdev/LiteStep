@@ -352,7 +352,6 @@ BOOL DDEWorker::_ShowGroup(LPCTSTR strGroupName, int nShow, BOOL bCommon)
 	// Get the program group path
 	if (GetShellFolderPath(bCommon ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, szPath, MAX_PATH))
 	{
-		PathUnquoteSpaces(szPath);
 		StringCchPrintf(szFullPath, MAX_PATH, "%s\\%s\\", szPath, strGroupName);
 		PathQuoteSpaces(szFullPath);
 
@@ -381,7 +380,6 @@ BOOL DDEWorker::_CreateGroup(LPCTSTR strGroupName, BOOL bCommon)
 	// Get the program group path
 	if (GetShellFolderPath(bCommon ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, szPath, MAX_PATH))
 	{
-		PathUnquoteSpaces(szPath);
 		StringCchPrintf(szFullPath, MAX_PATH, "%s\\%s", szPath, strGroupName);
 		PathQuoteSpaces(szFullPath);
 
@@ -424,10 +422,10 @@ BOOL DDEWorker::_DeleteGroup(LPCTSTR strGroupName, BOOL bCommon)
 	// Get the program group path
 	if (GetShellFolderPath(bCommon ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, szPath, MAX_PATH))
 	{
-		// Append \*.* for FindFirstFile
+        // Append \*.* for FindFirstFile
 		StringCchCopy(szTemp, MAX_PATH, "\\");
 		StringCchCat(szTemp, MAX_PATH, strGroupName);
-		StringCchCopy(szPath, MAX_PATH, szTemp);
+		StringCchCat(szPath, MAX_PATH, szTemp);
 
 		StringCchCopy(szTemp, MAX_PATH, szPath);
 		StringCchCat(szTemp, MAX_PATH, "\\*.*");
