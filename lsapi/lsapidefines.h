@@ -153,10 +153,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //---------------------------------------------------------
 #ifdef __cplusplus
 typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (BangCommandEx)(HWND hSender, LPCSTR pszArgs, LPCSTR pszCommand);
+typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
 #else  // __cplusplus
 typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (BangCommandEx)(HWND hSender, LPCSTR pszArgs, LPCSTR pszCommand);
+typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
 #endif	// __cplusplus
 
 typedef struct _LMBANGCOMMANDA
