@@ -116,11 +116,15 @@ void StartupRunner::_RunRunOnceEx()
     
     if (uChars > 0 && uChars < MAX_PATH)
     {
-        if (SUCCEEDED(StringCchCat(szArgs, MAX_PATH,
-            _T("\\iernonce.dll,RunOnceExProcess"))))
+        if (SUCCEEDED(StringCchCat(szArgs, MAX_PATH, _T("\\iernonce.dll"))))
         {
-            ShellExecute(NULL, _T("open"), _T("rundll32.exe"), szArgs, NULL,
-                SW_NORMAL);
+            // The file doesn't exist on NT4
+            if (PathFileExists(szArgs) && SUCCEEDED(StringCchCat(szArgs,
+                MAX_PATH, _T(",RunOnceExProcess"))))
+            {
+                ShellExecute(NULL, _T("open"), _T("rundll32.exe"), szArgs, NULL,
+                    SW_NORMAL);
+            }
         }
     }
 }
