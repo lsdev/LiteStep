@@ -187,7 +187,7 @@ SOURCE=.\shellhlp.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\stringicmp.h
+SOURCE=.\stringutility.h
 # End Source File
 # Begin Source File
 

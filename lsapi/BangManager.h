@@ -23,18 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "../lsapi/BangCommand.h"
 #include "../utility/criticalsection.h"
+#include "../utility/stringutility.h"
 #include <map>
 #include <string>
 
 using namespace std;
-
-struct stringicmp
-{
-	bool operator()(const string &s1, const string &s2) const
-	{
-		return (stricmp(s1.c_str(), s2.c_str()) < 0);
-	}
-};
 
 typedef map<string, Bang*, stringicmp> BangMap;
 
