@@ -255,8 +255,8 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 					// now let's paint both images to a new one
 
 					// and we support different sized images!! therefore:
-					wdtResult = max(wdtFirst, wdtSecond);
-					hgtResult = max(hgtFirst, hgtSecond);
+                    wdtResult = std::max(wdtFirst, wdtSecond);
+                    hgtResult = std::max(hgtFirst, hgtSecond);
 
 					// create another dc, compatible with second dc
 					hdcResult = CreateCompatibleDC(hdcSecond);
