@@ -175,8 +175,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,4,7
- PRODUCTVERSION 0,2,4,7
+ FILEVERSION 0,24,7,0
+ PRODUCTVERSION 0,24,7,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -194,12 +194,14 @@ BEGIN
             VALUE "Comments", "http://www.lsdev.org\0"
             VALUE "CompanyName", "Litestep Development Team\0"
             VALUE "FileDescription", "LiteStep alternate shell for Microsoft Windows Operating Systems\0"
-            VALUE "FileVersion", "0, 2, 4, 7\0"
+            VALUE "FileVersion", "0, 24, 7, 0\0"
             VALUE "InternalName", "LiteStep\0"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2002\0"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2003\0"
+            VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "litestep.exe\0"
+            VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "Litestep\0"
-            VALUE "ProductVersion", "0, 2, 4, 7\0"
+            VALUE "ProductVersion", "0, 24, 7, 0\0"
             VALUE "SpecialBuild", "Ticking over ahead of LiteStep 0.25\0"
         END
     END
