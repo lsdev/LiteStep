@@ -52,7 +52,6 @@ HRESULT DDEService::Start()
 	{
 		if (FindWindow(_T("Progman"), NULL) == NULL)
 		{
-			HMODULE hInstance = GetModuleHandle(NULL);
 			UINT uInitReturn;
 
 			uInitReturn = DdeInitialize(&m_dwDDEInst, (PFNCALLBACK)MakeProcInstance((FARPROC)DdeCallback, hInstance),
