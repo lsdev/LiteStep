@@ -31,7 +31,7 @@ public:
 	static DWORD WINAPI Run(void* pvVoid);
 
 private:
-	static BOOL _IsFirstRunThisSession();
+	static bool _IsFirstRunThisSession();
 	static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
 	static void _RunStartupMenu();
 	static void _RunFolderContents(LPCTSTR ptzPath);
