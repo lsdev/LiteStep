@@ -48,7 +48,7 @@ public:
 	DataStore();
 	virtual ~DataStore();
 
-	INT Count();
+	size_t Count();
 	void Clear();
 	BOOL ReleaseData(WORD wIdent, void *pvData, WORD wLength);
 	BOOL StoreData(WORD wIdent, void *pvData, WORD wLength);
