@@ -52,16 +52,12 @@ SettingsManager::~SettingsManager()
         {
             delete itFiles->second->m_pSettingsMap;
             delete itFiles->second;
-            
-            m_FileMap.erase(itFiles);
         }
         else
         {
             itFiles->second->m_Count--;
         }
     }
-
-    ASSERT(m_FileMap.empty());
 }
 
 
@@ -617,7 +613,7 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 		
         if (it != m_Iterators.end())
 		{
-			FileMap::iterator fmIt = m_FileMap.find((*it)->get_Path());
+            FileMap::iterator fmIt = m_FileMap.find((*it)->get_Path());
 
 			if (fmIt != m_FileMap.end())
 			{
@@ -634,7 +630,7 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 				}
 			}
 
-            delete *it;
+            delete (*it);
 
             m_Iterators.erase(it);
 		}
@@ -770,7 +766,7 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
         
         while (*ptzIter != _T('\0'))
         {
-            if (!isdigit(*ptzIter))
+            if (!(isdigit(*ptzIter) || *ptzIter == _T('.')))
             {
                 throw std::invalid_argument(ptzInput);
             }
