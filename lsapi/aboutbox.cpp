@@ -24,6 +24,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <math.h>
 #include "../utility/core.hpp"
 
+#ifdef __GNUC__
+  typedef void (__stdcall *STTWTYPE)(HWND, BOOL);
+
+  STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
+      GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
+#endif
+
 extern const char rcsRevision[];
 
 enum
