@@ -62,6 +62,7 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
 #include "TrayService.h"
 #include <regstr.h>
 #include <shlobj.h>
+#include <algorithm>
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
