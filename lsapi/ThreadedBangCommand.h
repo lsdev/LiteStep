@@ -20,33 +20,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __THREADEDBANGCOMMAND_H
 #define __THREADEDBANGCOMMAND_H
 
-#include "../utility/common.h"
-#include "../utility/base.h"
-#include "lsapidefines.h"
 #include "bangcommand.h"
+#include "../utility/core.hpp"
 
-class ThreadedBangCommand: public CountedBase
+class ThreadedBangCommand : public CountedBase
 {
 public:
-	ThreadedBangCommand(HWND hCaller, LPCSTR pszParams, Bang* pBang)
+    ThreadedBangCommand(HWND hCaller, LPCSTR pszParams, Bang* pBang) :
+      m_hCaller(hCaller), m_pBang(pBang)
 	{
-		m_hCaller = NULL;
-		m_pBang = NULL;
-		m_szParams[0] = '\0';
+		ASSERT_ISWRITEPTR(pBang);
+        ASSERT((pszParams == NULL) || !IsBadStringPtr(pszParams, UINT_MAX));
 
-		if (hCaller)
+        m_pBang = pBang;
+        m_pBang->AddRef();
+
+        if (pszParams)
 		{
-			m_hCaller = hCaller;
+			StringCchCopy(m_szParams, MAX_BANGARGS, pszParams);
 		}
-		if (pBang)
-		{
-			m_pBang = pBang;
-			m_pBang->AddRef();
-		}
-		if (pszParams)
-		{
-			strncpy(m_szParams, pszParams, MAX_PATH);
-		}
+        else
+        {
+            m_szParams[0] = '\0';
+        }
 	};
 
 	~ThreadedBangCommand()
@@ -60,7 +56,7 @@ public:
 
 	void Execute()
 	{
-		if (m_pBang)
+        if (m_pBang)
 		{
 			m_pBang->Execute(m_hCaller, m_szParams);
 		}
@@ -68,7 +64,8 @@ public:
 
 private:
 	Bang* m_pBang;
-	char m_szParams[MAX_BANGARGS];
+
+    char m_szParams[MAX_BANGARGS];
 	HWND m_hCaller;
 };
 
