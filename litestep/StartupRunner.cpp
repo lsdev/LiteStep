@@ -202,9 +202,14 @@ BOOL StartupRunner::_IsFirstRunThisSession()
 						lResult = RegCreateKeyEx(hkSessionInfo, "StartupHasBeenRun", 0, NULL, REG_OPTION_VOLATILE,
 						                         KEY_WRITE, NULL, &hkStartup, &dwDisposition);
 						RegCloseKey(hkSessionInfo);
-						if (dwDisposition == REG_CREATED_NEW_KEY)
+						
+                        if (lResult == ERROR_SUCCESS)
+                        {
+                            RegCloseKey(hkStartup);
+                        }
+
+                        if (dwDisposition == REG_CREATED_NEW_KEY)
 						{
-							RegCloseKey(hkStartup);
 							bReturn = TRUE;
 						}
 					}
