@@ -204,7 +204,7 @@ void FileParser::_StripString(LPWSTR pwzString)
 	{
 		*pwzLast = '\0';
 	}
-	if ((pwzCurrent != pwzString) && *pwzCurrent)
+	if ((pwzCurrent != pwzString) && pwzStart)
 	{
 		StringCchCopyW(pwzString, lstrlenW(pwzString) + 1, pwzStart);
 	}
