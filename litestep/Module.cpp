@@ -71,7 +71,8 @@ Module::Module(LPCSTR pszLoc, DWORD dwFlags)
 
 Module::~Module()
 {
-	if (m_dwFlags & MODULE_THREADED)
+	// do we have to keep the event handles until the very end?
+    if (m_dwFlags & MODULE_THREADED)
     {
         CloseHandle(m_hThread);
         CloseHandle(m_hInitEvent);
