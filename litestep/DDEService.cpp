@@ -134,6 +134,8 @@ bool DDEService::_DoStart()
 
     if (!m_dwDDEInst)
     {
+        CoInitialize(NULL);
+
         UINT uInitReturn = DdeInitialize(&m_dwDDEInst, (PFNCALLBACK)DdeCallback,
             APPCLASS_STANDARD | CBF_FAIL_POKES | CBF_FAIL_SELFCONNECTIONS |
             CBF_SKIP_ALLNOTIFICATIONS, 0L);
@@ -168,6 +170,10 @@ void DDEService::_DoStop()
         DdeFreeStringHandle(m_dwDDEInst, m_hszAppProperties);
     }
     DdeUninitialize(m_dwDDEInst);
+
+    m_dwDDEInst = NULL;
+
+    CoUninitialize();
 }
 
 
