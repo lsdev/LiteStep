@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include <shlobj.h>
 
-BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath);
+bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
+bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer);
+HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
+
 
 #endif // __INCLUDE_SHELLHLP_H
