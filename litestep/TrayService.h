@@ -280,7 +280,7 @@ private:
     
     bool _CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
         const NOTIFYICONDATA& nidSource) const;
-    void _Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid);
+    bool _Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid);
     
     //
     // methods handling version specifics
