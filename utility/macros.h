@@ -62,7 +62,9 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
 
 // Converts coordinates properly, taking into account for negative values
 // that are relative to the right/bottom of the screen
-#define CONVERT_COORDINATE_X(x) ((x) < 0 ? (SCREEN_WIDTH + (x)) : (SCREEN_LEFT + (x)))
-#define CONVERT_COORDINATE_Y(y) ((y) < 0 ? (SCREEN_HEIGHT + (y)) : (SCREEN_TOP + (y)))
+#define CONVERT_COORDINATE_WIDTH(x) ((x) + ((x) < 0 ? SCREEN_WIDTH : 0))
+#define CONVERT_COORDINATE_HEIGHT(y) ((y) + ((y) < 0 ? SCREEN_HEIGHT : 0))
+#define CONVERT_COORDINATE_X(x) (SCREEN_LEFT+CONVERT_COORDINATE_WIDTH(x))
+#define CONVERT_COORDINATE_Y(y) (SCREEN_TOP + CONVERT_COORDINATE_HEIGHT(y))
 
 #endif // __LSMACROS_H
