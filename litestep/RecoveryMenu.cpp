@@ -45,19 +45,20 @@ const int cMenuCommands = sizeof(rgMenuCommands) / sizeof(rgMenuCommands[0]);
 
 const char szRecoveryMenuWndClass[] = "RecoveryMenuWndClass";
 
-extern HINSTANCE hLSInstance;
-
+HINSTANCE g_hInstance = NULL;
 
 // this thread provides a recovery menu which can be accessed in
 // case errors render Litestep unusable
-DWORD WINAPI RecoveryThreadProc(LPVOID)
+DWORD WINAPI RecoveryThreadProc(LPVOID pvData)
 {
-	WNDCLASSEX wc;
+	g_hInstance = static_cast<HINSTANCE>(pvData);
+
+    WNDCLASSEX wc;
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.lpfnWndProc = RecoveryMenuWndProc;
-	wc.hInstance = hLSInstance;
+	wc.hInstance = g_hInstance;
 	wc.lpszClassName = szRecoveryMenuWndClass;
 
 	if (RegisterClassEx(&wc))
@@ -70,7 +71,7 @@ DWORD WINAPI RecoveryThreadProc(LPVOID)
             0, 0, 0, 0,
             NULL,
             NULL,
-            hLSInstance,
+            g_hInstance,
             NULL);
         
         if (IsWindow(hRecoveryWnd))
@@ -86,7 +87,7 @@ DWORD WINAPI RecoveryThreadProc(LPVOID)
             DestroyWindow(hRecoveryWnd);
         }
 
-        UnregisterClass(szRecoveryMenuWndClass, hLSInstance);
+        UnregisterClass(szRecoveryMenuWndClass, g_hInstance);
     }
 
     return 0;
@@ -111,7 +112,7 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 				{
 					char szBuffer[MAX_PATH];
 					//LoadString( (HINSTANCE) GetWindowLong( hWnd, GWL_HINSTANCE ), rgMenuCommands[i].nStringID, szBuffer, MAX_PATH );
-					GetResStr(hLSInstance,
+					GetResStr(g_hInstance,
 					          rgMenuCommands[i].nStringID, szBuffer, MAX_PATH,
 					          rgMenuCommands[i].pszDefText);
 					AppendMenu(hMenu, MF_STRING, rgMenuCommands[i].nCommandID, szBuffer);

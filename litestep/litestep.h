@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include "../utility/ILiteStep.h"
+#include <string>
 #include <vector>
 
 
@@ -41,8 +42,8 @@ class ModuleManager;
 
 
 // Program Options
-const LPCSTR szMainWindowClass = "TApplication";
-const LPCSTR szMainWindowTitle = "LiteStep";
+const char szMainWindowClass[] = "TApplication";
+const char szMainWindowTitle[] = "LiteStep";
 
 #define GWL_CLASSPOINTER	0
 
@@ -67,14 +68,14 @@ private:
 
 	void _Recycle();
 
-	CHAR m_szAppPath[MAX_PATH];
-	CHAR m_szRcPath[MAX_PATH];
+    std::string m_sAppPath;
+    std::string m_sConfigFile;
 
 	// Application instance
 	HINSTANCE m_hInstance;
 
-	BOOL m_bAutoHideModules;
-    BOOL m_bAppIsFullScreen; // = FALSE;		// Is there a full screen app active?
+	bool m_bAutoHideModules;
+    bool m_bAppIsFullScreen; // = false;
 
 	// Windows
 	HWND m_hMainWindow; // = NULL;
@@ -94,7 +95,7 @@ private:
 	HRESULT _StopManagers();
 	void _CleanupManagers();
 
-	BOOL bHookManagerStarted; // = FALSE;
+	bool m_bHookManagerStarted; // = false
 
 	//
 	// Service Related
