@@ -201,9 +201,9 @@ namespace debug
         const char* m_pszName;
     public:
         TraceFunction(const char* pszName) : m_pszName(pszName)
-        { TRACE("Enter: %s", pszName); }
+        { TRACE("%s - entered", m_pszName); }
         ~TraceFunction()
-        { TRACE("Leave: %s", m_pszName); }
+        { TRACE("%s - left", m_pszName); }
     };
 }
 
