@@ -24,8 +24,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // GetShellFolderPath
 //
-// Given a CLSID, returns the given shell folder
-// cchPath must be atleast equal to MAX_PATH
+// Given a CLSID, returns the given shell folder.
+// cchPath must be atleast equal to MAX_PATH.
+// Does NOT quote spaces, because often times the first thing that is done with
+// the returned path is to append another string to it, which doesn't work with
+// quotes.
 //
 BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath)
 {
@@ -46,7 +49,6 @@ BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath)
 				if (bReturn)
 				{
 					PathAddBackslash(tzPath);
-					PathQuoteSpaces(tzPath);
 				}
 
 				pMalloc->Free(pidl);
