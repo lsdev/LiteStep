@@ -63,7 +63,7 @@ private:
 	char m_szCurrentGroup[MAX_PATH];
 	BOOL m_bIsUserAnAdmin;
 
-	FARPROC (__stdcall *SHFindFiles)(LPCITEMIDLIST, LPCITEMIDLIST);
+	BOOL (__stdcall *SHFindFiles)(LPCITEMIDLIST, LPCITEMIDLIST);
 };
 
 #endif // __DDEWROKER_H

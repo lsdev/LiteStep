@@ -45,7 +45,7 @@ void DataStore::Clear()
 	m_dhmData.clear();
 }
 
-INT DataStore::Count()
+size_t DataStore::Count()
 {
 	return m_dhmData.size();
 }

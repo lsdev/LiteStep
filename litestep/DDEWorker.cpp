@@ -37,7 +37,7 @@ DDEWorker::DDEWorker()
 		m_bIsUserAnAdmin = FALSE;
 	}
 
-	SHFindFiles = (FARPROC (__stdcall *)(LPCITEMIDLIST, LPCITEMIDLIST))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x5A));
+	SHFindFiles = (BOOL (__stdcall *)(LPCITEMIDLIST, LPCITEMIDLIST))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x5A));
 }
 
 
@@ -57,11 +57,11 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 	DWORD dwRequest = _MatchRequest(pszRequest);
 	if (dwRequest)
 	{
-		int nLength = strlen(pszRequest) + 1;
-		pszWorkRequest = new char[nLength];
+		size_t stLength = strlen(pszRequest) + 1;
+		pszWorkRequest = new char[stLength];
 
-		StringCchCopy(pszWorkRequest, nLength, pszRequest);
-		pszWorkRequest[nLength - 3] = '\0';
+		StringCchCopy(pszWorkRequest, stLength, pszRequest);
+		pszWorkRequest[stLength - 3] = '\0';
 		pszWorkRequest = StrChr(pszWorkRequest, '(');
 		pszWorkRequest++;
 
@@ -480,15 +480,15 @@ BOOL DDEWorker::_ListGroupsHelper(HANDLE hHeap, char* szPath, LPVOID& pGroupList
 		{
 			if (*(FindData.cFileName) != '.' && (FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
 			{
-				int nLen = lstrlen(FindData.cFileName);
+				int stLen = lstrlen(FindData.cFileName);
 
-				pszTemp = (char*) HeapReAlloc(hHeap, HEAP_ZERO_MEMORY, pGroupList, ulSize + nLen + 2);
+				pszTemp = (char*) HeapReAlloc(hHeap, HEAP_ZERO_MEMORY, pGroupList, ulSize + stLen + 2);
 				if (pszTemp != NULL)
 				{
-					CopyMemory(&pszTemp[ulSize], FindData.cFileName, nLen);
-					CopyMemory(&pszTemp[ulSize + nLen], "\r\n", 2);
+					CopyMemory(&pszTemp[ulSize], FindData.cFileName, stLen);
+					CopyMemory(&pszTemp[ulSize + stLen], "\r\n", 2);
 					pGroupList = (LPVOID) pszTemp;
-					ulSize += (nLen + 2);
+					ulSize += (stLen + 2);
 					bReturn = TRUE;
 				}
 				else
