@@ -215,21 +215,12 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 						// grdtransparent work
 						if ((*iter)->LoadDll())
 						{
-							try
+							HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
+							if (hEvent)
 							{
-								HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
-								if (hEvent)
-								{
-									pInitEvents[nIndex++] = hEvent;
-								}
-								++uReturn;
+								pInitEvents[nIndex++] = hEvent;
 							}
-							catch (...)
-							{
-								RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
-									"Error: Exception during module initialization.\n\nPlease contact the module writer.",
-									(*iter)->GetLocation());
-							}
+							++uReturn;
 						}
 					}
 
@@ -285,18 +276,10 @@ void ModuleManager::_QuitModules()
 		{
 			if (*iter)
 			{
-				try
+				HANDLE hEvent = (*iter)->Quit();
+				if (hEvent)
 				{
-					HANDLE hEvent = (*iter)->Quit();
-					if (hEvent)
-					{
-						pQuitEvents[nIndex++] = hEvent;
-					}
-				}
-				catch (...)
-				{
-					// quietly swallow exceptions
-					// debugging/logging code should go here
+					pQuitEvents[nIndex++] = hEvent;
 				}
 			}
 
@@ -359,40 +342,32 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 		if (iter != m_ModuleQueue.end())
 		{
 			HANDLE hQuitEvents[1];
-			try
+			HANDLE hEvent = (*iter)->Quit();
+			if (hEvent)
 			{
-				HANDLE hEvent = (*iter)->Quit();
-				if (hEvent)
+				hQuitEvents[0] = hEvent;
+
+                DWORD dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
+				HWND hLiteStep = GetLitestepWnd();
+				while (1)
 				{
-					hQuitEvents[0] = hEvent;
-
-					DWORD dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
-					HWND hLiteStep = GetLitestepWnd();
-					while (1)
+					if (dwWaitStatus == (WAIT_OBJECT_0 + 1))
 					{
-						if (dwWaitStatus == (WAIT_OBJECT_0 + 1))
+						MSG message;
+						// if we use NULL instead of hLiteStep here.. it locks us up...
+						while (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
 						{
-							MSG message;
-							// if we use NULL instead of hLiteStep here.. it locks us up...
-							while (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
-							{
-								TranslateMessage(&message);
-								DispatchMessage (&message);
-							}
+							TranslateMessage(&message);
+							DispatchMessage (&message);
 						}
-						else if (dwWaitStatus == WAIT_OBJECT_0)
-						{
-							break;
-						}
-
-						dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
 					}
+					else if (dwWaitStatus == WAIT_OBJECT_0)
+					{
+						break;
+					}
+
+					dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
 				}
-			}
-			catch (...)
-			{
-				// quietly swallow exceptions
-				// debugging/logging code should go here
 			}
 			
             // better safe than sorry

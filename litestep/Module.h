@@ -105,6 +105,7 @@ public:
 
 private:
 	int CallInit();
+    void CallQuit();
 };
 
 #endif // __MODULE_H
