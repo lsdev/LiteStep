@@ -54,7 +54,7 @@ public:
 	
 private:
 	UINT _LoadModules();
-	UINT _StartModules(const ModuleQueue& mqModules);
+	UINT _StartModules(ModuleQueue& mqModules);
 	void _QuitModules();
 	
 	ModuleQueue::iterator _FindModule(LPCSTR pszLocation);

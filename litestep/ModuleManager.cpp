@@ -116,10 +116,9 @@ UINT ModuleManager::_LoadModules()
 
         while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
 		{
-            // LCTokenize clears these buffers if necessary
-            char szToken1[MAX_LINE_LENGTH];
-            char szToken2[MAX_LINE_LENGTH];
-			char szToken3[MAX_LINE_LENGTH];
+            char szToken1[MAX_LINE_LENGTH] = { 0 };
+            char szToken2[MAX_LINE_LENGTH] = { 0 };
+			char szToken3[MAX_LINE_LENGTH] = { 0 };
 
             // first buffer takes the "LoadModule" token
             LPSTR lpszBuffers[] = { NULL, szToken1, szToken2, szToken3 };
@@ -141,7 +140,8 @@ UINT ModuleManager::_LoadModules()
 				}
 
 				Module* pModule = _MakeModule(szToken1, dwFlags);
-				if (pModule)
+				
+                if (pModule)
 				{
 					mqModules.push_back(pModule);
 				}
@@ -160,7 +160,6 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 {
 	BOOL bReturn = FALSE;
 	
-	// _MakeModule checks if the module is already loaded
 	Module* pModule = _MakeModule(pszLocation, dwFlags);
 	
 	if (pModule)
@@ -177,47 +176,55 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 {
 	Module* pModule = NULL;
 
-	ModuleQueue::iterator it = _FindModule(pszLocation);
-
-	if (it == m_ModuleQueue.end())
-	{
-		try
-		{
-			pModule = new Module(pszLocation, dwFlags);
-		}
-		catch (...)
-		{
-            delete pModule;
-            pModule = NULL;
-		}
-	}
+    try
+    {
+        pModule = new Module(pszLocation, dwFlags);
+    }
+    catch (...)
+    {
+        delete pModule;
+        pModule = NULL;
+    }
 
 	return pModule;
 }
 
 
-UINT ModuleManager::_StartModules(const ModuleQueue& mqModules)
+UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 {
 	UINT uReturn = 0;
 
 	if (mqModules.size() > 0)
 	{
         std::vector<HANDLE> vecInitEvents;;
-        ModuleQueue::const_iterator iter = mqModules.begin();
+        ModuleQueue::iterator iter = mqModules.begin();
         
         while (iter != mqModules.end())
         {
             if (*iter)
             {
-                HANDLE hEvent = (*iter)->Init(m_hLiteStep, m_sAppPath);
-                
-                if (hEvent)
+                if (_FindModule((*iter)->GetLocation()) == m_ModuleQueue.end())
                 {
-                    vecInitEvents.push_back(hEvent);
+                    HANDLE hEvent = (*iter)->Init(m_hLiteStep, m_sAppPath);
+                    
+                    if (hEvent)
+                    {
+                        vecInitEvents.push_back(hEvent);
+                    }
+                    
+                    m_ModuleQueue.push_back(*iter);
+                    ++uReturn;
                 }
-                
-                m_ModuleQueue.push_back(*iter);
-                ++uReturn;
+                else
+                {
+                    // module already loaded
+                    ModuleQueue::iterator iterOld = iter++;
+                    
+                    delete *iterOld;
+                    mqModules.erase(iterOld);
+
+                    continue;
+                }
             }
             
             ++iter;
