@@ -35,8 +35,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.1 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.1 2002/09/23 02:43:27 message Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.2 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.2 2002/12/07 11:05:21 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -532,7 +532,7 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 	LPCSTR pszCurrent = pszString;
 	LPCSTR pszStartMarker = NULL;
 	int iBracketLevel = 0;
-	CHAR cQoute = '\0';
+	CHAR cQuote = '\0';
 	bool bIsToken = false;
 	bool bAppendNextToken = false;
 
@@ -547,19 +547,23 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 
 		for (; *pszCurrent; pszCurrent++)
 		{
-			if (isspace(*pszCurrent) && !cQoute)
+			if (isspace(*pszCurrent) && !cQuote)
 				break;
 
-			if (bUseBrackets && strchr("[]", *pszCurrent) && (!strchr("\'\"", cQoute) || !cQoute))
+			if (bUseBrackets && strchr("[]", *pszCurrent) && (!strchr("\'\"", cQuote) || !cQuote))
 			{
 				if (*pszCurrent == '[')
 				{
-					if (bIsToken && !cQoute)
+					if (bIsToken && !cQuote)
 						break;
 
 					iBracketLevel++;
-					cQoute = '[';
-					continue;
+					cQuote = '[';
+					
+                    if (iBracketLevel == 1)
+                    {
+                        continue;
+                    }
 				}
 				else
 				{
@@ -569,19 +573,19 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 				}
 			}
 
-			if (strchr("\'\"", *pszCurrent) && (cQoute != '['))
+			if (strchr("\'\"", *pszCurrent) && (cQuote != '['))
 			{
-				if (!cQoute)
+				if (!cQuote)
 				{
 					if (bIsToken)
 					{
 						bAppendNextToken = true;
 						break;
 					}
-					cQoute = *pszCurrent;
+					cQuote = *pszCurrent;
 					continue;
 				}
-				else if (*pszCurrent == cQoute)
+				else if (*pszCurrent == cQuote)
 				{
 					break;
 				}
