@@ -34,7 +34,7 @@ void CInstallNTUser::onInitDialog(Message& message)
 {
 	CWizardPage::onInitDialog(message);
 
-	SAFE_CHAR(szBuffer, 64);
+    char szBuffer[64] = { 0 };
 	DWORD dwLength = 64;
 	
 	SetStaticText(message.hWnd, IDC_INSTALL_NT_USERS, IDS_INSTALL_NT_USERS,

@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "wizardpage.h"
 #include <windowsx.h>
 #include <stdio.h>
-#include "localization.h"
+#include "../utility/localization.h"
 
 CWizardPage::CWizardPage(UINT nTemplate,
                          UINT nCaption)
