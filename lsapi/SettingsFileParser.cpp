@@ -215,13 +215,20 @@ void FileParser::_StripString(LPTSTR ptzString)
                 }
             }
         }
+        
         ++ptzCurrent;
     }
     
     if (ptzLast != NULL)
     {
+        while (ptzLast > ptzString && StrChr(WHITESPACE, *(ptzLast-1)))
+        {
+            --ptzLast;
+        }
+
         *ptzLast = '\0';
     }
+    
     if ((ptzCurrent != ptzString) && ptzStart)
     {
         StringCchCopy(ptzString, lstrlen(ptzString) + 1, ptzStart);
