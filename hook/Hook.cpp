@@ -66,6 +66,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
       lParam: Pointer to an MSG structure that contains details about the message
 ****************************************************************************/
 #define HOOK_DLL
+#include "../litestep/litestep.h"
 #include "hook.h"
 
 #ifdef _DEBUG 
@@ -106,7 +107,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 		hInst = hinstDLL;
 		hwndHookMgr = FindWindow(HOOKMGRWINDOWCLASS, HOOKMGRWINDOWNAME);
-		hwndLiteStep = FindWindow("TApplication", "LiteStep");
+		hwndLiteStep = FindWindow(szMainWindowClass, szMainWindowTitle);
 
 		HKEY hKey;
 		if (RegOpenKeyEx(HKEY_CURRENT_USER,
