@@ -588,8 +588,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 			if (m_pTrayService)
 			{
-				m_pTrayService->SendSystemTray();
-				lReturn = TRUE;
+				lReturn = (LRESULT)m_pTrayService->SendSystemTray();
 			}
 		}
 		break;

@@ -49,7 +49,7 @@ Note 6:  RegisterWindowMessage("TaskbarCreated") should be sent with
          afterwards would result in a Volume icon flicker or loss because the
          shell service object would delete the icon) Also ensure the
          "TaskbarCreated" message is sent only once. (W2K/XP)
- 
+
 Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
          (SSO). They are COM servers implementing the IOleCommandTarget
          interface. The CLSIDs are listed in 
@@ -68,21 +68,19 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
 #include "../utility/core.hpp"
 
 
-const char szTrayClass[] = "Shell_TrayWnd";
-const char szTrayTitle[] = "Litestep Tray Manager";
+const char szTrayClass[]   = "Shell_TrayWnd";
+const char szTrayTitle[]   = "Litestep Tray Manager";
+const char szNotifyClass[] = "TrayNotifyWnd";
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // TrayService
 //
-TrayService::TrayService()
+TrayService::TrayService() :
+m_hNotifyWnd(NULL), m_hTrayWnd(NULL), m_hLiteStep(NULL),
+m_hInstance(NULL)
 {
-	m_hInstance = NULL;
-	m_hTrayWnd = NULL;
-	m_hLiteStep = NULL;
-
-	m_bWin2000 = false;
 }
 
 
@@ -98,12 +96,6 @@ TrayService::~TrayService()
 //
 // Start()
 //
-// Returns:
-//				E_FAIL			- Unknown Error
-//				E_OUTOFMEMORY	- Couldn't allocate window or WNDCLASSEX
-//
-//				S_OK			- Success
-//
 HRESULT TrayService::Start()
 {
     ASSERT(m_hTrayWnd == NULL);
@@ -114,78 +106,22 @@ HRESULT TrayService::Start()
     
     if (m_hLiteStep && m_hInstance)
     {
-        OSVERSIONINFO OsVersionInfo = { 0 };
-        OsVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+        _CreateWindows();
 
-        GetVersionEx(&OsVersionInfo);
-        
-        if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-            OsVersionInfo.dwMajorVersion >= 5)
+        // even if the TrayNotifyWnd couldn't be created we can still start up
+        if (m_hTrayWnd)
         {
-            m_bWin2000 = true;
-        }
-
-        //
-        // Register tray notification window class
-        //
-        WNDCLASSEX wc;
-
-        ZeroMemory(&wc, sizeof(WNDCLASSEX));
-        wc.cbSize = sizeof(WNDCLASSEX);
-		wc.cbWndExtra = 4;
-		wc.lpfnWndProc = TrayService::WindowProc;
-		wc.hInstance = m_hInstance;
-		wc.lpszClassName = szTrayClass;
-		wc.style = CS_DBLCLKS;
-
-		if (RegisterClassEx(&wc))
-		{
-            // Window which receives the tray messages
-			m_hTrayWnd = CreateWindowEx(
-			                 WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
-			                 szTrayClass,
-			                 szTrayTitle,
-			                 WS_POPUP,
-                             // | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-			                 0, 0,
-			                 0, 0,
-			                 NULL,
-			                 NULL,
-			                 m_hInstance,
-			                 NULL);
-			if (m_hTrayWnd)
-			{
-				SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
-				SetWindowLong(m_hTrayWnd, 0, (LONG)this);
-
-                // tell apps to reregister their icons (see Note 6)
-                PostMessage(HWND_BROADCAST,
-                    RegisterWindowMessage("TaskbarCreated"), 0, 0);
-
-                if (m_bWin2000)
-				{
-					_LoadShellServiceObjects();
-				}
-                
-                hr = S_OK;
-			}
-			else
-			{
-				UnregisterClass(szTrayClass, m_hInstance);
-				
-                RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
-                    "Unable to create window.", szTrayTitle);
-
-                hr = E_OUTOFMEMORY;
-			}
-		}
-		else
-		{
-            RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
-                "Error registering window class.", szTrayClass);
+            SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
+            SetWindowLong(m_hTrayWnd, 0, (LONG)this);
             
-            hr = E_OUTOFMEMORY;
-		}
+            // tell apps to reregister their icons (see Note 6)
+            PostMessage(HWND_BROADCAST,
+                RegisterWindowMessage("TaskbarCreated"), 0, 0);
+            
+            _LoadShellServiceObjects();
+
+            hr = S_OK;
+        }
 	}
 
 	return hr;
@@ -200,18 +136,9 @@ HRESULT TrayService::Stop()
 {
 	HRESULT hr = S_OK;
 
-    if (m_bWin2000)
-    {
-        _UnloadShellServiceObjects();
-    }
-    
-    if (m_hTrayWnd)
-	{
-		DestroyWindow(m_hTrayWnd);
-        m_hTrayWnd = NULL;
+    _DestroyWindows();
 
-		UnregisterClass(szTrayClass, m_hInstance);
-	}
+    _UnloadShellServiceObjects();
     
     while (m_siVector.size())
     {
@@ -225,6 +152,199 @@ HRESULT TrayService::Stop()
     }
 
 	return hr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// _CreateWindows
+//
+bool TrayService::_CreateWindows()
+{
+    bool bReturn = false;
+
+    //
+    // Register tray window class
+    //
+    WNDCLASSEX wc = { 0 };
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.cbWndExtra = 4;
+    wc.lpfnWndProc = TrayService::WindowProc;
+    wc.hInstance = m_hInstance;
+    wc.lpszClassName = szTrayClass;
+    wc.style = CS_DBLCLKS;
+    
+    if (RegisterClassEx(&wc))
+    {
+        //
+        // Window which receives the tray messages
+        //
+        m_hTrayWnd = CreateWindowEx(
+            WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
+            szTrayClass, szTrayTitle,
+            WS_POPUP,
+            0, 0, 0, 0,
+            NULL, NULL,
+            m_hInstance,
+            NULL);
+
+        if (m_hTrayWnd)
+        {
+            //
+            // Register "TrayNotifyWnd" class and create window
+            //
+            ZeroMemory(&wc, sizeof(wc));
+            wc.cbSize = sizeof(WNDCLASSEX);
+            wc.lpfnWndProc = TrayService::WindowProc;
+            wc.hInstance = m_hInstance;
+            wc.lpszClassName = szNotifyClass;
+            wc.style = CS_DBLCLKS;
+            
+            if (RegisterClassEx(&wc))
+            {
+                m_hNotifyWnd = CreateWindowEx(
+                    0,
+                    szNotifyClass, NULL,
+                    WS_CHILD,
+                    0, 0, 0, 0,
+                    m_hTrayWnd, NULL,
+                    m_hInstance,
+                    NULL);
+
+                if (m_hNotifyWnd)
+                {
+                    bReturn = true;
+                }
+                else
+                {
+                    UnregisterClass(szNotifyClass, m_hInstance);
+                    
+                    RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
+                        "Unable to create window.", szNotifyClass);
+                }
+            }
+            else
+            {
+                RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
+                    "Error registering window class.", szTrayClass);
+            }
+        }
+        else
+        {
+            UnregisterClass(szTrayClass, m_hInstance);
+            
+            RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
+                "Unable to create window.", szTrayTitle);
+        }
+    }
+    else
+    {
+        RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
+            "Error registering window class.", szTrayClass);
+    }
+
+    return bReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// _DestroyWindows
+//
+void TrayService::_DestroyWindows()
+{
+    if (m_hNotifyWnd)
+    {
+        DestroyWindow(m_hNotifyWnd);
+        m_hNotifyWnd = NULL;
+
+        UnregisterClass(szNotifyClass, m_hInstance);
+    }
+
+    if (m_hTrayWnd)
+    {
+        DestroyWindow(m_hTrayWnd);
+        m_hTrayWnd = NULL;
+        
+        UnregisterClass(szTrayClass, m_hInstance);
+    }
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// _LoadShellServiceObjects
+//
+// Start the COM based shell services listed in the registry.
+//
+void TrayService::_LoadShellServiceObjects()
+{
+    HKEY hkeyServices;
+    int nCounter = 0;
+    
+    LONG lErrorCode = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+        REGSTR_PATH_SHELLSERVICEOBJECTDELAYED,
+        0, KEY_READ, &hkeyServices);
+    
+    
+    while (lErrorCode == ERROR_SUCCESS)
+    {
+        char szValueName[32];
+        char szData[40];
+        DWORD cbValueName = 32;
+        DWORD cbData = 40;
+        DWORD dwDataType;
+        
+        lErrorCode = RegEnumValue(hkeyServices, nCounter, szValueName,
+            &cbValueName, 0, &dwDataType, (LPBYTE) szData, &cbData);
+        
+        if (lErrorCode == ERROR_SUCCESS)
+        {
+            WCHAR wszCLSID[40];
+            CLSID clsid;
+            IOleCommandTarget* pCmdTarget = NULL;
+            
+            MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, 40);
+            
+            CLSIDFromString(wszCLSID, &clsid);
+            
+            HRESULT hr = CoCreateInstance(clsid, NULL,
+                CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
+                IID_IOleCommandTarget, (void **)&pCmdTarget);
+            
+            if (SUCCEEDED(hr))
+            {
+                pCmdTarget->Exec(&CGID_ShellServiceObject, OLECMDID_NEW,
+                    OLECMDEXECOPT_DODEFAULT, NULL, NULL);
+                
+                m_ssoList.push_back(pCmdTarget);
+            }
+        }
+        
+        ++nCounter;
+    }
+    
+    RegCloseKey(hkeyServices);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// _UnloadShellServiceObjects
+//
+// Shut down the COM based shell services.
+//
+//
+void TrayService::_UnloadShellServiceObjects()
+{
+    while (m_ssoList.size())
+    {
+        m_ssoList.back()->Exec(&CGID_ShellServiceObject, OLECMDID_SAVE,
+            OLECMDEXECOPT_DODEFAULT, NULL, NULL);
+        
+        m_ssoList.back()->Release();
+        m_ssoList.pop_back();
+    }
 }
 
 
@@ -407,7 +527,7 @@ BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
 // Resend all icon data; systray modules will request this via LM_SYSTRAYREADY
 // during their startup.
 //
-void TrayService::SendSystemTray()
+HWND TrayService::SendSystemTray()
 {
     for (IconVector::iterator iter = m_siVector.begin();
          iter != m_siVector.end(); ++iter)
@@ -417,6 +537,8 @@ void TrayService::SendSystemTray()
             _Notify(NIM_ADD, *iter);
         }
     }
+    
+    return m_hNotifyWnd;
 }
 
 
@@ -426,14 +548,16 @@ void TrayService::SendSystemTray()
 //
 bool TrayService::_AddIcon(const NOTIFYICONDATA& nid)
 {
-    //
-    // Return true in most cases; some apps crash if false is returned. In OOM
-    // conditions or if the icon handle is invalid it is safe to return false.
-    //
-    bool bReturn = true;
+    bool bReturn = false;
     
     if (nid.uFlags & NIF_MESSAGE)
     {
+        //
+        // Return true in most cases; some apps crash if false is returned. In
+        // OOM conditions it is safe to return false.
+        //
+        bReturn = true;
+
         //
         // Create a new item
         //
@@ -448,7 +572,7 @@ bool TrayService::_AddIcon(const NOTIFYICONDATA& nid)
             plnid->hWnd  = nid.hWnd;
             plnid->uCallbackMessage  = nid.uCallbackMessage;
             
-            bReturn = _CopyIconHandle(*plnid, nid);
+            _CopyIconHandle(*plnid, nid);
             _CopyVersionSpecifics(*plnid, nid);
             
             //
@@ -732,83 +856,4 @@ int TrayService::_ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
     
     ASSERT(!IsBadStringPtr(pszOutput, cchOutput + 1));
     return nReturn;
-}
-
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _LoadShellServiceObjects
-//
-// Start the COM based shell services listed in the registry.
-//
-void TrayService::_LoadShellServiceObjects()
-{
-	HKEY hkeyServices;
-	LONG lErrorCode;
-    int nCounter = 0;
-    
-	lErrorCode = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-	                          REGSTR_PATH_SHELLSERVICEOBJECTDELAYED,
-	                          0, KEY_READ, &hkeyServices);
-
-
-	while (lErrorCode == ERROR_SUCCESS)
-	{
-		char szValueName[32];
-		char szData[40];
-		DWORD cbValueName = 32;
-		DWORD cbData = 40;
-		DWORD dwDataType;
-
-		lErrorCode = RegEnumValue(hkeyServices, nCounter, szValueName,
-            &cbValueName, 0, &dwDataType, (LPBYTE) szData, &cbData);
-
-		if (lErrorCode == ERROR_SUCCESS)
-		{
-			WCHAR wszCLSID[40];
-			CLSID clsid;
-			IOleCommandTarget* pCmdTarget = NULL;
-
-			MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, 40);
-
-			CLSIDFromString(wszCLSID, &clsid);
-
-            HRESULT hr = CoCreateInstance(clsid, NULL,
-                CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                IID_IOleCommandTarget, (void **)&pCmdTarget);
-
-			if (SUCCEEDED(hr))
-			{
-				pCmdTarget->Exec(&CGID_ShellServiceObject, OLECMDID_NEW,
-                    OLECMDEXECOPT_DODEFAULT, NULL, NULL);
-
-				m_ssoList.push_back(pCmdTarget);
-			}
-		}
-
-		++nCounter;
-	}
-
-	RegCloseKey(hkeyServices);
-}
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _UnloadShellServiceObjects
-//
-// Shut down the COM based shell services.
-//
-//
-void TrayService::_UnloadShellServiceObjects()
-{
-    while (m_ssoList.size())
-	{
-        m_ssoList.back()->Exec(&CGID_ShellServiceObject, OLECMDID_SAVE,
-            OLECMDEXECOPT_DODEFAULT, NULL, NULL);
-
-		m_ssoList.back()->Release();
-        m_ssoList.pop_back();
-	}
 }
