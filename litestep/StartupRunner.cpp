@@ -38,7 +38,7 @@ StartupRunner::~StartupRunner()
 
 DWORD StartupRunner::Run(void* pvVoid)
 {
-    bool bRunStartup = true; //_IsFirstRunThisSession();
+    bool bRunStartup = _IsFirstRunThisSession();
 
     if (bRunStartup)
 	{
