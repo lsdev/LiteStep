@@ -29,41 +29,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath)
 {
-	// LPITEMIDLIST pidl;
-	// IMalloc *pMalloc;
-	// HRESULT hr;
+	LPITEMIDLIST pidl;
+	IMalloc* pMalloc;
 	BOOL bReturn = FALSE;
 
 	if (IsValidStringPtr(tzPath, cchPath) && (cchPath >= MAX_PATH))
 	{
-        bReturn = SHGetSpecialFolderPath(NULL, tzPath, nFolder, FALSE);
-
-        if (bReturn)
-        {
-            PathAddBackslash(tzPath);
-            PathQuoteSpaces(tzPath);
-        }
-        
-/*        if (SUCCEEDED(SHGetMalloc(&pMalloc)))
+        // SHGetSpecialFolderPath is not available on Win95
+        // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
+        if (SUCCEEDED(SHGetMalloc(&pMalloc)))
 		{
-
-			hr = SHGetSpecialFolderLocation(NULL, nFolder, &pidl);
-
-			if (SUCCEEDED(hr))
+			if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
 			{
-				bReturn = SHGetPathFromIDList(pidl, szPath);
+				bReturn = SHGetPathFromIDList(pidl, tzPath);
 
 				if (bReturn)
 				{
-					PathAddBackslash(szPath);
-					PathQuoteSpaces(szPath);
+					PathAddBackslash(tzPath);
+					PathQuoteSpaces(tzPath);
 				}
 
 				pMalloc->Free(pidl);
 				pMalloc->Release();
 			}
-		}*/
+		}
 	}
 
-	return bReturn;
+    return bReturn;
 }
