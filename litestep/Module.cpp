@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
+#include <process.h>
 #include "module.h"
 #include "resource.h"
 #include "../utility/macros.h"
@@ -104,11 +105,10 @@ HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
 				sa.bInheritHandle = FALSE;
 
 				m_hInitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-				
 				// using _beginthreadex instead of CreateThread because modules
 				// might use CRT functions
-				m_hThread = _beginthreadex(&sa, 0, Module::ThreadProc, this,
-					NULL, (ULONG*) & m_dwThreadID);
+				m_hThread = (HANDLE)_beginthreadex(&sa, 0, Module::ThreadProc,
+					this, NULL, (UINT*)&m_dwThreadID);
 			}
 			else
 			{
@@ -175,7 +175,7 @@ HANDLE Module::Quit()
 }
 
 
-ULONG __stdcall Module::ThreadProc(void* dllModPtr)
+UINT __stdcall Module::ThreadProc(void* dllModPtr)
 {
 	Module * dllMod = (Module*)dllModPtr;
 

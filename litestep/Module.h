@@ -65,7 +65,7 @@ public:
 	HANDLE Init(HWND hMainWindow, LPCTSTR ptzAppPath);
 	HANDLE Quit();
 
-	static ULONG __stdcall ThreadProc(void* dllModPtr);
+	static UINT __stdcall ThreadProc(void* dllModPtr);
 
 	HINSTANCE GetInstance() const
 	{
