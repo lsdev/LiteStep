@@ -52,12 +52,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LM_RESTOREDATA				8893
 #define LM_POPUP					9182
 #define LM_HIDEPOPUP				9183
-#define LM_FIRSTDESKTOPPAINT		9184 // Depreciated
+#define LM_FIRSTDESKTOPPAINT		9184 // Deprecated
 #define LM_LSSELECT					9185
-#define LM_SETTASKBARONTOP			9186 // Depreciated
-#define LM_SAVESYSTRAY				9210 // Depreciated
-#define LM_RESTORESYSTRAY			9211 // Depreciated
-#define LM_CHECKFORAPPBAR			9212 // Depreciated
+#define LM_SETTASKBARONTOP			9186 // Deprecated
+#define LM_SAVESYSTRAY				9210 // Deprecated
+#define LM_RESTORESYSTRAY			9211 // Deprecated
+#define LM_CHECKFORAPPBAR			9212 // Deprecated
 #define LM_SENDSYSTRAY				9213
 #define LM_SYSTRAY					9214
 #define LM_SYSTRAYREADY				9215
@@ -106,11 +106,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LM_GETDESKTOPOF				9361
 
 // Core Messages
-#define LM_GETLSOBJECT				9400 // Depreciated
-#define LM_WINDOWLIST				9401 // Depreciated
-#define LM_DATASTORE				9410 // Depreciated
-#define LM_MESSAGEMANAGER			9411 // Depreciated
+#define LM_GETLSOBJECT				9400 // Deprecated
+#define LM_WINDOWLIST				9401 // Deprecated
+#define LM_DATASTORE				9410 // Deprecated
+#define LM_MESSAGEMANAGER			9411 // Deprecated
 #define LM_BANGCOMMAND				9420
+#define LM_ENUMREVIDS               9430 // internal use only!
+#define LM_ENUMMODULES              9431 // internal use only!
 
 // shell hook messages
 #define LM_WINDOWCREATED			9501
@@ -212,6 +214,22 @@ LSDESKTOPINFO;
 // LM_UN/RELOADMODULE DEFINES
 //---------------------------------------------------------
 #define LMM_HINSTANCE 0x1000
+
+
+//---------------------------------------------------------
+// ENUMLSDATA DEFINES
+//---------------------------------------------------------
+#define ELD_BANGS   1
+#define ELD_MODULES 2
+#define ELD_REVIDS  3
+
+// ELD_MODULES: possible dwFlags values
+#define LS_MODULE_THREADED  0x0001
+#define LS_MODULE_NOTPUMPED 0x0002
+
+typedef BOOL (__stdcall* LSENUMBANGSPROC)(LPCSTR, LPARAM);
+typedef BOOL (__stdcall* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
+typedef BOOL (__stdcall* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
 
 
 #endif // __LSAPIDEFINES_H

@@ -67,6 +67,7 @@ private:
 	static LRESULT CALLBACK InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void _Recycle();
+    HRESULT _EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const;
 
     std::string m_sAppPath;
     std::string m_sConfigFile;

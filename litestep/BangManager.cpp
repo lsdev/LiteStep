@@ -122,3 +122,30 @@ void BangManager::ClearBangCommands()
 
 	bang_map.clear();
 }
+
+
+HRESULT BangManager::EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const
+{
+    Lock lock(cs);
+
+    HRESULT hr = S_OK;
+
+    try
+    {
+        for (BangMap::const_iterator iter = bang_map.begin();
+             iter != bang_map.end(); ++iter)
+        {
+            if (!pfnCallback(iter->first.c_str(), lParam))
+            {
+                hr = S_FALSE;
+                break;
+            }
+        }
+    }
+    catch (...)
+    {
+        hr = E_UNEXPECTED;
+    }
+
+    return hr;
+}

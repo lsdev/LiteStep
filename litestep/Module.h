@@ -23,9 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include <string>
 
-#define MODULE_THREADED		0x0001
-#define MODULE_NOTPUMPED	0x0002
-
 typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
 typedef int (*ModuleQuitFunc) (HINSTANCE);
 
@@ -93,7 +90,7 @@ public:
 
     BOOL HasMessagePump() const
 	{
-		return !(m_dwFlags & MODULE_NOTPUMPED);
+		return !(m_dwFlags & LS_MODULE_NOTPUMPED);
 	};
 
 	ModuleQuitFunc GetQuit() const

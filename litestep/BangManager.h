@@ -34,7 +34,7 @@ class BangManager
 {
 private:
 	BangMap bang_map;
-	CriticalSection cs;
+	mutable CriticalSection cs;
 
 public:
 	BangManager();
@@ -45,6 +45,7 @@ public:
 	Bang* GetBangCommand(LPCSTR pszName);
 	void ClearBangCommands();
 	BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
+    HRESULT EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const;
 };
 
 #endif // __BANGMANAGER_H
