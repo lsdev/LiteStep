@@ -200,6 +200,9 @@
 				RelativePath=".\BangCommand.h">
 			</File>
 			<File
+				RelativePath="..\litestep\BangManager.h">
+			</File>
+			<File
 				RelativePath=".\bangs.h">
 			</File>
 			<File
