@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "png_support.h"
+#include "../utility/safeptr.h"
 
 void PNGErrorHandler(png_structp PngStruct, png_const_charp Message)
 {

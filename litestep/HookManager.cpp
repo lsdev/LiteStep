@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "HookManager.h"
 #include "../utility/macros.h"
+#include "resource.h"
 
 msg2hwnd m2hmap;
 int numMessages;

@@ -19,16 +19,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#include "../utility/common.h"
 #include "SettingsManager.h"
 #include "SettingsFileParser.h"
-#include "lsapi.h"
 #include "../utility/shellhlp.h"
-#include "../utility/safestr.h" // Always include last in cpp file
+#include "../utility/core.hpp"
 
 #if !defined(CSIDL_COMMON_ADMINTOOLS)
-#define CSIDL_COMMON_ADMINTOOLS 0x002F
-#define CSIDL_ADMINTOOLS 0x0030
+#  define CSIDL_COMMON_ADMINTOOLS 0x002F
+#  define CSIDL_ADMINTOOLS 0x0030
 #endif
 
 SettingsManager::SettingsManager(LPCSTR pszLiteStepPath)

@@ -20,6 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __BANGS_H
 #define __BANGS_H
 
+#include "../utility/common.h"
+
+
 void BangAbout(HWND hCaller, LPCSTR pszArgs);
 void BangAlert(HWND hCaller, LPCSTR pszArgs);
 void BangCascadeWindows(HWND hCaller, LPCSTR pszArgs);

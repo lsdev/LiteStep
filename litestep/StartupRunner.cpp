@@ -20,10 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "StartupRunner.h"
-#include "../lsapi/lsapi.h"
 #include "../utility/shellhlp.h"
 #include <regstr.h>
-#include "../utility/safestr.h"
+#include "../utility/core.hpp"
 
 #define ERK_NONE				0x0000
 #define ERK_RUNSUBKEYS			0x0001
