@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Beta 3
+    LiteStep 0.24.7 Beta 4
     Prerelease Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -27,16 +27,22 @@
    startup items in the event that the shell crashes. Thus the -nostartup switch
    is obsolete on NT systems.
 
+ - Miscellaneous StartupRunner fixes and additions. Now has RunOnceEx support.
+
+ - Added -startup to force running of the startup items.
+
  - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core. It is now
    called DDEService and loaded by default. Liteman.dll should no longer be
    loaded.
 
  - Added "LSUseSystemDDE". This loads Windows' DDE server instead of the
-   DDEService. Results in larger memory usage but "proper" DDE support.
+   DDEService. May result in slightly larger memory usage but "proper" DDE
+   support.
    LSUseSystemDDE takes effect on startup only, not on !recycle.
    Requires shdocvw.dll from IE.
 
  - Added !HideModules and !ShowModules to hide or show all module windows.
+   !ToggleModules is also available.
 
  - If "LSAutoHideModules" is specified LS tries to automatically hide all module
    windows if a full-screen app is detected. Once the full-screen app exits
@@ -70,7 +76,17 @@
 
  - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
 
- - Rewrote the TrayService.
+ - Rewrote the TrayService. Among other things this enables support for the
+   language indicator icon (but not on WinXP).
+
+ - LM_UN/RELOADMODULE can now un/reload modules by using the HINSTANCE of the
+   module as the wParam. Set the lParam to LMM_HINSTANCE in that case.
+   !Reloadmodule and !unloadmodule take advantage of this and should thus no
+   longer crash even if a module tries to un-/reload itself.
+
+ - Removed -install and -uninstall.
+
+ - Removed !ToggleWharf and !Popup from the core.
 
  - etc. etc.
 
@@ -81,20 +97,10 @@
    LiteStep to call. This should give modules like lscp a chance to be more
    integrated with LiteStep.
    
- - Fix the managers so that they are thread safe and accessible by the aboutbox.
-
- - Complete -install/-uninstall updates, which will include a new wizards
-   interface.
-   
- - Make sure CListeStep::Start frees all allocated resources on failure before
-   returning.
-
  - Fix LS locking up if a PNG is used and libpng13.dll is not present.
 
- - Fix modules being hidden if BSPlayer is in desktop mode or if certain
-   installers (e.g. ObjectDock) are used.
-
- - Finish build.txt.
+ - Fix problems with automatic module hiding (e.g.modules are hidden if BSPlayer
+   is in desktop mode or if certain installers [e.g. ObjectDock] are used).
 
  - Merge this file and readme.txt.
 
@@ -115,19 +121,17 @@
 
  - Addition of $WinXP$, $compiledate$, and $quicklaunch$.
 
+ - Removal of !ToggleWharf and !Popup from lsapi.
+ 
+ - c0atzin's RegisterShellHook() fix for Win9x.
+
 
 -- INDIE LS CHANGES NOT (YET) ADDED TO 0.24.7 ----------------------------------
 
- - All changes made to the recovery menu.
+ - All changes made to the recovery menu and the aboutbox.
 
  - !setvar, !emptytrashbin
 
  - system color / font variables, OS-* variables.
 
- - LSCP (including !lscp)
-
- - Removal of !ToggleWharf and !Popup from lsapi.
-
- - inform-sega's multibyte character fix as it shouldn't be needed any more.
-
- - c0atzin's RegisterShellHook() fix as it's supposedly not needed any more.
+ - LSCP (including !lscp). This will have to be rewritten to work.
