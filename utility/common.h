@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __COMMON_H
 #define __COMMON_H
 
+// Build options
+#include "../litestep/buildoptions.h"
+
 #pragma warning(disable: 4786) // STL naming warnings
 #pragma warning(disable: 4503) // STL naming warnings
 
