@@ -27,9 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <map>
 #include <string>
 
-using namespace std;
 
-typedef map<string, Bang*, stringicmp> BangMap;
+typedef std::map<std::string, Bang*, stringicmp> BangMap;
 
 class BangManager
 {

@@ -21,25 +21,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __LITESTEP_H
 
 #include "../utility/common.h"
-#include "../lsapi/lsapi.h"
-#include "../utility/macros.h"
 #include "../utility/ILiteStep.h"
 
-#include <comdef.h>
-
 // Misc Helpers
-#include "../lsapi/ThreadedBangCommand.h"
-#include "StartupRunner.h"
 #include "DataStore.h"
-#include "RecoveryMenu.h"
 
-//Managers
+// Managers
 //#include "BangManager.h"
 #include "ModuleManager.h"
 #include "HookManager.h"
 #include "MessageManager.h"
 
-//Services
+// Services
 #include "DDEService.h"
 #include "TrayService.h"
 

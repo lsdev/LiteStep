@@ -21,19 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __HookManager_H
 
 #include "../utility/common.h"
-#include "../utility/macros.h"
 #include "../hook/hook.h"
-
-#include "resource.h"
 
 #include <map> // STL
 #include <set> // STL
 
-using namespace std;
 
-typedef set
-	<HookCallback*> sMsgHookList;
-typedef map<UINT, sMsgHookList*> msg2hwnd; // Maps a message to a list of HWNDs
+typedef std::set<HookCallback*> sMsgHookList;
+typedef std::map<UINT, sMsgHookList*> msg2hwnd; // Maps a message to a list of HWNDs
 
 BOOL startHookManager(HINSTANCE dllInst);
 void stopHookManager();

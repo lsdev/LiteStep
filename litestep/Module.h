@@ -23,12 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include <string>
 
-using namespace std;
-
-#define MODULE_BAD_PATH		0x0001
-#define MODULE_BAD_INIT		0x0002
-#define MODULE_BAD_QUIT		0x0004
-
 #define MODULE_THREADED		0x0001
 #define MODULE_NOTPUMPED	0x0002
 
@@ -44,8 +38,8 @@ private:
 	HWND m_hThreadWnd;
 	DWORD m_dwThreadID;
 
-	basic_string<TCHAR> m_tzLocation;
-	basic_string<TCHAR> m_tzAppPath;
+    std::basic_string<TCHAR> m_tzLocation;
+    std::basic_string<TCHAR> m_tzAppPath;
 
 
 	ModuleInitExFunc m_pInitEx;

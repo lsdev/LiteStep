@@ -22,18 +22,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include "../utility/IManager.h"
-#include "../utility/stringutility.h"
 #include "module.h"
 #include <vector>
-#include <string>
 
-using namespace std;
 
 // might want to move these to lsapidefines.h
 typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
 typedef int (*ModuleQuitFunc) (HINSTANCE);
 
-typedef vector<Module*> ModuleQueue;
+typedef std::vector<Module*> ModuleQueue;
 
 class ModuleManager: public IManager
 {

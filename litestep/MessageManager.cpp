@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "MessageManager.h"
 
+
 void MessageManager::AddMessage(HWND window, UINT message)
 {
 	m_MessageMap[message].insert(window);
@@ -130,7 +131,7 @@ BOOL MessageManager::HandlerExists(UINT message)
 }
 
 
-
+/*
 void MessageManager::GetWindowsForMessage(UINT message, vector<HWND> &rvHwnd)
 {
 	messageMapT::iterator it;
@@ -157,4 +158,4 @@ void MessageManager::GetMessagesForWindow(HWND hwnd, vector<HWND> &rvMessage)
 		}
 	}
 }
-
+*/

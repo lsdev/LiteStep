@@ -21,15 +21,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <map>
 #include <set>
-#include <vector>
-using namespace std;
+//#include <vector>
 
 class MessageManager
 {
 private:
-	typedef set
-		<HWND> windowSetT;
-	typedef map<UINT, windowSetT> messageMapT;
+    typedef std::set<HWND> windowSetT;
+    typedef std::map<UINT, windowSetT> messageMapT;
 
 	messageMapT m_MessageMap;
 
@@ -47,7 +45,7 @@ public:
 
 	// use vector cause the elements of the
 	// resulting vector is guanranteed to be unique
-	void GetWindowsForMessage(UINT message, vector<HWND> &rvHwnd);
-	void GetMessagesForWindow(HWND hwnd, vector<HWND> &rvMessage);
+	//void GetWindowsForMessage(UINT message, std::vector<HWND> &rvHwnd);
+	//void GetMessagesForWindow(HWND hwnd, std::vector<HWND> &rvMessage);
 };
 

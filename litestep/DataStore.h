@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include <map>
 
-using namespace std;
 
 class DataHolder
 {
@@ -41,7 +40,7 @@ public:
 
 class DataStore
 {
-	typedef map<WORD, DataHolder*> DataHolderMap;
+    typedef std::map<WORD, DataHolder*> DataHolderMap;
 
 	DataHolderMap m_dhmData;
 

@@ -20,9 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "ModuleManager.h"
-#include "../utility/macros.h"
-#include "resource.h"
 #include "../lsapi/lsapi.h"
+#include "../utility/macros.h"
+#include <algorithm>
 #include "../utility/safestr.h"
 
 ModuleManager::ModuleManager()
@@ -424,7 +424,7 @@ struct ModuleManager::ModuleLookup
 
 ModuleQueue::iterator ModuleManager::_FindModule(LPCSTR pszLocation)
 {
-	return find_if(m_ModuleQueue.begin(), m_ModuleQueue.end(),
+    return std::find_if(m_ModuleQueue.begin(), m_ModuleQueue.end(),
 		ModuleLookup(pszLocation));
 }
 

@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "resource.h"
 #include "../utility/macros.h"
 #include "../lsapi/ThreadedBangCommand.h"
-#include "../utility/safestr.h" // Always include last in cpp file
+
 
 Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 {
@@ -141,7 +141,7 @@ HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
 				// using _beginthreadex instead of CreateThread because modules
 				// might use CRT functions
 				m_hThread = (HANDLE)_beginthreadex(&sa, 0, Module::ThreadProc,
-					this, NULL, (UINT*)&m_dwThreadID);
+					this, 0, (UINT*)&m_dwThreadID);
 			}
 			else
 			{

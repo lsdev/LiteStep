@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __TRAYSERVICE_H
 
 #include "../utility/common.h"
-#include "../lsapi/lsapidefines.h"
 #include "../utility/IService.h"
 #include <shlobj.h>
 
