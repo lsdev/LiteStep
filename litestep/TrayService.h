@@ -210,7 +210,7 @@ typedef struct _SHELLTRAYDATA
 // loads ShellService-objects. If an icon is added/removed/modified/... it
 // notifies all listeners (usually the systray module) via LM_SYSTRAY.
 //
-class TrayService: public Service<TrayService>
+class TrayService: public IService
 {
 public:
 	~TrayService();
