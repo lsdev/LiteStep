@@ -45,9 +45,6 @@ public:
 	Bang* GetBangCommand(LPCSTR pszName);
 	void ClearBangCommands();
 	BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
-	UINT GetBangCommandNames(LPCSTR pszNames, UINT nSize);
-	STDMETHOD(get_Count)(PLONG plCount);
-
 };
 
 #endif // __BANGMANAGER_H
