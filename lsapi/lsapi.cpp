@@ -32,16 +32,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SettingsManager.h"
 #include "bangs.h"
 #include "match.h"
-#define STRSAFE_NO_DEPRECATE
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.3 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.3 2003/01/01 15:29:09 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.4 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.4 2003/01/02 11:07:10 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
-
-HWND hLiteStep = NULL;
 
 int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
@@ -51,12 +48,12 @@ public:
 	LSAPIInit();
 	~LSAPIInit();
 
-	DWORD GetMainThreadID()
+	DWORD GetMainThreadID() const
 	{
 		return m_dwMainThreadID;
 	}
 
-	BangManager* GetBangManager()
+	BangManager* GetBangManager() const
 	{
 		return m_bmBangManager;
 	}
@@ -178,6 +175,12 @@ void DeleteSettingsManager(void)
 		delete gSettingsManager;
 		gSettingsManager = NULL;
 	}
+}
+
+
+void ClearBangs()
+{
+    LSAPIManager.GetBangManager()->ClearBangCommands();
 }
 
 

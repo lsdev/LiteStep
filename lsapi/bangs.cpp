@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern char szAppPath[MAX_PATH + 1];
 extern char szRcPath[MAX_PATH + 1];
 
-void setupBangs()
+void SetupBangs()
 {
 	AddBangCommand("!ABOUT", BangAbout);
 	AddBangCommand("!ALERT", BangAlert);
