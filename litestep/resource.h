@@ -26,6 +26,7 @@
 #define IDS_LITESTEP_CREATEWINDOW_ERROR 22
 #define IDS_HOOKMGR_CREATETHREAD_ERROR  23
 #define IDS_HOOKMGR_LOADHOOK_ERROR      24
+#define IDS_LITESTEP_BANGEXCEPTION      25
 #define IDI_LS                          101
 #define IDD_ABOUT                       102
 #define IDI_VER                         103
@@ -46,7 +47,7 @@
 #define IDC_THEME_INFO                  1018
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        110
