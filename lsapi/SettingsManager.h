@@ -52,6 +52,8 @@ protected:
     double _MathEvaluate(LPTSTR ptzInput);
 #endif //LS_COMPAT_MATH
 
+    BOOL _SetShellFolderVariable(LPCSTR pszVariable, int nFolder);
+    
 public:
 
 	SettingsManager(LPCSTR pszLiteStepPath);
