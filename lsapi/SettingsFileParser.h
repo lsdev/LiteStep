@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "settingsevalparser.h"
 #include "settingsdefines.h"
 
-class FileParser
+class FileParser //: boost::noncopyable
 {
 public:
 	FileParser(SettingsMap* pSettingsMap);
@@ -35,10 +35,10 @@ public:
 private:
 	SettingsMap* m_pSettingsMap;
 	FILE* m_phFile;
-	EvalParser* m_pEvalParser;
+    std::auto_ptr<EvalParser> m_pEvalParser;
 
-	BOOL _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
-	void _StripString(LPWSTR pwzString);
+	bool _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
+	void _StripString(LPTSTR ptzString);
 	void _ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue);
 	void _ProcessIf(LPCTSTR ptzExpression);
 	void _SkipIf();
