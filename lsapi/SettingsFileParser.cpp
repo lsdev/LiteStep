@@ -137,8 +137,9 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     StringCchCopyEx(ptzValue, MAX_LINE_LENGTH, ptzValueStart,
                         NULL, NULL, STRSAFE_NULL_ON_FAILURE);
 
-                    bReturn = true;
                 }
+
+                bReturn = true;
             }
         }
     }
