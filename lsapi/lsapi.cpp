@@ -27,12 +27,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BangCommand.h"
 #include "SettingsManager.h"
 #include "bangs.h"
+#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.11 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.11 2003/07/13 17:57:27 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.12 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.12 2003/08/27 18:10:58 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -118,7 +119,7 @@ BOOL LSAPIInit::GetLiteStepPath(LPSTR pszPath, size_t cchPath)
 					if (GetModuleFileName(hInstance, m_szLiteStepPath, MAX_PATH))
 					{
 						PathRemoveFileSpec(m_szLiteStepPath);
-						PathAddBackslash(m_szLiteStepPath);
+						PathAddBackslashEx(m_szLiteStepPath, MAX_PATH);
 						bReturn = TRUE;
 					}
 				}
@@ -451,8 +452,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 	{
 		if (GetRCString("LSImageFolder", pszPath, NULL, cchPath))
 		{
-			PathAddBackslash(pszPath);
-			bReturn = TRUE;
+			bReturn = SUCCEEDED(PathAddBackslashEx(pszPath, cchPath));
 		}
 		else
 		{
