@@ -22,16 +22,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include "../utility/IManager.h"
+#include "../utility/stringutility.h"
 #include "module.h"
 #include <map>
 #include <string>
 
 using namespace std;
 
+// might want to move these to lsapidefines.h
 typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
 typedef int (*ModuleQuitFunc) (HINSTANCE);
 
-typedef map<string, class Module*> ModuleMap;
+typedef map<string, Module*, stringicmp> ModuleMap;
 
 class ModuleManager: public IManager
 {
@@ -58,8 +60,6 @@ private:
 	void _QuitModules();
 
 	ModuleMap m_ModuleMap;
-	//HWND m_hWndLiteStep;
-	//string m_szLiteStepPath;
 	ILiteStep *m_pILiteStep;
 };
 
