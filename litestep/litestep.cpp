@@ -408,25 +408,24 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
             {
                 if (message.hwnd == NULL)
 		        {
-                    if (message.message == 0)
-                    {
-					    //something's wacked, break out of this
-					    break;
-				    }
 				    // Thread message
 				    switch (message.message)
 				    {
 					    case LM_THREAD_BANGCOMMAND:
 					    {
-						    ThreadedBangCommand * pInfo = (ThreadedBangCommand*)message.wParam;
+						    ThreadedBangCommand* pInfo =
+                                (ThreadedBangCommand*)message.wParam;
 
 						    if (pInfo != NULL)
 						    {
 							    pInfo->Execute();
-							    pInfo->Release(); //check BangCommand.cpp for the reason
+							    pInfo->Release(); // check BangCommand.cpp for the reason
 						    }
 					    }
 					    break;
+
+                        default:
+                        break;
 				    }
 			    }
 			    else
@@ -737,6 +736,9 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				{
 					lReturn = SendMessage(hWnd, LM_BANGCOMMAND, 0, (LPARAM)pcds->lpData);
 				}
+				break;
+				
+				default:
 				break;
 			}
 		}
