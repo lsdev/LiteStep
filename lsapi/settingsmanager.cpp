@@ -650,6 +650,8 @@ BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_
 double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
 {
     int nCount, nBlock = 0, nStart;
+    
+    PathRemoveBlanks(ptzInput);
     int nLen = _tcslen(ptzInput);
 
     for (nCount = 0; nCount <= nLen; nCount++)
@@ -711,17 +713,7 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
     }
     else
     {
-        double dReturn = _tcstod(ptzInput, NULL);
-        
-        if (dReturn == 0)
-        {
-            // Not exactly a good way to handle errors.
-            // But I suppose the user will know something went wrong when s/he
-            // sees such a large value as the result
-            dReturn = INT_MAX;
-        }
-        
-        return dReturn;
+        return _tcstod(ptzInput, NULL);
     }
 }
 #endif // LS_COMPAT_MATH
