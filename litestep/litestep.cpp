@@ -169,7 +169,6 @@ static bool ParseCmdLine(LPCSTR pszCmdLine)
 //
 //
 //
-BOOL WINAPI FileIconInit(BOOL bFullInit);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int /* nCmdShow */)
 {
@@ -534,7 +533,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 					lReturn = DefWindowProc(hWnd, uMsg, wParam, lParam);
 				}
 				break;
-			}
+			}       
 		}
 		break;
 
@@ -602,7 +601,34 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		}
 		break;
 
-		case LM_RECYCLE:
+        case LM_ENUMREVIDS:
+        {
+            HRESULT hr = E_FAIL;
+            
+            if (m_pMessageManager)
+            {
+                hr = _EnumRevIDs((LSENUMREVIDSPROC)wParam, lParam);
+            }
+
+            return hr;
+        }
+        break;
+
+        case LM_ENUMMODULES:
+        {
+            HRESULT hr = E_FAIL;
+
+            if (m_pModuleManager)
+            {
+                hr = m_pModuleManager->EnumModules((LSENUMMODULESPROC)wParam,
+                    lParam);
+            }
+            
+            return hr;
+        }
+        break;
+
+        case LM_RECYCLE:
 		{
 			switch (wParam)
 			{
@@ -642,20 +668,14 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         break;
         
         case LM_RELOADMODULE:
-        case LM_UNLOADMODULE:
         {
             if (m_pModuleManager)
             {
                 if (lParam & LMM_HINSTANCE)
                 {
-                    if (uMsg == LM_UNLOADMODULE)
-                    {
-                        m_pModuleManager->QuitModule((HINSTANCE)wParam);
-                    }                    
-                    else
-                    {
-                        m_pModuleManager->ReloadModule((HINSTANCE)wParam);
-                    }
+                    // not sure if this feature is needed... if a module
+                    // wants to reload it shouldn't need the core to do that
+                    m_pModuleManager->ReloadModule((HINSTANCE)wParam);
                 }
                 else
                 {
@@ -663,16 +683,29 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     
                     if (IsValidStringPtr(pszPath))
                     {
-                        HINSTANCE hInst = m_pModuleManager->GetModuleInstance(pszPath);
-                        
-                        if (hInst != NULL)
-                        {
-                            PostMessage(hWnd, uMsg, (WPARAM)hInst, lParam | LMM_HINSTANCE);
-                        }
-                        else if (uMsg == LM_RELOADMODULE)
-                        {
-                            m_pModuleManager->LoadModule(pszPath, (DWORD)lParam);
-                        }
+                        m_pModuleManager->QuitModule(pszPath);
+                        m_pModuleManager->LoadModule(pszPath, (DWORD)lParam);
+                    }
+                }
+            }
+        }
+        break;
+
+        case LM_UNLOADMODULE:
+        {
+            if (m_pModuleManager)
+            {
+                if (lParam & LMM_HINSTANCE)
+                {
+                    m_pModuleManager->QuitModule((HINSTANCE)wParam);
+                }
+                else
+                {
+                    LPCSTR pszPath = (LPCSTR)wParam;
+                    
+                    if (IsValidStringPtr(pszPath))
+                    {
+                        m_pModuleManager->QuitModule(pszPath);
                     }
                 }
             }
@@ -705,27 +738,6 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				}
 				break;
 			}
-		}
-		break;
-
-		case LM_GETREVID:
-		{
-			char szBuffer[256];
-
-/*			if (wParam == 1)
-			{
-				StringCchCopy(szBuffer, 256, &rcsId[1]);
-				szBuffer[strlen(szBuffer) - 1] = '\0';
-			}
-			else
-			{
-				StringCchCopy(szBuffer, 256, "litestep.exe: ");
-				StringCchCat(szBuffer, 256, (LPCSTR) & LSRev);
-				szBuffer[strlen(szBuffer) - 1] = '\0';
-			}*/
-            #pragma COMPILE_TODO("Need to fix LM_GETREVID")
-			SendMessage((HWND)lParam, LM_GETREVID, 0, (long)szBuffer);
-			m_pMessageManager->GetRevID(LM_GETREVID, wParam, lParam);
 		}
 		break;
 
@@ -1044,21 +1056,43 @@ void CLiteStep::_Recycle()
 }
 
 
+//
+// _EnumRevIDs
+//
+HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const
+{
+    HRESULT hr = E_FAIL;
 
+    MessageManager::windowSetT setWindows;
+    
+    if (m_pMessageManager->GetWindowsForMessage(LM_GETREVID, setWindows))
+    {
+        hr = S_OK;
+        
+        try
+        {
+            for (MessageManager::windowSetT::iterator iter = setWindows.begin();
+                 iter != setWindows.end(); ++iter)
+            {
+                // Using MAX_LINE_LENGTH to be on the safe side. Modules
+                // should assume a length of 64 or so.
+                char szBuffer[MAX_LINE_LENGTH] = { 0 };
+                
+                if (SendMessage(*iter, LM_GETREVID, 0, (LPARAM)&szBuffer) > 0)
+                {
+                    if (!pfnCallback(szBuffer, lParam))
+                    {
+                        hr = S_FALSE;
+                        break;
+                    }
+                }
+            }
+        }
+        catch (...)
+        {
+            hr = E_UNEXPECTED;
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return hr;
+}

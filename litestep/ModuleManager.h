@@ -47,9 +47,10 @@ public:
 	
 	BOOL LoadModule(LPCSTR pszLocation, DWORD dwFlags);
 	BOOL QuitModule(HINSTANCE hModule);
+    BOOL QuitModule(LPCSTR pszLocation);
     BOOL ReloadModule(HINSTANCE hModule);
 
-    HINSTANCE GetModuleInstance(LPCSTR pszLocation);
+    HRESULT EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam) const;
 	
 private:
 	UINT _LoadModules();

@@ -120,13 +120,13 @@ UINT ModuleManager::_LoadModules()
 				if ((stricmp(szToken2, "threaded") == 0) ||
                     (stricmp(szToken3, "threaded") == 0))
 				{
-					dwFlags |= MODULE_THREADED;
+					dwFlags |= LS_MODULE_THREADED;
 				}
 				
 				if ((stricmp(szToken2, "nopump") == 0) ||
                     (stricmp(szToken3, "nopump") == 0))
 				{
-					dwFlags |= MODULE_NOTPUMPED;
+					dwFlags |= LS_MODULE_NOTPUMPED;
 				}
 
 				Module* pModule = _MakeModule(szToken1, dwFlags);
@@ -288,6 +288,21 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
 }
 
 
+BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
+{
+    BOOL bReturn = FALSE;
+
+    ModuleQueue::iterator iter = _FindModule(pszLocation);
+    
+    if (iter != m_ModuleQueue.end() && *iter)
+    {
+        bReturn = QuitModule((*iter)->GetInstance());
+    }
+
+    return bReturn;
+}
+
+
 BOOL ModuleManager::ReloadModule(HINSTANCE hModule)
 {
     BOOL bReturn = FALSE;
@@ -304,22 +319,6 @@ BOOL ModuleManager::ReloadModule(HINSTANCE hModule)
     }
 
     return bReturn;
-}
-
-
-HINSTANCE ModuleManager::GetModuleInstance(LPCSTR pszLocation)
-{
-    ASSERT_ISSTRING(pszLocation);
-
-    HINSTANCE hReturn = NULL;
-    ModuleQueue::iterator iter = _FindModule(pszLocation);
-
-    if (iter != m_ModuleQueue.end())
-    {
-        hReturn = (*iter)->GetInstance();
-    }
-
-    return hReturn;
 }
 
 
@@ -363,4 +362,29 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount,
             --dwRest;
         }
     }
+}
+
+
+HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam) const
+{
+    HRESULT hr = S_OK;
+    
+    try
+    {
+        for (ModuleQueue::const_iterator iter = m_ModuleQueue.begin(); iter != m_ModuleQueue.end(); ++iter)
+        {
+            if (!pfnCallback((*iter)->GetLocation(), (*iter)->GetFlags(),
+                lParam))
+            {
+                hr = S_FALSE;
+                break;
+            }
+        }
+    }
+    catch (...)
+    {
+        hr = E_UNEXPECTED;
+    }
+    
+    return hr;
 }

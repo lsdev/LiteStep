@@ -105,7 +105,7 @@ bool Module::_LoadDll()
 
 Module::~Module()
 {
-    if (m_dwFlags & MODULE_THREADED)
+    if (m_dwFlags & LS_MODULE_THREADED)
     {
         CloseHandle(m_hThread);
         CloseHandle(m_hInitEvent);
@@ -133,7 +133,7 @@ HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
         m_hMainWindow = hMainWindow;
         m_tzAppPath = ptzAppPath;
         
-        if (m_dwFlags & MODULE_THREADED)
+        if (m_dwFlags & LS_MODULE_THREADED)
         {
             SECURITY_ATTRIBUTES sa;
             

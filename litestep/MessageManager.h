@@ -25,13 +25,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class MessageManager
 {
-private:
+public:
     typedef std::set<HWND> windowSetT;
+
+private:
     typedef std::map<UINT, windowSetT> messageMapT;
 
 	messageMapT m_MessageMap;
-
-    CriticalSection m_cs;
+    mutable CriticalSection m_cs;
 
 public:
 	void AddMessage(HWND window, UINT message);
@@ -41,13 +42,9 @@ public:
 	void ClearMessages(void);
 	LRESULT SendMessage(UINT message, WPARAM wParam, LPARAM lParam);
 	BOOL PostMessage(UINT message, WPARAM wParam, LPARAM lParam);
-	void GetRevID(UINT message, WPARAM wParam, LPARAM lParam);
 
 	BOOL HandlerExists(UINT message);
 
-	// use vector cause the elements of the
-	// resulting vector is guanranteed to be unique
-	//void GetWindowsForMessage(UINT message, std::vector<HWND> &rvHwnd);
-	//void GetMessagesForWindow(HWND hwnd, std::vector<HWND> &rvMessage);
+	bool GetWindowsForMessage(UINT uMsg, windowSetT& setWindows) const;
 };
 

@@ -105,6 +105,8 @@ extern "C"
 	LSAPI int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal);
 	LSAPI int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal);
 
+    LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
+
     // for internal use only
     LSAPI BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath);
     LSAPI void DeleteSettingsManager(void);

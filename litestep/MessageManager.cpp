@@ -120,60 +120,25 @@ BOOL MessageManager::PostMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	return bResult;
 }
 
-void MessageManager::GetRevID(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	Lock lock(m_cs);
-
-    messageMapT::iterator it;
-	it = m_MessageMap.find(message);
-	if (it != m_MessageMap.end())
-	{
-		char buffer[1024];
-		windowSetT::iterator winIt;
-
-		for (winIt = it->second.begin(); winIt != it->second.end(); ++winIt)
-		{
-			buffer[0] = '\0';
-			::SendMessage((HWND) * winIt, message, wParam, (LPARAM)buffer);
-			::SendMessage((HWND)lParam, message, 0, (LPARAM)buffer);
-		}
-
-	}
-
-}
-
 BOOL MessageManager::HandlerExists(UINT message)
 {
     Lock lock(m_cs);
 	return (m_MessageMap.find(message) != m_MessageMap.end()) ? TRUE : FALSE;
 }
 
-
-/*
-void MessageManager::GetWindowsForMessage(UINT message, vector<HWND> &rvHwnd)
+bool MessageManager::GetWindowsForMessage(UINT uMsg, windowSetT& setWindows) const
 {
-	messageMapT::iterator it;
-	rvHwnd.clear();
-	it = m_MessageMap.find(message);
-	if (it != m_MessageMap.end())
-	{
-		insert_iterator<vector<HWND> > iIt(rvHwnd, rvHwnd.begin());
-		copy(it->second.begin(), it->second.end(), iIt);
-	}
-}
+	Lock lock(m_cs);
 
+    bool bResult = false;
+    
+    messageMapT::const_iterator iter = m_MessageMap.find(uMsg);
 
-void MessageManager::GetMessagesForWindow(HWND hwnd, vector<HWND> &rvMessage)
-{
-	messageMapT::iterator it;
-	rvMessage.clear();
-	for (it = m_MessageMap.begin(); it != m_MessageMap.end(); ++it)
+    if (iter != m_MessageMap.end())
 	{
-		windowSetT::iterator winIt = it->second.find(hwnd);
-		if (winIt != it->second.end())
-		{
-			rvMessage.push_back(*winIt);
-		}
+        setWindows = iter->second;
+        bResult = true;
 	}
+
+    return bResult;
 }
-*/

@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.12 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.12 2003/08/27 18:10:58 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.13 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.13 2003/10/11 19:27:46 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -665,4 +665,56 @@ void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpan
 			StringCchCopy(pszExpandedString, cchExpandedString, pszTemplate);
 		}
 	}
+}
+
+//
+// EnumLSData
+//
+// Return values:
+//   E_INVALIDARG - Invalid value for uInfo
+//   E_POINTER    - Invalid callback
+//   E_FAIL       - Unspecified error
+//   E_UNEXPECTED - Callback crashed or other catastrophic failure
+//   S_OK         - Enumeration successful, callback always returned TRUE
+//   S_FALSE      - Enumeration successful, but cancelled by callback
+//
+HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
+{
+    HRESULT hr = E_INVALIDARG;
+
+    if (!IsBadCodePtr(pfnCallback))
+    {
+        switch (uInfo)
+        {   
+            case ELD_BANGS:
+            {
+                hr = LSAPIManager.GetBangManager()->
+                    EnumBangs((LSENUMBANGSPROC)pfnCallback, lParam);
+            }
+            break;
+
+            case ELD_REVIDS:
+            {
+                hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMREVIDS,
+                    (WPARAM)pfnCallback, lParam);
+            }
+            break;
+            
+            case ELD_MODULES:
+            {
+                hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMMODULES,
+                    (WPARAM)pfnCallback, lParam);
+            }
+            break;
+
+            default:
+            break;
+        }
+    }
+    else
+    {
+        hr = E_POINTER;
+    }
+
+    return hr;
 }
