@@ -36,8 +36,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h"
 
 
-// const char rcsRevision[] = "$Revision: 1.9 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.9 2003/03/21 18:37:27 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.10 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.10 2003/03/27 19:26:08 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -738,7 +738,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			}
 			else
 			{
-				StringCchCopy(szBuffer, 256, , "litestep.exe: ");
+				StringCchCopy(szBuffer, 256, "litestep.exe: ");
 				StringCchCat(szBuffer, 256, (LPCSTR) & LSRev);
 				szBuffer[strlen(szBuffer) - 1] = '\0';
 			}
