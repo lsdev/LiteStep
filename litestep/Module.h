@@ -104,7 +104,7 @@ public:
 
 
 private:
-	ULONG CallInit();
+	int CallInit();
 };
 
 #endif // __MODULE_H
