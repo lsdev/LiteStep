@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 
 
-void TransparentBltLSWorker(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent);
+void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent);
 
 
 //
@@ -282,7 +282,7 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 					// Since TransparentBltLS double buffers the painting to reduce flicker
 					// and we are using only memory DC's in this function, we will just
 					// call TransparentBltLSWorker and shave off a few BitBlt calls
-					TransparentBltLSWorker(hdcResult, (wdtResult - wdtFirst) / 2, (hgtResult - hgtFirst) / 2, wdtFirst, hgtFirst, hdcFirst, 0, 0, RGB(255, 0, 255));
+					TransparentBltLSWorker(hdcResult, wdtFirst, hgtFirst, hdcFirst, 0, 0, RGB(255, 0, 255));
 
 					// deselect the bitmap from the dc and delete the dc to get the image
 					SelectObject(hdcResult, hbmResultOld);
@@ -511,7 +511,7 @@ void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeigh
 
 	BitBlt(hdcDstCpy, 0, 0, nWidth, nHeight, hdcDst, nXDest, nYDest, SRCCOPY);
 
-	TransparentBltLSWorker(hdcDstCpy, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, colorTransparent);
+	TransparentBltLSWorker(hdcDstCpy, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, colorTransparent);
 
 	// now we have created the image we want to blt
 	// in the destination copy dc
@@ -523,7 +523,7 @@ void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeigh
 }
 
 
-void TransparentBltLSWorker(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent)
+void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent)
 {
 	HDC hdcMem, hdcMask;
 	HBITMAP hbmMask, hbmMem;
