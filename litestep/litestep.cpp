@@ -36,8 +36,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h"
 
 
-// const char rcsRevision[] = "$Revision: 1.8 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.8 2003/03/15 22:01:34 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.9 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.9 2003/03/21 18:37:27 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -904,7 +904,10 @@ HRESULT CLiteStep::_StartServices()
 		}
 	}
 
-	m_pTrayService->get_hWnd(&hTrayManager);
+	if (m_pTrayService)
+    {
+        m_pTrayService->get_hWnd(&hTrayManager);
+    }
 
 	return hr;
 }
