@@ -104,7 +104,11 @@ HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
 				sa.bInheritHandle = FALSE;
 
 				m_hInitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-				m_hThread = CreateThread(&sa, 0, Module::ThreadProc, this, NULL, (ULONG*) & m_dwThreadID);
+				
+				// using _beginthreadex instead of CreateThread because modules
+				// might use CRT functions
+				m_hThread = _beginthreadex(&sa, 0, Module::ThreadProc, this,
+					NULL, (ULONG*) & m_dwThreadID);
 			}
 			else
 			{
@@ -130,6 +134,11 @@ ULONG Module::CallInit()
 		m_hInstance = NULL;
 
 		ulReturn = -1;
+        // There should wither be a "throw" here (or the return value should be
+		// used) so the ModuleManager gets to know that something went wrong. At
+		// the moment this only seems to cause more problems so it's commented
+		// out for the time being.
+		//throw;
 	}
 
 	return ulReturn;
