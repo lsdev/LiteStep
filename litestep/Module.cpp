@@ -55,7 +55,7 @@ Module::Module(LPCSTR pszLoc, DWORD dwFlags)
 			m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "quitModule");
 			if (!m_pQuit)   // Might be a BC module, check for underscore
 			{
-				m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "_quitModule");
+                m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "_quitModule");
 			}
 			if (!m_pQuit)
 			{
@@ -71,9 +71,13 @@ Module::Module(LPCSTR pszLoc, DWORD dwFlags)
 
 Module::~Module()
 {
-	CloseHandle(m_hThread);
-	CloseHandle(m_hInitEvent);
-	CloseHandle(m_hQuitEvent);
+	if (m_dwFlags & MODULE_THREADED)
+    {
+        CloseHandle(m_hThread);
+        CloseHandle(m_hInitEvent);
+        CloseHandle(m_hQuitEvent);
+    }
+    
 	if (m_hInstance)
 	{
 		FreeLibrary(m_hInstance);
