@@ -293,6 +293,12 @@ private:
             ((lnid.dwState & lnid.dwStateMask) & NIS_HIDDEN));
     }
 
+    inline bool _IsShared(const LSNOTIFYICONDATA& lnid) const
+    {
+        return ((lnid.uFlags & NIF_STATE) &&
+            ((lnid.dwState & lnid.dwStateMask) & NIS_SHAREDICON));
+    }
+
     inline bool _IsValidIcon(const LSNOTIFYICONDATA* plnid) const
     {
         ASSERT_ISREADPTR(plnid);
@@ -306,6 +312,7 @@ private:
     HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
 	HWND m_hLiteStep;
+    HWND m_hConnectionsTray;
     HINSTANCE m_hInstance;
     
     std::vector<struct IOleCommandTarget*> m_ssoList;
