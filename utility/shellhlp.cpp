@@ -150,3 +150,87 @@ bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
         NULL
         ));
 }
+
+
+//
+// CLSIDToString
+//
+HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
+{
+    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
+
+    LPOLESTR pOleString = NULL;
+
+    HRESULT hr = StringFromCLSID(rclsid, &pOleString);
+
+    if (SUCCEEDED(hr) && pOleString)
+    {
+#ifdef UNICODE
+        hr = StringCchCopyEx(ptzBuffer, cchBuffer, pOleString, NULL, NULL,
+            STRSAFE_NULL_ON_FAILURE);
+
+        switch (hr)
+        {
+            case S_OK:
+            break;
+
+            case STRSAFE_E_INSUFFICIENT_BUFFER:
+            {
+                hr = E_OUTOFMEMORY;
+            }
+            break;
+
+            case STRSAFE_E_INVALID_PARAMETER:
+            {
+                hr = E_INVALIDARG;
+            }
+            break;
+
+            default:
+            {
+                ASSERT(false);
+                hr = E_UNEXPECTED;
+            }
+        }
+
+#else // UNICODE
+
+        int nReturn = WideCharToMultiByte(CP_ACP, 0, pOleString,
+            wcslen(pOleString), ptzBuffer, cchBuffer, NULL, NULL);
+
+        if (nReturn == 0)
+        {
+            switch (GetLastError())
+            {
+                case ERROR_INSUFFICIENT_BUFFER:
+                {
+                    hr = E_OUTOFMEMORY;
+                }
+                break;
+                
+                case ERROR_INVALID_FLAGS:
+                case ERROR_INVALID_PARAMETER:
+                {
+                    hr = E_INVALIDARG;
+                }
+                break;
+                
+                default:
+                {
+                    ASSERT(false);
+                    hr = E_UNEXPECTED;
+                }
+                break;
+            }
+        }
+        else
+        {
+            hr = S_OK;
+        }
+#endif
+    }
+
+    CoTaskMemFree(pOleString);
+
+    return hr;
+}
