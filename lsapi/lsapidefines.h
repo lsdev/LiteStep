@@ -217,6 +217,15 @@ LSDESKTOPINFO;
 
 
 //---------------------------------------------------------
+// LSLOG LOG LEVEL CONSTANTS
+//---------------------------------------------------------
+#define LOG_ERROR 1
+#define LOG_WARNING 2
+#define LOG_NOTICE 3
+#define LOG_DEBUG 4
+
+
+//---------------------------------------------------------
 // ENUMLSDATA DEFINES
 //---------------------------------------------------------
 #define ELD_BANGS   1
