@@ -78,6 +78,8 @@ private:
 	bool m_bAutoHideModules;
     bool m_bAppIsFullScreen; // = false;
 
+	bool m_bUnderExplorer;
+
 	// Windows
 	HWND m_hMainWindow; // = NULL;
 
