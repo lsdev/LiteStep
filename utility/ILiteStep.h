@@ -34,4 +34,4 @@ public:
 	STDMETHOD(get_AppPath)(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) = 0;
 };
 
-#endif __ILITESTEP_H
+#endif // __ILITESTEP_H

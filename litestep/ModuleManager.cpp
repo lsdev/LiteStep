@@ -384,11 +384,12 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 }
 
 
-struct ModuleManager::ModuleLookup
+// need to put this at global scope because of mingw issues
+struct ModuleLookup
 {
 	ModuleLookup(LPCSTR pszName) : m_pszName(pszName){}
 	
-	bool operator() (const Module*& pModule) const
+	bool operator() (const Module* pModule) const
 	{
 		return (stricmp(m_pszName, pModule->GetLocation()) == 0);
 	}

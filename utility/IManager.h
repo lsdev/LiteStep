@@ -37,4 +37,4 @@ public:
 	virtual HRESULT rStop() = 0;
 };
 
-#endif __IMANAGER_H
+#endif // __IMANAGER_H

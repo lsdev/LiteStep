@@ -310,8 +310,6 @@ private:
     
     std::vector<struct IOleCommandTarget*> m_ssoList;
     IconVector m_siVector;
-
-    struct _FindIconPredicate;
 };
 
 #endif //!defined __TRAYSERVICE_H

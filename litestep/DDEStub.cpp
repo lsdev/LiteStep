@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 HMODULE DDEStub::m_hShDocVw = NULL;
-void (__stdcall *DDEStub::m_pShellDDEInit)(BOOL bInit) = NULL;
+DDEStub::ShellDDEFunc* DDEStub::m_pShellDDEInit = NULL;
 
 DDEStub::DDEStub()
 {}
