@@ -232,13 +232,12 @@ HRESULT TrayService::Stop()
 //
 // WindowProc
 //
-// Redirects all messages to HandleNotification or DefWindowProc
+// Redirects all messages to the appropriate handler
 //
 LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                                                WPARAM wParam, LPARAM lParam)
 {
     static TrayService* pTrayService = NULL;
-    LRESULT lReturn = 0;
     
 	if (!pTrayService)
 	{
@@ -264,18 +263,28 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                     case 0:
                     {
                         //
-                        // Application Bar Message (not supported yet)
+                        // Application Bar Message
                         //
+                        SHELLAPPBARDATA* pData = (SHELLAPPBARDATA*)pcds->lpData;
+                        
+                        return pTrayService->HandleAppBarMessage(pData);
                     }
                     break;
                     
                     case 1:
                     {
                         //
-                        // System Tray notification
+                        // System Tray Notification
                         //
                         SHELLTRAYDATA* pstd = (SHELLTRAYDATA*)pcds->lpData;
-                        lReturn = pTrayService->HandleNotification(pstd);
+                        
+                        return pTrayService->HandleNotification(pstd);
+                    }
+                    break;
+
+                    default:
+                    {
+                        TRACE("Unsupported tray message: %u", pcds->dwData);
                     }
                     break;
                 }
@@ -283,18 +292,41 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
             break;
             
             default:
-            {
-                lReturn = DefWindowProc(hWnd, uMsg, wParam, lParam);
-            }
             break;
         }
     }
-    else
-    {
-        lReturn = DefWindowProc(hWnd, uMsg, wParam, lParam);
-    }
+
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// HandleAppBarMessage
+//
+// Handler for all AppBar Messages
+//
+BOOL TrayService::HandleAppBarMessage(SHELLAPPBARDATA* pData)
+{
+    TRACE("Received AppBar Message %u; DontKnow: %u; NoClue: %u",
+        pData->dwMessage, pData->dwDontKnow, pData->dwNoClue);
     
-    return lReturn;
+    switch(pData->dwMessage)
+    {
+        // Hack that could let some appbars work
+        case ABM_NEW:
+        case ABM_REMOVE:
+        case ABM_QUERYPOS:
+        case ABM_SETPOS:
+        {
+            return TRUE;
+        }
+
+        default:
+            break;
+    }
+
+    return FALSE;
 }
 
 
@@ -304,18 +336,17 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
 //
 // Handler for all system tray notifications
 //
-bool TrayService::HandleNotification(SHELLTRAYDATA* pstd)
+BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
 {
-    bool bReturn = false;
-    
     // New actions for W2K and after, we don't handle these right now
     // so we will just bail out if we receive them
     if ((pstd->dwMessage == NIM_SETFOCUS) ||
         (pstd->dwMessage == NIM_SETVERSION))
     {
-        return bReturn;
+        return FALSE;
     }
     
+    bool bReturn = false;
     bool bHidden = _IsHidden(&pstd->nid);
 
     switch (pstd->dwMessage)
@@ -365,7 +396,7 @@ bool TrayService::HandleNotification(SHELLTRAYDATA* pstd)
         break;
     }
 
-    return bReturn;
+    return bReturn ? TRUE : FALSE;
 }
 
 
