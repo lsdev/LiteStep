@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Release Candidate 1
+    LiteStep 0.24.7 Release Candidate 2
     Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -80,6 +80,9 @@
 
  - Rewrote the TrayService. Among other things this enables support for the
    language indicator icon (but not on WinXP).
+
+ - Added new step.rc setting "LSTrayService". "LSTrayService FALSE" disables
+   the core's system tray support. Defaults to TRUE.
 
  - LM_UN/RELOADMODULE can now un/reload modules by using the HINSTANCE of the
    module as the wParam. Set the lParam to LMM_HINSTANCE in that case.
