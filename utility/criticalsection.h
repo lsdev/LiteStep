@@ -36,6 +36,10 @@ public:
 
 protected:
 	CRITICAL_SECTION &_cs;
+
+private:
+    Lock(const Lock& rhs);
+    Lock& operator=(const Lock& rhs);
 };
 
 #endif // __CRITICALSECTION_H
