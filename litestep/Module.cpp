@@ -43,9 +43,9 @@ Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 }
 
 
-BOOL Module::LoadDll()
+bool Module::_LoadDll()
 {
-	BOOL bReturn = FALSE;
+    bool bReturn = false;
 
 	if (!m_hInstance)
 	{
@@ -77,7 +77,7 @@ BOOL Module::LoadDll()
 			}
 			else
 			{
-				bReturn = TRUE;
+				bReturn = true;
 			}
 		}
 		else
@@ -105,7 +105,6 @@ BOOL Module::LoadDll()
 
 Module::~Module()
 {
-	// do we have to keep the event handles until the very end?
     if (m_dwFlags & MODULE_THREADED)
     {
         CloseHandle(m_hThread);
@@ -122,32 +121,36 @@ Module::~Module()
 
 HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
 {
-	if (m_hInstance)
+    ASSERT(m_hInstance == NULL);
+    
+    // delaying the LoadLibrary call until this point is necessary to make
+    // grdtransparent work (it hooks LoadLibrary)
+    if (_LoadDll())
 	{
-		if (m_pInitEx)
-		{
-			m_hMainWindow = hMainWindow;
-			m_tzAppPath = ptzAppPath;
+		ASSERT(m_pInitEx != NULL);
+        ASSERT(m_pQuit != NULL);
 
-			if (m_dwFlags & MODULE_THREADED)
-			{
-				SECURITY_ATTRIBUTES sa;
-
-				sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-				sa.lpSecurityDescriptor = NULL;
-				sa.bInheritHandle = FALSE;
-
-				m_hInitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-				// using _beginthreadex instead of CreateThread because modules
-				// might use CRT functions
-				m_hThread = (HANDLE)_beginthreadex(&sa, 0, Module::ThreadProc,
-					this, 0, (UINT*)&m_dwThreadID);
-			}
-			else
-			{
-				CallInit();
-			}
-		}
+        m_hMainWindow = hMainWindow;
+        m_tzAppPath = ptzAppPath;
+        
+        if (m_dwFlags & MODULE_THREADED)
+        {
+            SECURITY_ATTRIBUTES sa;
+            
+            sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+            sa.lpSecurityDescriptor = NULL;
+            sa.bInheritHandle = FALSE;
+            
+            m_hInitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            // using _beginthreadex instead of CreateThread because modules
+            // might use CRT functions
+            m_hThread = (HANDLE)_beginthreadex(&sa, 0, Module::ThreadProc,
+                this, 0, (UINT*)&m_dwThreadID);
+        }
+        else
+        {
+            CallInit();
+        }
 	}
 
 	return m_hInitEvent;
@@ -166,13 +169,6 @@ int Module::CallInit()
         RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
             "Error: Exception during module initialization.\n\nPlease contact the module writer.",
             m_tzLocation.c_str());
-
-        // If the library were freed here quitModule would never be called.
-        // Of course the module's memory may be corrupted, but the quitModule
-        // call is also wrapped in a try/catch block so it should be safe...
-        
-        //FreeLibrary(m_hInstance);
-        //m_hInstance = NULL;
     }
 
     return nReturn;
@@ -217,36 +213,36 @@ HANDLE Module::Quit()
 
 UINT __stdcall Module::ThreadProc(void* dllModPtr)
 {
-	Module * dllMod = (Module*)dllModPtr;
+	Module* dllMod = (Module*)dllModPtr;
 
 	dllMod->CallInit();
 
-	SetEvent(dllMod->GetInitEvent());
-
-	if (dllMod->HasMessagePump())
-	{
-		MSG msg;
-
-		while (GetMessage(&msg, 0, 0, 0))
-		{
-			try
-			{
-				if (msg.hwnd == NULL)
-				{
-					// Thread message
-					dllMod->HandleThreadMessage(msg);
-				}
-				else
-				{
-					// Window message
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-			}
-			catch (...)
-			{
-				// Quietly ignore exceptions?
-				// #pragma COMPILE_WARN(Note: Need stronger exception-handling code here...restart the module or something)
+    SetEvent(dllMod->GetInitEvent());
+    
+    if (dllMod->HasMessagePump())
+    {
+        MSG msg;
+        
+        while (GetMessage(&msg, 0, 0, 0))
+        {
+            try
+            {
+                if (msg.hwnd == NULL)
+                {
+                    // Thread message
+                    dllMod->HandleThreadMessage(msg);
+                }
+                else
+                {
+                    // Window message
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+            }
+            catch (...)
+            {
+                // Quietly ignore exceptions?
+                // #pragma COMPILE_WARN(Note: Need stronger exception-handling code here...restart the module or something)
 			}
 		}
 	}
@@ -283,5 +279,8 @@ void Module::HandleThreadMessage(MSG &msg)
             }
 		}
 		break;
+
+        default:
+        break;
 	}
 }

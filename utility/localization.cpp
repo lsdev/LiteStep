@@ -232,53 +232,79 @@ int Localization::MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// ResLocalizer
+// GetString
 //
 // Obtains strings from litestep.exe's resources.
 //
-class ResLocalizer
+static void GetString(UINT uId, TCHAR* ptzBuffer, size_t cchBuffer,
+                      const TCHAR* ptzDefault)
 {
-public:
-    static const TCHAR* GetString(UINT uId, TCHAR* ptzBuffer,
-        size_t cchBuffer, const TCHAR* ptzDefault)
+    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
+    ASSERT_ISSTRING(ptzDefault);
+    
+    if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, cchBuffer) == 0)
     {
-        ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
-        ASSERT_ISSTRING(ptzDefault);
+        HRESULT hr = StringCchCopy(ptzBuffer, cchBuffer, ptzDefault);
         
-        if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, cchBuffer) == 0)
+        if (FAILED(hr) && hr != STRSAFE_E_INSUFFICIENT_BUFFER)
         {
-            HRESULT hr = StringCchCopy(ptzBuffer, cchBuffer, ptzDefault);
-            
-            if (FAILED(hr) && hr != STRSAFE_E_INSUFFICIENT_BUFFER)
-            {
-                *ptzBuffer = '\0';
-            }
+            *ptzBuffer = '\0';
         }
-        
-        return ptzBuffer;
     }
-};
+}
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// LocalizerPolicy
+// CheckedFormat
 //
-// The functions below used to be part of a Localizer template configured with
-// a LocalizerPolicy; however following the KISS principle it was deprecated
-// for the time being.
-//
-typedef ResLocalizer LocalizerPolicy;
+static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
+                          const TCHAR* ptzFormat, const va_list& vargs)
+{
+    ASSERT(cchBuffer > 0);
+    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer); ASSERT_ISSTRING(ptzFormat);
+    
+    HRESULT hr = E_FAIL;
+    
+    try
+    {
+        hr = StringCchVPrintf(ptzBuffer, cchBuffer, ptzFormat, vargs);
+    }
+    catch (...)
+    {
+        // Don't want exceptions during error reporting
+        ASSERT(false);
+    }
+    
+    if (FAILED(hr) && (hr != STRSAFE_E_INSUFFICIENT_BUFFER))
+    {
+        StringCchCopyEx(ptzBuffer, cchBuffer, ptzFormat, NULL, NULL,
+            STRSAFE_NULL_ON_FAILURE);
+    }
+}
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // DoError
 //
-static int DoError(const TCHAR* ptzText, UINT uType = MB_OK)
+static int DoError(const TCHAR* ptzText, const TCHAR* ptzCaption = NULL)
 {
-    return MessageBox(NULL, ptzText, _T("LiteStep :: Error"),
-        MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND | uType);
+    ASSERT_ISSTRING(ptzText);
+
+    TCHAR tzCaption[MAX_LINE_LENGTH] = { _T("LiteStep :: Error") };
+    
+    if (ptzCaption != NULL)
+    {
+        ASSERT_ISSTRING(ptzCaption);
+
+        StringCchPrintfEx(tzCaption, MAX_LINE_LENGTH,
+            NULL, NULL, STRSAFE_NULL_ON_FAILURE,
+            _T("LiteStep :: %s :: Error"), ptzCaption);
+    }
+
+    return MessageBox(NULL, ptzText, tzCaption,
+        MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND);
 }
 
 
@@ -286,13 +312,22 @@ static int DoError(const TCHAR* ptzText, UINT uType = MB_OK)
 //
 // Error
 //
-void Error(UINT uId, const TCHAR* ptzDefault)
+void Error(UINT uMessageId, LPCTSTR ptzDefault, ...)
 {
     ASSERT_ISSTRING(ptzDefault);
-    TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
+    TCHAR tzMessage[MAX_LINE_LENGTH] = { 0 };
+    TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
     
-    DoError(LocalizerPolicy::GetString(uId, tzBuffer,
-        MAX_LINE_LENGTH, ptzDefault));
+    GetString(uMessageId, tzFormat, MAX_LINE_LENGTH, ptzDefault);
+    
+    va_list vargs;
+    va_start(vargs, ptzDefault);
+    
+    CheckedFormat(tzMessage, MAX_LINE_LENGTH, tzFormat, vargs);
+    
+    va_end(vargs);
+    
+    DoError(tzMessage);
 }
 
 
@@ -300,37 +335,22 @@ void Error(UINT uId, const TCHAR* ptzDefault)
 //
 // ErrorEx
 //
-void ErrorEx(UINT uId, const TCHAR* ptzDefault, ...)
+void ErrorEx(LPCTSTR ptzCaption, UINT uMessageId, LPCTSTR ptzDefault, ...)
 {
     ASSERT_ISSTRING(ptzDefault);
-    TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
-    TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
+    ASSERT_ISSTRING(ptzCaption);
     
-    const TCHAR* ptzFormat = LocalizerPolicy::GetString(uId, tzFormat,
-        MAX_LINE_LENGTH, ptzDefault);
+    TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
+    TCHAR tzMessage[MAX_LINE_LENGTH] = { 0 };
+    
+    GetString(uMessageId, tzFormat, MAX_LINE_LENGTH, ptzDefault);
     
     va_list vargs;
     va_start(vargs, ptzDefault);
     
-    HRESULT hr = E_FAIL;
-    
-    try
-    {
-        hr = StringCchVPrintf(tzBuffer, MAX_LINE_LENGTH, ptzFormat, vargs);
-    }
-    catch (...)
-    {
-        tzBuffer[0] = '\0';
-    }
+    CheckedFormat(tzMessage, MAX_LINE_LENGTH, tzFormat, vargs);
     
     va_end(vargs);
     
-    if (FAILED(hr) && hr != STRSAFE_E_INSUFFICIENT_BUFFER)
-    {
-        DoError(ptzDefault);
-    }
-    else
-    {
-        DoError(tzBuffer);
-    }
+    DoError(tzMessage, ptzCaption);
 }

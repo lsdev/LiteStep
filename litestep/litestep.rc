@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -26,7 +26,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "±z¤w¸g¦b°õ¦æ LiteStep ¡A\n½T©w­nÄ~Äò¶Ü¡H"
     IDS_LITESTEP_ERROR2     "§ä¤£¨ìÀÉ®× ""%s""¡C\n½Ð½T»{ÀÉ®×¸ô®|¬O§_¥¿½T«á¦A¬O¤@¦¸¡C"
@@ -45,7 +45,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "Ãö³¬µøµ¡(&S)"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "²¾°£ LiteStep (&U)"
 END
@@ -68,7 +68,7 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen?"
     IDS_LITESTEP_ERROR2     "Konnte die Datei ""%s"" nicht finden.\nBitte stellen Sie sicher, daß der Pfad korrekt ist und die Datei existiert."
@@ -87,7 +87,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "Windows &Herunterfahren"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "Litestep &Deinstallieren"
 END
@@ -112,7 +112,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_LS                  ICON                    "litestep.ico"
+IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -120,18 +120,18 @@ IDI_LS                  ICON                    "litestep.ico"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "\r\n"
     "\0"
@@ -146,7 +146,7 @@ END
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 240, 185
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "About LiteStep..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -168,6 +168,7 @@ BEGIN
 END
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -190,16 +191,16 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "http://www.lsdev.org"
-            VALUE "CompanyName", "Litestep Development Team"
-            VALUE "FileDescription", "LiteStep alternate shell for Microsoft Windows Operating Systems"
-            VALUE "FileVersion", "0, 2, 4, 7"
-            VALUE "InternalName", "LiteStep"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2002"
-            VALUE "OriginalFilename", "litestep.exe"
-            VALUE "ProductName", "Litestep"
-            VALUE "ProductVersion", "0, 2, 4, 7"
-            VALUE "SpecialBuild", "Ticking over ahead of LiteStep 0.25"
+            VALUE "Comments", "http://www.lsdev.org\0"
+            VALUE "CompanyName", "Litestep Development Team\0"
+            VALUE "FileDescription", "LiteStep alternate shell for Microsoft Windows Operating Systems\0"
+            VALUE "FileVersion", "0, 2, 4, 7\0"
+            VALUE "InternalName", "LiteStep\0"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2002\0"
+            VALUE "OriginalFilename", "litestep.exe\0"
+            VALUE "ProductName", "Litestep\0"
+            VALUE "ProductVersion", "0, 2, 4, 7\0"
+            VALUE "SpecialBuild", "Ticking over ahead of LiteStep 0.25\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -208,13 +209,15 @@ BEGIN
     END
 END
 
+#endif    // !_MAC
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_LS                  BITMAP                  "litestep.bmp"
+IDB_LS                  BITMAP  MOVEABLE PURE   "litestep.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -222,7 +225,7 @@ IDB_LS                  BITMAP                  "litestep.bmp"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO MOVEABLE PURE 
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -238,7 +241,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "A previous instance of LiteStep was detected.\nAre you sure you want to continue?"
     IDS_LITESTEP_ERROR2     "Unable to find the file ""%s"".\nPlease verify the location of the file."
@@ -257,7 +260,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Shutdown Windows..."
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "U&ninstall LiteStep"
     IDS_MODULEQUIT_ERROR    "Exception while quitting module."
@@ -273,7 +276,7 @@ BEGIN
     IDS_HOOKMGR_CREATETHREAD_ERROR "Could not create Hook Manager Thread"
     IDS_HOOKMGR_LOADHOOK_ERROR "Could not load hook.dll"
     IDS_LITESTEP_BANGEXCEPTION 
-                            "Error: Exception during bang command execution.\nPlease contact the module writer.\n\nBang parameters: %s"
+                            "Exception during bang command execution.\nPlease contact the module author.\n\nBang parameters: %s"
     IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."
 END
 
@@ -295,7 +298,7 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Une instance de LiteStep existe déjà.\nVoulez-vous vraiment continuer?"
     IDS_LITESTEP_ERROR2     "Impossible de trouver le fichier ""%s"".\nVeuillez vérifier\nl'emplacement du fichier."
@@ -314,7 +317,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Fermeture de Windows..."
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "&Désinstaller LiteStep"
 END
@@ -337,7 +340,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Er is een andere instantie van LiteStep gedetecteerd.\nWeet u zeker dat u door wilt gaan?"
     IDS_LITESTEP_ERROR2     "Het bestand ""%s"".\nVerifieer de locatie van het bestand en probeer opnieuw."
@@ -356,7 +359,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Afsluiten Windows..."
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "&De-installeren LiteStep"
 END
@@ -379,7 +382,7 @@ LANGUAGE LANG_SWEDISH, SUBLANG_DEFAULT
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "En tidigare instans av LiteStep upptäcktes.\nÄr du säker på att du vill fortsätta?"
     IDS_LITESTEP_ERROR2     "Kunde inte hitta filen ""%s"".\nKontrollera att filen existerar och försök igen."
@@ -398,7 +401,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Stäng av..."
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "A&vinstallera LiteStep"
 END
@@ -421,7 +424,7 @@ LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Fue detectada una instancia previa de LiteStep.\n¿Estas seguro de querer continuar?"
     IDS_LITESTEP_ERROR2     "No se pudo encontrar el archivo ""%s"".\nPor favor verifique donde se encuentra el archivo, e intente de nuevo."
@@ -440,7 +443,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Apagar Windows..."
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "&Desinstalar LiteStep"
 END

@@ -27,7 +27,6 @@ BangManager::BangManager()
 
 BangManager::~BangManager()
 {
-    ASSERT(bang_map.empty());
 }
 
 

@@ -23,14 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "../utility/IManager.h"
 #include "module.h"
-#include <vector>
+#include <list>
 
 
 // might want to move these to lsapidefines.h
 typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
 typedef int (*ModuleQuitFunc) (HINSTANCE);
 
-typedef std::vector<Module*> ModuleQueue;
+typedef std::list<Module*> ModuleQueue;
 
 class ModuleManager: public IManager
 {
@@ -46,21 +46,50 @@ public:
 	HRESULT rStop();
 	
 	BOOL LoadModule(LPCSTR pszLocation, DWORD dwFlags);
-	BOOL QuitModule(LPCSTR pszLocation);
-	UINT GetModuleList(LPSTR *lpszModules, DWORD dwSize);
-	
-	STDMETHOD(get_Count)( /*[out, retval]*/ long* pCount);
+	BOOL QuitModule(HINSTANCE hModule);
+    BOOL ReloadModule(HINSTANCE hModule);
+
+    HINSTANCE GetModuleInstance(LPCSTR pszLocation);
 	
 private:
 	UINT _LoadModules();
-	UINT _StartModules(ModuleQueue& mqModules);
+	UINT _StartModules(const ModuleQueue& mqModules);
 	void _QuitModules();
 	
 	ModuleQueue::iterator _FindModule(LPCSTR pszLocation);
-	Module* _MakeModule(LPCSTR pszLocation, DWORD dwFlags);
-	
-	ModuleQueue m_ModuleQueue;
-	ILiteStep *m_pILiteStep;
+    ModuleQueue::iterator _FindModule(HINSTANCE hModule);
+    Module* _MakeModule(LPCSTR pszLocation, DWORD dwFlags);
+    
+    void _WaitForModules(const HANDLE* pHandles, DWORD dwCount, HWND hWnd) const;
+    
+    ModuleQueue m_ModuleQueue;
+    ILiteStep *m_pILiteStep;
+    
+    struct IsLocationEqual
+    {
+        IsLocationEqual(LPCSTR pszLocation) : m_pszLocation(pszLocation){}
+        
+        bool operator() (const Module* pModule) const
+        {
+            return (lstrcmpi(m_pszLocation, pModule->GetLocation()) == 0);
+        }
+        
+    private:
+        LPCSTR m_pszLocation;
+    };
+    
+    struct IsInstanceEqual
+    {
+        IsInstanceEqual(HINSTANCE hInstance) : m_hInstance(hInstance) {}
+        
+        bool operator() (const Module* pModule) const
+        {
+            return (pModule->GetInstance() == m_hInstance);
+        }
+        
+    private:
+        HINSTANCE m_hInstance;
+    };
 };
 
 #endif // __MODULEMANAGER_H
