@@ -246,27 +246,60 @@ public:
         LPARAM lParam);
     
 private:
-    bool _AddIcon(const NOTIFYICONDATA* pnid);
-    bool _ModifyIcon(LSNOTIFYICONDATA* plnid, const NOTIFYICONDATA* pnid);
+    //
+    // NIM_* handlers
+    //
+    bool _AddIcon(const NOTIFYICONDATA& nid);
+    bool _ModifyIcon(LSNOTIFYICONDATA* plnid, const NOTIFYICONDATA& nid);
     bool _RemoveIcon(IconVector::iterator itIcon);
     
+    bool _CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
+        const NOTIFYICONDATA& nidSource) const;
     void _Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid);
-    IconVector::iterator _FindIcon(const NOTIFYICONDATA* pnid);
     
+    //
     // methods handling version specifics
-    bool _IsHidden(const NOTIFYICONDATA* pstd);
-    void _CopyVersionSpecifics(LSNOTIFYICONDATA* plnidTarget,
-        const NOTIFYICONDATA* pnidSource);
+    //
+    void _CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
+                               const NOTIFYICONDATA& nidSource) const;
+    int _ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
+        const wchar_t* pwzInput, size_t cchInputMax) const;
 
+    //
     // manage COM based shell services
+    //
     void _LoadShellServiceObjects();
     void _UnloadShellServiceObjects();
-
-    inline bool _IsValidIcon(UINT uFlags)
+    
+    //
+    // _FindIcon variants
+    //
+    IconVector::iterator TrayService::_FindIcon(HWND hWnd, UINT uId);
+    
+    inline IconVector::iterator _FindIcon(const NOTIFYICONDATA& nid)
     {
-        return ((uFlags & NIF_MESSAGE) && (uFlags & NIF_ICON));
+        return _FindIcon(nid.hWnd, nid.uID);
     }
     
+    //
+    // miscellaneous
+    //
+    inline bool _IsHidden(const LSNOTIFYICONDATA& lnid) const
+    {
+        return ((lnid.uFlags & NIF_STATE) &&
+            ((lnid.dwState & lnid.dwStateMask) & NIS_HIDDEN));
+    }
+
+    inline bool _IsValidIcon(const LSNOTIFYICONDATA* plnid) const
+    {
+        ASSERT_ISREADPTR(plnid);
+        return ((plnid->uFlags & NIF_MESSAGE) && (plnid->uFlags & NIF_ICON) &&
+            !_IsHidden(*plnid));
+    }
+    
+    //
+    //
+    //
     bool m_bWin2000;
     HWND m_hTrayWnd;
 	HWND m_hLiteStep;
