@@ -110,7 +110,6 @@ void StartupRunner::_RunStartupMenu()
 	{
 		if (GetShellFolderPath(STARTUPMENU_TABLE[i], tzPath, MAX_PATH))
 		{
-			PathUnquoteSpaces(tzPath);
 			_RunFolderContents(tzPath);
 		}
 	}
