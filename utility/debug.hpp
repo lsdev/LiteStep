@@ -147,6 +147,7 @@ struct DebugOutputTracer
     }
 };
     
+#define TRACE_ENABLED
 #define TRACE  debug::Trace<DebugOutputTracer>
 #define INFO   debug::PrefixedOutput<DebugOutputTracer>(__LINE__, __FILE__)
 
