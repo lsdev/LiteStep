@@ -383,10 +383,14 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		// Run startup items if the SHIFT key is not down
 		if (nStartupMode != STARTUP_DONT_RUN)
 		{
-			DWORD dwThread;
+//			DWORD dwThread;
 			
-            CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
-                (void*)nStartupMode, 0, &dwThread));
+//            CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
+//                (void*)nStartupMode, 0, &dwThread));
+            
+            // once it's certain that this won't be run in its own thread any
+            // more the void* parameter should be changed to an int or so.
+            StartupRunner::Run((void*)nStartupMode);
 		}
 
 		hr = _InitManagers();
