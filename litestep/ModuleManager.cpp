@@ -109,15 +109,16 @@ UINT ModuleManager::_LoadModules()
             
 			if (LCTokenize(szLine, lpszBuffers, 4, NULL) >= 2)
 			{
-				DWORD dwFlags = MODULE_THREADED;
+				DWORD dwFlags = 0;
 
-				if ((stricmp(szToken2, "notthreaded") == 0) ||
-                    (stricmp(szToken3, "notthreaded") == 0))
+				if ((stricmp(szToken2, "threaded") == 0) ||
+                    (stricmp(szToken3, "threaded") == 0))
 				{
-					dwFlags &= ~(MODULE_THREADED);
+					dwFlags |= MODULE_THREADED;
 				}
-				else if ((stricmp(szToken2, "nopump") == 0) ||
-                         (stricmp(szToken3, "nopump") == 0))
+				
+				if ((stricmp(szToken2, "nopump") == 0) ||
+                    (stricmp(szToken3, "nopump") == 0))
 				{
 					dwFlags |= MODULE_NOTPUMPED;
 				}
@@ -142,13 +143,13 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 	Module* pModule = NULL;
 	BOOL bReturn = FALSE;
 
-	ModuleMap::iterator it = m_ModuleMap.find(pszLocation);
-	if (it == m_ModuleMap.end())
+	ModuleQueue::iterator it = _FindModule(pszLocation);
+	if (it == m_ModuleQueue.end())
 	{
 		try
 		{
 			pModule = new Module(pszLocation, dwFlags);
-			m_ModuleMap.insert(ModuleMap::value_type(pszLocation, pModule));
+			m_ModuleQueue.push_back(pModule);
             bReturn = TRUE;
 		}
 		catch (int error)
@@ -185,7 +186,7 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 
 void ModuleManager::_StartModules()
 {
-	int nModuleCount = m_ModuleMap.size();
+	int nModuleCount = m_ModuleQueue.size();
 
 	if (nModuleCount)
 	{
@@ -200,16 +201,16 @@ void ModuleManager::_StartModules()
 			if (SUCCEEDED(hr))
 			{
 				HANDLE* pInitEvents = new HANDLE[nModuleCount];
-				ModuleMap::iterator iter = m_ModuleMap.begin();
+				ModuleQueue::iterator iter = m_ModuleQueue.begin();
 
 				int nIndex = 0;
-				while (iter != m_ModuleMap.end())
+				while (iter != m_ModuleQueue.end())
 				{
-					if (iter->second)
+					if (*iter)
 					{
 						try
 						{
-							HANDLE hEvent = iter->second->Init(hLiteStep, szAppPath);
+							HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
 							if (hEvent)
 							{
 								pInitEvents[nIndex++] = hEvent;
@@ -219,7 +220,7 @@ void ModuleManager::_StartModules()
 						{
 							RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
 											"Error: Exception during module initialization.\n\nPlease contact the module writer.",
-											iter->first.c_str());
+											(*iter)->GetLocation());
 						}
 					}
 
@@ -261,21 +262,21 @@ void ModuleManager::_StartModules()
 
 void ModuleManager::_QuitModules()
 {
-	int nModuleCount = m_ModuleMap.size();
+	int nModuleCount = m_ModuleQueue.size();
 
 	if (nModuleCount)
 	{
 		HANDLE * pQuitEvents = new HANDLE[nModuleCount];
-		ModuleMap::iterator iter = m_ModuleMap.begin();
+		ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
 
 		int nIndex = 0;
-		while (iter != m_ModuleMap.end())
+		while (iter != m_ModuleQueue.rend())
 		{
-			if (iter->second)
+			if (*iter)
 			{
 				try
 				{
-					HANDLE hEvent = iter->second->Quit();
+					HANDLE hEvent = (*iter)->Quit();
 					if (hEvent)
 					{
 						pQuitEvents[nIndex++] = hEvent;
@@ -322,17 +323,17 @@ void ModuleManager::_QuitModules()
 		delete [] pQuitEvents;
 
 		// Clean it all up
-		iter = m_ModuleMap.begin();
-		while (iter != m_ModuleMap.end())
+		iter = m_ModuleQueue.rbegin();
+		while (iter != m_ModuleQueue.rend())
 		{
-			if (iter->second)
+			if (*iter)
 			{
 				//CloseHandle(iter->second->GetThread());
-				delete iter->second;
+				delete *iter;
 			}
 			++iter;
 		}
-		m_ModuleMap.clear();
+		m_ModuleQueue.clear();
 
 	}
 }
@@ -342,14 +343,14 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 {
 	if (IsValidStringPtr(pszLocation))
 	{
-		ModuleMap::iterator iter = m_ModuleMap.find(pszLocation);
+		ModuleQueue::iterator iter = _FindModule(pszLocation);
 
-		if (iter != m_ModuleMap.end())
+		if (iter != m_ModuleQueue.end())
 		{
 			HANDLE hQuitEvents[1];
 			try
 			{
-				HANDLE hEvent = iter->second->Quit();
+				HANDLE hEvent = (*iter)->Quit();
 				if (hEvent)
 				{
 					hQuitEvents[0] = hEvent;
@@ -382,18 +383,40 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 				// quietly swallow exceptions
 				// debugging/logging code should go here
 			}
-
+			
             // better safe than sorry
-            if (iter->second)
+            if (*iter)
             {
-                delete iter->second;
+                delete *iter;
             }
-            m_ModuleMap.erase(iter);
+            m_ModuleQueue.erase(iter);
 		}
 	}
-
+	
 	return TRUE;
 }
+
+
+struct ModuleManager::ModuleLookup
+{
+	ModuleLookup(LPCSTR pszName) : m_pszName(pszName){}
+	
+	bool operator() (const Module*& pModule) const
+	{
+		return (stricmp(m_pszName, pModule->GetLocation()) == 0);
+	}
+	
+    private:
+        LPCSTR m_pszName;
+};
+
+
+ModuleQueue::iterator ModuleManager::_FindModule(LPCSTR pszLocation)
+{
+	return find_if(m_ModuleQueue.begin(), m_ModuleQueue.end(),
+		ModuleLookup(pszLocation));
+}
+
 
 UINT ModuleManager::GetModuleList(LPSTR *lpszModules, DWORD dwSize)
 {
@@ -432,7 +455,7 @@ STDMETHODIMP ModuleManager::get_Count(long* pCount)
 	if (pCount != NULL)
 	{
 		//Lock();
-		*pCount = m_ModuleMap.size();
+		*pCount = m_ModuleQueue.size();
 		//Unlock();
 
 		hr = S_OK;
