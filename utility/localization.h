@@ -22,9 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "common.h"
 
-void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText);
-void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...);
-
 HFONT LocalCreateFontIndirect(LOGFONT *lplf);
 HFONT LocalCreateFont(int nHeight,
                       int nWidth,
@@ -56,5 +53,10 @@ private:
 	HINSTANCE m_hRes;
 	LANGID m_wLanguageID;
 };
+
+void Error(UINT uId, const TCHAR* ptzDefault);
+void ErrorEx(UINT uId, const TCHAR* ptzDefault, ...);
+
+#define LOCALIZE_THIS 0
 
 #endif // __INCLUDE_LOCALIZATION_H
