@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ID_TERMINATE 3
 #define ID_RUN 4
 #define ID_SHUTDOWN 5
-#define ID_UNINSTALL 6
 
 LRESULT WINAPI RecoveryMenuWndProc(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI RecoveryThreadProc(LPVOID);

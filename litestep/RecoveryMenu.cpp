@@ -34,7 +34,6 @@ rgMenuCommands[] =
         IDS_LITESTEP_RECYCLELS, ID_RECYCLE, "&Recycle LiteStep",
         IDS_LITESTEP_QUITLS, ID_QUIT, "&Quit LiteStep",
         IDS_LITESTEP_TERMINATELS, ID_TERMINATE, "Forcibly &Terminate LiteStep",
-        IDS_LITESTEP_UNINSTALLLS, ID_UNINSTALL, "U&ninstall LiteStep",
         0, -1, "",
         IDS_LITESTEP_RUN, ID_RUN, "R&un...",
         0, -1, "",
@@ -178,28 +177,9 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 				}
 				break;
 
-				case ID_UNINSTALL:
-				{
-					HMODULE hInstall = LoadLibrary("install.dll");
-					if (hInstall)
-					{
-						FARPROC (__stdcall * UninstallShell)(VOID) = NULL;
-						UninstallShell = (FARPROC (__stdcall *)(VOID))GetProcAddress(hInstall, "UninstallShell");
-
-						if (UninstallShell)
-						{
-							UninstallShell();
-						}
-
-						UninstallShell = NULL;
-						FreeLibrary(hInstall);
-						hInstall = NULL;
-
-						ExitProcess(0);
-					}
-				}
-				break;
-			}
+                default:
+                break;
+            }
 
 			return 0;
 		}

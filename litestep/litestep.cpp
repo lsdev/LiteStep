@@ -133,46 +133,6 @@ static bool ParseCmdLine(LPCSTR pszCmdLine)
                     {
                         g_nStartupMode = STARTUP_FORCE_RUN;
                     }                    
-					else if (!stricmp(szToken, "-install"))
-					{
-						HMODULE hInstall = LoadLibrary("install.dll");
-						if (hInstall)
-						{
-							FARPROC (__stdcall * InstallShell)(LPCSTR) = NULL;
-							InstallShell = (FARPROC (__stdcall *)(LPCSTR))GetProcAddress(hInstall, "InstallShell");
-
-							if (InstallShell)
-							{
-								InstallShell(szAppPath);
-							}
-
-							InstallShell = NULL;
-							FreeLibrary(hInstall);
-							hInstall = NULL;
-						}
-
-                        return false;
-					}
-					else if (!stricmp(szToken, "-uninstall"))
-					{
-						HMODULE hInstall = LoadLibrary("install.dll");
-						if (hInstall)
-						{
-							FARPROC (__stdcall * UninstallShell)(VOID) = NULL;
-							UninstallShell = (FARPROC (__stdcall *)(VOID))GetProcAddress(hInstall, "UninstallShell");
-
-							if (UninstallShell)
-							{
-								UninstallShell();
-							}
-
-							UninstallShell = NULL;
-							FreeLibrary(hInstall);
-							hInstall = NULL;
-						}
-
-                        return false;
-					}
 				}
 				break;
 
@@ -209,12 +169,29 @@ static bool ParseCmdLine(LPCSTR pszCmdLine)
 //
 //
 //
+BOOL WINAPI FileIconInit(BOOL bFullInit);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int /* nCmdShow */)
 {
-	HRESULT hr = S_OK;
+    
+    typedef BOOL (WINAPI* FII_PROC)(BOOL bFullInit);
+    
+    HMODULE      hShell32 = LoadLibrary("shell32.dll");
+    
+    if(hShell32 != NULL)
+    {
+        FII_PROC FileIconInit = (FII_PROC)GetProcAddress(hShell32, (LPCSTR)660);
+        
+        // Initialize imagelist for this process - function not present on win95/98
+        if(FileIconInit != NULL)
+        {
+            FileIconInit(TRUE);
+        }
+    }
 
-	// Determine our application's path
+    HRESULT hr = S_OK;
+    
+    // Determine our application's path
 	if (GetModuleFileName (hInstance, szAppPath, sizeof (szAppPath)) > 0)
 	{
 		PathRemoveFileSpec(szAppPath);
@@ -258,7 +235,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     CloseHandle(hMutex);
 
-	return HRESULT_CODE(hr);
+	FreeLibrary(hShell32);
+    return HRESULT_CODE(hr);
 }
 
 
