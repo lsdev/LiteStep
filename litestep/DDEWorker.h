@@ -51,7 +51,7 @@ public:
 
 private:
 
-	BOOL _FindFiles(LPCSTR pszPath, BOOL bFindFolder);
+	BOOL _FindFiles(LPSTR pszPath, BOOL bFindFolder);
 	BOOL _ShowGroup(LPCTSTR strGroupName, int nShow, BOOL bCommon);
 	BOOL _CreateGroup(LPCTSTR strGroupName, BOOL bCommon);
 	BOOL _DeleteGroup(LPCTSTR strGroupName, BOOL bCommon);
