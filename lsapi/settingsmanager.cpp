@@ -45,10 +45,15 @@ SettingsManager::~SettingsManager()
 
 BOOL SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
-    char szTemp[MAX_PATH];
+    char szPath[MAX_PATH];
 
-    BOOL bReturn = GetShellFolderPath(nFolder, szTemp, MAX_PATH);
-    SetVariable(pszVariable, szTemp);
+    BOOL bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
+    
+    if (bReturn)
+    {
+        PathQuoteSpaces(szPath);
+        SetVariable(pszVariable, szPath);
+    }
 
     return bReturn;    
 }
@@ -74,7 +79,16 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
         SetVariable("username", szTemp);
     }
 
-	SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
+    if (GetShellFolderPath(CSIDL_APPDATA, szTemp, MAX_PATH))
+    {
+        StringCchCat(szTemp, MAX_PATH,
+            "Microsoft\\Internet Explorer\\Quick Launch\\");
+        
+        PathQuoteSpaces(szTemp);
+        SetVariable("quicklaunch", szTemp);
+    }
+
+    SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
 	SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
 	SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
 	SetVariable("network", "::{208D2C60-3AEA-1069-A2D7-08002B30309D}");
