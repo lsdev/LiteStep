@@ -44,10 +44,14 @@ bool EvalParser::evaluate(LPCSTR expr, int *result)
 	int value;
 
 	if (!expression(value))
-		return false;
+    {
+        return false;
+    }
 
 	if (result)
-		* result = value;
+    {
+        *result = value;
+    }
 
 	return true;
 }
@@ -59,14 +63,14 @@ bool EvalParser::evaluate(LPCSTR expr, int *result)
 
 bool EvalParser::basicExpression(int &result)
 {
-	CHAR szValue[MAX_LINE_LENGTH + 1];
+	char szValue[MAX_LINE_LENGTH + 1];
 
 	if (currentToken == TT_ID)
 	{
 		if (GetRCString(stringValue.c_str(), szValue, NULL, MAX_LINE_LENGTH))
 		{
-			CHAR szToken[MAX_LINE_LENGTH + 1];
-			CHAR szExpanded[MAX_LINE_LENGTH + 1];
+			char szToken[MAX_LINE_LENGTH + 1];
+			char szExpanded[MAX_LINE_LENGTH + 1];
 
 			VarExpansionEx(szExpanded, szValue, MAX_LINE_LENGTH);
 
@@ -74,7 +78,7 @@ bool EvalParser::basicExpression(int &result)
 			{
 				result = 0;
 
-				if (GetToken(szExpanded, szToken, NULL, false))
+				if (GetToken(szExpanded, szToken, NULL, FALSE))
 				{
 					result = strtol(szToken, NULL, 0);
 				}
@@ -83,11 +87,11 @@ bool EvalParser::basicExpression(int &result)
 			{
 				result = TRUE;
 
-				if (GetToken(szExpanded, szToken, NULL, false))
+				if (GetToken(szExpanded, szToken, NULL, FALSE))
 				{
-					if ((stricmp(szToken, "off") == 0) ||
-					        (stricmp(szToken, "false") == 0) ||
-					        (stricmp(szToken, "no") == 0))
+					if ((lstrcmpi(szToken, "off") == 0) ||
+                        (lstrcmpi(szToken, "false") == 0) ||
+                        (lstrcmpi(szToken, "no") == 0))
 					{
 						result = FALSE;
 					}
@@ -113,7 +117,9 @@ bool EvalParser::basicExpression(int &result)
 	else if (matchToken(TT_LP))
 	{
 		if (!expression(result))
-			return false;
+        {
+            return false;
+        }
 
 		return matchToken(TT_RP);
 	}
@@ -141,7 +147,9 @@ bool EvalParser::unaryExpression(int &result)
 	if (matchToken(TT_NOT))
 	{
 		if (!basicExpression(result))
-			return false;
+        {
+            return false;
+        }
 
 		result = !result;
 		return true;
@@ -149,7 +157,9 @@ bool EvalParser::unaryExpression(int &result)
 	else if (matchToken(TT_MINUS))
 	{
 		if (!basicExpression(result))
-			return false;
+        {
+            return false;
+        }
 
 		result = -result;
 		return true;
@@ -168,16 +178,22 @@ bool EvalParser::relationalExpression(int &result)
 	int token;
 
 	if (!unaryExpression(result))
-		return false;
+    {
+        return false;
+    }
 
 	if (!isRelationalOperator(currentToken))
-		return true;
+    {
+        return true;
+    }
 
 	token = currentToken;
 	nextToken();
 
 	if (!unaryExpression(subresult))
-		return false;
+    {
+        return false;
+    }
 
 	switch (token)
 	{
@@ -220,7 +236,9 @@ bool EvalParser::andExpression(int &result)
         int subresult;
         
         if (!relationalExpression(subresult))
+        {
             return false;
+        }
         
         result = result && subresult;
 	}
@@ -244,7 +262,9 @@ bool EvalParser::orExpression(int &result)
         int subresult;
         
         if (!andExpression(subresult))
+        {
             return false;
+        }
         
         result = result || subresult;
 	}
@@ -277,11 +297,15 @@ bool EvalParser::nextToken()
 {
 	// skip whitespace
 	while (isWhiteSpace(currentChar))
-		nextChar();
+    {
+        nextChar();
+    }
 
 	// are we at the end of the input?
 	if (currentChar == 0)
-		return currentToken = TT_END, true;
+    {
+        return currentToken = TT_END, true;
+    }
 
 	// predict token type based on first wchar_t
 	if (isLetter(currentChar))
@@ -299,16 +323,26 @@ bool EvalParser::nextToken()
 		currentToken = TT_ID;
 
 		// is it a keyword?
-		if (!stricmp(stringValue.c_str(), "and"))
-			currentToken = TT_AND, true;
-		else if (!stricmp(stringValue.c_str(), "or"))
-			currentToken = TT_OR, true;
-		else if (!stricmp(stringValue.c_str(), "not"))
-			currentToken = TT_NOT, true;
-		else if (!stricmp(stringValue.c_str(), "false"))
-			currentToken = TT_FALSE, true;
-		else if (!stricmp(stringValue.c_str(), "true"))
-			currentToken = TT_TRUE, true;
+		if (!lstrcmpi(stringValue.c_str(), "and"))
+        {
+            currentToken = TT_AND, true;
+        }
+		else if (!lstrcmpi(stringValue.c_str(), "or"))
+        {
+            currentToken = TT_OR, true;
+        }
+		else if (!lstrcmpi(stringValue.c_str(), "not"))
+        {
+            currentToken = TT_NOT, true;
+        }
+		else if (!lstrcmpi(stringValue.c_str(), "false"))
+        {
+            currentToken = TT_FALSE, true;
+        }
+		else if (!lstrcmpi(stringValue.c_str(), "true"))
+        {
+            currentToken = TT_TRUE, true;
+        }
 
 		return currentToken != FALSE;
 	}
@@ -331,29 +365,53 @@ bool EvalParser::nextToken()
 	{
 		// assume it's a symbol
 		if (matchChar('='))
-			return currentToken = TT_EQ, true;
+        {
+            return currentToken = TT_EQ, true;
+        }
 		else if (matchChars('<', '>'))
-			return currentToken = TT_NE, true;
+        {
+            return currentToken = TT_NE, true;
+        }
 		else if (matchChars('<', '='))
-			return currentToken = TT_LE, true;
+        {
+            return currentToken = TT_LE, true;
+        }
 		else if (matchChar('<'))
-			return currentToken = TT_LT, true;
+        {
+            return currentToken = TT_LT, true;
+        }
 		else if (matchChars('>', '='))
-			return currentToken = TT_GE, true;
+        {
+            return currentToken = TT_GE, true;
+        }
 		else if (matchChar('>'))
-			return currentToken = TT_GT, true;
+        {
+            return currentToken = TT_GT, true;
+        }
 		else if (matchChar('+'))
-			return currentToken = TT_PLUS, true;
+        {
+            return currentToken = TT_PLUS, true;
+        }
 		else if (matchChar('-'))
-			return currentToken = TT_MINUS, true;
+        {
+            return currentToken = TT_MINUS, true;
+        }
 		else if (matchChar('*'))
-			return currentToken = TT_STAR, true;
+        {
+            return currentToken = TT_STAR, true;
+        }
 		else if (matchChar('/'))
-			return currentToken = TT_SLASH, true;
+        {
+            return currentToken = TT_SLASH, true;
+        }
 		else if (matchChar('('))
-			return currentToken = TT_LP, true;
+        {
+            return currentToken = TT_LP, true;
+        }
 		else if (matchChar(')'))
-			return currentToken = TT_RP, true;
+        {
+            return currentToken = TT_RP, true;
+        }
 	}
 
 	// if we got this far, it's an error
@@ -390,19 +448,17 @@ bool EvalParser::nextChar()
 {
 	// first time?
 	if (inputPosition == 0)
-		lookaheadChar = input.c_str()[inputPosition++];
+    {
+        lookaheadChar = input.c_str()[inputPosition++];
+    }
 
 	// read in wchar_t
 	currentChar = lookaheadChar;
 
     if (lookaheadChar != 0)
-		lookaheadChar = input.c_str()[inputPosition++];
+    {
+        lookaheadChar = input.c_str()[inputPosition++];
+    }
 
 	return true;
-}
-
-BOOL Evaluate(LPCSTR expr, int *result)
-{
-	EvalParser EvalParser;
-	return EvalParser.evaluate(expr, result);
 }
