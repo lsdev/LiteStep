@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "litestep.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.1 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.1 2002/09/23 02:43:24 message Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.2 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.2 2002/10/20 18:42:10 message Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -802,6 +802,41 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 
+STDMETHODIMP CLiteStep::get_Window(/*[out, retval]*/ long *phWnd)
+{
+    HRESULT hr;
+
+    if (phWnd != NULL)
+    {
+        *phWnd = (LONG)m_hMainWindow;
+        hr = S_OK;
+    }
+    else
+    {
+        hr = E_INVALIDARG;
+    }
+
+    return hr;
+}
+
+
+STDMETHODIMP CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath)
+{
+    HRESULT hr;
+
+    if (IsValidStringPtr(pszPath, cchPath))
+    {
+        hr = StringCchCopy(pszPath, cchPath, m_szAppPath);
+    }
+    else
+    {
+        hr = E_INVALIDARG;
+    }
+
+    return hr;
+}
+
+
 //
 // _InitServies()
 //
@@ -890,7 +925,7 @@ HRESULT CLiteStep::_InitManagers()
 
 	m_pMessageManager = new MessageManager();
 
-	m_pModuleManager = new ModuleManager(m_hMainWindow, m_szAppPath);
+	m_pModuleManager = new ModuleManager();
 
 	//gBangManager = new BangManager();
 
@@ -911,7 +946,7 @@ HRESULT CLiteStep::_StartManagers()
 	setupBangs();
 
 	// Load modules
-	m_pModuleManager->LoadModules();
+	m_pModuleManager->Start(this);
 
 	return hr;
 }
@@ -930,7 +965,7 @@ HRESULT CLiteStep::_StopManagers()
 		bHookManagerStarted = FALSE;
 	}
 
-	m_pModuleManager->QuitModules();
+	m_pModuleManager->Stop();
 	//gBangManager->ClearBangCommands();
 	m_pMessageManager->ClearMessages();
 

@@ -139,6 +139,10 @@ SOURCE=.\criticalsection.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\ILiteStep.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\IManager.h
 # End Source File
 # Begin Source File
