@@ -34,6 +34,9 @@ void CInstallNTUser::onInitDialog(Message& message)
 {
 	CWizardPage::onInitDialog(message);
 
+	SAFE_CHAR(szBuffer, 64);
+	DWORD dwLength = 64;
+	
 	SetStaticText(message.hWnd, IDC_INSTALL_NT_USERS, IDS_INSTALL_NT_USERS,
 	              "How would you like to install %s?", "LiteStep");
 
@@ -41,7 +44,9 @@ void CInstallNTUser::onInitDialog(Message& message)
 	              "Install for ALL users (%s will become the shell for all users on \
 				  this computer)", "LiteStep");
 
+	GetUserName(szBuffer, &dwLength);
+
 	SetStaticText(message.hWnd, IDC_INSTALL_NT_CURRENT_USER, IDS_INSTALL_NT_CURRENT_USER,
 	              "Install for CURRENT user (%s will only become the shell for %s)",
-				  "LiteStep", NULL);
+				  "LiteStep", szBuffer);
 }
