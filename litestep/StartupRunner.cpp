@@ -27,6 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ERK_NONE				0x0000
 #define ERK_RUNSUBKEYS			0x0001 // runs key and its subkeys
 #define ERK_DELETE				0x0002
+#define ERK_WAITFOR_QUIT        0x0004 // wait until process exits
+#define ERK_WAITFOR_IDLE        0x0008 // wait until process waits for input
 #define REGSTR_PATH_RUN_POLICY	REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
 
 StartupRunner::StartupRunner()
@@ -48,68 +50,53 @@ DWORD StartupRunner::Run(void* pvVoid)
 		bool bHKLMRunOnce = !SHRestricted(REST_NOLOCALMACHINERUNONCE);
 		bool bHKCURunOnce = !SHRestricted(REST_NOCURRENTUSERRUNONCE);
 
-		// Ini Sections
-
-		// HKLM Keys
-		_RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN_POLICY, ERK_NONE);
-		if (bHKLMRun)
-		{
-			_RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_NONE);
-		}
-
-		// HKCU Keys
-		_RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN_POLICY, ERK_NONE);
-		if (bHKCURun)
-		{
-			_RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN, ERK_NONE);
-		}
-
-        _RunStartupMenu();
-        
         if (bHKLMRunOnce)
         {
             _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUNONCE,
-                (ERK_RUNSUBKEYS | ERK_DELETE));
+                (ERK_RUNSUBKEYS | ERK_DELETE | ERK_WAITFOR_QUIT));
         }
+
+        _RunRunOnceEx();
+        
+        if (bHKLMRun)
+        {
+            _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_NONE);
+        }
+
+        _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN_POLICY, ERK_NONE);
+        _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN_POLICY, ERK_NONE);
+        
+        if (bHKCURun)
+        {
+            _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN, ERK_NONE);
+        }
+        
+        _RunStartupMenu();
         
         if (bHKCURunOnce)
         {
             _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUNONCE,
                 (ERK_RUNSUBKEYS | ERK_DELETE));
         }
-        
-        _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN_POLICY, ERK_RUNSUBKEYS);
-        if (bHKLMRun)
-        {
-            _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_RUNSUBKEYS);
-        }
-        
-        _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN_POLICY, ERK_RUNSUBKEYS);
-        if (bHKCURun)
-        {
-            _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN, ERK_RUNSUBKEYS);
-        }
     }
     
-    //
-    // RunOnceEx
-    //
-    // http://support.microsoft.com/default.aspx?scid=kb;EN-US;q232509
-    // http://support.microsoft.com/default.aspx?scid=kb;en-us;Q232487
-    //
+    return bRunStartup;
+}
+
+void StartupRunner::_RunRunOnceEx()
+{
     char szArgs[MAX_PATH] = { 0 };
     UINT uChars = GetSystemDirectory(szArgs, MAX_PATH);
     
     if (uChars > 0 && uChars < MAX_PATH)
     {
         if (SUCCEEDED(StringCchCat(szArgs, MAX_PATH,
-            "\\iernonce.dll,RunOnceExProcess")))
+            _T("\\iernonce.dll,RunOnceExProcess"))))
         {
-            ShellExecute(NULL, "open", "rundll32.exe", szArgs, NULL, SW_NORMAL);
+            ShellExecute(NULL, _T("open"), _T("rundll32.exe"), szArgs, NULL,
+                SW_NORMAL);
         }
     }
-    
-	return bRunStartup;
 }
 
 void StartupRunner::_RunStartupMenu()
@@ -286,22 +273,8 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
             {
                 if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
                 {
-                    STARTUPINFO suInfo = { 0 };
-                    PROCESS_INFORMATION procInfo;
-                    
-                    suInfo.cb = sizeof(suInfo);
-                    
-                    BOOL bReturn = CreateProcess(NULL, tzValueBuffer,
-                        NULL, NULL, FALSE,
-                        CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
-                        NULL, NULL, &suInfo,&procInfo);
-                    
-                    if (bReturn)
-                    {
-                        CloseHandle(procInfo.hProcess);
-                        CloseHandle(procInfo.hThread);
-                    }
-                    
+                    _CreateProcess(tzValueBuffer, dwFlags);
+
                     if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
                     {
                         if (RegDeleteValue(hkSubKey, tzNameBuffer) ==
@@ -344,17 +317,49 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 						if (RegDeleteValue(hkSubKey, tzNameBuffer) ==
                             ERROR_SUCCESS)
 						{
-							--dwLoop;
-						}
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-	}
-
+                            --dwLoop;
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+    }
+    
     RegCloseKey(hkSubKey);
+}
+
+
+bool StartupRunner::_CreateProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
+{
+    ASSERT(!(dwFlags & ERK_WAITFOR_QUIT && dwFlags & ERK_WAITFOR_IDLE));
+    
+    STARTUPINFO suInfo = { 0 };
+    PROCESS_INFORMATION procInfo = { 0 };
+
+    suInfo.cb = sizeof(suInfo);
+    
+    BOOL bReturn = CreateProcess(NULL, ptzCommandLine, NULL, NULL, FALSE,
+        CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
+        NULL, NULL, &suInfo, &procInfo);
+    
+    if (bReturn)
+    {
+        if (dwFlags & ERK_WAITFOR_QUIT)
+        {
+            WaitForSingleObject(procInfo.hProcess, INFINITE);
+        }
+        else if (dwFlags & ERK_WAITFOR_IDLE)
+        {
+            WaitForInputIdle(procInfo.hProcess, INFINITE);
+        }
+
+        CloseHandle(procInfo.hProcess);
+        CloseHandle(procInfo.hThread);
+    }
+
+    return bReturn ? true : false;
 }
