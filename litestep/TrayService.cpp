@@ -115,32 +115,24 @@ HRESULT TrayService::Start()
     
     if (m_hLiteStep && m_hInstance)
     {
-        // is there another tray?
-        if (!FindWindow(szTrayClass, NULL))
+        _CreateWindows();
+        
+        // Our main window is enough to start up, we can do without the
+        // TrayNotifyWnd if necessary.
+        if (m_hTrayWnd)
         {
-            _CreateWindows();
+            SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
+            SetWindowLong(m_hTrayWnd, 0, (LONG)this);
             
-            // Our main window is enough to start up, we can do without the
-            // TrayNotifyWnd if necessary.
-            if (m_hTrayWnd)
-            {
-                SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
-                SetWindowLong(m_hTrayWnd, 0, (LONG)this);
-                
-                // tell apps to reregister their icons (see Note 6)
-                PostMessage(HWND_BROADCAST,
-                    RegisterWindowMessage("TaskbarCreated"), 0, 0);
-                
-                _LoadShellServiceObjects();
-                
-                hr = S_OK;
-            }
+            // tell apps to reregister their icons (see Note 6)
+            PostMessage(HWND_BROADCAST,
+                RegisterWindowMessage("TaskbarCreated"), 0, 0);
+            
+            _LoadShellServiceObjects();
+            
+            hr = S_OK;
         }
-        else
-        {
-            hr = E_ABORT;
-        }
-	}
+    }
 
 	return hr;
 }
