@@ -21,12 +21,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "../utility/common.h"
 #include "lsapi.h"
+#include "png_support.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-#ifndef _NO_PNG_SUPPORT
-#include "png_support.h"
-#endif // _NO_PNG_SUPPORT
 
+void TransparentBltLSWorker(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent);
+
+
+//
+// Since the transparent color for all LiteStep modules should be 0xFF00FF and we 
+// are going to assume a tolerance of 0x000000, we can ignore the clrTransp and
+// clrTolerence parameter and hard code the values for the High and Low RGB bytes
+// The original code can be enabled by using the TRANSP_TOLERANCE #define below.
+// This should only be done if full backwards compatibility is needed. Modules
+// that depend on the original functionality should implement this function
+// themselves.
+
+//#define TRANSP_TOLERANCE
 
 HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int xoffset, int yoffset)
 {
@@ -40,7 +51,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 		HDC hdcMem = CreateCompatibleDC(NULL);
 		if (hdcMem)
 		{
-			VOID * pbits32;
+			VOID *pbits32;
 			HBITMAP hbm32;
 			BITMAP bm;
 			// get the size
@@ -59,7 +70,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 			bmpInfo32.biClrUsed	= 0;
 			bmpInfo32.biClrImportant	= 0;
 
-			hbm32 = CreateDIBSection(hdcMem, (BITMAPINFO *) & bmpInfo32, DIB_RGB_COLORS, &pbits32, NULL, 0);
+			hbm32 = CreateDIBSection(hdcMem, (BITMAPINFO*)&bmpInfo32, DIB_RGB_COLORS, &pbits32, NULL, 0);
 			if (hbm32)
 			{
 				HBITMAP hbmOld32 = (HBITMAP)SelectObject(hdcMem, hbm32);
@@ -73,15 +84,19 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 					BITMAP bm32;
 					GetObject(hbm32, sizeof(bm32), &bm32);
 					while (bm32.bmWidthBytes % 4)
+					{
 						bm32.bmWidthBytes++;
+					}
 
-					// get the limits for the colors
-					BYTE clrHiR = (0xff - GetRValue(clrTolerance) > GetRValue(clrTransp)) ? GetRValue(clrTransp) + GetRValue(clrTolerance) : 0xff;
-					BYTE clrHiG = (0xff - GetGValue(clrTolerance) > GetGValue(clrTransp)) ? GetGValue(clrTransp) + GetGValue(clrTolerance) : 0xff;
-					BYTE clrHiB = (0xff - GetBValue(clrTolerance) > GetBValue(clrTransp)) ? GetBValue(clrTransp) + GetBValue(clrTolerance) : 0xff;
-					BYTE clrLoR = (GetRValue(clrTolerance) < GetRValue(clrTransp)) ? GetRValue(clrTransp) - GetRValue(clrTolerance) : 0x00;
-					BYTE clrLoG = (GetGValue(clrTolerance) < GetGValue(clrTransp)) ? GetGValue(clrTransp) - GetGValue(clrTolerance) : 0x00;
-					BYTE clrLoB = (GetBValue(clrTolerance) < GetBValue(clrTransp)) ? GetBValue(clrTransp) - GetBValue(clrTolerance) : 0x00;
+#ifdef TRANSP_TOLERANCE
+                    // get the limits for the colors
+					BYTE clrHiR = ( 0xff - GetRValue( clrTolerance ) > GetRValue( clrTransp ) ) ? GetRValue( clrTransp ) + GetRValue( clrTolerance ) : 0xff;
+					BYTE clrHiG = ( 0xff - GetGValue( clrTolerance ) > GetGValue( clrTransp ) ) ? GetGValue( clrTransp ) + GetGValue( clrTolerance ) : 0xff;
+					BYTE clrHiB = ( 0xff - GetBValue( clrTolerance ) > GetBValue( clrTransp ) ) ? GetBValue( clrTransp ) + GetBValue( clrTolerance ) : 0xff;
+					BYTE clrLoR = ( GetRValue( clrTolerance ) < GetRValue( clrTransp ) ) ? GetRValue( clrTransp ) - GetRValue( clrTolerance ) : 0x00;
+					BYTE clrLoG = ( GetGValue( clrTolerance ) < GetGValue( clrTransp ) ) ? GetGValue( clrTransp ) - GetGValue( clrTolerance ) : 0x00;
+					BYTE clrLoB = ( GetBValue( clrTolerance ) < GetBValue( clrTransp ) ) ? GetBValue( clrTransp ) - GetBValue( clrTolerance ) : 0x00;
+#endif // TRANSP_TOLERANCE
 
 					// Copy the bitmap into the memory D
 					HBITMAP hbmOld = (HBITMAP)SelectObject(hdcTmp, hbm);
@@ -89,49 +104,73 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 					BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcTmp, 0, 0, SRCCOPY);
 
 					// Scan each bitmap row from bottom to top (the bitmap is inverted vertically
-					BYTE *p;
+#ifdef TRANSP_TOLERANCE
+                    BYTE *p;
+#else
+					DWORD *p;
+#endif // TRANSP_TOLERANCE
 					BYTE *p32 = (BYTE *)bm32.bmBits + (bm32.bmHeight - 1) * bm32.bmWidthBytes;
 					while (y < bm.bmHeight)
 					{
 						int x = 0;
-						while (x < bm.bmWidth)
+						while ( x < bm.bmWidth )
 						{
 							int x0 = 0;
 							// loop through all transparent pixels...
-							while (x < bm.bmWidth)
+							while ( x < bm.bmWidth )
 							{
+#ifdef TRANSP_TOLERANCE
 								p = p32 + 4 * x;
 
-								// if the pixel is non-transparent
+								//if the pixel is non-transparent
+								bool isOpaque = ((*p < clrLoB) || (*p > clrHiB));
+								p++;
+								isOpaque |= ((*p < clrLoG) || (*p > clrHiG));
+								p++;
+								isOpaque |= ((*p < clrLoR) || (*p > clrHiR));
+								if (isOpaque)
 								{
-									bool isOpaque = *p < clrLoB || *p > clrHiB;
-									p++;
-									isOpaque |= *p < clrLoG || *p > clrHiG;
-									p++;
-									isOpaque |= *p < clrLoR || *p > clrHiR;
-									if (isOpaque)
-										break;
+									break;
 								}
+#else
+								p = (DWORD*)(p32 + 4 * x);
+								if (*p != 0xFF00FF)
+								{
+									break;
+								}
+#endif // TRANSP_TOLERANCE
 
 								x++;
 							}
 							// set first non transparent pixel
 							x0 = x;
 							// loop through all non transparent pixels
-							while (x < bm.bmWidth)
+							while ( x < bm.bmWidth )
 							{
+#ifdef TRANSP_TOLERANCE
 								p = p32 + 4 * x;
+
 								// if the pixel is transparent, then break
-								if (*p >= clrLoB && *p <= clrHiB)
+								if ((*p >= clrLoB) && (*p <= clrHiB))
 								{
 									p++;
-									if (*p >= clrLoG && *p <= clrHiG)
+									if ((*p >= clrLoG) && (*p <= clrHiG))
 									{
 										p++;
-										if (*p >= clrLoR && *p <= clrHiR)
+										if ((*p >= clrLoR) && (*p <= clrHiR))
+										{
 											break;
+										}
 									}
 								}
+#else
+								p = (DWORD*)(p32 + 4 * x);
+								if (*p == 0xFF00FF)
+								{
+									break;
+								}
+#endif // TRANSP_TOLERANCE
+								
 								x++;
 							}
 							// if found one or more non-transparent pixels in a row, add them to the rgn...
@@ -159,28 +198,6 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 	return hRgn;
 }
 
-#ifndef _NO_PNG_SUPPORT
-HANDLE LoadImagePassthru(
-    HINSTANCE hinst,      // handle to instance
-    LPCSTR lpszName,     // image to load
-    UINT uType,           // image type
-    int cxDesired,        // desired width
-    int cyDesired,        // desired height
-    UINT fuLoad        // load options
-)
-{
-	//if ((strstr(lpszName, ".PNG\0") != NULL) || (strstr(lpszName, ".png\0") != NULL))
-	if (PathMatchSpec(lpszName, "*.png"))
-	{
-		return LoadFromPNG(lpszName);
-	}
-	else
-	{
-		return LoadImage(hinst, lpszName, uType, cxDesired, cyDesired, fuLoad);
-	}
-}
-#endif // _NO_PNG_SUPPORT
-
 
 //
 // HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
@@ -191,128 +208,116 @@ HANDLE LoadImagePassthru(
 //   .extract=file.exe[,3]
 HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 {
-	char szImageBuf[MAX_PATH];
-	char szImageFinal[MAX_PATH];
-	HINSTANCE hInstance;
 	HBITMAP hbmReturn = NULL;
 
 	if (IsValidStringPtr(pszImage))
 	{
-		if (strcmpi(pszImage, ".none") != 0)
+		if (lstrcmpi(pszImage, ".none") != 0)
 		{
-			hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
-			if (hInstance != NULL)
+			char szImage[MAX_PATH];
+			StringCchCopy(szImage, MAX_PATH, pszImage);
+
+			// Bitmap merging by Thedd
+			//  Thedd - pic1.bmp|pic2.bmp merges the images. Works recursively,
+			//  so pic1.bmp|.extract=whatever.dll,3|pic2.bmp also works etc...
+			// bitmap merging by grd
+			LPSTR pszSecondImage = strchr(szImage, '|');
+			if (pszSecondImage)
 			{
 
-				StringCchCopy(szImageBuf, MAX_PATH, pszImage);
+				HDC hdcFirst, hdcSecond, hdcResult;
+				HBITMAP hbmFirst, hbmFirstOld;
+				HBITMAP hbmSecond, hbmSecondOld;
+				HBITMAP	hbmResult, hbmResultOld;
+				HBRUSH hbrTransparent;
+				RECT rc;
+				int wdtFirst, hgtFirst;
+				int wdtSecond, hgtSecond;
+				int wdtResult, hgtResult;
 
-				// Bitmap merging by Thedd
-				//  Thedd - pic1.bmp|pic2.bmp merges the images. Works recursively,
-				//  so pic1.bmp|.extract=whatever.dll,3|pic2.bmp also works etc...
-				// bitmap merging by grd
-				if (strchr(szImageBuf, '|'))
+				// get the position after the [|] character
+				*pszSecondImage = '\0';
+				++pszSecondImage;
+
+				// load the two bitmaps
+				hbmFirst = LoadLSImage(szImage, pszFile);
+				hbmSecond = LoadLSImage(pszSecondImage, pszFile);
+
+				// if the second one is NULL, then there's no merging to do and
+				if (hbmSecond != NULL)
 				{
+					// create mem dcs for the bitmaps
+					hdcFirst = CreateCompatibleDC(NULL);
+					hdcSecond = CreateCompatibleDC(NULL);
 
-					HDC hdcFirst, hdcSecond, hdcResult;
-					HBITMAP hbmFirst, hbmFirstOld;
-					HBITMAP hbmSecond, hbmSecondOld;
-					HBITMAP	hbmResult, hbmResultOld;
-					HBRUSH hbrTransparent;
-					RECT rc;
-					int wdtFirst, hgtFirst;
-					int wdtSecond, hgtSecond;
-					int wdtResult, hgtResult;
-					char szFirstImage[MAX_PATH];
-					char szRestImageBuf[MAX_LINE_LENGTH];
-					LPSTR pipepos;
+					// select the bitmaps
+					hbmFirstOld = (HBITMAP)SelectObject(hdcFirst, hbmFirst);
+					hbmSecondOld = (HBITMAP)SelectObject(hdcSecond, hbmSecond);
 
-					// get the position after the [|] character
-					pipepos = strchr(szImageBuf, '|') + 1;
+					// get the bitmap sizes..
+					GetLSBitmapSize(hbmFirst, &wdtFirst, &hgtFirst);
+					GetLSBitmapSize(hbmSecond, &wdtSecond, &hgtSecond);
 
-					// copy the text after to szBuffer2
-					StringCchCopy(szFirstImage, MAX_PATH, pipepos);
+					// in earlier version of bitmap merge, those were painted on to each other
+					// now let's paint both images to a new one
 
-					// copy the text before to szBuffer1
-					StringCchCopyN(szRestImageBuf, MAX_LINE_LENGTH, szImageBuf, (pipepos - szImageBuf) - 1); //StrLen(szImageBuf)-StrLen(szBuffer2)-1);
+					// and we support different sized images!! therefore:
+					wdtResult = max(wdtFirst, wdtSecond);
+					hgtResult = max(hgtFirst, hgtSecond);
 
-					// load the two bitmaps
-					hbmFirst = LoadLSImage(szFirstImage, pszFile);
-					hbmSecond = LoadLSImage(szRestImageBuf, pszFile);
+					// create another dc, compatible with second dc
+					hdcResult = CreateCompatibleDC(hdcSecond);
 
-					// if the second one is NULL, then there's no merging to do and
-					if (hbmSecond != NULL)
-					{
-						// create mem dcs for the bitmaps
-						hdcFirst = CreateCompatibleDC(NULL);
-						hdcSecond = CreateCompatibleDC(NULL);
+					// create a new bitmap for the new dc and select it
+					hbmResult = CreateCompatibleBitmap(hdcSecond, wdtResult, hgtResult);
+					hbmResultOld = (HBITMAP)SelectObject(hdcResult, hbmResult);
 
-						// select the bitmaps
-						hbmFirstOld = (HBITMAP)SelectObject(hdcFirst, hbmFirst);
-						hbmSecondOld = (HBITMAP)SelectObject(hdcSecond, hbmSecond);
+					rc.top = 0;
+					rc.left = 0;
+					rc.right = wdtResult;
+					rc.bottom = hgtResult;
 
-						// get the bitmap sizes..
-						GetLSBitmapSize(hbmFirst, &wdtFirst, &hgtFirst);
-						GetLSBitmapSize(hbmSecond, &wdtSecond, &hgtSecond);
+					// paint the background in transparent color...
+					hbrTransparent = CreateSolidBrush(RGB(255, 0, 255));
+					FillRect(hdcResult, &rc, hbrTransparent);
+					DeleteObject(hbrTransparent);
 
-						// in earlier version of bitmap merge, those were painted on to each other
-						// now let's paint both images to a new one
+					// first "standard blit" the second image into the new one:
+					BitBlt(hdcResult, (wdtResult - wdtSecond) / 2, (hgtResult - hgtSecond) / 2, wdtSecond, hgtSecond, hdcSecond, 0, 0, SRCCOPY);
 
-						// and we support different sized images!! therefore:
-						wdtResult = max(wdtFirst, wdtSecond);
-						hgtResult = max(hgtFirst, hgtSecond);
+					// Secondly "tranparent blit" the first image over the second one
+					// Since TransparentBltLS double buffers the painting to reduce flicker
+					// and we are using only memory DC's in this function, we will just
+					// call TransparentBltLSWorker and shave off a few BitBlt calls
+					TransparentBltLSWorker(hdcResult, (wdtResult - wdtFirst) / 2, (hgtResult - hgtFirst) / 2, wdtFirst, hgtFirst, hdcFirst, 0, 0, RGB(255, 0, 255));
 
-						// create another dc, compatible with second dc
-						hdcResult = CreateCompatibleDC(hdcSecond);
+					// deselect the bitmap from the dc and delete the dc to get the image
+					SelectObject(hdcResult, hbmResultOld);
+					DeleteDC(hdcResult);
 
-						// create a new bitmap for the new dc and select it
-						hbmResult = CreateCompatibleBitmap(hdcSecond, wdtResult, hgtResult);
-						hbmResultOld = (HBITMAP)SelectObject(hdcResult, hbmResult);
+					// delete all used objects
+					SelectObject(hdcFirst, hbmFirstOld);
+					DeleteObject(hbmFirst);
+					DeleteDC(hdcFirst);
 
-						// paint the background in transparent color...
-						hbrTransparent = CreateSolidBrush(RGB(255, 0, 255));
+					SelectObject(hdcSecond, hbmSecondOld);
+					DeleteObject(hbmSecond);
+					DeleteDC(hdcSecond);
 
-						rc.top = 0;
-						rc.left = 0;
-						rc.right = wdtResult;
-						rc.bottom = hgtResult;
-
-						FillRect(hdcResult, &rc, hbrTransparent);
-
-						DeleteObject(hbrTransparent);
-
-						// first "standard blit" the second image into the new one:
-						BitBlt(hdcResult, (wdtResult - wdtSecond) / 2, (hgtResult - hgtSecond) / 2, wdtSecond, hgtSecond, hdcSecond, 0, 0, SRCCOPY);
-
-						// secondly "tranparent blit" the first image over the second one
-						TransparentBltLS(hdcResult, (wdtResult - wdtFirst) / 2, (hgtResult - hgtFirst) / 2, wdtFirst, hgtFirst, hdcFirst, 0, 0, RGB(255, 0, 255));
-
-						// deselect the bitmap from the dc and delete the dc to get the image
-						SelectObject(hdcResult, hbmResultOld);
-						DeleteDC(hdcResult);
-
-						// delete all used objects
-						SelectObject(hdcFirst, hbmFirstOld);
-						DeleteObject(hbmFirst);
-						DeleteDC(hdcFirst);
-
-						SelectObject(hdcSecond, hbmSecondOld);
-						DeleteObject(hbmSecond);
-						DeleteDC(hdcSecond);
-
-						hbmReturn = hbmResult;
-					}
-					else
-					{
-						hbmReturn = hbmFirst;
-					}
+					hbmReturn = hbmResult;
 				}
-				// end bitmap merging by grd
-
-				if (!strnicmp(szImageBuf, ".extract", strlen(".extract")))
+				else
+				{
+					hbmReturn = hbmFirst;
+				}
+			}
+			else
+			{
+				if (!strnicmp(szImage, ".extract", 8 /*strlen(".extract")*/))
 				{
 					HICON hIcon = NULL;
 
-					hIcon = LoadLSIcon(szImageBuf, pszFile);
+					hIcon = LoadLSIcon(szImage, pszFile);
 
 					if (hIcon)
 					{
@@ -320,37 +325,39 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 						DestroyIcon(hIcon);
 					}
 				}
-				else  // For now, we only support .BMP files
+				else
 				{
-					char szFullPath[MAX_PATH];
+					// Append the image name to the LiteStep image path and attempt to
+					// load the image. 
+					char szExpandedImage[MAX_PATH];
 
-					LSGetImagePath(szFullPath, MAX_PATH);
+					VarExpansionEx(szExpandedImage, szImage, MAX_PATH);
 
-					VarExpansionEx(szImageFinal, szImageBuf, MAX_PATH);
+					LSGetImagePath(szImage, MAX_PATH);
 
-					StringCchCat(szFullPath, MAX_PATH, szImageFinal);
+					PathAppend(szImage, szExpandedImage);
 
-					hbmReturn = (HBITMAP)LoadImagePassthru
-					            (
-					                hInstance,
-					                szFullPath,
-					                IMAGE_BITMAP,
-					                0,
-					                0,
-					                LR_DEFAULTCOLOR | LR_LOADFROMFILE
-					            );
-
-					if (!hbmReturn)
+					if (PathMatchSpec(szImage, "*.png"))
 					{
-						hbmReturn = (HBITMAP)LoadImagePassthru
-						            (
-						                hInstance,
-						                szImageFinal,
-						                IMAGE_BITMAP,
-						                0,
-						                0,
-						                LR_DEFAULTCOLOR | LR_LOADFROMFILE
-						            );
+						hbmReturn = LoadFromPNG(szImage);
+					}
+					else
+					{
+						hbmReturn = (HBITMAP)LoadImage(NULL, szImage, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_LOADFROMFILE);
+					}
+
+					// If that fails, treat the image as a fully 
+					// qualified path and try loading it
+					if (hbmReturn == NULL)
+					{
+						if (PathMatchSpec(szExpandedImage, "*.png"))
+						{
+							hbmReturn = LoadFromPNG(szExpandedImage);
+						}
+						else
+						{
+							hbmReturn = (HBITMAP)LoadImage(NULL, szExpandedImage, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_LOADFROMFILE);
+						}
 					}
 				}
 			}
@@ -368,32 +375,28 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 HBITMAP BitmapFromIcon(HICON hIcon)
 {
 	ICONINFO infoIcon;
-	HBITMAP hBitmap = NULL;
 
 	if (GetIconInfo(hIcon, &infoIcon))
 	{
 		HDC hDC;
 		HBITMAP hOldBMP;
 		HBRUSH hBrush;
-		BITMAP bmBitmap;
 
 		hDC = CreateCompatibleDC(NULL);
-
-		GetObject(infoIcon.hbmColor, sizeof(BITMAP), &bmBitmap);
-		hBitmap = CreateBitmapIndirect(&bmBitmap);
-		hOldBMP = (HBITMAP)SelectObject(hDC, hBitmap);
+		hOldBMP = (HBITMAP)SelectObject(hDC, infoIcon.hbmColor);
 		hBrush = CreateSolidBrush(RGB (255, 0, 255));
 		DrawIconEx(hDC, 0, 0, hIcon, 0, 0, 0, hBrush, DI_NORMAL);
-
 		DeleteObject(hBrush);
 		DeleteObject(infoIcon.hbmMask);
-		DeleteObject(infoIcon.hbmColor);
 		SelectObject(hDC, hOldBMP);
 		DeleteDC(hDC);
+
+		return infoIcon.hbmColor;
 	}
 
-	return hBitmap;
+	return NULL;
 }
+
 
 //
 // LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
@@ -404,93 +407,75 @@ HBITMAP BitmapFromIcon(HICON hIcon)
 //   c:\path\     <- icon extraction for path out of desktop.ini
 //   .extract
 //   .extract=file.exe[,3]  ... and returns an icon
-
 HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 {
-	char szIconPathBuf[MAX_PATH];
-	char szIconPathFinal[MAX_PATH];
-	int nIcon = 0;
-	HINSTANCE hInstance = NULL;
 	HICON hIcon = NULL;
 
 	if (IsValidStringPtr(pszIconPath))
 	{
-
-		if (strcmpi(pszIconPath, ".none") != 0)
+		if (lstrcmpi(pszIconPath, ".none") != 0)
 		{
-			hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
-			if (hInstance)
+			char szIconPath[MAX_PATH];
+			char szIconLSImagePath[MAX_PATH];
+			LPSTR pszIconFile = (LPSTR)pszIconPath;
+			int nIcon = 0;
+		
+			// here comes a large block which does nothing but turning it into the form
+			// <absolute path>[,<iconIndex>]
+
+			// if .extract but nothing else is there...
+			// then take the file specified as an icon (could probably be done earlier, but anyhow)
+			if (lstrcmpi(pszIconPath, ".extract") == 0)
 			{
-				// here comes a large block which does nothing but turning it into the form
-				// <absolute path>[,<iconIndex>]
+				pszIconFile = (LPSTR)pszFile;
+			}
+			else if (strnicmp(pszIconPath, ".extract=", 9) == 0)
+			{
+				// remove ".extract=" (as we won't use it anyway)
+				pszIconFile = (LPSTR)pszIconPath + 9;
+			}
 
-				// if .extract but nothing else is there...
-				// then take the file specified as an icon (could probably be done earlier, but anyhow)
-				if (strcmpi(pszIconPath, ".extract") == 0)
-				{
-					StringCchCopy(szIconPathFinal, MAX_PATH, pszFile);
-				}
-				else
-				{
-					// remove ".extract=" (as we won't use it anyway)
-					StringCchCopy(szIconPathFinal, MAX_PATH, pszIconPath + (strnicmp(pszIconPath, ".extract=", strlen(".extract=")) ? 0 : strlen(".extract=")));
-				}
+			VarExpansionEx(szIconPath, pszIconFile, MAX_PATH);
 
-				VarExpansionEx(szIconPathBuf, szIconPathFinal, MAX_PATH);
+			if (PathIsRelative(szIconPath))
+			{
+				LSGetImagePath(szIconLSImagePath, MAX_PATH);
+				PathAppend(szIconLSImagePath, szIconPath);
+				pszIconFile = szIconLSImagePath;
+			}
+			else
+			{
+				pszIconFile = szIconPath;
+			}
 
-				if (strlen(szIconPathBuf) >= 3) // could probably extend it some more
-				{
-					if (szIconPathBuf[1] != ':' || szIconPathBuf[2] != '\\')
-					{
-						LSGetImagePath(szIconPathFinal, MAX_PATH);
-					}
-					else
-					{
-						szIconPathFinal[0] = '\0';
-					}
+			// large block ends here, now time to separate path and index (if we have an index)
+			nIcon = PathParseIconLocation(pszIconFile);
 
-					StringCchCat(szIconPathFinal, MAX_PATH, szIconPathBuf);
+			// now we have the two vars we would like, and the loading can begin
+			// well not really, if it's a path, where we're going to get the icon form desktop.ini
+			// there is just a little bit more we have to do before we can start loading
+			if (PathIsDirectory(pszIconFile))
+			{
+				char szTemp[MAX_PATH];
 
-					// large block ends here, now time to separate path and index (if we have an index)
-					LPSTR szTemp = strrchr(szIconPathFinal, ',');
-					if (szTemp) // iconIndex found
-					{
-						*szTemp++ = '\0';
-						nIcon = atoi(szTemp);
-					}
+				PathAppend(pszIconFile, "desktop.ini");
+				nIcon = GetPrivateProfileInt(".ShellClassInfo", "IconIndex", 0, pszIconFile);
 
-					// now we have the two vars we would like, and the loading can begin
+				GetPrivateProfileString(".ShellClassInfo", "IconFile", "", szTemp, MAX_PATH, pszIconFile);
+				StringCchCopy(pszIconFile, MAX_PATH, szTemp);	
+			}
 
-					// well not really, if it's a path, where we're going to get the icon form desktop.ini
-					// there is just a little bit more we have to do before we can start loading
-
-					szTemp = strrchr(szIconPathFinal, '\\');
-					if (szTemp != NULL)
-					{
-						if (strlen(szTemp) == 1) // c:\path\ -> desktop.ini
-						{
-							char szSetting[MAX_PATH];
-							StringCchCat(szIconPathFinal, MAX_PATH, "desktop.ini");
-							GetPrivateProfileString(".ShellClassInfo", "IconIndex", "0", szSetting, MAX_PATH, szIconPathFinal);
-							nIcon = atoi(szSetting);
-							GetPrivateProfileString(".ShellClassInfo", "IconFile", "", szSetting, MAX_PATH, szIconPathFinal);
-							StringCchCopy(szIconPathFinal, MAX_PATH, szSetting);
-						}
-					}
-
-					// okay, now it's really time to load the icon...
-					// if it's an .ico file we want to do an LoadImage() thing, otherwise it's extracticon
-					// so lets find out the extension
-					szTemp = strrchr(szIconPathFinal, '.');
-					if (!szTemp || strcmpi(szTemp, ".ico")) // it's not an .ico file
-					{
-						hIcon = ExtractIcon(hInstance, szIconPathFinal, nIcon);
-					}
-					else
-					{
-						hIcon = (HICON)LoadImage(hInstance, szIconPathFinal, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_LOADFROMFILE);
-					}
-				}
+			// okay, now it's really time to load the icon...
+			// if it's an .ico file we want to do an LoadImage() thing, otherwise it's extracticon
+			// so lets find out the extension
+			if (PathMatchSpec(pszIconFile, "*.ico"))
+			{
+				hIcon = (HICON)LoadImage(NULL, pszIconFile, IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+			}
+			else
+			{
+				HINSTANCE hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
+				hIcon = ExtractIcon(hInstance, pszIconFile, nIcon);
 			}
 		}
 	}
@@ -521,9 +506,9 @@ void GetLSBitmapSize(HBITMAP hBitmap, LPINT nWidth, LPINT nHeight)
 
 void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent)
 {
-	HDC hdcMem, hdcMask, hdcDstCpy;
-	HBITMAP hbmMask, hbmMem, hbmDstCpy;
-	HBITMAP hbmOldMem, hbmOldMask, hbmOldDstCpy;
+	HDC hdcDstCpy;
+	HBITMAP hbmDstCpy;
+	HBITMAP hbmOldDstCpy;
 
 	// create a destination compatble dc containing
 	// a copy of the destination dc
@@ -532,6 +517,24 @@ void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeigh
 	hbmOldDstCpy = (HBITMAP)SelectObject(hdcDstCpy, hbmDstCpy);
 
 	BitBlt(hdcDstCpy, 0, 0, nWidth, nHeight, hdcDst, nXDest, nYDest, SRCCOPY);
+
+	TransparentBltLSWorker(hdcDstCpy, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, colorTransparent);
+
+	// now we have created the image we want to blt
+	// in the destination copy dc
+	BitBlt(hdcDst, nXDest, nYDest, nWidth, nHeight, hdcDstCpy, 0, 0, SRCCOPY);
+
+	SelectObject(hdcDstCpy, hbmOldDstCpy);
+	DeleteObject(hbmDstCpy);
+	DeleteDC(hdcDstCpy);
+}
+
+
+void TransparentBltLSWorker(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent)
+{
+	HDC hdcMem, hdcMask;
+	HBITMAP hbmMask, hbmMem;
+	HBITMAP hbmOldMem, hbmOldMask;
 
 	// create a destination compatble dc containing
 	// a copy of the source dc
@@ -561,18 +564,10 @@ void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeigh
 
 	BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
 
-	// Set the foreground to black. See comment above.
-	SetBkColor(hdcDst, RGB(255, 255, 255));
-	SetTextColor(hdcDst, RGB(0, 0, 0));
-
-	BitBlt(hdcDstCpy, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
+    BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
 
 	// Combine the foreground with the background
-	BitBlt(hdcDstCpy, 0, 0, nWidth, nHeight, hdcMem, 0, 0, SRCPAINT);
-
-	// now we have created the image we want to blt
-	// in the destination copy dc
-	BitBlt(hdcDst, nXDest, nYDest, nWidth, nHeight, hdcDstCpy, 0, 0, SRCCOPY);
+	BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMem, 0, 0, SRCPAINT);
 
 	SelectObject(hdcMask, hbmOldMask);
 	DeleteObject(hbmMask);
@@ -581,10 +576,6 @@ void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeigh
 	SelectObject(hdcMem, hbmOldMem);
 	DeleteObject(hbmMem);
 	DeleteDC(hdcMem);
-
-	SelectObject(hdcDstCpy, hbmOldDstCpy);
-	DeleteObject(hbmDstCpy);
-	DeleteDC(hdcDstCpy);
 }
 
 
