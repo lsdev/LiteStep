@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <shellapi.h>
 #include <vector>
 
+#define TRAY_MAX_TIP_LENGTH       128
+#define TRAY_MAX_INFO_LENGTH      256
+#define TRAY_MAX_INFOTITLE_LENGTH 64
 
 // this is sent to the systray module(s)
 typedef struct
@@ -35,9 +38,22 @@ typedef struct
 	UINT uFlags;
 	UINT uCallbackMessage;
 	HICON hIcon;
-	CHAR szTip[256];
-	DWORD dwState;
+	CHAR szTip[TRAY_MAX_TIP_LENGTH];
+
+	// new in 2K:
+    DWORD dwState;
 	DWORD dwStateMask;
+    CHAR szInfo[TRAY_MAX_INFO_LENGTH];
+    union
+    {
+        UINT uTimeout;
+        UINT uVersion;
+    } DUMMYUNIONNAME;
+    CHAR szInfoTitle[TRAY_MAX_INFOTITLE_LENGTH];
+    DWORD dwInfoFlags;
+
+    // new in XP:
+    GUID guidItem;
 }
 LSNOTIFYICONDATA;
 
@@ -271,13 +287,11 @@ private:
     //
     void _CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
                                const NOTIFYICONDATA& nidSource) const;
-    int _ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
-        const wchar_t* pwzInput, size_t cchInputMax) const;
 
     //
     // _FindIcon variants
     //
-    IconVector::iterator TrayService::_FindIcon(HWND hWnd, UINT uId);
+    IconVector::iterator _FindIcon(HWND hWnd, UINT uId);
     
     inline IconVector::iterator _FindIcon(const NOTIFYICONDATA& nid)
     {
@@ -287,6 +301,12 @@ private:
     //
     // miscellaneous
     //
+    inline bool _IsUnicode(const NOTIFYICONDATA& nid) const
+    {
+        return (nid.cbSize != NID_4A_SIZE && nid.cbSize != NID_5A_SIZE && 
+            nid.cbSize != NID_6A_SIZE);
+    }
+
     inline bool _IsHidden(const LSNOTIFYICONDATA& lnid) const
     {
         return ((lnid.uFlags & NIF_STATE) &&
@@ -299,12 +319,25 @@ private:
             ((lnid.dwState & lnid.dwStateMask) & NIS_SHAREDICON));
     }
 
+    inline bool _IsShared(const NOTIFYICONDATA& nid) const
+    {
+        NID_6W* pnid = (NID_6W*)&nid;
+        return ((pnid->uFlags & NIF_STATE) &&
+            (pnid->cbSize != NID_4A_SIZE) && (pnid->cbSize != NID_4W_SIZE) &&
+            ((pnid->dwState & pnid->dwStateMask) & NIS_SHAREDICON));
+    }
+
     inline bool _IsValidIcon(const LSNOTIFYICONDATA* plnid) const
     {
         ASSERT_ISREADPTR(plnid);
-        return ((plnid->uFlags & NIF_MESSAGE) && (plnid->uFlags & NIF_ICON) &&
-            !_IsHidden(*plnid));
+        return ((plnid->uFlags & NIF_ICON) && !_IsHidden(*plnid));
     }
+
+    int _ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
+        const wchar_t* pwzInput, size_t cchInputMax) const;
+
+    bool _StringCopy(LPSTR pszDest, size_t cchDest, LPCSTR pszSrc) const;
+    bool _StringCopy(LPSTR pszDest, size_t cchDest, LPCWSTR pwzSrc) const;
     
     //
     //
@@ -312,7 +345,6 @@ private:
     HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
 	HWND m_hLiteStep;
-    HWND m_hConnectionsTray;
     HINSTANCE m_hInstance;
     
     std::vector<struct IOleCommandTarget*> m_ssoList;
