@@ -24,12 +24,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void MessageManager::AddMessage(HWND window, UINT message)
 {
-	m_MessageMap[message].insert(window);
+	Lock lock(m_cs);
+    m_MessageMap[message].insert(window);
 }
 
 void MessageManager::AddMessages(HWND window, UINT *pMessages)
 {
-	if (pMessages != NULL)
+    Lock lock(m_cs);
+
+    if (pMessages != NULL)
 	{
 		while (*pMessages != 0)
 		{
@@ -41,8 +44,15 @@ void MessageManager::AddMessages(HWND window, UINT *pMessages)
 
 void MessageManager::RemoveMessage(HWND window, UINT message)
 {
-	messageMapT::iterator it;
-	it = m_MessageMap.find(message);
+    //
+    // This function is the main reason why everything here is locked...
+    // You wouldn't want this function to mess around while another thread is in
+    // SendMessage for example.
+    //
+    Lock lock(m_cs);
+
+	messageMapT::iterator it = m_MessageMap.find(message);
+
 	if (it != m_MessageMap.end())
 	{
 		it->second.erase(window);
@@ -55,6 +65,8 @@ void MessageManager::RemoveMessage(HWND window, UINT message)
 
 void MessageManager::RemoveMessages(HWND window, UINT *pMessages)
 {
+    Lock lock(m_cs);
+
 	if (pMessages != NULL)
 	{
 		while (*pMessages != 0)
@@ -68,11 +80,13 @@ void MessageManager::RemoveMessages(HWND window, UINT *pMessages)
 
 void MessageManager::ClearMessages(void)
 {
+    Lock lock(m_cs);
 	m_MessageMap.clear();
 }
 
 LRESULT MessageManager::SendMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
+    Lock lock(m_cs);
 	LRESULT lResult = 0;
 
 	messageMapT::iterator it = m_MessageMap.find(message);
@@ -90,6 +104,7 @@ LRESULT MessageManager::SendMessage(UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL MessageManager::PostMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
+    Lock lock(m_cs);
 	BOOL bResult = TRUE;
 
 	messageMapT::iterator it = m_MessageMap.find(message);
@@ -107,7 +122,9 @@ BOOL MessageManager::PostMessage(UINT message, WPARAM wParam, LPARAM lParam)
 
 void MessageManager::GetRevID(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	messageMapT::iterator it;
+	Lock lock(m_cs);
+
+    messageMapT::iterator it;
 	it = m_MessageMap.find(message);
 	if (it != m_MessageMap.end())
 	{
@@ -127,6 +144,7 @@ void MessageManager::GetRevID(UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL MessageManager::HandlerExists(UINT message)
 {
+    Lock lock(m_cs);
 	return (m_MessageMap.find(message) != m_MessageMap.end()) ? TRUE : FALSE;
 }
 
