@@ -2,12 +2,79 @@
 
 BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {
-	return TRUE;
+#ifdef LS_COMPAT_LOGGING
+
+    char szLogFile[MAX_PATH];
+	
+    int nLogLevel = GetRCInt("LSLogLevel", 2);
+    GetRCString("LSLogFile", szLogFile, NULL, MAX_PATH);
+	
+	// Has a log file been assigned?
+	if(!szLogFile[0])
+		return FALSE;
+
+	// Should this message be logged?
+	if(nLevel > nLogLevel)
+		return FALSE;
+
+	// If so, open it
+	HANDLE hLogFile = CreateFile(szLogFile, 
+		GENERIC_WRITE,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL,
+		OPEN_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+        NULL);
+    
+    // Did open succeed?
+    if(hLogFile == INVALID_HANDLE_VALUE)
+        return FALSE;
+    
+    // Move to the end of the file
+    SetFilePointer(hLogFile, 0, NULL, FILE_END);
+    
+    // Get timestamp
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    
+    // Add timestamp and module name to message
+    LPCSTR rszLevel[4] = { "Error", "Warning", "Notice", "Debug" };
+    TCHAR szLine[2048];
+    int nLen;
+    
+    nLen = wsprintf(szLine, "%02d-%02d-%04d %02d:%02d:%02d - %s - %s: %s\r\n",
+        st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute, st.wSecond,
+        rszLevel[nLevel-1], pszModule, pszMessage);
+    
+    // Write it to the log file
+    DWORD dwCount;
+    WriteFile(hLogFile, szLine, nLen, &dwCount, NULL);
+    
+    // Close the log
+    CloseHandle(hLogFile);
+#endif // LS_COMPAT_LOGGING
+    
+    return TRUE;
 }
 
 BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
 {
-	return TRUE;
+#ifdef LS_COMPAT_LOGGING
+
+    char szMessage[MAX_LINE_LENGTH];
+    va_list argList;
+    
+    va_start(argList, pszFormat);
+    wvsprintf(szMessage, pszFormat, argList);
+    va_end(argList);
+    
+    return LSLog(nLevel, pszModule, szMessage);
+
+#else
+
+    return TRUE;
+
+#endif // LS_COMPAT_LOGGING
 }
 
 int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal)

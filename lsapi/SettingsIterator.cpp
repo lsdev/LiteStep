@@ -71,26 +71,23 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
 BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
-	char wzKey[MAX_RCCOMMAND];
 
 	if (IsValidStringPtr(pszValue, cchValue) && IsValidStringPtr(pszConfig))
 	{
 		SettingsMap::iterator itSettings;
-		StringCchCopy(wzKey, MAX_RCCOMMAND, pszConfig);
-		CharLowerBuff(wzKey, MAX_RCCOMMAND);
-
+		
 		pszValue[0] = '\0';
 
 		// Has ReadNextConfig been used before for pszConfig?
-		IteratorMap::iterator it = m_Iterators.find(wzKey);
+		IteratorMap::iterator it = m_Iterators.find(pszConfig);
 		if (it == m_Iterators.end())
 		{
 			// No, so find the first item with a key of pszConfig
-			itSettings = m_pSettingsMap->lower_bound(wzKey);
-			if (strcmp(itSettings->first.c_str(), wzKey) == 0) // != m_pSettingsManager->end())
+			itSettings = m_pSettingsMap->lower_bound(pszConfig);
+			if (stricmp(itSettings->first.c_str(), pszConfig) == 0) // != m_pSettingsManager->end())
 			{
 				// Save the iterator for future use and return the value
-				it = (m_Iterators.insert(IteratorMap::value_type(wzKey, itSettings))).first;
+				it = (m_Iterators.insert(IteratorMap::value_type(pszConfig, itSettings))).first;
 
 				bReturn = TRUE;
 			}
@@ -98,7 +95,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
 		else
 		{
 			// Yes so find the last item with a matching key
-			itSettings = m_pSettingsMap->upper_bound(wzKey);
+			itSettings = m_pSettingsMap->upper_bound(pszConfig);
 
 			// Loop until we either find an item with a matching key or the
 			// last matching item
@@ -106,7 +103,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
 			{
 				it->second++;
 			}
-			while ((strcmp(wzKey, it->first.c_str()) != 0) &&
+			while ((stricmp(pszConfig, it->first.c_str()) != 0) &&
 			        (it->second != itSettings));
 			// If we found a valid item, return it
 			if (it->second != itSettings)
