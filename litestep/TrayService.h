@@ -202,6 +202,15 @@ typedef struct _SHELLTRAYDATA
     NOTIFYICONDATA nid;
 } SHELLTRAYDATA;
 
+// Data sent with AppBar Message (from Maduin)
+typedef struct _SHELLAPPBARDATA
+{
+    APPBARDATA abd;
+    DWORD dwMessage;
+    DWORD dwDontKnow;
+    DWORD dwNoClue;
+} SHELLAPPBARDATA;
+
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
@@ -223,8 +232,11 @@ public:
     virtual HRESULT Start();
     virtual HRESULT Stop();
     
+    // Handler for AppBar messages
+    BOOL HandleAppBarMessage(SHELLAPPBARDATA* pData);
+
     // Handler for system tray notifications
-    bool HandleNotification(SHELLTRAYDATA* pstd);
+    BOOL HandleNotification(SHELLTRAYDATA* pstd);
     
     // resend all icon data
     void SendSystemTray();
