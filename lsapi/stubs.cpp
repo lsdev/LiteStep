@@ -10,11 +10,14 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
     int nLogLevel = GetRCInt("LSLogLevel", 2);
     
     // Should this message be logged?
-    if(nLevel > nLogLevel)
+    if (!pszModule || !pszMessage ||
+        (nLevel > nLogLevel) || (nLevel < 1) || (nLevel > 4))
+    {
         return FALSE;
+    }
 
     // Has a log file been assigned?
-    if(!GetRCString("LSLogFile", szLogFile, NULL, MAX_PATH))
+    if (!GetRCString("LSLogFile", szLogFile, NULL, MAX_PATH))
     {
         return FALSE;
     }
@@ -65,6 +68,11 @@ BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
 {
 #ifdef LS_COMPAT_LOGGING
 
+    if (!pszModule || !pszFormat)
+    {
+        return FALSE;
+    }
+
     char szMessage[MAX_LINE_LENGTH];
     va_list argList;
     
@@ -83,10 +91,12 @@ BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
 
 int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal)
 {
-	CHAR strVal[MAX_LINE_LENGTH];
+	char strVal[MAX_LINE_LENGTH];
 
 	if (!GetRCString(pszKeyName, strVal, NULL, MAX_LINE_LENGTH))
-		return nDefault;
+    {
+        return nDefault;
+    }
 
 	return ParseCoordinate(strVal, nDefault, nMaxVal);
 }
@@ -99,8 +109,10 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
 
 	int value = 0;
 
-	if (!szString[0])
-		return nDefault;
+	if (!szString || !szString[0])
+    {
+        return nDefault;
+    }
 
 	if (szString[0] == '-')
 	{
