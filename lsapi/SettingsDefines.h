@@ -8,15 +8,9 @@
 #include <map>
 #include <set>
 
-using namespace std;
 
-typedef multimap<string, string, stringicmp> SettingsMap;
-typedef SettingsMap::value_type value_type;
-typedef map<string, SettingsMap::iterator> IteratorMap;
-
-#include "settingsiterator.h"
-
-
+typedef std::multimap<std::string, std::string, stringicmp> SettingsMap;
+typedef std::map<std::string, SettingsMap::iterator> IteratorMap;
 
 
 #endif // __SETTINGSDEFINES_H_
