@@ -20,10 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __HOOK_H
 #define __HOOK_H
 
-#ifdef _DEBUG
-#define _LSDEBUG
-#endif
-
 #include "../utility/common.h"
 
 #define HOOKMGRWINDOWNAME  "HookMgrWindow"

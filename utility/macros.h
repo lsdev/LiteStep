@@ -25,12 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "..\lsapi\lsapi.h"
 
-// Include debugging macros
-#ifdef _DEBUG
-#define _LSDEBUG
-#endif
-#include "lsdebug.h"
-
 // Macros for Resource strings and localization
 #ifndef _LSRESOURCEBUFFER
 static char resourceTextBuffer[MAX_LINE_LENGTH + 1];

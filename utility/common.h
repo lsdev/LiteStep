@@ -43,12 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <shlwapi.h>
 #include <tchar.h>
 
-// Include debugging macros
-#ifdef _DEBUG
-#define _LSDEBUG
-#endif
-#include "lsdebug.h"
-
+#include "debug.hpp"
 #include "../litestep/resource.h"
 #include "../lsapi/lsapidefines.h"
 #include "safeptr.h"
