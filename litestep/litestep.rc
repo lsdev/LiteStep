@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Taiwan) resources
+// Chinesisch (Taiwan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
 #ifdef _WIN32
@@ -50,12 +50,12 @@ BEGIN
     IDS_LITESTEP_UNINSTALLLS "²¾°£ LiteStep (&U)"
 END
 
-#endif    // Chinese (Taiwan) resources
+#endif    // Chinesisch (Taiwan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
+// Deutsch (Deutschland) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 #ifdef _WIN32
@@ -92,12 +92,12 @@ BEGIN
     IDS_LITESTEP_UNINSTALLLS "Litestep &Deinstallieren"
 END
 
-#endif    // German (Germany) resources
+#endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// Englisch (USA) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -253,11 +253,11 @@ BEGIN
     IDS_LITESTEP_ERROR6     "Recycle has been paused, click OK to continue."
     IDS_LITESTEP_ERROR7     "Unable to load %s."
     IDS_LITESTEP_TITLE_FATAL_ERROR "Fatal Error"
-    IDS_LITESTEP_RECYCLELS  "&Recycle LiteStep"
+    IDS_LITESTEP_RECYCLELS  "Re&cycle LiteStep"
     IDS_LITESTEP_QUITLS     "&Quit LiteStep"
     IDS_LITESTEP_TERMINATELS "Forcibly &Terminate LiteStep"
-    IDS_LITESTEP_RUN        "R&un..."
-    IDS_LITESTEP_SHUTDOWNWIN "&Shutdown Windows..."
+    IDS_LITESTEP_RUN        "&Run..."
+    IDS_LITESTEP_SHUTDOWNWIN "Sh&utdown Windows..."
 END
 
 STRINGTABLE DISCARDABLE 
@@ -280,12 +280,12 @@ BEGIN
     IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."
 END
 
-#endif    // English (U.S.) resources
+#endif    // Englisch (USA) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// French (France) resources
+// Französisch (Frankreich) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
 #ifdef _WIN32
@@ -322,12 +322,12 @@ BEGIN
     IDS_LITESTEP_UNINSTALLLS "&Désinstaller LiteStep"
 END
 
-#endif    // French (France) resources
+#endif    // Französisch (Frankreich) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Dutch (Netherlands) resources
+// Holländisch (Niederlande) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
 #ifdef _WIN32
@@ -364,12 +364,12 @@ BEGIN
     IDS_LITESTEP_UNINSTALLLS "&De-installeren LiteStep"
 END
 
-#endif    // Dutch (Netherlands) resources
+#endif    // Holländisch (Niederlande) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Swedish resources
+// Schwedisch resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_SVE)
 #ifdef _WIN32
@@ -406,12 +406,12 @@ BEGIN
     IDS_LITESTEP_UNINSTALLLS "A&vinstallera LiteStep"
 END
 
-#endif    // Swedish resources
+#endif    // Schwedisch resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Mexican) resources
+// Spanisch (Mexikanisch) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 #ifdef _WIN32
@@ -448,7 +448,7 @@ BEGIN
     IDS_LITESTEP_UNINSTALLLS "&Desinstalar LiteStep"
 END
 
-#endif    // Spanish (Mexican) resources
+#endif    // Spanisch (Mexikanisch) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
