@@ -119,7 +119,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 				// fill the listview
 				aboutOptions[i].function(GetDlgItem(hWnd, IDC_LISTVIEW));
 			}
-			else if (LOWORD(wParam) == IDOK)
+			else if (LOWORD(wParam) == IDOK || LOWORD(wParam == IDCANCEL))
 			{
 				// release title font
 				HFONT titleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
