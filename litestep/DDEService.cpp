@@ -1,0 +1,224 @@
+/*
+This is a part of the LiteStep Shell Source code.
+
+Copyright (C) 1997-2002 The LiteStep Development Team
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/ 
+/****************************************************************************
+****************************************************************************/
+#include "DDEService.h"
+#include "../utility/shellhlp.h"
+#include "../utility/safestr.h" // Always include last in cpp file
+
+DDEWorker DDEService::m_DDEWorker;
+HSZ DDEService::m_hszProgman;
+HSZ DDEService::m_hszGroups;
+HSZ DDEService::m_hszFolders;
+HSZ DDEService::m_hszAppProperties;
+DWORD DDEService::m_dwDDEInst;
+
+DDEService::DDEService()
+{
+	m_hszProgman = NULL;
+	m_hszGroups = NULL;
+	m_hszFolders = NULL;
+	m_hszAppProperties = NULL;
+	m_dwDDEInst = NULL;
+}
+
+DDEService::~DDEService()
+{}
+
+HRESULT DDEService::Start()
+{
+	HRESULT hr = E_FAIL;
+
+	// If m_dwDDEInst is not NULL, then we have already been started, just return S_FALSE
+	// which will still pass SUCCEEDED()
+	if (!m_dwDDEInst)
+	{
+		if (FindWindow("Progman", NULL) == NULL)
+		{
+			HMODULE hInstance = GetModuleHandle(NULL);
+			UINT uInitReturn;
+
+			uInitReturn = DdeInitialize(&m_dwDDEInst, (PFNCALLBACK)MakeProcInstance((FARPROC)DdeCallback, hInstance),
+			                            APPCLASS_STANDARD | CBF_FAIL_POKES | CBF_FAIL_SELFCONNECTIONS | CBF_SKIP_ALLNOTIFICATIONS,
+			                            0L);
+			if (uInitReturn == DMLERR_NO_ERROR)
+			{
+				hr = _RegisterDDE();
+			}
+		}
+	}
+	else
+	{
+		hr = S_FALSE;
+	}
+
+	return hr;
+}
+
+
+HRESULT DDEService::Stop()
+{
+	HRESULT hr = S_OK;
+
+	DdeNameService(m_dwDDEInst, 0L, 0L, DNS_UNREGISTER);
+	if (m_hszProgman)
+	{
+		DdeFreeStringHandle(m_dwDDEInst, m_hszProgman);
+	}
+	if (m_hszGroups)
+	{
+		DdeFreeStringHandle(m_dwDDEInst, m_hszGroups);
+	}
+	if (m_hszFolders)
+	{
+		DdeFreeStringHandle(m_dwDDEInst, m_hszFolders);
+	}
+	if (m_hszAppProperties)
+	{
+		DdeFreeStringHandle(m_dwDDEInst, m_hszAppProperties);
+	}
+	DdeUninitialize(m_dwDDEInst);
+
+	return hr;
+}
+
+HDDEDATA CALLBACK DDEService::DdeCallback(
+    UINT wType,
+    UINT wFmt,
+    HCONV hConv,
+    HSZ hszTopic,
+    HSZ hszItem,
+    HDDEDATA hData,
+    DWORD lData1,
+    DWORD lData2)
+{
+	static HANDLE hToken;
+	static TOKEN_PRIVILEGES tp;
+	static LUID luid;
+	HDDEDATA hReturn = (HDDEDATA)FALSE;
+
+	switch (wType)
+	{
+		case XTYP_CONNECT:
+		{
+			hReturn = (HDDEDATA)TRUE;
+		}
+		break;
+
+		case XTYP_WILDCONNECT:
+		{
+			HDDEDATA hData;
+			HSZPAIR FAR *phszp;
+			DWORD cb;
+
+			if ((!hszTopic || hszTopic == m_hszProgman) && (!hszItem || hszItem == m_hszProgman))
+			{
+				if ((hData = DdeCreateDataHandle(m_dwDDEInst, NULL,
+				                                 2 * sizeof(HSZPAIR), 0L, 0, 0, 0)))
+				{
+					phszp = (HSZPAIR FAR *)DdeAccessData(hData, &cb);
+					phszp[0].hszSvc = m_hszProgman;
+					phszp[0].hszTopic = m_hszProgman;
+					phszp[1].hszSvc = phszp[1].hszTopic = 0;
+					DdeUnaccessData(hData);
+					hReturn = hData;
+				}
+			}
+		}
+		break;
+
+		case XTYP_EXECUTE:
+		{
+			if ((hszTopic == m_hszGroups) || (hszTopic == m_hszAppProperties))
+			{
+				CHAR szBuf[MAX_PATH];
+				DdeGetData(hData, (LPBYTE)szBuf, MAX_PATH, 0);
+				szBuf[MAX_PATH - 1] = '\0';
+				if (m_DDEWorker.ParseRequest(szBuf))
+				{
+					hReturn = (HDDEDATA)DDE_FACK;
+				}
+			}
+		}
+		break;
+
+		case XTYP_ADVSTART:
+		case XTYP_ADVSTOP:
+		{
+			if (wFmt == CF_TEXT)
+			{
+				hReturn = (HDDEDATA)TRUE;
+			}
+		}
+		break;
+
+		case XTYP_REQUEST:
+		case XTYP_ADVREQ:
+		{
+			if ((wFmt == CF_TEXT) && ((hszTopic == m_hszProgman) && (hszItem == m_hszGroups)))
+			{
+				LPVOID pList = NULL;
+				UINT ulLen = 0;
+
+				if (m_DDEWorker.ListGroups(pList, ulLen))
+				{
+					hReturn = DdeCreateDataHandle(m_dwDDEInst, (LPBYTE)pList, ulLen, 0L,
+					                              m_hszGroups, CF_TEXT, 0);
+					HeapFree(GetProcessHeap(), 0, pList);
+				}
+			}
+		}
+		break;
+	}
+
+	return hReturn;
+}
+
+
+HRESULT DDEService::_RegisterDDE()
+{
+	HRESULT hr = E_FAIL;
+
+	m_hszProgman = DdeCreateStringHandle(m_dwDDEInst, "PROGMAN", 0);
+	if (m_hszProgman != 0L)
+	{
+		m_hszGroups = DdeCreateStringHandle(m_dwDDEInst, "Groups", 0);
+		if (m_hszGroups != 0L)
+		{
+			m_hszFolders = DdeCreateStringHandle(m_dwDDEInst, "Folders", 0);
+			if (m_hszGroups != 0L)
+			{
+				m_hszAppProperties = DdeCreateStringHandle(m_dwDDEInst, "AppProperties", 0);
+				if (m_hszAppProperties != 0L)
+				{
+					if (DdeNameService(m_dwDDEInst, m_hszProgman, 0L, DNS_REGISTER) != 0L)
+					{
+						if (DdeNameService(m_dwDDEInst, m_hszFolders, 0L, DNS_REGISTER) != 0L)
+						{
+							hr = S_OK;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return hr;
+}

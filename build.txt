@@ -1,0 +1,17 @@
+How to build.
+
+Download libpng from http://www.libpng.org and place in the \libpng directory (make sure it is libpng and not lpng124 or something else)
+
+Download zlib from http://www.zlib.org and unzip in the \zlib directory
+
+Open the \libpng\projects\msvc\libpng.dsw MS VC++ workspace
+
+Compile the zlib and libpng dll's
+
+LiteStep sources should be in \ls-b247
+
+for instance the directory structure should look something like this
+
+c:\cvs\libpng\
+c:\cvs\zlib\
+c:\cvs\ls-b247\
