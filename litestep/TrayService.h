@@ -24,10 +24,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/IService.h"
 #include <vector>
 
-#define TRAYSERVICE_CLASS "Shell_TrayWnd"
-#define TRAYSERVICE_TITLE "Litestep Tray Manager"
 
-typedef struct LSNOTIFYICONDATA
+// this is sent to the systray module(s)
+typedef struct
 {
 	DWORD cbSize;
 	HWND hWnd;
@@ -39,36 +38,30 @@ typedef struct LSNOTIFYICONDATA
 	DWORD dwState;
 	DWORD dwStateMask;
 }
-LSNOTIFYICONDATA, *PLSNOTIFYICONDATA;
+LSNOTIFYICONDATA;
 
-struct SYSTRAYICONDATA
+typedef std::vector<LSNOTIFYICONDATA*> IconVector;
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// NOTIFYICONDATA variants
+//
+
+// Win9x
+typedef struct
 {
-	LSNOTIFYICONDATA nid;
-	BOOL bHidden;
-};
-typedef SYSTRAYICONDATA* PSYSTRAYICONDATA;
+    DWORD cbSize;
+    HWND hWnd;
+    UINT uID;
+    UINT uFlags;
+    UINT uCallbackMessage;
+    HICON hIcon;
+    CHAR szTip[64];
+} NID_4A;
 
-struct IOleCommandTarget;
-typedef std::vector<IOleCommandTarget*> ShellServiceObjectVector;
-typedef std::vector<SYSTRAYICONDATA*> SystrayIconVector;
-
-
-// version of NOTIFYICONDATA used by 9x
-typedef struct _NOTIFYICONDATAV4A
-{
-	DWORD cbSize;
-	HWND hWnd;
-	UINT uID;
-	UINT uFlags;
-	UINT uCallbackMessage;
-	HICON hIcon;
-	CHAR szTip[64];
-}
-NOTIFYICONDATAV4A, *PNOTIFYICONDATAV4A;
-const ULONG NOTIFYICONDATAV4A_cbSize = sizeof(NOTIFYICONDATAV4A);
-
-// version of NOTIFYICONDATA used by NT 4.0
-typedef struct _NOTIFYICONDATAV4W
+// NT 4.0
+typedef struct
 {
 	DWORD cbSize;
 	HWND hWnd;
@@ -77,12 +70,54 @@ typedef struct _NOTIFYICONDATAV4W
 	UINT uCallbackMessage;
 	HICON hIcon;
 	WCHAR szTip[64];
-}
-NOTIFYICONDATAV4W, *PNOTIFYICONDATAV4W;
-const ULONG NOTIFYICONDATAV4W_cbSize = sizeof(NOTIFYICONDATAV4W);
+} NID_4W;
 
-// version of NOTIFYICONDATA used by ME
-typedef struct _NOTIFYICONDATAV5A
+// IE 5 (ME?)
+typedef struct
+{
+    DWORD cbSize;
+    HWND hWnd;
+    UINT uID;
+    UINT uFlags;
+    UINT uCallbackMessage;
+    HICON hIcon;
+    CHAR szTip[128];
+    DWORD dwState;
+    DWORD dwStateMask;
+    CHAR szInfo[256];
+    union
+    {
+        UINT uTimeout;
+        UINT uVersion;
+    } DUMMYUNIONNAME;
+    CHAR szInfoTitle[64];
+    DWORD dwInfoFlags;
+} NID_5A;
+
+// IE 5 (2K)
+typedef struct
+{
+    DWORD cbSize;
+    HWND hWnd;
+    UINT uID;
+    UINT uFlags;
+    UINT uCallbackMessage;
+    HICON hIcon;
+    WCHAR szTip[128];
+    DWORD dwState;
+    DWORD dwStateMask;
+    WCHAR szInfo[256];
+    union
+    {
+        UINT uTimeout;
+        UINT uVersion;
+    } DUMMYUNIONNAME;
+    WCHAR szInfoTitle[64];
+    DWORD dwInfoFlags;
+} NID_5W;
+
+// IE 6
+typedef struct
 {
 	DWORD cbSize;
 	HWND hWnd;
@@ -94,18 +129,18 @@ typedef struct _NOTIFYICONDATAV5A
 	DWORD dwState;
 	DWORD dwStateMask;
 	CHAR szInfo[256];
-	union {
+	union
+    {
 		UINT uTimeout;
 		UINT uVersion;
 	} DUMMYUNIONNAME;
 	CHAR szInfoTitle[64];
 	DWORD dwInfoFlags;
-}
-NOTIFYICONDATAV5A, *PNOTIFYICONDATAV5A;
-const ULONG NOTIFYICONDATAV5A_cbSize = sizeof(NOTIFYICONDATAV5A);
+    GUID guidItem;
+} NID_6A;
 
-// version of NOTIFYICONDATA used by W2K
-typedef struct _NOTIFYICONDATAV5W
+// IE 6 (XP)
+typedef struct
 {
 	DWORD cbSize;
 	HWND hWnd;
@@ -117,115 +152,117 @@ typedef struct _NOTIFYICONDATAV5W
 	DWORD dwState;
 	DWORD dwStateMask;
 	WCHAR szInfo[256];
-	union {
-		UINT uTimeout;
-		UINT uVersion;
-	} DUMMYUNIONNAME;
-	WCHAR szInfoTitle[64];
-	DWORD dwInfoFlags;
-}
-NOTIFYICONDATAV5W, *PNOTIFYICONDATAV5W;
-const ULONG NOTIFYICONDATAV5W_cbSize = sizeof(NOTIFYICONDATAV5W);
-
-// version of NOTIFYICONDATA used by W2K
-typedef struct _NOTIFYICONDATAV6W
-{
-	DWORD cbSize;
-	HWND hWnd;
-	UINT uID;
-	UINT uFlags;
-	UINT uCallbackMessage;
-	HICON hIcon;
-	WCHAR szTip[128];
-	DWORD dwState;
-	DWORD dwStateMask;
-	WCHAR szInfo[256];
-	union {
+	union
+    {
 		UINT uTimeout;
 		UINT uVersion;
 	} DUMMYUNIONNAME;
 	WCHAR szInfoTitle[64];
 	DWORD dwInfoFlags;
 	GUID guidItem;
-}
-NOTIFYICONDATAV6W, *PNOTIFYICONDATAV6W;
-const ULONG NOTIFYICONDATAV6W_cbSize = sizeof(NOTIFYICONDATAV6W);
+} NID_6W;
 
-// data sent by shell via Shell_NotifyIcon -- Maduin
-typedef struct SHELLTRAYDATA
+
+union NID_PTR
 {
-	DWORD dwUnknown;
-	DWORD dwMessage;
-	union nid
-	{
-		NOTIFYICONDATAV4A w9X;
-		NOTIFYICONDATAV4W wNT;
-		NOTIFYICONDATAV5A wME;
-		NOTIFYICONDATAV5W w2K;
-	} nid;
-}
-SHELLTRAYDATA, *PSHELLTRAYDATA;
+    NID_4A* w9X;
+    NID_4W* NT4;
+    NID_5A* IE5;
+    NID_5W* w2K;
+    NID_6A* IE6;
+    NID_6W* wXP;
+};
 
 
-#ifndef NIF_INFO
-#define NIF_INFO        0x00000010
-#endif
-#ifndef NIS_HIDDEN
-#define NIS_HIDDEN		0x00000001
-#endif
-#ifndef NIS_SHAREDICON
-#define NIS_SHAREDICON  0x00000002
-#endif
+// size constants
+const unsigned short NID_4A_SIZE = sizeof(NID_4A); // 9x
+const unsigned short NID_4W_SIZE = sizeof(NID_4W); // NT 4.0
+const unsigned short NID_5A_SIZE = sizeof(NID_5A); // IE 5 (ME?)
+const unsigned short NID_5W_SIZE = sizeof(NID_5W); // IE 5 (2K)
+const unsigned short NID_6A_SIZE = sizeof(NID_6A); // IE 6
+const unsigned short NID_6W_SIZE = sizeof(NID_6W); // IE 6 (XP)
 
-#ifndef NIM_SETFOCUS
-#define NIM_SETFOCUS    0x00000003
-#endif
-#ifndef NIM_SETVERSION
-#define NIM_SETVERSION  0x00000004
-#endif
 
 #ifndef NIF_STATE
 #define NIF_STATE       0x00000008
+#define NIF_INFO        0x00000010 // partial support: used as tooltip
+#define NIF_GUID        0x00000020 // not supported
+#define NIS_HIDDEN		0x00000001
+#define NIS_SHAREDICON  0x00000002
+#define NIM_SETFOCUS    0x00000003 // not supported
+#define NIM_SETVERSION  0x00000004 // not supported
 #endif
 
+// data sent by shell via Shell_NotifyIcon -- Maduin
+typedef struct _SHELLTRAYDATA
+{
+	DWORD dwUnknown;
+	DWORD dwMessage;
+    NOTIFYICONDATA nid;
+} SHELLTRAYDATA;
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// TrayService
+//
+// This is the tray service handler. It keeps track of all systray icons and
+// loads ShellService-objects. If an icon is added/removed/modified/... it
+// notifies all listeners (usually the systray module) via LM_SYSTRAY.
+//
 class TrayService: public Service<TrayService>
 {
 public:
 	~TrayService();
 	TrayService();
-
-	HRESULT Start();
-	HRESULT Stop();
-
+    
+	//
+    // IService methods
+    //
+    virtual HRESULT Start();
+    virtual HRESULT Stop();
+    
+    // Handler for system tray notifications
+    bool HandleNotification(SHELLTRAYDATA* pstd);
+    
+    // resend all icon data
     void SendSystemTray();
-
-    static LRESULT CALLBACK WndProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	LRESULT WindowProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-
+    
+    // Message Handler
+    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
+        LPARAM lParam);
+    
 private:
-	BOOL _PrepIcon(PSYSTRAYICONDATA pnidFound, PSHELLTRAYDATA pstd, BOOL bNewIcon);
-	LRESULT _AddIcon(PSYSTRAYICONDATA pnidFound, PSHELLTRAYDATA pstd);
-	LRESULT _ModifyIcon(PSYSTRAYICONDATA pnidFound, PSHELLTRAYDATA pstd);
-	void _LoadShellServiceObjects();
-	void _UnloadShellServiceObjects();
+    bool _AddIcon(const NOTIFYICONDATA* pnid);
+    bool _ModifyIcon(LSNOTIFYICONDATA* plnid, const NOTIFYICONDATA* pnid);
+    bool _RemoveIcon(IconVector::iterator itIcon);
+    
+    void _Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid);
+    IconVector::iterator _FindIcon(const NOTIFYICONDATA* pnid);
+    
+    // methods handling version specifics
+    bool _IsHidden(const NOTIFYICONDATA* pstd);
+    void _CopyVersionSpecifics(LSNOTIFYICONDATA* plnidTarget,
+        const NOTIFYICONDATA* pnidSource);
 
-	inline BOOL _ValidIcon(DWORD dwFlags)
-	{
-		return ((dwFlags & NIF_MESSAGE) && (dwFlags & NIF_ICON) && (dwFlags & NIF_TIP));
-	}
+    // manage COM based shell services
+    void _LoadShellServiceObjects();
+    void _UnloadShellServiceObjects();
 
-    SystrayIconVector::iterator _FindItem(const HWND hWnd, const UINT uID);
-
-	HINSTANCE m_hInstance;
-
-	HWND m_hTrayWnd;
+    inline bool _IsValidIcon(UINT uFlags)
+    {
+        return ((uFlags & NIF_MESSAGE) && (uFlags & NIF_ICON));
+    }
+    
+    bool m_bWin2000;
+    HWND m_hTrayWnd;
 	HWND m_hLiteStep;
-	HWND m_hConnectionsTray;
+    HINSTANCE m_hInstance;
+    
+    std::vector<struct IOleCommandTarget*> m_ssoList;
+    IconVector m_siVector;
 
-	ShellServiceObjectVector m_ssoVector;
-    SystrayIconVector m_siVector;
-	BOOL m_bWin2000;
+    struct _FindIconPredicate;
 };
 
-#endif //!defined TRAYSERVICE
+#endif //!defined __TRAYSERVICE_H
