@@ -380,26 +380,22 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 			// Quietly swallow service errors... in the future.. do something
 		}
 
-		// Run startup items if the SHIFT key is not down
-		if (nStartupMode != STARTUP_DONT_RUN)
-		{
-//			DWORD dwThread;
-			
-//            CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
-//                (void*)nStartupMode, 0, &dwThread));
-            
-            // once it's certain that this won't be run in its own thread any
-            // more the void* parameter should be changed to an int or so.
-            StartupRunner::Run((void*)nStartupMode);
-		}
-
-		hr = _InitManagers();
-		if (SUCCEEDED(hr))
-		{
+        hr = _InitManagers();
+        if (SUCCEEDED(hr))
+        {
             hr = _StartManagers();
             // Quietly swallow manager errors... in the future.. do something
         }
         
+		// Run startup items if the SHIFT key is not down
+		if (nStartupMode != STARTUP_DONT_RUN)
+		{
+			DWORD dwThread;
+			
+            CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
+                (void*)nStartupMode, 0, &dwThread));
+		}
+
         // Undocumented call: Shell Loading Finished
         SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
         
