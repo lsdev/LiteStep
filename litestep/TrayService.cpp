@@ -106,6 +106,7 @@ TrayService::~TrayService()
 //
 HRESULT TrayService::Start()
 {
+    ASSERT(m_hTrayWnd == NULL);
     HRESULT hr = E_FAIL;
     
     m_hLiteStep = GetLitestepWnd();
@@ -121,7 +122,7 @@ HRESULT TrayService::Start()
         GetVersionEx(&OsVersionInfo);
         
         if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-            OsVersionInfo.dwMajorVersion == 5)
+            OsVersionInfo.dwMajorVersion >= 5)
         {
             m_bWin2000 = true;
         }
@@ -146,7 +147,8 @@ HRESULT TrayService::Start()
 			                 WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
 			                 szTrayClass,
 			                 szTrayTitle,
-			                 WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+			                 WS_POPUP,
+                             // | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 			                 0, 0,
 			                 0, 0,
 			                 NULL,
@@ -352,15 +354,6 @@ BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
     switch (pstd->dwMessage)
     {
         case NIM_ADD:
-        {
-            // Don't add it if it's hidden.
-            if (bHidden)
-            {
-                break;
-            }
-        }
-        // No break here, see below.
-        
         case NIM_MODIFY:
         {
             //
@@ -373,15 +366,27 @@ BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
             
             if (itIcon == m_siVector.end())
             {
-                bReturn = _AddIcon(&pstd->nid);
-            }
-            else if (bHidden)
-            {
-                bReturn = _RemoveIcon(itIcon);
+                //
+                // new icon
+                //
+                if (!bHidden)
+                {
+                    bReturn = _AddIcon(&pstd->nid);
+                }
             }
             else
             {
-                bReturn = _ModifyIcon(*itIcon, &pstd->nid);
+                //
+                // existing icon
+                //
+                if (bHidden)
+                {
+                    bReturn = _RemoveIcon(itIcon);
+                }
+                else
+                {
+                    bReturn = _ModifyIcon(*itIcon, &pstd->nid);
+                }
             }
         }
         break;
