@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 
 #define ERK_NONE				0x0000
-#define ERK_RUNSUBKEYS			0x0001
+#define ERK_RUNSUBKEYS			0x0001 // runs key and its subkeys
 #define ERK_DELETE				0x0002
 #define REGSTR_PATH_RUN_POLICY	REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
 
@@ -39,7 +39,9 @@ DWORD StartupRunner::Run(void* pvVoid)
 {
     bool bRunStartup = _IsFirstRunThisSession();
 
-    if (bRunStartup)
+    // by keeping the call to _IsFirstRunThisSession() above we make sure the
+    // regkey is created even if we're in "force startup" mode
+    if (bRunStartup || (BOOL)pvVoid == TRUE)
 	{
 		bool bHKLMRun = !SHRestricted(REST_NOLOCALMACHINERUN);
 		bool bHKCURun = !SHRestricted(REST_NOCURRENTUSERRUN);
@@ -62,33 +64,51 @@ DWORD StartupRunner::Run(void* pvVoid)
 			_RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN, ERK_NONE);
 		}
 
-		_RunStartupMenu();
-
-		if (bHKLMRunOnce)
-		{
-			_RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUNONCE,
+        _RunStartupMenu();
+        
+        if (bHKLMRunOnce)
+        {
+            _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUNONCE,
                 (ERK_RUNSUBKEYS | ERK_DELETE));
-		}
-
-		if (bHKCURunOnce)
-		{
-			_RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUNONCE,
+        }
+        
+        if (bHKCURunOnce)
+        {
+            _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUNONCE,
                 (ERK_RUNSUBKEYS | ERK_DELETE));
-		}
-
-		_RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN_POLICY, ERK_RUNSUBKEYS);
-		if (bHKLMRun)
-		{
-			_RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_RUNSUBKEYS);
-		}
-
-		_RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN_POLICY, ERK_RUNSUBKEYS);
-		if (bHKCURun)
-		{
-			_RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN, ERK_RUNSUBKEYS);
-		}
-	}
-
+        }
+        
+        _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN_POLICY, ERK_RUNSUBKEYS);
+        if (bHKLMRun)
+        {
+            _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_RUNSUBKEYS);
+        }
+        
+        _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN_POLICY, ERK_RUNSUBKEYS);
+        if (bHKCURun)
+        {
+            _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUN, ERK_RUNSUBKEYS);
+        }
+    }
+    
+    //
+    // RunOnceEx
+    //
+    // http://support.microsoft.com/default.aspx?scid=kb;EN-US;q232509
+    // http://support.microsoft.com/default.aspx?scid=kb;en-us;Q232487
+    //
+    char szArgs[MAX_PATH] = { 0 };
+    UINT uChars = GetSystemDirectory(szArgs, MAX_PATH);
+    
+    if (uChars > 0 && uChars < MAX_PATH)
+    {
+        if (SUCCEEDED(StringCchCat(szArgs, MAX_PATH,
+            "\\iernonce.dll,RunOnceExProcess")))
+        {
+            ShellExecute(NULL, "open", "rundll32.exe", szArgs, NULL, SW_NORMAL);
+        }
+    }
+    
 	return bRunStartup;
 }
 
@@ -132,9 +152,7 @@ void StartupRunner::_RunFolderContents(LPCTSTR ptzPath)
                 !(findData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
                 !(findData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
 			{
-				SHELLEXECUTEINFO seiCommand;
-
-				memset(&seiCommand, 0, sizeof(seiCommand));
+                SHELLEXECUTEINFO seiCommand = { 0 };
 				seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
 
 				seiCommand.lpFile = findData.cFileName;
@@ -142,7 +160,7 @@ void StartupRunner::_RunFolderContents(LPCTSTR ptzPath)
 				seiCommand.nShow = SW_SHOWNORMAL;
 				seiCommand.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
 
-				ShellExecuteEx(&seiCommand);
+                ShellExecuteEx(&seiCommand);
 			}
 
 			if (!FindNextFile(hSearch, &findData))
@@ -237,25 +255,85 @@ bool StartupRunner::_IsFirstRunThisSession()
 //
 void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 {
-	HKEY hkSubKey;
+    HKEY hkSubKey;
 
 	LONG lResult = RegOpenKeyEx(hkParent, ptzSubKey, 0, MAXIMUM_ALLOWED,
         &hkSubKey);
 
 	if (lResult == ERROR_SUCCESS)
 	{
-		if (dwFlags & ERK_RUNSUBKEYS)
+        //
+        // Run the key itself
+        //
+        for (DWORD dwLoop = 0; ; ++dwLoop)
+        {
+            TCHAR tzNameBuffer[MAX_PATH] = { 0 };
+            TCHAR tzValueBuffer[MAX_LINE_LENGTH] = { 0 };
+            
+            DWORD dwNameSize = MAX_PATH;
+            DWORD dwValueSize = MAX_LINE_LENGTH;
+            DWORD dwType;
+
+            lResult = RegEnumValue(hkSubKey, dwLoop, tzNameBuffer, &dwNameSize,
+                NULL, &dwType, (LPBYTE)tzValueBuffer, &dwValueSize);
+            
+            if (lResult == ERROR_MORE_DATA)
+            {
+                // tzNameBuffer too small?
+                continue;
+            }
+            else if (lResult == ERROR_SUCCESS)
+            {
+                if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
+                {
+                    STARTUPINFO suInfo = { 0 };
+                    PROCESS_INFORMATION procInfo;
+                    
+                    suInfo.cb = sizeof(suInfo);
+                    
+                    BOOL bReturn = CreateProcess(NULL, tzValueBuffer,
+                        NULL, NULL, FALSE,
+                        CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
+                        NULL, NULL, &suInfo,&procInfo);
+                    
+                    if (bReturn)
+                    {
+                        CloseHandle(procInfo.hProcess);
+                        CloseHandle(procInfo.hThread);
+                    }
+                    
+                    if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
+                    {
+                        if (RegDeleteValue(hkSubKey, tzNameBuffer) ==
+                            ERROR_SUCCESS)
+                        {
+                            --dwLoop;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        //
+        // Run subkeys as well?
+        //
+        if (dwFlags & ERK_RUNSUBKEYS)
 		{
-            TCHAR tzNameBuffer[MAX_PATH];
             dwFlags &= ~(ERK_RUNSUBKEYS);
 
 			for (DWORD dwLoop = 0; ; ++dwLoop)
 			{
+                TCHAR tzNameBuffer[MAX_PATH] = { 0 };
                 lResult = RegEnumKey(hkSubKey, dwLoop, tzNameBuffer, MAX_PATH);
 				
                 if (lResult == ERROR_MORE_DATA)
 				{
-					continue;
+					// tzNameBuffer too small?
+                    continue;
 				}
 				else if (lResult == ERROR_SUCCESS)
 				{
@@ -267,59 +345,6 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
                             ERROR_SUCCESS)
 						{
 							--dwLoop;
-						}
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-		else
-		{
-			TCHAR tzNameBuffer[MAX_PATH], tzValueBuffer[MAX_LINE_LENGTH];
-			DWORD dwNameSize, dwValueSize, dwType;
-
-			for (DWORD dwLoop = 0; ; ++dwLoop)
-			{
-				dwNameSize = MAX_PATH;
-				dwValueSize = MAX_LINE_LENGTH;
-
-                lResult = RegEnumValue(hkSubKey, dwLoop,
-                    tzNameBuffer, &dwNameSize, NULL, &dwType,
-                    (LPBYTE)tzValueBuffer, &dwValueSize);
-
-				if (lResult == ERROR_MORE_DATA)
-				{
-                    continue;
-                }
-                else if (lResult == ERROR_SUCCESS)
-                {
-                    if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
-                    {
-                        STARTUPINFO suInfo;
-                        PROCESS_INFORMATION procInfo;
-                        
-                        ZeroMemory(&suInfo, sizeof(STARTUPINFO));
-                        suInfo.cb = sizeof(suInfo);
-                        
-                        if (CreateProcess(NULL, tzValueBuffer, NULL, NULL,
-                            FALSE,
-                            CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
-                            NULL, NULL, &suInfo,&procInfo))
-                        {
-                            CloseHandle(procInfo.hProcess);
-                            CloseHandle(procInfo.hThread);
-                        }
-                        
-						if ((dwFlags & ERK_DELETE) &&
-                            (tzNameBuffer[0] != _T('!')))
-						{
-							if (RegDeleteValue(hkSubKey, tzNameBuffer) == ERROR_SUCCESS)
-							{
-								dwLoop--;
-							}
 						}
 					}
 				}
