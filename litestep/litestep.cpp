@@ -44,6 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // STL headers
 #include <algorithm>
+#include <memory>
 
 // Always include last in cpp file
 #include "../utility/safestr.h"
@@ -54,78 +55,66 @@ using std::for_each;
 using std::mem_fun;
 
 
-// const char rcsRevision[] = "$Revision: 1.13 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.13 2003/05/01 17:35:19 ilmcuts Exp $"; // The Full RCS ID.
-const char LSRev[] = "0.24.7 ";
-
 // Parse the command line
-void ParseCmdLine(LPCSTR pszCmdLine);
-void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
+static bool ParseCmdLine(LPCSTR pszCmdLine);
+static void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
 
 CLiteStep gLiteStep;
 BOOL bRunStartup = TRUE;
 CHAR szAppPath[MAX_PATH];
 CHAR szRcPath[MAX_PATH];
-HINSTANCE hLSInstance = NULL;
 
-struct CreationData
-{
-	SHORT cbExtra;
-	CLiteStep* pLiteStep;
-};
-
-typedef UNALIGNED CreationData UACreationData;
 
 //
 // ExecuteCmdLineBang
 //
-void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
+static void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
 {
-	LMBANGCOMMAND * bcBangCommand = NULL;
-
-	if (IsValidStringPtr(pszCommand))
+    if (IsValidStringPtr(pszCommand))
 	{
-		HWND hWnd = FindWindow("TApplication", "Litestep");
-		if ((hWnd != NULL) && IsWindow(hWnd))
+		HWND hWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
+		
+        if (IsWindow(hWnd))
 		{
-			bcBangCommand = new LMBANGCOMMAND;
-			if (bcBangCommand != NULL)
+            std::auto_ptr<LMBANGCOMMAND> pBangCommand(new LMBANGCOMMAND);
+			if (pBangCommand.get() != NULL)
 			{
-				bcBangCommand->cbSize = sizeof(LMBANGCOMMAND);
-				bcBangCommand->hWnd = NULL;
+				pBangCommand->cbSize = sizeof(LMBANGCOMMAND);
+				pBangCommand->hWnd = NULL;
 
-				StringCchCopy(bcBangCommand->szCommand, MAX_BANGCOMMAND, pszCommand);
+				StringCchCopy(pBangCommand->szCommand, MAX_BANGCOMMAND, pszCommand);
 
-				bcBangCommand->szArgs[0] = '\0';
+				pBangCommand->szArgs[0] = '\0';
 				if (IsValidStringPtr(pszArgs))
 				{
-					StringCchCopy(bcBangCommand->szArgs, MAX_BANGARGS, pszArgs);
+					StringCchCopy(pBangCommand->szArgs, MAX_BANGARGS, pszArgs);
 				}
 
-				COPYDATASTRUCT cds = {LM_BANGCOMMAND, sizeof(LMBANGCOMMAND), (LPVOID)bcBangCommand};
+				COPYDATASTRUCT cds =
+                {
+                    LM_BANGCOMMAND,
+                    sizeof(LMBANGCOMMAND),
+                    (LPVOID)pBangCommand.get()
+                };
 
-				SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM) & cds);
-
-				delete bcBangCommand;
+				SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds);
 			}
 		}
 	}
-
-	exit(0);
 }
 
 
 //
 // ParseCmdLine(LPCSTR pszCmdLine)
 //
-void ParseCmdLine(LPCSTR pszCmdLine)
+static bool ParseCmdLine(LPCSTR pszCmdLine)
 {
-	CHAR szToken[MAX_PATH];
-
 	if (IsValidStringPtr(pszCmdLine))
 	{
-		LPCSTR pszNextToken = pszCmdLine;
-		while (GetToken(pszNextToken, szToken, &pszNextToken, false))
+        char szToken[MAX_LINE_LENGTH];
+        LPCSTR pszNextToken = pszCmdLine;
+
+        while (GetToken(pszNextToken, szToken, &pszNextToken, false))
 		{
 			switch (szToken[0])
 			{
@@ -151,9 +140,9 @@ void ParseCmdLine(LPCSTR pszCmdLine)
 							InstallShell = NULL;
 							FreeLibrary(hInstall);
 							hInstall = NULL;
-
-							exit(0);
 						}
+
+                        return false;
 					}
 					else if (!stricmp(szToken, "-uninstall"))
 					{
@@ -171,9 +160,9 @@ void ParseCmdLine(LPCSTR pszCmdLine)
 							UninstallShell = NULL;
 							FreeLibrary(hInstall);
 							hInstall = NULL;
-
-							exit(0);
 						}
+
+                        return false;
 					}
 				}
 				break;
@@ -181,6 +170,7 @@ void ParseCmdLine(LPCSTR pszCmdLine)
 				case '!':
 				{
 					ExecuteCmdLineBang(szToken, pszNextToken);
+                    return false;
 				}
 				break;
 
@@ -202,6 +192,8 @@ void ParseCmdLine(LPCSTR pszCmdLine)
 			}
 		}
 	}
+
+    return true;
 }
 
 
@@ -212,7 +204,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int /* nCmdShow */)
 {
 	HRESULT hr = S_OK;
-	hLSInstance = hInstance;
 
 	// Determine our application's path
 	if (GetModuleFileName (hInstance, szAppPath, sizeof (szAppPath)) > 0)
@@ -223,7 +214,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PathCombine(szRcPath, szAppPath, "step.rc");
 
 	// Parse command line, setting appropriate variables
-	ParseCmdLine(lpCmdLine);
+	if (!ParseCmdLine(lpCmdLine))
+    {
+        return 1;
+    }
 
 	// If we can't find "step.rc", there's no point in proceeding
 	if (!PathFileExists(szRcPath))
@@ -231,7 +225,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		RESOURCE_STREX(hInstance, IDS_LITESTEP_ERROR2, resourceTextBuffer, MAX_LINE_LENGTH,
 		               "Unable to find the file \"%s\".\nPlease verify the location of the file, and try again.", szRcPath);
 		MessageBox(NULL, resourceTextBuffer, "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
-		exit(0);
+		return 2;
 	}
 
 	// Check for previous instance
@@ -264,18 +258,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 //
 CLiteStep::CLiteStep()
 {
-	m_szAppPath[0] = '\0';
-	m_szRcPath[0] = '\0';
 	m_hInstance = NULL;
-    m_bAutoHideModules = FALSE;
-    m_bAppIsFullScreen = FALSE;
+    m_bAutoHideModules = false;
+    m_bAppIsFullScreen = false;
 	m_hMainWindow = NULL;
 	WM_ShellHook = 0;
 	m_pModuleManager = NULL;
-	//gBangManager = NULL;
 	m_pDataStoreManager = NULL;
 	m_pMessageManager = NULL;
-	bHookManagerStarted = FALSE;
+	m_bHookManagerStarted = false;
 	m_pTrayService = NULL;
 }
 
@@ -293,14 +284,12 @@ CLiteStep::~CLiteStep()
 //
 HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, BOOL bRunStartup)
 {
-	ATOM aClass;
-	WNDCLASSEX wc;
 	HRESULT hr;
 	BOOL bDoRunStartup;
-	BOOL bUnderExplorer = FALSE;
+	bool bUnderExplorer = false;
 
-	StringCchCopy(m_szAppPath, MAX_PATH, pszAppPath);
-	StringCchCopy(m_szRcPath, MAX_PATH, pszRcPath);
+	m_sAppPath.assign(pszAppPath);  // could throw length_error
+	m_sConfigFile.assign(pszRcPath);
 	m_hInstance = hInstance;
 
 	// Initialize OLE/COM
@@ -308,11 +297,11 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 
 	// before anything else, start the recovery menu thread
 	DWORD dwRecoveryThreadID;
-	HANDLE hRecoveryThread = 
-        CreateThread(NULL, 0, RecoveryThreadProc, NULL, 0, &dwRecoveryThreadID);
+	HANDLE hRecoveryThread = CreateThread(NULL, 0, RecoveryThreadProc,
+        (void*)m_hInstance, 0, &dwRecoveryThreadID);
 
 	// configure the Win32 window manager to hide windows when they are minimized
-	MINIMIZEDMETRICS mm;
+    MINIMIZEDMETRICS mm = { 0 };
 	mm.cbSize = sizeof(MINIMIZEDMETRICS);
 
 	SystemParametersInfo(SPI_GETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
@@ -323,11 +312,11 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
 	}
 
-	SetupSettingsManager(m_szAppPath, m_szRcPath);
+	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
 
 	bDoRunStartup = ((bRunStartup) ? GetRCBool("LSNoStartup", FALSE) : FALSE);
 
-	m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE);
+    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
 
 	// Check for explorer
 	if (FindWindow("Shell_TrayWnd", NULL)) // Running under Exploder
@@ -342,18 +331,18 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 				return E_ABORT;
 			}
 		}
-		bUnderExplorer = TRUE;
+		bUnderExplorer = true;
 	}
 
 	// Register Window Class
-	memset (&wc, 0, sizeof(wc));
+    WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.cbWndExtra = sizeof(CLiteStep*);
 	wc.lpfnWndProc = CLiteStep::InternalWndProc;
 	wc.hInstance = m_hInstance;
 	wc.lpszClassName = szMainWindowClass;
-	aClass = RegisterClassEx(&wc);
-	if (!aClass)
+
+    if (!RegisterClassEx(&wc))
 	{
 		RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR4,
 		                  "Error registering main Litestep window class.",
@@ -362,12 +351,13 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		return E_FAIL;
 	}
 
-	UACreationData cdCreationData = {sizeof(UACreationData), this};
-
 	// Create our main window
 	m_hMainWindow = CreateWindowEx(WS_EX_TOOLWINDOW,
-	                               szMainWindowClass, szMainWindowTitle, 0,
-	                               0, 0, 0, 0, NULL, NULL, m_hInstance, (LPVOID) & cdCreationData);
+        szMainWindowClass, szMainWindowTitle,
+        0, 0, 0, 0,
+        0, NULL, NULL,
+        m_hInstance,
+        (void*)this);
 
 	// Start up everything
 	if (m_hMainWindow)
@@ -382,7 +372,8 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		
         if (RegisterShellHook)
 		{
-			RegisterShellHook(NULL, RSH_REGISTER);
+            #pragma COMPILE_TODO("Need to fix shellhook for Win9x")
+            RegisterShellHook(NULL, RSH_REGISTER);
 			RegisterShellHook(m_hMainWindow, RSH_TASKMAN);
 		}
 
@@ -515,33 +506,15 @@ LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 
 	if (uMsg == WM_CREATE)
 	{
-		LPVOID & lpCreateParams = LPCREATESTRUCT(lParam)->lpCreateParams;
+        pLiteStep = static_cast<CLiteStep*>(
+            reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
 
-		if (lpCreateParams)
-		{
-			pLiteStep = ((UACreationData*)(lpCreateParams))->pLiteStep;
-			SetWindowLong(hWnd, GWL_CLASSPOINTER, (LONG)pLiteStep);
-		}
-	}
-	else if (pLiteStep == NULL)
-	{
-		pLiteStep = (CLiteStep*)(GetWindowLong(hWnd, GWL_CLASSPOINTER));
+        ASSERT_ISWRITEPTR(pLiteStep);
 	}
 
 	if (pLiteStep)
 	{
-		/*if (uMsg == WM_CREATE)
-		{
-			const_cast<HWND>(pLiteStep->m_hMainWindow) = hWnd;
-		}*/
-
-		return pLiteStep->ExternalWndProc(hWnd, uMsg, wParam, lParam);
-
-		/*if (uMsg == WM_NCDESTROY)
-		{
-			const_cast<HWND>(pLiteStep->hWnd) = NULL;
-		}*/ 
-		//return lReturn;
+        return pLiteStep->ExternalWndProc(hWnd, uMsg, wParam, lParam);
 	}
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -746,7 +719,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 			char szBuffer[256];
 
-			if (wParam == 1)
+/*			if (wParam == 1)
 			{
 				StringCchCopy(szBuffer, 256, &rcsId[1]);
 				szBuffer[strlen(szBuffer) - 1] = '\0';
@@ -756,7 +729,8 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				StringCchCopy(szBuffer, 256, "litestep.exe: ");
 				StringCchCat(szBuffer, 256, (LPCSTR) & LSRev);
 				szBuffer[strlen(szBuffer) - 1] = '\0';
-			}
+			}*/
+            #pragma COMPILE_TODO("Need to fix LM_GETREVID")
 			SendMessage((HWND)lParam, LM_GETREVID, 0, (long)szBuffer);
 			m_pMessageManager->GetRevID(LM_GETREVID, wParam, lParam);
 		}
@@ -764,11 +738,11 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		case LM_REGISTERHOOKMESSAGE:
 		{
-			if (!bHookManagerStarted)
+			if (!m_bHookManagerStarted)
 			{
-				bHookManagerStarted = startHookManager(m_hInstance);
+                m_bHookManagerStarted = startHookManager(m_hInstance) ? true : false;
 			}
-			if (bHookManagerStarted)
+			if (m_bHookManagerStarted)
 			{
 				lReturn = RegisterHookMessage(hWnd, wParam, (HookCallback*)lParam);
 			}
@@ -777,12 +751,12 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		case LM_UNREGISTERHOOKMESSAGE:
 		{
-			if (bHookManagerStarted)
+			if (m_bHookManagerStarted)
 			{
 				if (UnregisterHookMessage(hWnd, wParam, (HookCallback*)lParam) == 0)
 				{
 					stopHookManager();
-					bHookManagerStarted = FALSE;
+					m_bHookManagerStarted = false;
 				}
 			}
 		}
@@ -819,14 +793,14 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     if (m_bAutoHideModules)
 					{
-						if ((lParam > 0) && (m_bAppIsFullScreen == FALSE))
+						if ((lParam > 0) && (m_bAppIsFullScreen == false))
 						{
-							m_bAppIsFullScreen = TRUE;
+							m_bAppIsFullScreen = true;
 							ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
 						}
-						else if ((lParam <= 0) && (m_bAppIsFullScreen == TRUE))
+						else if ((lParam <= 0) && (m_bAppIsFullScreen == true))
 						{
-							m_bAppIsFullScreen = FALSE;
+							m_bAppIsFullScreen = false;
 							ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
 						}
 					}
@@ -871,7 +845,7 @@ STDMETHODIMP CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ si
 
     if (IsValidStringPtr(pszPath, cchPath))
     {
-        hr = StringCchCopy(pszPath, cchPath, m_szAppPath);
+        hr = StringCchCopy(pszPath, cchPath, m_sAppPath.c_str());
     }
     else
     {
@@ -1007,10 +981,10 @@ HRESULT CLiteStep::_StopManagers()
 {
 	HRESULT hr = S_OK;
 
-	if (bHookManagerStarted)
+	if (m_bHookManagerStarted)
 	{
 		stopHookManager();
-		bHookManagerStarted = FALSE;
+		m_bHookManagerStarted = false;
 	}
 
 	m_pModuleManager->Stop();
@@ -1071,7 +1045,7 @@ void CLiteStep::_Recycle()
 		                "Recycle has been paused, click OK to continue.", "LiteStep")
 	}
 
-	SetupSettingsManager(szAppPath, szRcPath);
+	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
 
 	_StartManagers();
 }
