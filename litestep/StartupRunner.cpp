@@ -299,7 +299,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
             {
                 if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
                 {
-                    _CreateProcess(tzValueBuffer, dwFlags);
+                    _SpawnProcess(tzValueBuffer, dwFlags);
 
                     if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
                     {
@@ -359,33 +359,95 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 }
 
 
-bool StartupRunner::_CreateProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
+bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
 {
     ASSERT(!(dwFlags & ERK_WAITFOR_QUIT && dwFlags & ERK_WAITFOR_IDLE));
     
-    STARTUPINFO suInfo = { 0 };
-    PROCESS_INFORMATION procInfo = { 0 };
+    //
+    // The following cases need to be supported:
+    //
+    // 1. "C:\Program Files\App\App.exe" -params
+    // 2. C:\Program Files\App\App.exe -params
+    // 3. App.exe -params   (app.exe is in %path% or HKLM->REGSTR_PATH_APPPATHS)
+    // and all the above cases without arguments.
+    //
+    // CreateProcess handles 1 and 2, ShellExecuteEx handles 1 and 3.
+    // So if the first token doesn't contain path characters (':' or '\')
+    // ShellExecuteEx is used. That's really ugly but it *should* work.
+    //
 
-    suInfo.cb = sizeof(suInfo);
-    
-    BOOL bReturn = CreateProcess(NULL, ptzCommandLine, NULL, NULL, FALSE,
-        CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
-        NULL, NULL, &suInfo, &procInfo);
-    
-    if (bReturn)
+    TCHAR tzToken[MAX_LINE_LENGTH] = { 0 };
+    LPCTSTR ptzArgs = NULL;
+
+    GetToken(ptzCommandLine, tzToken, &ptzArgs, FALSE);
+
+    HANDLE hProcess = INVALID_HANDLE_VALUE;
+
+    if (StrChr(tzToken, _T('\\')) || StrChr(tzToken, _T(':')))
+    {
+        hProcess = _CreateProcess(ptzCommandLine);
+    }
+    else
+    {
+        hProcess = _ShellExecuteEx(tzToken, ptzArgs);
+    }
+
+    if (hProcess != INVALID_HANDLE_VALUE)
     {
         if (dwFlags & ERK_WAITFOR_QUIT)
         {
-            WaitForSingleObject(procInfo.hProcess, INFINITE);
+            WaitForSingleObject(hProcess, INFINITE);
         }
         else if (dwFlags & ERK_WAITFOR_IDLE)
         {
-            WaitForInputIdle(procInfo.hProcess, INFINITE);
+            WaitForInputIdle(hProcess, INFINITE);
         }
 
-        CloseHandle(procInfo.hProcess);
-        CloseHandle(procInfo.hThread);
+        CloseHandle(hProcess);
     }
 
-    return bReturn ? true : false;
+    return hProcess != INVALID_HANDLE_VALUE;
+}
+
+
+HANDLE StartupRunner::_CreateProcess(LPTSTR ptzCommandLine)
+{
+    HANDLE hReturn = INVALID_HANDLE_VALUE;
+
+    STARTUPINFO suInfo = { 0 };
+    PROCESS_INFORMATION procInfo = { 0 };
+    
+    suInfo.cb = sizeof(suInfo);
+    
+    if (CreateProcess(NULL, ptzCommandLine, NULL, NULL, FALSE,
+        CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
+        NULL, NULL, &suInfo, &procInfo))
+    {
+        CloseHandle(procInfo.hThread);
+
+        hReturn = procInfo.hProcess;
+    }
+    
+    return hReturn;
+}
+
+
+HANDLE StartupRunner::_ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs)
+{
+    HANDLE hReturn = INVALID_HANDLE_VALUE;
+
+    SHELLEXECUTEINFO sei = { 0 };
+    sei.cbSize = sizeof(sei);
+
+    sei.lpFile = ptzExecutable;
+    sei.lpParameters = ptzArgs;
+    sei.nShow = SW_SHOWNORMAL;
+    sei.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
+    
+    if (ShellExecuteEx(&sei))
+    {
+        hReturn = sei.hProcess;
+    }
+
+    return hReturn;
 }
