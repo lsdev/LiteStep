@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <shellapi.h>
 #include <shlwapi.h>
-#include <basetyps.h>
+//#include <basetyps.h>
 #include <tchar.h>
 
 // Include debugging macros
@@ -58,36 +58,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include "lsdebug.h"
 
-#define INIT_STRUCT_CBSIZE(structure) memset(&structure, 0, sizeof(structure)); \
-								      structure.cbSize = sizeof(structure);
-
-#define INIT_STRUCT_DWSIZE(structure)	memset(&structure, 0, sizeof(structure)); \
-                                        structure.dwSize = sizeof(structure);
-
-#define INIT_STRUCT(structure) INIT_STRUCT_CBSIZE(structure);
-
 #ifndef MAX_LINE_LENGTH
 #define MAX_LINE_LENGTH				4096
 #endif // MAX_LINE_LENGTH
 
 #include "safeptr.h"
 
-/*#include "..\lsapi\lsapi.h"
- 
-//
-// Redefines windows Multimon functions to our own
-// just makes it easier to convert existing code
-//
-#define GetSystemMetrics    LSGetSystemMetrics
-#define MonitorFromWindow   LSMonitorFromWindow
-#define MonitorFromRect     LSMonitorFromRect
-#define MonitorFromPoint    LSMonitorFromPoint
-#undef GetMonitorInfo
-#define GetMonitorInfo      LSGetMonitorInfo
-#define EnumDisplayMonitors LSEnumDisplayMonitors
-#undef EnumDisplayDevices
-#define EnumDisplayDevices  LSEnumDisplayDevices
- 
-#include "macros.h"*/
 
 #endif // __COMMON_H

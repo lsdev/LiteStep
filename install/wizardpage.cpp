@@ -47,7 +47,8 @@ CWizardPage::~CWizardPage()
 }
 void CWizardPage::_Create(LPCSTR pszTemplate, UINT nCaption)
 {
-	INIT_STRUCT_DWSIZE(m_pspPage);
+	ZeroMemory(&m_pspPage, sizeof(m_pspPage));
+    m_pspPage.dwSize = sizeof(m_pspPage);
 
 	m_pspPage.dwFlags = PSP_DEFAULT;
 	m_pspPage.pszTemplate = pszTemplate;

@@ -53,7 +53,8 @@ void CWizardMain::_Create(HINSTANCE hInstance, HBITMAP hbmWaterMark, HBITMAP hbm
 	m_nPages = 0;
 	m_nLastPage = 0;
 
-	INIT_STRUCT_DWSIZE(m_pshHeader);
+	ZeroMemory(&m_pshHeader, sizeof(m_pshHeader));
+    m_pshHeader.dwSize = sizeof(m_pshHeader);
 
 	m_pshHeader.hInstance = hInstance;
 	m_pshHeader.hwndParent = NULL;
