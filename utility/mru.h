@@ -96,7 +96,7 @@ extern "C"
 #endif // __cplusplus
 
 
-#include "lsapi.h"
+#include "../lsapi/lsapi.h"
 #include "lsdebug.h"
 
 #define MAX_ITEMS 29
