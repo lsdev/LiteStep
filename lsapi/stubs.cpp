@@ -1,4 +1,5 @@
 #include "lsapi.h"
+#include "../utility/common.h"
 
 BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {

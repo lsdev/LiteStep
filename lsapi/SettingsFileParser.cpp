@@ -123,9 +123,10 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 
 	VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
 
+    PathUnquoteSpaces(tzExpandedPath);
 	GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, tzFullPath, NULL);
 
-	m_phFile = fopen(tzFullPath, _T("r"));
+    m_phFile = fopen(tzFullPath, _T("r"));
 
 	if (m_phFile)
 	{
@@ -224,9 +225,9 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 		GetToken(ptzValue, tzPath, NULL, false);
 		
 		FileParser fpParser(m_pSettingsMap);
-		fpParser.ParseFile(tzPath);
-	}
-	else
+        fpParser.ParseFile(tzPath);
+    }
+    else
 	{
 		m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
 	}

@@ -65,7 +65,9 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 	DWORD dwLength = MAX_PATH;
 	OSVERSIONINFO OsVersionInfo;
 
-	SetVariable("litestepdir", pszLiteStepPath);
+	StringCchCopy(szTemp, MAX_PATH, pszLiteStepPath);
+    PathQuoteSpaces(szTemp);
+    SetVariable("litestepdir", szTemp);
 	
     if (GetWindowsDirectory(szTemp, MAX_PATH))
     {
@@ -531,7 +533,7 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
                 pFileInfo->m_pSettingsMap = new SettingsMap;
 				pFileInfo->m_Count = 1;
 
-				FileParser fpParser(pFileInfo->m_pSettingsMap);
+                FileParser fpParser(pFileInfo->m_pSettingsMap);
 				fpParser.ParseFile(szPath);
 
 				m_FileMap.insert(FileMap::value_type(szPath, pFileInfo));
