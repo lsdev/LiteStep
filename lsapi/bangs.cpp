@@ -295,10 +295,15 @@ void BangRestoreWindows(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangRun(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	FARPROC (__stdcall * MSRun)(HWND, int, int, LPSTR, LPSTR, int);
+    typedef void (WINAPI* RunDlgType)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT);
+    
+    RunDlgType RunDlg = (RunDlgType)GetProcAddress(
+        GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3D));
 
-	MSRun = (FARPROC (__stdcall *) (HWND, int, int, LPSTR, LPSTR, int))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3D));
-	MSRun(NULL, 0, 0, NULL, NULL, 0);
+	if (RunDlg)
+    {
+        RunDlg(NULL, NULL, NULL, NULL, NULL, 0);
+    }
 }
 
 
@@ -321,8 +326,10 @@ void BangShutdown(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangSwitchUser(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	FARPROC (__stdcall * LockWorkStation)() = NULL;
-	LockWorkStation = (FARPROC (__stdcall *)())GetProcAddress(GetModuleHandle("USER32.DLL"), "LockWorkStation");
+    typedef BOOL (__stdcall *LockWorkStationType)();
+
+	LockWorkStationType LockWorkStation = (LockWorkStationType )GetProcAddress(
+        GetModuleHandle("USER32.DLL"), "LockWorkStation");
 
 	if (LockWorkStation)
 	{
