@@ -123,7 +123,7 @@ HRESULT TrayService::Start()
         if (m_hTrayWnd)
         {
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
-            SetWindowLong(m_hTrayWnd, 0, (LONG)this);
+            SetWindowLongPtr(m_hTrayWnd, 0, (LONG)this);
             
             // tell apps to reregister their icons (see Note 6)
             PostMessage(HWND_BROADCAST,
@@ -372,7 +372,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
     
 	if (!pTrayService)
 	{
-		pTrayService = (TrayService*)GetWindowLong(hWnd, 0);
+		pTrayService = (TrayService*)GetWindowLongPtr(hWnd, 0);
 	}
 
     if (pTrayService)

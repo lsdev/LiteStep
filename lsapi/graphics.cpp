@@ -467,7 +467,9 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 			}
 			else
 			{
-				HINSTANCE hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
+				HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(
+                    GetLitestepWnd(), GWL_HINSTANCE);
+
 				hIcon = ExtractIcon(hInstance, pszIconFile, nIcon);
 			}
 		}

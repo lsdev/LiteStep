@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.13 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.13 2003/10/11 19:27:46 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.14 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.14 2004/02/21 22:34:01 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -111,10 +111,10 @@ BOOL LSAPIInit::GetLiteStepPath(LPSTR pszPath, size_t cchPath)
 			}
 			else
 			{
-				HINSTANCE hInstance = NULL;
-
-				hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
-				if (hInstance)
+				HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(
+                    GetLitestepWnd(), GWLP_HINSTANCE);
+				
+                if (hInstance)
 				{
 					if (GetModuleFileName(hInstance, m_szLiteStepPath, MAX_PATH))
 					{
