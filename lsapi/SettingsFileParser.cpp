@@ -27,7 +27,7 @@
 // FileParser constructor
 //
 FileParser::FileParser(SettingsMap* pSettingsMap)
-: m_pSettingsMap(pSettingsMap), m_phFile(NULL)
+: m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_pEvalParser(NULL)
 {
     ASSERT_ISWRITEPTR(m_pSettingsMap);
 }
@@ -39,6 +39,7 @@ FileParser::FileParser(SettingsMap* pSettingsMap)
 //
 FileParser::~FileParser()
 {
+    delete m_pEvalParser;
 }
 
 
@@ -277,12 +278,12 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
 	TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
 
-	if (!m_pEvalParser.get())
+	if (!m_pEvalParser)
 	{
-		m_pEvalParser.reset(new EvalParser());
+		m_pEvalParser = new EvalParser();
 	}
 
-	if (m_pEvalParser.get())
+	if (m_pEvalParser)
 	{
         BOOL bResult;
 
