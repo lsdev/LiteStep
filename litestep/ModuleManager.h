@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/IManager.h"
 #include "../utility/stringutility.h"
 #include "module.h"
-#include <map>
+#include <vector>
 #include <string>
 
 using namespace std;
@@ -33,33 +33,38 @@ using namespace std;
 typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
 typedef int (*ModuleQuitFunc) (HINSTANCE);
 
-typedef map<string, Module*, stringicmp> ModuleMap;
+typedef vector<Module*> ModuleQueue;
 
 class ModuleManager: public IManager
 {
 public:
 	ModuleManager();
 	virtual ~ModuleManager();
-
+	
 	// IManager
 	HRESULT Start(ILiteStep *ILiteStep);
 	HRESULT Stop();
-
+	
 	HRESULT rStart();
 	HRESULT rStop();
-
+	
 	BOOL LoadModule(LPCSTR pszLocation, DWORD dwFlags);
 	BOOL QuitModule(LPCSTR pszLocation);
 	UINT GetModuleList(LPSTR *lpszModules, DWORD dwSize);
-
+	
 	STDMETHOD(get_Count)( /*[out, retval]*/ long* pCount);
-
+	
 private:
 	UINT _LoadModules();
 	void _StartModules();
 	void _QuitModules();
-
-	ModuleMap m_ModuleMap;
+	
+	ModuleQueue::iterator _FindModule(LPCSTR pszLocation);
+	
+    // predicate to be used with std::find_if
+	struct ModuleLookup;
+	
+	ModuleQueue m_ModuleQueue;
 	ILiteStep *m_pILiteStep;
 };
 
