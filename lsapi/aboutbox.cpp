@@ -136,9 +136,11 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			return FALSE;
 		}
 
-		case WM_CTLCOLORSTATIC:
+        case WM_CTLCOLOREDIT:
+        case WM_CTLCOLORSTATIC:
 		{
-			BOOL bReturn = FALSE;
+			HBRUSH hbReturn = FALSE; // special return value to tell the system
+                                     // to perform default message processing
 
             // the header and title need a white (COLOR_WINDOW) background
 			int id = GetDlgCtrlID((HWND)lParam);
@@ -150,14 +152,14 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 				SetTextColor(hDC, GetSysColor(COLOR_WINDOWTEXT));
 				SetBkColor(hDC, GetSysColor(COLOR_WINDOW));
 
-				bReturn = (BOOL)GetSysColorBrush(COLOR_WINDOW);
+				hbReturn = GetSysColorBrush(COLOR_WINDOW);
 			}
 			else if (id == IDC_HEADER || id == IDC_LOGO)
 			{
-				bReturn = (BOOL)GetSysColorBrush(COLOR_WINDOW);
+				hbReturn = GetSysColorBrush(COLOR_WINDOW);
 			}
 
-			return bReturn;
+			return (BOOL)hbReturn;
 		}
 
 		case WM_INITDIALOG:
@@ -219,8 +221,11 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 			SwitchToThisWindow(hWnd, TRUE);
 
-			return TRUE;
+			return FALSE;
 		}
+
+        default:
+        break;
 	}
 
 	return FALSE;
