@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __MODULEMANAGER_H
 
 #include "../utility/common.h"
+#include "../utility/IManager.h"
 #include "module.h"
 #include <map>
 #include <string>
@@ -32,29 +33,34 @@ typedef int (*ModuleQuitFunc) (HINSTANCE);
 
 typedef map<string, class Module*> ModuleMap;
 
-class ModuleManager
+class ModuleManager: public IManager
 {
 public:
-	//static HANDLE thread_event;
-	//static HANDLE load_quit_event;
-	ModuleManager(HWND, LPCSTR);
+	ModuleManager();
 	virtual ~ModuleManager();
 
-	UINT LoadModules();
+	// IManager
+	HRESULT Start(ILiteStep *ILiteStep);
+	HRESULT Stop();
+
+	HRESULT rStart();
+	HRESULT rStop();
+
 	BOOL LoadModule(LPCSTR pszLocation, DWORD dwFlags);
-	BOOL QuitModules();
 	BOOL QuitModule(LPCSTR pszLocation);
 	UINT GetModuleList(LPSTR *lpszModules, DWORD dwSize);
 
 	STDMETHOD(get_Count)( /*[out, retval]*/ long* pCount);
 
 private:
-
+	UINT _LoadModules();
 	void _StartModules();
+	void _QuitModules();
 
 	ModuleMap m_ModuleMap;
-	HWND hMainWindow;
-	string appPath;
+	//HWND m_hWndLiteStep;
+	//string m_szLiteStepPath;
+	ILiteStep *m_pILiteStep;
 };
 
 #endif // __MODULEMANAGER_H

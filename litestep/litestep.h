@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "../lsapi/lsapi.h"
 #include "../utility/macros.h"
+#include "../utility/ILiteStep.h"
 
 #include <comdef.h>
 
@@ -78,7 +79,7 @@ public:
 
 };
 
-class CLiteStep
+class CLiteStep: public ILiteStep
 {
 public:
 	CLiteStep();
@@ -86,8 +87,11 @@ public:
 
 	HRESULT Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, BOOL bRunStartup);
 
-
 	LRESULT ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	// ILiteStep
+	STDMETHOD(get_Window)(/*[out, retval]*/ long* phWnd);
+	STDMETHOD(get_AppPath)(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath);
 
 private:
 

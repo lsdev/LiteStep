@@ -25,26 +25,70 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../lsapi/lsapi.h"
 #include "../utility/safestr.h"
 
-//HANDLE ModuleManager::thread_event;
-//HANDLE ModuleManager::load_quit_event;
-
-ModuleManager::ModuleManager(HWND hwnd, LPCSTR appPath)
+ModuleManager::ModuleManager()
 {
-	//thread_event = CreateEvent(NULL, FALSE, TRUE, "ThreadEvent");
-	//load_quit_event = CreateEvent(NULL, FALSE, TRUE, "LoadQuitEvent");
-
-	this->appPath = appPath;
-	this->hMainWindow = hwnd;
+	m_pILiteStep = NULL;
 }
 
 ModuleManager::~ModuleManager()
 {
-	//QuitModules();
-	//CloseHandle(ModuleManager::thread_event);
+}
+
+HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
+{
+	HRESULT hr;
+
+	if (pILiteStep != NULL)
+	{
+		m_pILiteStep = pILiteStep;
+		m_pILiteStep->AddRef();
+
+		_LoadModules();
+
+		hr = S_OK;
+	}
+	else
+	{
+		hr = E_INVALIDARG;
+	}
+
+	return hr;
+}
+
+HRESULT ModuleManager::Stop()
+{
+	HRESULT hr = S_OK;
+
+	_QuitModules();
+
+	if (m_pILiteStep)
+	{
+		m_pILiteStep->Release();
+	}
+
+	return hr;
+}
+
+HRESULT ModuleManager::rStart()
+{
+	HRESULT hr = S_OK;
+
+	_LoadModules();
+
+	return hr;
+}
+
+HRESULT ModuleManager::rStop()
+{
+	HRESULT hr = S_OK;
+
+	_QuitModules();
+
+	return hr;
 }
 
 
-UINT ModuleManager::LoadModules()
+UINT ModuleManager::_LoadModules()
 {
 	int nReturn = 0;
 	char buffer[MAX_LINE_LENGTH];
@@ -150,66 +194,77 @@ void ModuleManager::_StartModules()
 
 	if (nModuleCount)
 	{
-		HANDLE * pQuitEvents = new HANDLE[nModuleCount];
-		ModuleMap::iterator iter = m_ModuleMap.begin();
+		HWND hLiteStep = NULL;
+		CHAR szAppPath[MAX_PATH];
+		HRESULT hr;
 
-		int nIndex = 0;
-		while (iter != m_ModuleMap.end())
+		hr = m_pILiteStep->get_Window((LONG*)hLiteStep);
+		if (SUCCEEDED(hr))
 		{
-			if (iter->second)
+			hr = m_pILiteStep->get_AppPath(szAppPath, MAX_PATH);
+			if (SUCCEEDED(hr))
 			{
-				try
+				HANDLE * pQuitEvents = new HANDLE[nModuleCount];
+				ModuleMap::iterator iter = m_ModuleMap.begin();
+
+				int nIndex = 0;
+				while (iter != m_ModuleMap.end())
 				{
-					HANDLE hEvent = iter->second->Init(hMainWindow, appPath.c_str());
-					if (hEvent)
+					if (iter->second)
 					{
-						pQuitEvents[nIndex++] = hEvent;
+						try
+						{
+							HANDLE hEvent = iter->second->Init(hLiteStep, szAppPath);
+							if (hEvent)
+							{
+								pQuitEvents[nIndex++] = hEvent;
+							}
+						}
+						catch (...)
+						{
+							RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
+											"Error: Exception during module initialization.\n\nPlease contact the module writer.",
+											iter->first.c_str());
+						}
+					}
+
+					iter++;
+				}
+
+				// Wait for all modules to signal that they have started before exiting this function
+				nModuleCount = nIndex;
+				DWORD dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
+				HWND hLiteStep = GetLitestepWnd();
+				while (nIndex)
+				{
+					if (dwWaitStatus == (WAIT_OBJECT_0 + nModuleCount))
+					{
+						MSG message;
+						// if we use NULL instead of hLiteStep here.. it locks us up...
+						if (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
+						{
+							TranslateMessage(&message);
+							DispatchMessage (&message);
+						}
+					}
+					else if ((dwWaitStatus >= WAIT_OBJECT_0) && (dwWaitStatus <= (WAIT_OBJECT_0 + nModuleCount - 1)))
+					{
+						nIndex--;
+					}
+
+					if (nIndex)
+					{
+						dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
 					}
 				}
-				catch (...)
-				{
-					RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
-					                "Error: Exception during module initialization.\n\nPlease contact the module writer.",
-					                iter->first.c_str());
-				}
-			}
 
-			iter++;
-		}
-
-		// Wait for all modules to signal that they have quit before deleting them
-		nModuleCount = nIndex;
-		DWORD dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
-		HWND hLiteStep = GetLitestepWnd();
-		while (nIndex)
-		{
-			if (dwWaitStatus == (WAIT_OBJECT_0 + nModuleCount))
-			{
-				MSG message;
-				// if we use NULL instead of hLiteStep here.. it locks us up...
-				if (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
-				{
-					TranslateMessage(&message);
-					DispatchMessage (&message);
-				}
-			}
-			else if ((dwWaitStatus >= WAIT_OBJECT_0) && (dwWaitStatus <= (WAIT_OBJECT_0 + nModuleCount - 1)))
-			{
-				nIndex--;
-			}
-
-			if (nIndex)
-			{
-				dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
+				delete [] pQuitEvents;
 			}
 		}
-
-
-		delete [] pQuitEvents;
 	}
 }
 
-BOOL ModuleManager::QuitModules()
+void ModuleManager::_QuitModules()
 {
 	int nModuleCount = m_ModuleMap.size();
 
@@ -285,7 +340,6 @@ BOOL ModuleManager::QuitModules()
 		m_ModuleMap.clear();
 
 	}
-	return TRUE;
 }
 
 

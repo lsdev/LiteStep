@@ -19,22 +19,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#ifndef __IMANAGER_H
-#define __IMANAGER_H
+#ifndef __ILITESTEP_H
+#define __ILITESTEP_H
 
 #include "common.h"
 #include "Base.h"
-#include "ILiteStep.h"
 
-class IManager: public CountedBase
+class ILiteStep: public CountedBase
 {
 public:
-	virtual HRESULT Start(ILiteStep *pILiteStep) = 0;
-	virtual HRESULT Stop() = 0;
 
-	// Recycliing
-	virtual HRESULT rStart() = 0;
-	virtual HRESULT rStop() = 0;
+	STDMETHOD(get_Window)(/*[out, retval]*/ long* phWnd) = 0;
+	STDMETHOD(get_AppPath)(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) = 0;
 };
 
-#endif __IMANAGER_H
+#endif __ILITESTEP_H
