@@ -21,8 +21,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "DDEService.h"
 #include "../utility/shellhlp.h"
+#include "../lsapi/lsapi.h"
+#include <process.h>
 #include "../utility/safestr.h" // Always include last in cpp file
 
+unsigned int DDEService::m_uThreadId;
+HANDLE DDEService::m_hThread;
+HANDLE DDEService::m_hStartEvent;
 DDEWorker DDEService::m_DDEWorker;
 HSZ DDEService::m_hszProgman;
 HSZ DDEService::m_hszGroups;
@@ -37,36 +42,67 @@ DDEService::DDEService()
 	m_hszFolders = NULL;
 	m_hszAppProperties = NULL;
 	m_dwDDEInst = NULL;
+    m_hStartEvent = NULL;
 }
 
 DDEService::~DDEService()
 {}
 
+unsigned int __stdcall DDEService::_DDEThreadProc(void* pvService)
+{
+    DDEService* pService = (DDEService*)pvService;
+
+    bool bStarted = pService->_DoStart();
+
+    SetEvent(pService->m_hStartEvent);
+
+    if (bStarted)
+    {
+        MSG msg;
+        while (GetMessage(&msg, 0, 0, 0))
+        {
+            try
+            {
+                // Window message
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            catch (...)
+            {
+                // Quietly ignore exceptions?
+            }
+        }
+    }
+    
+    pService->_DoStop();
+    
+    return 0;
+}
+
 HRESULT DDEService::Start()
 {
-	HRESULT hr = E_FAIL;
-
-	// If m_dwDDEInst is not NULL, then we have already been started, just return S_FALSE
-	// which will still pass SUCCEEDED()
-	if (!m_dwDDEInst)
-	{
-		if (FindWindow(_T("Progman"), NULL) == NULL)
-		{
-			UINT uInitReturn;
-
-			uInitReturn = DdeInitialize(&m_dwDDEInst, (PFNCALLBACK)MakeProcInstance((FARPROC)DdeCallback, hInstance),
-			                            APPCLASS_STANDARD | CBF_FAIL_POKES | CBF_FAIL_SELFCONNECTIONS | CBF_SKIP_ALLNOTIFICATIONS,
-			                            0L);
-			if (uInitReturn == DMLERR_NO_ERROR)
-			{
-				hr = _RegisterDDE();
-			}
-		}
-	}
-	else
-	{
-		hr = S_FALSE;
-	}
+    HRESULT hr = E_FAIL;
+    
+    // If m_dwDDEInst is not NULL, then we have already been started, just
+    // return S_FALSE which will still pass SUCCEEDED()
+    if (!m_dwDDEInst)
+    {
+        if (FindWindow(_T("Progman"), NULL) == NULL)
+        {
+            m_hStartEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            m_hThread = (HANDLE)_beginthreadex(NULL, 0, _DDEThreadProc, this,
+                0, &m_uThreadId);
+            
+            WaitForSingleObject(m_hStartEvent, INFINITE);
+            CloseHandle(m_hStartEvent);
+            hr = S_OK;
+        }
+    }
+    else
+    {
+        hr = S_FALSE;
+    }
+        
 
 	return hr;
 }
@@ -76,27 +112,64 @@ HRESULT DDEService::Stop()
 {
 	HRESULT hr = S_OK;
 
-	DdeNameService(m_dwDDEInst, 0L, 0L, DNS_UNREGISTER);
-	if (m_hszProgman)
-	{
-		DdeFreeStringHandle(m_dwDDEInst, m_hszProgman);
-	}
-	if (m_hszGroups)
-	{
-		DdeFreeStringHandle(m_dwDDEInst, m_hszGroups);
-	}
-	if (m_hszFolders)
-	{
-		DdeFreeStringHandle(m_dwDDEInst, m_hszFolders);
-	}
-	if (m_hszAppProperties)
-	{
-		DdeFreeStringHandle(m_dwDDEInst, m_hszAppProperties);
-	}
-	DdeUninitialize(m_dwDDEInst);
-
-	return hr;
+    if (m_hThread)
+    {
+        PostThreadMessage(m_uThreadId, WM_QUIT, 0, 0);
+        
+        if (WaitForSingleObject(m_hThread, 3000) == WAIT_TIMEOUT)
+        {
+            TerminateThread(m_hThread, 0);
+            hr = S_FALSE;
+        }
+        
+        CloseHandle(m_hThread);
+    }
+    
+    return hr;
 }
+
+bool DDEService::_DoStart()
+{
+    bool bReturn = false;
+
+    if (!m_dwDDEInst)
+    {
+        UINT uInitReturn = DdeInitialize(&m_dwDDEInst, (PFNCALLBACK)DdeCallback,
+            APPCLASS_STANDARD | CBF_FAIL_POKES | CBF_FAIL_SELFCONNECTIONS |
+            CBF_SKIP_ALLNOTIFICATIONS, 0L);
+    
+        if (uInitReturn == DMLERR_NO_ERROR)
+        {
+            bReturn = SUCCEEDED(_RegisterDDE());
+        }
+    }
+
+    return bReturn;
+}
+
+
+void DDEService::_DoStop()
+{
+    DdeNameService(m_dwDDEInst, 0L, 0L, DNS_UNREGISTER);
+    if (m_hszProgman)
+    {
+        DdeFreeStringHandle(m_dwDDEInst, m_hszProgman);
+    }
+    if (m_hszGroups)
+    {
+        DdeFreeStringHandle(m_dwDDEInst, m_hszGroups);
+    }
+    if (m_hszFolders)
+    {
+        DdeFreeStringHandle(m_dwDDEInst, m_hszFolders);
+    }
+    if (m_hszAppProperties)
+    {
+        DdeFreeStringHandle(m_dwDDEInst, m_hszAppProperties);
+    }
+    DdeUninitialize(m_dwDDEInst);
+}
+
 
 HDDEDATA CALLBACK DDEService::DdeCallback(
     UINT wType,
@@ -207,7 +280,7 @@ HRESULT DDEService::_RegisterDDE()
 		if (m_hszGroups != 0L)
 		{
 			m_hszFolders = DdeCreateStringHandle(m_dwDDEInst, _T("Folders"), DDE_CP);
-			if (m_hszGroups != 0L)
+			if (m_hszFolders != 0L)
 			{
 				m_hszAppProperties = DdeCreateStringHandle(m_dwDDEInst, _T("AppProperties"), DDE_CP);
 				if (m_hszAppProperties != 0L)
