@@ -24,12 +24,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "lswinbase.h"
 #include "../lsapi/lsapi.h"
 
-#ifdef _DEBUG
-#include <crtdbg.h>
-#define ASSERT(x) _ASSERTE(x)
-#else
-#define ASSERT(x)
-#endif
+#if !defined(ASSERT)
+#  if defined(_DEBUG)
+#    include <crtdbg.h>
+#    define ASSERT(x) _ASSERTE(x)
+#  else
+#    define ASSERT(x)
+#  endif
+#endif // !defined(ASSERT)
 
 #ifdef END_MESSAGEPROC
 #undef END_MESSAGEPROC
