@@ -127,6 +127,10 @@ SOURCE=.\criticalsection.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\debug.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ILiteStep.h
 # End Source File
 # Begin Source File
@@ -140,10 +144,6 @@ SOURCE=.\IService.h
 # Begin Source File
 
 SOURCE=.\localization.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\lsdebug.h
 # End Source File
 # Begin Source File
 

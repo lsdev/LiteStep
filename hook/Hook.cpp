@@ -131,7 +131,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			if (RegQueryValueEx(hKey, szFileName, NULL, NULL,
 			                    NULL, NULL) == ERROR_SUCCESS)
 			{
-				_LSDEBUG2("Not hooking file", szFileName)
+				TRACE("Not hooking file: %s", szFileName);
 				bFilter = true;
 			}
 			else
@@ -224,7 +224,7 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 					case WM_PAINT:
 					break;
 					case WM_SYSCOMMAND:
-					_LSDEBUG1("WM_SYSCOMMAND")
+					TRACE("WM_SYSCOMMAND");
 					default:
 					{
 						//_LSDEBUGPRINTMSG("GetMsgProc Hook Called for Message", (int)msg);
@@ -277,7 +277,7 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 					case WM_COPYDATA:
 					break;
 					case WM_SYSCOMMAND:
-					_LSDEBUG1("WM_SYSCOMMAND")
+					TRACE("WM_SYSCOMMAND");
 					default:
 					{
 						//_LSDEBUGPRINTMSG("CallWndProc Hook Called for Message", (int)msg);

@@ -151,23 +151,23 @@ DWORD HookMgrMain(LPVOID lpv)
 
 bool InstallMsgFilter(bool install)
 {
-	_LSDEBUG1("Installing Hooks...")
+	TRACE("Installing Hooks...");
 	if (install && !hMsgHook && !hCallWndHook)
 	{
 
 		setCallWndHook(SetWindowsHookEx(WH_CALLWNDPROC,
 		                                (HOOKPROC)GetProcAddress(hmodHook, "CallWndProc"), hmodHook, 0));
-		_LSDEBUGLASTERR
+		TRACE_LASTERR("hook CallWndProc");
 		hCallWndHook = getCallWndHook();
 
 		setMsgHook(SetWindowsHookEx(WH_GETMESSAGE,
 		                            (HOOKPROC)GetProcAddress(hmodHook, "GetMsgProc"), hmodHook, 0));
-		_LSDEBUGLASTERR
+		TRACE_LASTERR("hook GetMsgProc");
 		hMsgHook = getMsgHook();
 
 		if (hMsgHook && hCallWndHook)
 		{
-			_LSDEBUG1("Hooks Installed!")
+			TRACE("Hooks Installed!");
 			return true;
 		}
 	}
@@ -181,7 +181,7 @@ bool InstallMsgFilter(bool install)
 		UnhookWindowsHookEx(hCallWndHook);
 		hCallWndHook = NULL;
 	}
-	_LSDEBUG1("Hooks Not Installed!")
+	TRACE("Hooks Not Installed!");
 	return false;
 }
 
@@ -291,7 +291,7 @@ LRESULT CALLBACK HookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			m2hit = m2hmap.find(msgd.message);
 			if (m2hit != m2hmap.end())
 			{
-				_LSDEBUG2("WM_COPYDATA message found", (int)msgd.message)
+				TRACE("WM_COPYDATA message found = %u", msgd.message);
 				psHwnds = (*m2hit).second;
 				for (lrit = psHwnds->rbegin(); lrit != psHwnds->rend(); lrit++)
 				{
