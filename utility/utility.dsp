@@ -99,10 +99,6 @@ SOURCE=.\lswinbasex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mru.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\safeptr.cpp
 # End Source File
 # Begin Source File
@@ -168,10 +164,6 @@ SOURCE=.\lswinbasex.h
 # Begin Source File
 
 SOURCE=.\macros.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\mru.h
 # End Source File
 # Begin Source File
 
