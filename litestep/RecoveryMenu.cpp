@@ -48,23 +48,24 @@ extern HINSTANCE hLSInstance;
 DWORD WINAPI RecoveryThreadProc(LPVOID)
 {
 	WNDCLASSEX wc;
-	memset(&wc, 0, sizeof(WNDCLASSEX));
+	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.lpfnWndProc = RecoveryMenuWndProc;
-	wc.hInstance = GetModuleHandle(NULL);
+	wc.hInstance = hLSInstance;
 	wc.lpszClassName = szRecoveryMenuWndClass;
 
 	RegisterClassEx(&wc);
 
-	CreateWindowEx(0,
+	HWND hRecoveryWnd =
+            CreateWindowEx(0,
 	               szRecoveryMenuWndClass,
 	               NULL,
 	               WS_POPUP,
 	               0, 0, 0, 0,
 	               NULL,
 	               NULL,
-	               GetModuleHandle(NULL),
+	               hLSInstance,
 	               NULL);
 
 	MSG msg;
@@ -75,7 +76,8 @@ DWORD WINAPI RecoveryThreadProc(LPVOID)
 		DispatchMessage(&msg);
 	}
 
-	UnregisterClass(szRecoveryMenuWndClass, hLSInstance);
+	DestroyWindow(hRecoveryWnd);
+    UnregisterClass(szRecoveryMenuWndClass, hLSInstance);
 
 	return 0;
 }
@@ -89,9 +91,11 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 			if (wParam != ID_HOTKEY)
 				break;
 
-			HMENU hMenu = CreatePopupMenu();
+			// our hotkey was pressed, create the menu
+            HMENU hMenu = CreatePopupMenu();
 
-			for (int i = 0; i < cMenuCommands; i++)
+			// populate the menu
+            for (int i = 0; i < cMenuCommands; i++)
 			{
 				if (rgMenuCommands[i].nStringID)
 				{
@@ -108,17 +112,20 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 				}
 			}
 
-			POINT pt;
+			// get the current position of the mouse
+            POINT pt;
 			GetCursorPos(&pt);
 
 			SetForegroundWindow(hWnd);
 
-			int nCommand = (int) TrackPopupMenu(hMenu,
+            int nCommand = (int) TrackPopupMenu(hMenu,
 			                                    TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY,
 			                                    pt.x, pt.y,
 			                                    0, hWnd, NULL);
 
-			switch (nCommand)
+            DestroyMenu(hMenu);
+            
+            switch (nCommand)
 			{
 				case ID_RECYCLE:
 				{
@@ -179,8 +186,6 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 				break;
 			}
 
-			DestroyMenu(hMenu);
-
 			return 0;
 		}
 
@@ -193,10 +198,13 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 		case WM_DESTROY:
 		{
 			UnregisterHotKey(hWnd, ID_HOTKEY);
-
-			PostQuitMessage(0);
 			return 0;
 		}
+
+        case WM_CLOSE:
+        {
+            return 0;
+        }
 	}
 
 	return DefWindowProc(hWnd, nMessage, wParam, lParam);
