@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "litestep.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.5 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.5 2003/01/03 04:59:05 message Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.6 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.6 2003/03/09 20:47:31 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -235,7 +235,8 @@ CLiteStep::CLiteStep()
 	m_szAppPath[0] = '\0';
 	m_szRcPath[0] = '\0';
 	m_hInstance = NULL;
-	m_bAppIsFullScreen = FALSE;
+    m_bAutoHideModules = TRUE;
+    m_bAppIsFullScreen = FALSE;
 	m_hMainWindow = NULL;
 	WM_ShellHook = 0;
 	m_pModuleManager = NULL;
@@ -297,6 +298,8 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 
 	bDoRunStartup = ((bRunStartup) ? GetRCBool("LSNoStartup", FALSE) : FALSE);
 
+	m_bAutoHideModules = GetRCBool("LSNoAutoHideModules", FALSE);
+
 	// Check for explorer
 	if (FindWindow("Shell_TrayWnd", NULL)) // Running under Exploder
 	{
@@ -340,15 +343,15 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	// Start up everything
 	if (m_hMainWindow)
 	{
-		MSG message;
-		FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = NULL;
-
 		// Set magic DWORD to prevent VWM from seeing main window
 		SetWindowLong (m_hMainWindow, GWL_USERDATA, magicDWord);
 
-		RegisterShellHook = (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0xB5));
-		WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
-		if (RegisterShellHook)
+        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = NULL;
+        RegisterShellHook = (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0xB5));
+
+        WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
+		
+        if (RegisterShellHook)
 		{
 			RegisterShellHook(NULL, RSH_REGISTER);
 			RegisterShellHook(m_hMainWindow, RSH_TASKMAN);
@@ -391,6 +394,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
 
 		// Main message pump
+        MSG message;
 		while (GetMessage(&message, 0, 0, 0) > 0)
 		{
 			__try
@@ -775,35 +779,34 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		default:
 		{
-			if (m_pMessageManager)
+            if (uMsg == WM_ShellHook)
+            {
+                HWND hWndMessage = (HWND)lParam;
+                uMsg = (LOWORD(wParam) & 0x00FF) + 9500;
+                lParam = (LOWORD(wParam) & 0xFF00);
+                wParam = (WPARAM)hWndMessage;
+                
+                if (uMsg == LM_WINDOWACTIVATED)
+                {
+                    if ((lParam > 0) && m_bAutoHideModules &&
+                        (m_bAppIsFullScreen == FALSE))
+                    {
+                        m_bAppIsFullScreen = TRUE;
+                        ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
+                    }
+                    else if ((lParam <= 0) && m_bAutoHideModules &&
+                        (m_bAppIsFullScreen == TRUE))
+                    {
+                        m_bAppIsFullScreen = FALSE;
+                        ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
+                    }
+                }
+            }
+
+            if (m_pMessageManager && m_pMessageManager->HandlerExists(uMsg))
 			{
-				if (uMsg == WM_ShellHook)
-				{
-					HWND hWndMessage = (HWND)lParam;
-					uMsg = (LOWORD(wParam) & 0x00FF) + 9500;
-					lParam = (LOWORD(wParam) & 0xFF00);
-					wParam = (WPARAM)hWndMessage;
-
-					if (uMsg == LM_WINDOWACTIVATED)
-					{
-						if ((lParam > 0) && (m_bAppIsFullScreen == FALSE))
-						{
-							m_bAppIsFullScreen = TRUE;
-							ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
-						}
-						else if ((lParam <= 0) && (m_bAppIsFullScreen == TRUE))
-						{
-							m_bAppIsFullScreen = FALSE;
-							ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
-						}
-					}
-				}
-
-				if (m_pMessageManager->HandlerExists(uMsg))
-				{
-					lReturn = m_pMessageManager->SendMessage(uMsg, wParam, lParam);
-					break;
-				}
+                lReturn = m_pMessageManager->SendMessage(uMsg, wParam, lParam);
+                break;
 			}
 			lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
 		}

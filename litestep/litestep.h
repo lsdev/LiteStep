@@ -105,7 +105,8 @@ private:
 	// Application instance
 	HINSTANCE m_hInstance;
 
-	BOOL m_bAppIsFullScreen; // = FALSE;		// Is there a full screen app active?
+	BOOL m_bAutoHideModules;
+    BOOL m_bAppIsFullScreen; // = FALSE;		// Is there a full screen app active?
 
 	// Windows
 	HWND m_hMainWindow; // = NULL;
