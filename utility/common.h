@@ -28,6 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable: 4786) // STL naming warnings
 #pragma warning(disable: 4503) // STL naming warnings
 
+
+#ifndef _WINDOWS_
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -38,11 +41,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NOCRYPT
 #endif
 
-#ifdef _WINDOWS_
-	#error WINDOWS.H already included.  Do not #include <windows.h> with common.h
-#endif
-
 #include <windows.h>
+#endif // _WINDOWS_
+
 
 // Common includes
 #include <stdlib.h>
