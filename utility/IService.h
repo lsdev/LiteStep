@@ -33,33 +33,4 @@ public:
 };
 
 
-template <class T>
-class Service: public IService
-{
-public:
-	static HRESULT CreateInstance(REFIID /*iid*/, void **ppvObject)
-	{
-		HRESULT hr;
-
-		if (ppvObject != NULL)
-		{
-			*ppvObject = new T;
-			if (*ppvObject != NULL)
-			{
-				hr = S_OK;
-			}
-			else
-			{
-				hr = E_OUTOFMEMORY;
-			}
-		}
-		else
-		{
-			hr = E_INVALIDARG;
-		}
-
-		return hr;
-	}
-};
-
 #endif __ISERVICE_H

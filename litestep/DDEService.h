@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DDEWorker.h"
 #include "../utility/IService.h"
 
-class DDEService: public Service<DDEService>
+class DDEService: public IService
 {
 public:
 	DDEService();
