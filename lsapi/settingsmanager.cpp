@@ -37,7 +37,30 @@ SettingsManager::SettingsManager(LPCSTR pszLiteStepPath)
 
 SettingsManager::~SettingsManager()
 {
-    m_SettingsMap.clear();
+    // check if nasty modules forgot to call LCClose
+    for (IteratorSet::iterator itSet = m_Iterators.begin();
+         itSet != m_Iterators.end(); ++itSet)
+    {
+        delete *itSet;
+    }
+
+    for (FileMap::iterator itFiles = m_FileMap.begin();
+         itFiles != m_FileMap.end(); ++itFiles)
+    {
+        if (itFiles->second->m_Count == 1)
+        {
+            delete itFiles->second->m_pSettingsMap;
+            delete itFiles->second;
+            
+            m_FileMap.erase(itFiles);
+        }
+        else
+        {
+            itFiles->second->m_Count--;
+        }
+    }
+
+    ASSERT(m_FileMap.empty());
 }
 
 
@@ -509,12 +532,13 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 //
 FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 {
-	FILE * pFile = NULL;
+	FILE* pFile = NULL;
 
 	if (pszPath == NULL)
 	{
-		SettingsIterator * psiNew = new SettingsIterator(&m_SettingsMap, "\0");
-		if (psiNew)
+		SettingsIterator* psiNew = new SettingsIterator(&m_SettingsMap, "\0");
+		
+        if (psiNew)
 		{
 			m_Iterators.insert(psiNew);
 			pFile = (FILE*)psiNew;
@@ -522,13 +546,18 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 	}
 	else
 	{
-		char szPath[MAX_PATH];
+        char szPath[MAX_PATH] = { 0 };
 		VarExpansionEx(szPath, pszPath, MAX_PATH);
-		FileMap::iterator it = m_FileMap.find(szPath);
+		
+        Lock lock(m_CritSection);
+
+        FileMap::iterator it = m_FileMap.find(szPath);
+
 		if (it == m_FileMap.end())
 		{
-			FileInfo * pFileInfo = new FileInfo;
-			if (pFileInfo)
+			FileInfo* pFileInfo = new FileInfo;
+			
+            if (pFileInfo)
 			{
                 pFileInfo->m_pSettingsMap = new SettingsMap;
 				pFileInfo->m_Count = 1;
@@ -537,19 +566,21 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 				fpParser.ParseFile(szPath);
 
 				m_FileMap.insert(FileMap::value_type(szPath, pFileInfo));
-				it = m_FileMap.find(szPath);
+				
+                it = m_FileMap.find(szPath);
+                ASSERT(it != m_FileMap.end());
 			}
 		}
-		if (it != m_FileMap.end())
-		{
-			SettingsIterator * psiNew = new SettingsIterator(it->second->m_pSettingsMap, szPath);
-			if (psiNew)
-			{
-				it->second->m_Count++;
-				m_Iterators.insert(psiNew);
-				pFile = (FILE*)psiNew;
-			}
-		}
+        
+        SettingsIterator * psiNew =
+            new SettingsIterator(it->second->m_pSettingsMap, szPath);
+        
+        if (psiNew)
+        {
+            it->second->m_Count++;
+            m_Iterators.insert(psiNew);
+            pFile = (FILE*)psiNew;
+        }
 	}
 
 	return pFile;
@@ -565,25 +596,34 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 
 	if (pFile != NULL)
 	{
+        Lock lock(m_CritSection);
+        
 		IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
-		if (it != m_Iterators.end())
+		
+        if (it != m_Iterators.end())
 		{
-			m_Iterators.erase(it);
-			FileMap::iterator fmIt = m_FileMap.find(((SettingsIterator*)pFile)->get_Path());
+			FileMap::iterator fmIt = m_FileMap.find((*it)->get_Path());
+
 			if (fmIt != m_FileMap.end())
 			{
 				if (fmIt->second->m_Count == 1)
 				{
                     delete fmIt->second->m_pSettingsMap;
 					delete fmIt->second;
+
+                    m_FileMap.erase(fmIt);
 				}
 				else
 				{
 					fmIt->second->m_Count--;
 				}
 			}
-			delete pFile;
+
+            delete *it;
+
+            m_Iterators.erase(it);
 		}
+
 		bReturn = TRUE;
 	}
 

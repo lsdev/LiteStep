@@ -23,12 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 BangManager::BangManager()
 {
-	InitializeCriticalSection(&cs);
 }
 
 BangManager::~BangManager()
 {
-	DeleteCriticalSection(&cs);
+    ASSERT(bang_map.empty());
 }
 
 
