@@ -96,9 +96,7 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
 	BOOL negative = false;
 	BOOL center = false;
 	BOOL percentual = false;
-	int length = 0;
 
-	int i = 0;
 	int value = 0;
 
 	if (!szString[0])
@@ -114,7 +112,8 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
 		szString++;
 	}
 
-	length = strlen(szString);
+	size_t length = strlen(szString);
+	size_t i = 0;
 
 	while (i < length)
 	{
@@ -123,7 +122,7 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
 		else
 			break;
 
-		i++;
+		++i;
 	}
 
 	if (i == 0)
@@ -143,7 +142,7 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
 			break;
 		//		}
 
-		i++;
+		++i;
 	}
 
 	if (percentual)
