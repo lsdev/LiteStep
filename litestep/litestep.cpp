@@ -173,22 +173,6 @@ BOOL WINAPI FileIconInit(BOOL bFullInit);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int /* nCmdShow */)
 {
-    
-    typedef BOOL (WINAPI* FII_PROC)(BOOL bFullInit);
-    
-    HMODULE      hShell32 = LoadLibrary("shell32.dll");
-    
-    if(hShell32 != NULL)
-    {
-        FII_PROC FileIconInit = (FII_PROC)GetProcAddress(hShell32, (LPCSTR)660);
-        
-        // Initialize imagelist for this process - function not present on win95/98
-        if(FileIconInit != NULL)
-        {
-            FileIconInit(TRUE);
-        }
-    }
-
     HRESULT hr = S_OK;
     
     // Determine our application's path
