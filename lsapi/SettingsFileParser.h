@@ -32,17 +32,17 @@ public:
 	FileParser(SettingsMap* pSettingsMap);
 	~FileParser();
 
-	void ParseFile(LPCSTR pszFileName);
+	void ParseFile(LPCTSTR ptzFileName);
 
 private:
 	SettingsMap* m_pSettingsMap;
 	FILE* m_phFile;
 	EvalParser* m_pEvalParser;
 
-	BOOL _ReadLineFromFile(LPSTR pszName, LPSTR pszValue);
+	BOOL _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
 	void _StripString(LPWSTR pwzString);
-	void _ProcessLine(LPCSTR pszName, LPCSTR pszValue);
-	void _ProcessIf(LPCSTR pszExpression);
+	void _ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue);
+	void _ProcessIf(LPCTSTR ptzExpression);
 	void _SkipIf();
 
 };

@@ -19,20 +19,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#include "../utility/common.h"
 #include "SettingsFileParser.h"
 #include "lsapi.h"
-#define _UNICODE
-#include <tchar.h>
-#undef _UNICODE
 #include "../utility/safestr.h" // Always include last in cpp file
 
-BOOL FileParser::_ReadLineFromFile(LPSTR pszName, LPSTR pszValue)
+
+//
+// BOOL _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
+//
+// ptzName must be MAX_RCOCOMMAND size
+// ptzValue must be MAX_LINE_LENGTH size
+//
+BOOL FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 {
-	WCHAR wzBuffer[MAX_LINE_LENGTH + 1];
+	WCHAR wzBuffer[MAX_LINE_LENGTH];
 	BOOL bReturn = FALSE;
 
-	if ((m_phFile) && IsValidStringPtr(pszName))
+	if ((m_phFile) && IsValidStringPtr(ptzName, MAX_RCCOMMAND))
 	{
 		while (!feof(m_phFile))
 		{
@@ -44,24 +47,30 @@ BOOL FileParser::_ReadLineFromFile(LPSTR pszName, LPSTR pszValue)
 			if (wzBuffer[0] != L';')
 			{
 				LPWSTR pwzCurrent = wzBuffer;
-				pwzCurrent += wcsspn(pwzCurrent, WHITESPACEW);
+				pwzCurrent += StrSpnW(pwzCurrent, WHITESPACEW);
 
 				if (pwzCurrent[0] && pwzCurrent[0] != L';')
 				{
-					WCHAR wzName[MAX_RCCOMMAND + 1];
-					size_t nEndConfig = wcscspn(pwzCurrent, WHITESPACEW);
+					int nEndConfig = wcscspn(pwzCurrent, WHITESPACEW);
 
-					wcsncpy(wzName, pwzCurrent, nEndConfig);
+#ifdef _UNICODE
+					StringCchCopyNExW(ptzName, MAX_RCCOMMAND, pwzCurrent, nEndConfig, NULL, NULL, STRSAFE_NULL_ON_FAILURE);
+					ptzName[nEndConfig] = '\0';
+					CharLowerBuffW(ptzName, MAX_RCCOMMAND);
+#else // _UNICODE
+					WCHAR wzName[MAX_RCCOMMAND];
+					StringCchCopyNExW(wzName, MAX_RCCOMMAND, pwzCurrent, nEndConfig, NULL, NULL, STRSAFE_NULL_ON_FAILURE);
 					wzName[nEndConfig] = '\0';
 					CharLowerBuffW(wzName, MAX_RCCOMMAND);
 
-					WideCharToMultiByte(CP_ACP, 0, wzName, -1, pszName, MAX_RCCOMMAND, NULL, NULL);
+					WideCharToMultiByte(CP_ACP, 0, wzName, -1, ptzName, MAX_RCCOMMAND, NULL, NULL);
+#endif // _UNICODE
 
-					if (IsValidStringPtr(pszValue))
+					if (IsValidStringPtr(ptzValue))
 					{
 						LPWSTR pwzValueStart;
 
-						if (nEndConfig < wcslen(pwzCurrent))
+						if (nEndConfig < lstrlenW(pwzCurrent))
 						{
 							pwzValueStart = pwzCurrent + nEndConfig + 1;
 						}
@@ -72,7 +81,11 @@ BOOL FileParser::_ReadLineFromFile(LPSTR pszName, LPSTR pszValue)
 
 						_StripString(pwzValueStart);
 
-						WideCharToMultiByte(CP_ACP, 0, pwzValueStart, -1, pszValue, MAX_LINE_LENGTH, NULL, NULL);
+#ifdef _UNICODE
+						StringCchCopyExW(ptzValue, MAX_LINE_LENGTH, pwzValueStart, NULL, NULL, STRSAFE_NULL_ON_FAILURE);
+#else // _UNICODE
+						WideCharToMultiByte(CP_ACP, 0, pwzValueStart, -1, ptzValue, MAX_LINE_LENGTH, NULL, NULL);
+#endif // _UNICODE
 					}
 
 					bReturn = TRUE;
@@ -105,40 +118,26 @@ FileParser::~FileParser()
 	}
 }
 
-void FileParser::ParseFile(LPCSTR pszFileName)
+void FileParser::ParseFile(LPCTSTR ptzFileName)
 {
-	CHAR szExpandedPath[MAX_PATH_LENGTH + 1];
-	CHAR szFullPath[MAX_PATH_LENGTH + 1];
-	CHAR szKey[MAX_RCCOMMAND + 1];
-	CHAR szValue[MAX_LINE_LENGTH + 1];
+	TCHAR tzExpandedPath[MAX_PATH_LENGTH];
+	TCHAR tzFullPath[MAX_PATH_LENGTH];
+	TCHAR tzKey[MAX_RCCOMMAND];
+	TCHAR tzValue[MAX_LINE_LENGTH];
 
-	VarExpansionEx(szExpandedPath, pszFileName, MAX_PATH_LENGTH);
-	/*
-	if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-	{
-		GetFullPathNameW(wzExpandedPath, MAX_PATH_LENGTH, wzFullPath, NULL);
-	}
-	else
-	{
-		char szPath[MAX_PATH_LENGTH];
-		char szFullPath[MAX_PATH_LENGTH];
-		size_t nLength = wcslen(wzExpandedPath) + 1;
-		WideCharToMultiByte(CP_ACP, 0, wzExpandedPath, nLength, szPath, nLength, NULL, NULL);
-		*/
-	GetFullPathName(szExpandedPath, MAX_PATH_LENGTH, szFullPath, NULL);
-	/*
-	MultiByteToWideChar(CP_ACP, 0, szFullPath, nLength, wzFullPath, nLength);
-	}*/
+	VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
 
-	m_phFile = fopen(szFullPath, "r");
+	GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, tzFullPath, NULL);
+
+	m_phFile = fopen(tzFullPath, _T("r"));
 
 	if (m_phFile)
 	{
 		fseek(m_phFile, 0, SEEK_SET);
 
-		while (_ReadLineFromFile(szKey, szValue))
+		while (_ReadLineFromFile(tzKey, tzValue))
 		{
-			_ProcessLine(szKey, szValue);
+			_ProcessLine(tzKey, tzValue);
 		}
 
 		fclose(m_phFile);
@@ -156,7 +155,7 @@ void FileParser::_StripString(LPWSTR pwzString)
 
 	while (*pwzCurrent != L'\0')
 	{
-		if (wcschr(WHITESPACEW, *pwzCurrent) == NULL)
+		if (StrChrW(WHITESPACEW, *pwzCurrent) == NULL)
 		{
 			if (pwzStart == NULL)
 			{
@@ -190,7 +189,7 @@ void FileParser::_StripString(LPWSTR pwzString)
 				}
 				else if (!wLastQuote)
 				{
-					nQuoteLevel++;
+					++nQuoteLevel;
 					wLastQuote = *pwzCurrent;
 				}
 			}
@@ -211,36 +210,37 @@ void FileParser::_StripString(LPWSTR pwzString)
 	}
 	if ((pwzCurrent != pwzString) && *pwzCurrent)
 	{
-		StringCchCopyW(pwzString, wcslen(pwzString) + 1, pwzStart);
+		StringCchCopyW(pwzString, lstrlenW(pwzString) + 1, pwzStart);
 	}
 }
 
 
-void FileParser::_ProcessLine(LPCSTR pszName, LPCSTR pszValue)
+void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
-	if (strcmp(pszName, "if") == 0)
+	if (lstrcmp(ptzName, _T("if")) == 0)
 	{
-		_ProcessIf(pszValue);
+		_ProcessIf(ptzValue);
 	}
-	else if (strcmp(pszName, "include") == 0)
+	else if (lstrcmp(ptzName, _T("include")) == 0)
 	{
-		CHAR szPath[MAX_PATH_LENGTH];
-		GetToken(pszValue, szPath, NULL, false);
-		//ParseFile(szPath);
+		TCHAR tzPath[MAX_PATH_LENGTH];
+
+		GetToken(ptzValue, tzPath, NULL, false);
+		
 		FileParser fpParser(m_pSettingsMap);
-		fpParser.ParseFile(szPath);
+		fpParser.ParseFile(tzPath);
 	}
 	else
 	{
-		m_pSettingsMap->insert(SettingsMap::value_type(pszName, pszValue));
+		m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
 	}
 }
 
 
-void FileParser::_ProcessIf(LPCSTR pszExpression)
+void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
-	CHAR szName[MAX_RCCOMMAND + 1];
-	CHAR szValue[MAX_LINE_LENGTH + 1];
+	TCHAR tzName[MAX_RCCOMMAND];
+	TCHAR tzValue[MAX_LINE_LENGTH];
 	BOOL bResult;
 
 	if (m_pEvalParser == NULL)
@@ -251,15 +251,15 @@ void FileParser::_ProcessIf(LPCSTR pszExpression)
 	if (m_pEvalParser)
 	{
 
-		if (!m_pEvalParser->evaluate(pszExpression, &bResult))
+		if (!m_pEvalParser->evaluate(ptzExpression, &bResult))
 		{
-			CHAR szError[MAX_LINE_LENGTH];
+			TCHAR tzError[MAX_LINE_LENGTH];
 
-			StringCchPrintf(szError, MAX_LINE_LENGTH,
-			                "Syntax error in If expression:\n%s",
-			                pszExpression);
+			StringCchPrintf(tzError, MAX_LINE_LENGTH,
+			                _T("Syntax error in If expression:\n%s"),
+			                ptzExpression);
 
-			MessageBox(NULL, szError, "LiteStep", MB_SETFOREGROUND);
+			MessageBox(NULL, tzError, _T("LiteStep"), MB_SETFOREGROUND);
 		}
 		else
 		{
@@ -267,16 +267,16 @@ void FileParser::_ProcessIf(LPCSTR pszExpression)
 			{
 				// when the If condition evaluates true we read and process
 				// all lines until we reach ElseIf, Else, or EndIf
-				while (_ReadLineFromFile(szName, szValue))
+				while (_ReadLineFromFile(tzName, tzValue))
 				{
-					if ((strcmp(szName, "else") == 0) || (strcmp(szName, "elseif") == 0))
+					if ((lstrcmp(tzName, _T("else")) == 0) || (lstrcmp(tzName, _T("elseif")) == 0))
 					{
 						// if we find an ElseIf or Else then we read and ignore
 						// all lines until we find EndIf
 						_SkipIf();
 						break;
 					}
-					else if (strcmp(szName, "endif") == 0)
+					else if (lstrcmp(tzName, _T("endif")) == 0)
 					{
 						// we're done
 						break;
@@ -284,7 +284,7 @@ void FileParser::_ProcessIf(LPCSTR pszExpression)
 					else
 					{
 						// just a normal line, process it
-						_ProcessLine(szName, szValue);
+						_ProcessLine(tzName, tzValue);
 					}
 				}
 			}
@@ -292,41 +292,41 @@ void FileParser::_ProcessIf(LPCSTR pszExpression)
 			{
 				// when the If expression evaluates false we read and ignore
 				// all lines until we find an ElseIf, Else, or EndIf
-				while (_ReadLineFromFile(szName, szValue))
+				while (_ReadLineFromFile(tzName, tzValue))
 				{
-					if (strcmp(szName, "if") == 0)
+					if (lstrcmp(tzName, _T("if")) == 0)
 					{
 						// nested Ifs are a special case
 						_SkipIf();
 					}
-					else if (strcmp(szName, "elseif") == 0)
+					else if (lstrcmp(tzName, _T("elseif")) == 0)
 					{
 						// we handle ElseIfs by recursively calling ProcessIf
-						_ProcessIf(szValue);
+						_ProcessIf(tzValue);
 						break;
 					}
-					else if (strcmp(szName, "else") == 0)
+					else if (lstrcmp(tzName, _T("else")) == 0)
 					{
 						// since the If expression was false, when we see Else
 						// we start process lines until EndIf
-						while (_ReadLineFromFile(szName, szValue))
+						while (_ReadLineFromFile(tzName, tzValue))
 						{
 							// we should probably check that there are no ElseIfs
 							// after the Else, but for now we silently ignore
 							// such an error
 
 							// break on EndIf
-							if (strcmp(szName, "endif") == 0)
+							if (lstrcmp(tzName, _T("endif")) == 0)
 								break;
 
 							// otherwise process the line
-							_ProcessLine(szName, szValue);
+							_ProcessLine(tzName, tzValue);
 						}
 
 						// we're done
 						break;
 					}
-					else if (strcmp(szName, "endif") == 0)
+					else if (lstrcmp(tzName, _T("endif")) == 0)
 					{
 						// we're done
 						break;
@@ -339,15 +339,15 @@ void FileParser::_ProcessIf(LPCSTR pszExpression)
 
 void FileParser::_SkipIf()
 {
-	CHAR szName[MAX_RCCOMMAND];
+	TCHAR tzName[MAX_RCCOMMAND];
 
-	while (_ReadLineFromFile(szName, NULL))
+	while (_ReadLineFromFile(tzName, NULL))
 	{
-		if (strcmp(szName, "if") == 0)
+		if (lstrcmp(tzName, _T("if")) == 0)
 		{
 			_SkipIf();
 		}
-		else if (strcmp(szName, "endif") == 0)
+		else if (lstrcmp(tzName, _T("endif")) == 0)
 		{
 			break;
 		}
