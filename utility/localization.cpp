@@ -148,7 +148,7 @@ HFONT LocalCreateFontIndirect(LOGFONT *lplf)
 Localization::Localization()
 {
 	m_hRes = NULL;
-	m_wLanguageID = -1;
+	m_wLanguageID = 0xFFFF;
 	
 	LANGID wLanguageID;
 	

@@ -705,10 +705,10 @@ BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_
 // leave it alone as long as it works exactly like the old function.
 double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
 {
-    int nCount, nBlock = 0, nStart;
+    int nCount, nBlock = 0, nStart = 0;
     
     PathRemoveBlanks(ptzInput);
-    int nLen = _tcslen(ptzInput);
+    int nLen = (int)_tcslen(ptzInput);
     
     for (nCount = 0; nCount <= nLen; nCount++)
     {
