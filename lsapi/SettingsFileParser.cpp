@@ -82,7 +82,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     {
         ErrorEx(LOCALIZE_THIS,
             _T("Error opening \"%s\" for parsing.\n")
-            _T("Received as: %s"), tzFullPath, ptzFileName);
+            _T("Requested as: %s"), tzFullPath, ptzFileName);
     }
 }
 
@@ -153,90 +153,78 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 void FileParser::_StripString(LPTSTR ptzString)
 {
     ASSERT_ISWRITEPTR(ptzString);
-
+    
     LPTSTR ptzCurrent = ptzString;
-	LPTSTR ptzStart = NULL;
-	LPTSTR ptzLast = NULL;
-	size_t stQuoteLevel = 0;
-	TCHAR tLastQuote = '\0';
-
+    LPTSTR ptzStart = NULL;
+    LPTSTR ptzLast = NULL;
+    size_t stQuoteLevel = 0;
+    TCHAR tLastQuote = _T('\0');
+    
     while (*ptzCurrent != _T('\0'))
-	{
-		if (StrChr(WHITESPACE, *ptzCurrent) == NULL)
-		{
-			if (ptzStart == NULL)
-			{
-				ptzStart = ptzCurrent;
-			}
-			
+    {
+        if (StrChr(WHITESPACE, *ptzCurrent) == NULL)
+        {
+            if (ptzStart == NULL)
+            {
+                ptzStart = ptzCurrent;
+            }
+            
             ptzLast = NULL;
-		}
-		else if (ptzLast == NULL)
+        }
+        else if (ptzLast == NULL)
         {
             ptzLast = ptzCurrent;
         }
-
-		if (ptzStart != NULL)
-		{
-			switch (*ptzCurrent)
+        
+        if (ptzStart != NULL)
+        {
+            if (*ptzCurrent == '[')
+			{
+				++stQuoteLevel;
+			}
+			else if (*ptzCurrent == ']')
+			{
+				if (stQuoteLevel > 0)
+                {
+                    --stQuoteLevel;
+                }
+            }
+            else if ((*ptzCurrent == '"') || (*ptzCurrent == '\''))
             {
-                case _T('['):
+                if (tLastQuote == *ptzCurrent)
+                {
+                    ASSERT(stQuoteLevel > 0);
+                    --stQuoteLevel;
+                    tLastQuote = 0;
+                }
+                else if (!tLastQuote)
                 {
                     ++stQuoteLevel;
+                    tLastQuote = *ptzCurrent;
                 }
-                break;
-                
-                case _T(']'):
+            }
+            else if (*ptzCurrent == ';')
+            {
+                if (!stQuoteLevel)
                 {
-                    if (stQuoteLevel > 0)
-                    {
-                        --stQuoteLevel;
-                    }
+                    ptzLast = ptzCurrent;
+                    break;
                 }
-                break;
-                
-                case _T('"'):
-                case _T('\''):
-                {
-                    if (*ptzCurrent == tLastQuote)
-                    {
-                        --stQuoteLevel;
-                        tLastQuote = '\0';
-                    }
-                    else if (tLastQuote == '\0')
-                    {
-                        ++stQuoteLevel;
-                        tLastQuote = *ptzCurrent;
-                    }
-                }
-                break;
-
-                case _T(';'):
-                {
-                    if (!stQuoteLevel)
-                    {
-                        ptzLast = ptzCurrent;
-                    }
-                }
-                break;
-                
-                default:
-                break;
             }
         }
-
         ++ptzCurrent;
     }
-
-	if (ptzLast != NULL)
-	{
-		*ptzLast = '\0';
-	}
-	if ((ptzCurrent != ptzString) && ptzStart)
-	{
-		StringCchCopy(ptzString, lstrlen(ptzString) + 1, ptzStart);
-	}
+    
+    if (ptzLast != NULL)
+    {
+        *ptzLast = '\0';
+    }
+    if ((ptzCurrent != ptzString) && ptzStart)
+    {
+        StringCchCopy(ptzString, lstrlen(ptzString) + 1, ptzStart);
+    }
 }
+
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
