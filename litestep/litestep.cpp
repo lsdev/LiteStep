@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "litestep.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.6 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.6 2003/03/09 20:47:31 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.7 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.7 2003/03/11 19:24:56 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -788,18 +788,19 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 
                 if (uMsg == LM_WINDOWACTIVATED)
                 {
-                    if ((lParam > 0) && m_bAutoHideModules &&
-                        (m_bAppIsFullScreen == FALSE))
-                    {
-                        m_bAppIsFullScreen = TRUE;
-                        ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
-                    }
-                    else if ((lParam <= 0) && m_bAutoHideModules &&
-                        (m_bAppIsFullScreen == TRUE))
-                    {
-                        m_bAppIsFullScreen = FALSE;
-                        ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
-                    }
+                    if (m_bAutoHideModules)
+					{
+						if ((lParam > 0) && (m_bAppIsFullScreen == FALSE))
+						{
+							m_bAppIsFullScreen = TRUE;
+							ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
+						}
+						else if ((lParam <= 0) && (m_bAppIsFullScreen == TRUE))
+						{
+							m_bAppIsFullScreen = FALSE;
+							ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
+						}
+					}
                 }
             }
 
