@@ -21,9 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "../utility/common.h"
 #include <commctrl.h>
-#include <objbase.h>
-#include <oleauto.h>
-#include <io.h>
 #include <math.h>
 #include "../utility/core.hpp"
 
@@ -40,25 +37,21 @@ enum
 
 typedef void (*AboutFunction)(HWND);
 
+void AboutBangs(HWND hListView);
+void AboutDevTeam(HWND hListView);
+void AboutModules(HWND hListView);
+void AboutRevIDs(HWND hListView);
+void AboutSysInfo(HWND hListView);
+
+//
+// misc functions
+//
 BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-void AboutBangs(HWND);
-void AboutDevTeam(HWND);
-void AboutModules(HWND);
-void AboutRevIDs(HWND);
-void AboutSysInfo(HWND);
-
-//
-// utility functions
-//
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
-int GetClientWidth(HWND);
-void TrimLeft(char *);
+int GetClientWidth(HWND hWnd);
+void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
-
-
-// AboutBox Dialog Procedure
-//
 
 struct
 {
@@ -88,6 +81,16 @@ theDevTeam[] =
 const unsigned int aboutOptionsCount = sizeof(aboutOptions) / sizeof(aboutOptions[0]);
 const unsigned int theDevTeamCount = sizeof(theDevTeam) / sizeof(theDevTeam[0]);
 
+struct CallbackInfo
+{
+    HWND hListView;
+    int nItem;
+};
+
+
+//
+// AboutBox Dialog Procedure
+//
 BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -129,29 +132,32 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
                 return TRUE;
 			}
+            
 			return FALSE;
 		}
 
 		case WM_CTLCOLORSTATIC:
 		{
-			// the header and title need a white (COLOR_WINDOW) background
-			int id = GetDlgCtrlID((HWND) lParam);
+			BOOL bReturn = FALSE;
+
+            // the header and title need a white (COLOR_WINDOW) background
+			int id = GetDlgCtrlID((HWND)lParam);
 
 			if (id == IDC_TITLE || id == IDC_THEME_INFO)
 			{
-				HDC hDC = (HDC) wParam;
+				HDC hDC = (HDC)wParam;
 
 				SetTextColor(hDC, GetSysColor(COLOR_WINDOWTEXT));
 				SetBkColor(hDC, GetSysColor(COLOR_WINDOW));
 
-				return (BOOL)GetSysColorBrush(COLOR_WINDOW);
+				bReturn = (BOOL)GetSysColorBrush(COLOR_WINDOW);
 			}
 			else if (id == IDC_HEADER || id == IDC_LOGO)
 			{
-				return (BOOL)GetSysColorBrush(COLOR_WINDOW);
+				bReturn = (BOOL)GetSysColorBrush(COLOR_WINDOW);
 			}
 
-			return FALSE;
+			return bReturn;
 		}
 
 		case WM_INITDIALOG:
@@ -165,10 +171,9 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.7 Beta 4");
 
 			// set Theme info
-			char themeAuthor[16];
-			char themeName[21];
-			char themeOut[MAX_LINE_LENGTH];
-			themeName[0] = themeAuthor[0] = '\0';
+            char themeAuthor[16] = { 0 };
+            char themeName[21] = { 0 };
+            char themeOut[MAX_LINE_LENGTH] = { 0 };
 
 			GetRCString("ThemeAuthor", themeAuthor, "(unknown)", sizeof(themeAuthor));
 
@@ -186,7 +191,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			SetDlgItemText(hWnd, IDC_THEME_INFO, themeOut);
 
 			// set compile time
-			char compileTime[64];
+            char compileTime[64] = { 0 };
 			StringCchPrintf(compileTime, 64,
                 "Compiled on %s at %s", __DATE__, __TIME__);
 
@@ -196,7 +201,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			for (int i = 0; i < aboutOptionsCount; ++i)
             {
                 SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_ADDSTRING,
-                    0, (LPARAM) aboutOptions[i].option);
+                    0, (LPARAM)aboutOptions[i].option);
             }
 
 			// default to revision IDs
@@ -207,12 +212,10 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			RECT rc;
 			GetWindowRect(hWnd, &rc);
 
-			SetWindowPos(hWnd,
-			             HWND_TOP,
-			             (GetSystemMetrics(SM_CXSCREEN) - (rc.right - rc.left)) / 2,
-			             (GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
-			             0, 0,
-			             SWP_NOSIZE);
+			SetWindowPos(hWnd, HWND_TOP,
+                (GetSystemMetrics(SM_CXSCREEN) - (rc.right - rc.left)) / 2,
+                (GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
+                0, 0, SWP_NOSIZE);
 
 			SwitchToThisWindow(hWnd, TRUE);
 
@@ -237,6 +240,21 @@ ULONG WINAPI AboutBoxThread(void *)
 // Fill listview with bang command information
 //
 
+BOOL __stdcall BangCallback(LPCSTR pszName, LPARAM lParam)
+{
+    CallbackInfo* pCi = (CallbackInfo*)lParam;
+
+    LVITEM itemInfo;
+    itemInfo.mask = LVIF_TEXT;
+    itemInfo.iItem = pCi->nItem++;
+    itemInfo.pszText = (char*)pszName;
+    itemInfo.iSubItem = 0;
+
+    ListView_InsertItem(pCi->hListView, &itemInfo);
+
+    return TRUE;
+}
+
 void AboutBangs(HWND hListView)
 {
 	LVCOLUMN columnInfo;
@@ -249,53 +267,10 @@ void AboutBangs(HWND hListView)
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
 
-	// get bang command names from bang manager
-	/*ILitestep *litestep;
-	IBangManager *bangMgr;
+    CallbackInfo ci = { 0 };
+    ci.hListView = hListView;
 
-	litestep = (ILitestep *) SendMessage( GetLitestepWnd(), LM_GETLSOBJECT, 0, 0 );
-	litestep->GetBangManager( &bangMgr );
-
-	if ( !bangMgr )
-		return ;
-
-	long count = bangMgr->GetBangCommandCount(), total = 0;
-	BSTR *array = new BSTR[count];
-	if ( !array )
-		return ;
-
-	total = bangMgr->GetBangCommandNames(count, array);
-
-	if ( !total )
-		return ;
-
-	for ( int i = 0; i < count; i++ )
-	{
-		LVITEM itemInfo;
-		char buffer[64];
-
-		WideCharToMultiByte( CP_ACP,
-		                     0,
-		                     array[i],
-		                     -1,
-		                     buffer,
-		                     64,
-		                     NULL,
-		                     NULL );
-
-		SysFreeString(array[i]);
-
-		itemInfo.mask = LVIF_TEXT;
-		itemInfo.iItem = i;
-		itemInfo.pszText = buffer;
-		itemInfo.iSubItem = 0;
-
-		ListView_InsertItem( hListView, &itemInfo );
-	}
-
-	// free up array damnit
-	delete array;*/
-
+    EnumLSData(ELD_BANGS, (FARPROC)BangCallback, (LPARAM)&ci);
 }
 
 
@@ -338,69 +313,59 @@ void AboutDevTeam(HWND hListView)
 // Fill listview with module information
 //
 
+BOOL __stdcall ModulesCallback(LPCSTR pszPath, DWORD dwFlags, LPARAM lParam)
+{
+    CallbackInfo* pCi = (CallbackInfo*)lParam;
+    
+    LVITEM itemInfo;
+    itemInfo.mask = LVIF_TEXT;
+    itemInfo.iItem = pCi->nItem++;
+    itemInfo.pszText = (char*)pszPath;
+    itemInfo.iSubItem = 0;
+    
+    ListView_InsertItem(pCi->hListView, &itemInfo);
+
+    return TRUE;
+}
+
+
 void AboutModules(HWND hListView)
 {
-	LVCOLUMN columnInfo;
+    LVCOLUMN columnInfo;
+    
+    columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+    columnInfo.fmt = LVCFMT_LEFT;
+    columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
+    columnInfo.pszText = "Module";
+    columnInfo.iSubItem = 0;
 
-	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-	columnInfo.fmt = LVCFMT_LEFT;
-	columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
-	columnInfo.pszText = "Module";
-	columnInfo.iSubItem = 0;
-
-	ListView_InsertColumn(hListView, 0, &columnInfo);
-
-	// get module names from module manager
-	/*ILitestep *litestep;
-	IModuleManager *moduleMgr;
-
-	litestep = (ILitestep *) SendMessage( GetLitestepWnd(), LM_GETLSOBJECT, 0, 0 );
-	litestep->GetModuleManager( &moduleMgr );
-
-	if ( !moduleMgr )
-		return ;
-
-	int count = 0;
-	//moduleMgr->GetModuleCount( &count );
-
-	if ( count == 0 )
-		return ;
-
-	SAFEARRAY *array = SafeArrayCreateVector( VT_BSTR, 0, count );
-	//moduleMgr->GetModuleList( array, &count );
-
-	BSTR *arrayData;
-	SafeArrayAccessData( array, (void **) &arrayData );
-
-	for ( int i = 0; i < count; i++ )
-	{
-		LVITEM itemInfo;
-		char buffer[MAX_PATH];
-
-		WideCharToMultiByte( CP_ACP,
-		                     0,
-		                     arrayData[i],
-		                     -1,
-		                     buffer,
-		                     MAX_PATH,
-		                     NULL,
-		                     NULL );
-
-		itemInfo.mask = LVIF_TEXT;
-		itemInfo.iItem = i;
-		itemInfo.pszText = buffer;
-		itemInfo.iSubItem = 0;
-
-		ListView_InsertItem( hListView, &itemInfo );
-	}
-
-	SafeArrayUnaccessData( array );
-	SafeArrayDestroy( array );*/
+    ListView_InsertColumn(hListView, 0, &columnInfo);
+    
+    CallbackInfo ci = { 0 };
+    ci.hListView = hListView;
+    
+    EnumLSData(ELD_MODULES, (FARPROC)ModulesCallback, (LPARAM)&ci);
 }
 
 
 // Fill listview with revision ID (LM_GETREVID) information
 //
+
+BOOL __stdcall RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
+{
+    CallbackInfo* pCi = (CallbackInfo*)lParam;
+    
+    LVITEM itemInfo;
+    itemInfo.mask = LVIF_TEXT;
+    itemInfo.iItem = pCi->nItem++;
+    itemInfo.pszText = (char*)pszRevID;
+    itemInfo.iSubItem = 0;
+    
+    ListView_InsertItem(pCi->hListView, &itemInfo);
+    
+    return TRUE;
+}
+
 
 void AboutRevIDs(HWND hListView)
 {
@@ -423,61 +388,17 @@ void AboutRevIDs(HWND hListView)
 	itemInfo.pszText = buffer;
 	itemInfo.iSubItem = 0;
 
-	StringCchCopy(buffer, MAX_PATH, "litestep.exe: 0.24.7");
-	ListView_InsertItem(hListView, &itemInfo);
-
-	itemInfo.iItem = i++;
-
 	StringCchCopy(buffer, MAX_PATH, "lsapi.dll: ");
 	StringCchCat(buffer, MAX_PATH, &rcsRevision[11]);
 	buffer[strlen(buffer) - 1] = 0;
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	// ask message manager which windows handle LM_GETREVID
-	/*ILitestep *litestep;
-	IMessageManager *msgMgr;
-
-	litestep = (ILitestep *) SendMessage( GetLitestepWnd(), LM_GETLSOBJECT, 0, 0 );
-	litestep->GetMessageManager( &msgMgr );
-
-	if ( !msgMgr )
-		return ;
-
-	SAFEARRAY *array = NULL;
-	msgMgr->GetWindowsForMessage( LM_GETREVID, &array );
-
-	if ( !array )
-		return ;
-
-	long lbound, ubound;
-
-	SafeArrayGetLBound( array, 1, &lbound );
-	SafeArrayGetUBound( array, 1, &ubound );
-
-	int count = ubound - lbound + 1;
-
-	HWND *arrayData;
-	SafeArrayAccessData( array, (void **) &arrayData );
-
-	for ( int j = 0; j < count; j++ )
-	{
-		if ( !IsWindow( arrayData[j] ) )
-			continue;
-
-		buffer[0] = 0;
-		SendMessage( arrayData[j], LM_GETREVID, 0, (LPARAM) buffer );
-
-		itemInfo.mask = LVIF_TEXT;
-		itemInfo.iItem = i++;
-		itemInfo.pszText = buffer;
-		itemInfo.iSubItem = 0;
-
-		ListView_InsertItem( hListView, &itemInfo );
-	}
-
-	SafeArrayUnaccessData( array );
-	SafeArrayDestroy( array );*/
+    CallbackInfo ci = { 0 };
+    ci.hListView = hListView;
+    ci.nItem = i;
+    
+    EnumLSData(ELD_REVIDS, (FARPROC)RevIDCallback, (LPARAM)&ci);
 }
 
 
@@ -654,7 +575,7 @@ void TrimLeft(char* pszToTrim)
 	ASSERT_ISSTRING(pszToTrim);
     
     // skip past spaces
-	while (*pszToTrim && isspace(*pszToTrim))
+	while (*pszToTrim && StrChr(WHITESPACE, *pszToTrim))
     {
         ++pszToTrim;
     }

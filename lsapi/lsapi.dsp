@@ -96,6 +96,10 @@ LINK32=link.exe
 # PROP Default_Filter "*.cpp;*.c"
 # Begin Source File
 
+SOURCE=.\aboutbox.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\BangCommand.cpp
 # End Source File
 # Begin Source File
