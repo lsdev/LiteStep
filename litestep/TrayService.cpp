@@ -901,7 +901,7 @@ bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCSTR pszSrc) cons
 bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCWSTR pwzSrc) const
 {
     ASSERT_ISWRITEDATA(pszDest, cchDest);
-    ASSERT(!IsBadStringPtrW(pwzSrc));
+    ASSERT(!IsBadStringPtrW(pwzSrc, -1));
 
     bool bReturn = (_ConvertWideToAnsi(pszDest, cchDest, pwzSrc, cchDest) != 0);
     
