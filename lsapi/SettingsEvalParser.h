@@ -146,10 +146,10 @@ inline bool EvalParser::isSymbol(int ch)
     case '>':
     case '(':
     case ')':
-        return false;
+        return true;
 
     default:
-        return true;
+        return false;
     }
 }
 
