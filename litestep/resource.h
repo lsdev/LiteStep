@@ -27,6 +27,7 @@
 #define IDS_HOOKMGR_CREATETHREAD_ERROR  23
 #define IDS_HOOKMGR_LOADHOOK_ERROR      24
 #define IDS_LITESTEP_BANGEXCEPTION      25
+#define IDS_LITESTEP_REGISTERCLASS_ERROR 26
 #define IDI_LS                          101
 #define IDD_ABOUT                       102
 #define IDI_VER                         103
