@@ -61,7 +61,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     TRACE("Parsing \"%s\"", tzFullPath);
 
-    m_phFile = fopen(tzFullPath, _T("r"));
+    m_phFile = _tfopen(tzFullPath, _T("r"));
     
     if (m_phFile)
     {
