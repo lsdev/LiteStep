@@ -206,7 +206,8 @@ void SettingsManager::ParseFile(LPCSTR pszFileName)
 
 BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
 {
-	BOOL bReturn = FALSE;
+    ASSERT_ISSTRING(pszName);
+    BOOL bReturn = FALSE;
 	
     // first appearance of a setting takes effect
     it = m_SettingsMap.lower_bound(pszName);
@@ -225,21 +226,34 @@ BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszD
 	SettingsMap::iterator it;
 	BOOL bReturn = FALSE;
 
-	pszValue[0] = '\0';
-	if (_FindLine(pszKeyName, it))
-	{
-		CHAR szToken[MAX_LINE_LENGTH + 1];
-		GetToken(it->second.c_str(), szToken, NULL, FALSE);
-		VarExpansionEx(pszValue, szToken, nMaxLen);
-		bReturn = TRUE;
-	}
-	else if (pszDefStr)
-	{
-		StringCchCopy(pszValue, nMaxLen, pszDefStr);
-		// for compatibility reasons GetRCString and GetRCLine return FALSE
-        // if the default value is returned.
-        //bReturn = TRUE;
-	}
+    if (pszValue)
+    {
+        pszValue[0] = '\0';
+    }
+    
+    if (pszKeyName)
+    {
+        if (_FindLine(pszKeyName, it))
+        {
+            bReturn = TRUE;
+
+            if (pszValue)
+            {
+                char szToken[MAX_LINE_LENGTH] = { 0 };
+                GetToken(it->second.c_str(), szToken, NULL, FALSE);
+                
+                VarExpansionEx(pszValue, szToken, nMaxLen);
+            }
+        }
+        else if (pszDefStr && pszValue)
+        {
+            StringCchCopy(pszValue, nMaxLen, pszDefStr);
+            
+            // for compatibility reasons GetRCString and GetRCLine return FALSE
+            // if the default value is returned.
+            //bReturn = TRUE;
+        }
+    }
 
 	return bReturn;
 }
@@ -250,38 +264,53 @@ BOOL SettingsManager::GetRCLine(LPCSTR pszKeyName, LPSTR pszValue, int nMaxLen, 
 	SettingsMap::iterator it;
 	BOOL bReturn = FALSE;
 
-	pszValue[0] = '\0';
-	if (_FindLine(pszKeyName, it))
-	{
-		// for compatibility reasons GetRCLine expands $evars$
-        VarExpansionEx(pszValue, it->second.c_str(), nMaxLen);
-        //StringCchCopy(pszValue, nMaxLen, it->second.c_str());
-		bReturn = TRUE;
-	}
-	else if (pszDefStr)
-	{
-		StringCchCopy(pszValue, nMaxLen, pszDefStr);
+	if (pszValue)
+    {
+        pszValue[0] = '\0';
+    }
 
-        // for compatibility reasons GetRCString and GetRCLine return FALSE
-        // if the default value is returned.
-        //bReturn = TRUE;
-	}
-	return bReturn;
+    if (pszKeyName)
+    {
+        if (_FindLine(pszKeyName, it))
+        {
+            bReturn = TRUE;
+
+            if (pszValue)
+            {
+                // for compatibility reasons GetRCLine expands $evars$
+                VarExpansionEx(pszValue, it->second.c_str(), nMaxLen);
+            }
+        }
+        else if (pszDefStr && pszValue)
+        {
+            StringCchCopy(pszValue, nMaxLen, pszDefStr);
+            
+            // for compatibility reasons GetRCString and GetRCLine return FALSE
+            // if the default value is returned.
+            //bReturn = TRUE;
+        }
+    }
+
+    return bReturn;
 }
 
 
 BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
 {
 	SettingsMap::iterator it;
-	CHAR szToken[MAX_LINE_LENGTH + 1];
-	CHAR szExpanded[MAX_LINE_LENGTH + 1];
-
-	if (_FindLine(pszKeyName, it))
+	
+	if (pszKeyName && _FindLine(pszKeyName, it))
 	{
+        char szExpanded[MAX_LINE_LENGTH] = { 0 };
+        char szToken[MAX_LINE_LENGTH] = { 0 };
+
 		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-		if (GetToken(szExpanded, szToken, NULL, false))
+
+		if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
-			if (stricmp(szToken, "off") && stricmp(szToken, "false") && stricmp(szToken, "no"))
+			if (lstrcmpi(szToken, "off") &&
+                lstrcmpi(szToken, "false") &&
+                lstrcmpi(szToken, "no")) 
 			{
 				return bIfFound;
 			}
@@ -299,21 +328,24 @@ BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
 BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
 {
 	SettingsMap::iterator it;
-	CHAR szToken[MAX_LINE_LENGTH];
-	CHAR szExpanded[MAX_LINE_LENGTH + 1];
 
-	if (_FindLine(pszKeyName, it))
+	if (pszKeyName && _FindLine(pszKeyName, it))
 	{
-		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-		if (GetToken(szExpanded, szToken, NULL, false))
+        char szToken[MAX_LINE_LENGTH] = { 0 };
+        char szExpanded[MAX_LINE_LENGTH] = { 0 };
+
+        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+		
+        if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
-			if ((stricmp(szToken, "off") == 0) ||
-			        (stricmp(szToken, "false") == 0) ||
-			        (stricmp(szToken, "no") == 0))
+			if ((lstrcmpi(szToken, "off") == 0) ||
+                (lstrcmpi(szToken, "false") == 0) ||
+                (lstrcmpi(szToken, "no") == 0))
 			{
 				return FALSE;
 			}
 		}
+
 		return TRUE;
 	}
 
@@ -324,14 +356,16 @@ BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
 int SettingsManager::GetRCInt(LPCSTR pszKeyName, int nDefault)
 {
 	SettingsMap::iterator it;
-	CHAR szToken[MAX_LINE_LENGTH + 1];
-	CHAR szExpanded[MAX_LINE_LENGTH + 1];
 	int nValue = nDefault;
 
-	if (_FindLine(pszKeyName, it))
+	if (pszKeyName && _FindLine(pszKeyName, it))
 	{
-		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-		if (GetToken(szExpanded, szToken, NULL, false))
+        char szToken[MAX_LINE_LENGTH] = { 0 };
+        char szExpanded[MAX_LINE_LENGTH] = { 0 };
+
+        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+
+		if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
 			nValue = strtol(szToken, NULL, 0);
 		}
@@ -346,7 +380,7 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 	COLORREF crReturn = crDefault;
 	SettingsMap::iterator it;
 
-	if (_FindLine(pszKeyName, it))
+	if (pszKeyName && _FindLine(pszKeyName, it))
 	{
 		char szBuffer[MAX_LINE_LENGTH];
         char szFirst[MAX_LINE_LENGTH];
