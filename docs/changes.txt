@@ -1,0 +1,112 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    LiteStep 0.24.7 Beta 1
+    Prerelease Changelog
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+-- NOTE ------------------------------------------------------------------------
+
+ The 0.24.7 code is based on the 2002-01-03 pre-0.24.6 source. Some of the
+ functionality that was added to the 0.24.6 branch after this date was
+ reimplemented in 0.24.7. See below for a list of these functions.
+
+
+-- CHANGES SINCE 0.24.6 --------------------------------------------------------
+
+ - Removed all COM.
+
+ - Cleaned up the code... this includes numerous fixes, formatting, and source 
+   beautifications.
+
+ - Switched to STLport (http://www.stlport.com) due to threading issues and
+   other general issues with the version of STL included with the VC 6.0 package.
+
+ - On NT systems, LiteStep detects if startup items have been run before or not.
+   This is the same method that Explorer uses to detect if it should rerun
+   startup items in the event that the shell crashes. Thus the -nostartup switch
+   is obsolete on NT systems.
+
+ - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core.
+
+ - Modules are loaded and unloaded asynchronously (at the same time) if threaded.
+   This should lead to faster start and recycle times if threading is used.
+
+ - Removed support for PixmapPath (use LSImageFolder instead) and LSThemeFile.
+ 
+ - Both the !alert and the !confirm MessageBoxes should now always have focus
+   and appear ontop of the active window.
+ 
+ - The Recovery Menu cannot be closed permanently with ALT-F4 any more.
+ 
+ - Added !HideModules and !ShowModules to hide or show all module windows.
+
+ - If a full-screen app is detected all module windows will be hidden
+   automatically using !HideModules. Once the full-screen app exits !ShowModules
+   is called. This behavior can be disabled by specifying "LSNoAutoHideModules"
+   in step.rc.
+
+ - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
+
+ - etc. etc.
+
+
+-- TODO UNTIL 0.24.7 RELEASE ---------------------------------------------------
+
+ - The aboutbox will be implemented as a separate DLL exporting a function for
+   LiteStep to call. This should give modules like lscp a chance to be more
+   integrated with LiteStep.
+   
+ - Fix the managers so that they are thread safe and accessible by the aboutbox.
+
+ - Fix deadlock in BangManager (esp. on !recycle).
+
+ - Complete -install/-uninstall updates, which will include a new wizards
+   interface.
+   
+ - Check DDEWorker.cpp for Path* related bugs.
+
+ - Make sure CListeStep::Start frees all allocated resources on failure before
+   returning.
+
+ - Fix LS locking up if a PNG is used and libpng13.dll is not present.
+
+ - Fix modules being hidden if BSPlayer is in desktop mode or if certain
+   installers (e.g. ObjectDock) are used.
+
+ - Finish build.txt.
+
+ - Write new readme.txt.
+
+
+-- INDIE LS CHANGES ADDED TO 0.24.7 --------------------------------------------
+
+ - GetRCCoordinate and ParseCoordinate added to lsapi for reading coordinates
+   with negative and centered support.
+
+ - Some typos in the string tables were corrected.
+
+ - $windir$ is guaranteed to end with a backslash ('\').
+
+ - Math evaluation in VarExpansion (can be disabled at compiletime).
+
+ - Stubs in lsapi for the logging APIs (minimal logging support can be enabled
+   at compiletime).
+
+ - $WinXP$, $compiledate$.
+
+
+-- INDIE LS CHANGES NOT (YET) ADDED TO 0.24.7 ----------------------------------
+
+ - All changes made to the recovery menu.
+
+ - !setvar, !emptytrashbin
+
+ - $quicklaunch$, system color / font variables, OS-* variables.
+
+ - LSCP (including !lscp)
+
+ - Removal of !ToggleWharf and !Popup from lsapi.
+
+ - inform-sega's multibyte character fix as it shouldn't be needed any more.
+
+ - c0atzin's RegisterShellHook() fix as it's supposedly not needed any more.
