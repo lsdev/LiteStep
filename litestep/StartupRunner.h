@@ -32,9 +32,9 @@ public:
 
 private:
 	static BOOL _IsFirstRunThisSession();
-	static void _RunRegKeys(HKEY hkParent, LPCSTR pszSubKey, DWORD dwFlags);
+	static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
 	static void _RunStartupMenu();
-	static void _RunFolderContents(LPCSTR szParams);
+	static void _RunFolderContents(LPCTSTR ptzPath);
 };
 
 #endif // __STARTUPRUNNER_H
