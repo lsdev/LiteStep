@@ -56,8 +56,12 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
         SetVariable("windir", szTemp);
     }
 
-	GetUserName(szTemp, &dwLength);
-    SetVariable("username", szTemp);
+	if (GetUserName(szTemp, &dwLength))
+    {
+        PathQuoteSpaces(szTemp);
+        SetVariable("username", szTemp);
+    }
+
 	SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
 	SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
 	SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
