@@ -299,7 +299,10 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
             {
                 if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
                 {
-                    _SpawnProcess(tzValueBuffer, dwFlags);
+                    if (tzValueBuffer[0])
+                    {
+                        _SpawnProcess(tzValueBuffer, dwFlags);
+                    }
 
                     if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
                     {
