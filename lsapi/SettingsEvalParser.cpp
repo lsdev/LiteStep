@@ -307,14 +307,15 @@ bool EvalParser::nextToken()
         return currentToken = TT_END, true;
     }
 
-	// predict token type based on first wchar_t
+	// predict token type based on first character
 	if (isLetter(currentChar))
 	{
 		// it's an identifier or keyword
 		stringValue.assign(1, (CHAR) currentChar);
 		nextChar();
 
-		while (isLetter(currentChar) || isDigit(currentChar))
+		while ((isLetter(currentChar) || isDigit(currentChar)) &&
+            !isSymbol(currentChar))
 		{
 			stringValue.append(1, (CHAR) currentChar);
 			nextChar();

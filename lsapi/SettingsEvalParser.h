@@ -104,6 +104,7 @@ private:
 	inline static bool isLetter(int ch);
 	inline static bool isDigit(int ch);
 	inline static bool isWhiteSpace(int ch);
+    inline static bool isSymbol(int ch);
 };
 
 
@@ -124,12 +125,32 @@ inline bool EvalParser::isLetter(int ch)
 
 inline bool EvalParser::isDigit(int ch)
 {
-	return (ch >= '0' && ch <= '9');
+	return ((ch >= '0' && ch <= '9') || (ch == '-'));
 }
 
 inline bool EvalParser::isWhiteSpace(int ch)
 {
 	return (ch == ' ') || (ch == '\t');
+}
+
+inline bool EvalParser::isSymbol(int ch)
+{
+    switch (ch)
+    {
+    case '+':
+    case '-':
+    case '*':
+    case '/':
+    case '=':
+    case '<':
+    case '>':
+    case '(':
+    case ')':
+        return false;
+
+    default:
+        return true;
+    }
 }
 
 #endif
