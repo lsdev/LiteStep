@@ -161,23 +161,45 @@ int Module::CallInit()
 	{
 		nReturn = m_pInitEx(m_hMainWindow, m_hInstance, m_tzAppPath.c_str());
 	}
-	catch (...)
-	{
- 		FreeLibrary(m_hInstance);
-		m_hInstance = NULL;
+    catch (...)
+    {
+        RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
+            "Error: Exception during module initialization.\n\nPlease contact the module writer.",
+            m_tzLocation.c_str());
 
-        // Propagate the exception to ModuleManager
-		throw;
-	}
+        // If the library were freed here quitModule would never be called.
+        // Of course the module's memory may be corrupted, but the quitModule
+        // call is also wrapped in a try/catch block so it should be safe...
+        
+        //FreeLibrary(m_hInstance);
+        //m_hInstance = NULL;
+    }
 
-	return nReturn;
+    return nReturn;
 }
+
+
+void Module::CallQuit()
+{
+    if (m_pQuit)
+    {
+        try
+        {
+            m_pQuit(m_hInstance);
+        }
+        catch (...)
+        {
+            RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
+                "Exception while quitting module.", m_tzLocation.c_str())
+        }
+    }
+}
+
 
 HANDLE Module::Quit()
 {
 	if (m_hInstance)
 	{
-
 		if (m_hThread)
 		{
 			m_hQuitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -185,18 +207,7 @@ HANDLE Module::Quit()
 		}
 		else
 		{
-			if (m_pQuit)
-			{
-				try
-				{
-					m_pQuit(m_hInstance);
-				}
-				catch (...)
-				{
-					RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
-					                "Exception while quitting module.", m_tzLocation.c_str())
-				}
-			}
+            CallQuit();
 		}
 	}
 
@@ -264,21 +275,12 @@ void Module::HandleThreadMessage(MSG &msg)
 		case WM_DESTROY:
 		{
 			Module *dll_mod = (Module*)msg.lParam;
-			if (dll_mod)
+			
+            if (dll_mod)
 			{
-				try
-				{
-					dll_mod->GetQuit()(dll_mod->GetInstance());
-				}
-				catch (...)
-				{
-					RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
-					                "Exception while quitting module.", dll_mod->GetLocation())
-				}
-
-				PostQuitMessage(0);
-			}
-
+				dll_mod->CallQuit();
+                PostQuitMessage(0);
+            }
 		}
 		break;
 	}
