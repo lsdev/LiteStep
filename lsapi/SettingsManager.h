@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __SETTINGSMANAGER_H
 
 #include "../utility/common.h"
+#include "../utility/stringutility.h"
 #include <string>
 #include <map>
 #include <set>
@@ -34,9 +35,8 @@ struct FileInfo
 	UINT m_Count;
 };
 
-typedef set
-	<SettingsIterator*> IteratorSet;
-typedef map<string, FileInfo*, stringcmp> FileMap;
+typedef set<SettingsIterator*> IteratorSet;
+typedef map<string, FileInfo*, stringicmp> FileMap;
 
 class SettingsManager
 {
@@ -49,6 +49,10 @@ protected:
 	BOOL _FindLine(LPCSTR pszName, SettingsMap::iterator &it);
 
 	void _SetupVars(LPCSTR szLSPath);
+
+#ifdef LS_COMPAT_MATH
+    double _MathEvaluate(LPTSTR ptzInput);
+#endif //LS_COMPAT_MATH
 
 public:
 

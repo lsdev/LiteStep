@@ -161,6 +161,9 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 
 	StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
 	SetVariable("ResolutionY", szTemp);
+
+    StringCchPrintf(szTemp, MAX_PATH, "\"%s\"", __DATE__);
+    SetVariable("CompileDate", szTemp);
 }
 
 void SettingsManager::ParseFile(LPCSTR pszFileName)
@@ -172,14 +175,11 @@ void SettingsManager::ParseFile(LPCSTR pszFileName)
 BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
 {
 	BOOL bReturn = FALSE;
-	char wzKey[MAX_RCCOMMAND];
-
-	StringCchCopy(wzKey, MAX_RCCOMMAND, pszName);
-	CharLowerBuff(wzKey, MAX_RCCOMMAND);
-
-	it = m_SettingsMap.upper_bound(wzKey);
-	--it;
-	if (strcmp(wzKey, it->first.c_str()) == 0)
+	
+    // first appearance of a setting takes effect
+    it = m_SettingsMap.lower_bound(pszName);
+    
+    if (it != m_SettingsMap.end() && stricmp(pszName, it->first.c_str()) == 0)
 	{
 		bReturn = TRUE;
 	}
@@ -204,7 +204,9 @@ BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszD
 	else if (pszDefStr)
 	{
 		StringCchCopy(pszValue, nMaxLen, pszDefStr);
-		bReturn = TRUE;
+		// for compatibility reasons GetRCString and GetRCLine return FALSE
+        // if the default value is returned.
+        //bReturn = TRUE;
 	}
 
 	return bReturn;
@@ -219,15 +221,19 @@ BOOL SettingsManager::GetRCLine(LPCSTR pszKeyName, LPSTR pszValue, int nMaxLen, 
 	pszValue[0] = '\0';
 	if (_FindLine(pszKeyName, it))
 	{
-		StringCchCopy(pszValue, nMaxLen, it->second.c_str());
+		// for compatibility reasons GetRCLine expands $evars$
+        VarExpansionEx(pszValue, it->second.c_str(), nMaxLen);
+        //StringCchCopy(pszValue, nMaxLen, it->second.c_str());
 		bReturn = TRUE;
 	}
 	else if (pszDefStr)
 	{
 		StringCchCopy(pszValue, nMaxLen, pszDefStr);
-		bReturn = TRUE;
-	}
 
+        // for compatibility reasons GetRCString and GetRCLine return FALSE
+        // if the default value is returned.
+        //bReturn = TRUE;
+	}
 	return bReturn;
 }
 
@@ -310,13 +316,15 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 
 	if (_FindLine(pszKeyName, it))
 	{
-		char szFirst[MAX_LINE_LENGTH];
+		char szBuffer[MAX_LINE_LENGTH];
+        char szFirst[MAX_LINE_LENGTH];
 		char szSecond[MAX_LINE_LENGTH];
 		char szThird[MAX_LINE_LENGTH];
 
 		LPSTR lpszTokens[3] = { szFirst, szSecond, szThird	};
 
-		int nCount = LCTokenize(it->second.c_str(), lpszTokens, 3, NULL);
+        VarExpansionEx(szBuffer, it->second.c_str(), MAX_LINE_LENGTH);
+        int nCount = LCTokenize(szBuffer, lpszTokens, 3, NULL);
 
 		if (nCount >= 3)
 		{
@@ -342,20 +350,31 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 
 BOOL SettingsManager::GetVariable(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
 {
-	return GetRCLine(pszKeyName, pszValue, dwLength, "\0");
+	// using GetRCString instead of GetRCLine here, again for compatibility reasons.
+    // as a side effect this strips any "" quotes around the variable's value.
+    return GetRCString(pszKeyName, pszValue, NULL, dwLength);
 }
 
 
 void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
 {
-	char szKey[MAX_RCCOMMAND];
+    if ((pszKeyName) && (pszValue))
+    {
+        // in order for LSSetVariable to work evars must be redefinable
 
-	if ((pszKeyName) && (pszValue))
-	{
-		StringCchCopy(szKey, MAX_RCCOMMAND, pszKeyName);
-		CharLowerBuff(szKey, MAX_RCCOMMAND);
-		m_SettingsMap.insert(SettingsMap::value_type(szKey, pszValue));
-	}
+        // m_SettingsMap.insert(SettingsMap::value_type(pszKeyName, pszValue));
+        SettingsMap::iterator it = m_SettingsMap.lower_bound(pszKeyName);
+        
+        if (it != m_SettingsMap.end() &&
+            stricmp(pszKeyName, it->first.c_str()) == 0)
+        {
+            it->second.assign(pszValue);
+        }
+        else
+        {
+            m_SettingsMap.insert(SettingsMap::value_type(pszKeyName, pszValue));
+        }
+    }
 }
 
 
@@ -363,7 +382,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 {
 	LPCSTR pszVariable;
 	CHAR szVariable[MAX_LINE_LENGTH + 1];
-	char szTempExpandedString[MAX_LINE_LENGTH];
+    char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
 	LPSTR pszTempExpandedString = szTempExpandedString;
 	DWORD dwWorkLength = dwLength;
 
@@ -385,12 +404,12 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				//
 				// This is a variable so we need to find the end of it:
 				//
-				pszTemplate++;
-				pszVariable = pszTemplate;
-				while ((*pszTemplate != '$') && (*pszTemplate != '\0'))
-				{
-					pszTemplate++;
-				}
+                pszTemplate++;
+                pszVariable = pszTemplate;
+                while ((*pszTemplate != '$') && (*pszTemplate != '\0'))
+                {
+                    pszTemplate++;
+                }
 
 				bool bSucceeded = false;
 
@@ -406,26 +425,42 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 					// someplace usefull:
 					//
 					strncpy(szVariable, pszVariable, pszTemplate - pszVariable);
-					szVariable[pszTemplate - pszVariable] = '\0';
-					if (szVariable[0] != '\0')
-					{
-						//
-						// Get the value, if we can.
-						//
-						SettingsMap::iterator it;
-						if (_FindLine(szVariable, it))
-						{
-							GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
-							bSucceeded = true;
-						}
-						else if (GetEnvironmentVariable(szVariable, pszTempExpandedString, dwLength))
-						{
-							bSucceeded = true;
-						}
-						else
-						{
-							pszTempExpandedString[0] = '\0';
-						}
+                    szVariable[pszTemplate - pszVariable] = '\0';
+                    if (szVariable[0] != '\0')
+                    {
+                        //
+                        // Get the value, if we can.
+                        //
+                        SettingsMap::iterator it;
+                        if (_FindLine(szVariable, it))
+                        {
+                            GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
+                            bSucceeded = true;
+                        }
+                        else if (GetEnvironmentVariable(szVariable, pszTempExpandedString, dwLength))
+                        {
+                            bSucceeded = true;
+                        }
+                        else
+                        {
+#ifdef LS_COMPAT_MATH
+                            int nValue = static_cast<int>(_MathEvaluate(szVariable));
+                            
+                            if (nValue != INT_MAX)
+                            {
+                                StringCchPrintf(pszTempExpandedString, dwLength,
+                                    "%d", nValue);
+                                
+                                bSucceeded = true;
+                            }
+                            else
+                            {
+                                pszTempExpandedString[0] = '\0';
+                            }
+#else
+                            pszTempExpandedString[0] = '\0';
+#endif // LS_COMPAT_MATH
+                        }
 					}
 				}
 				//
@@ -481,14 +516,19 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 	{
 		char szPath[MAX_PATH];
 		VarExpansionEx(szPath, pszPath, MAX_PATH);
-		CharLowerBuff(szPath, MAX_PATH);
 		FileMap::iterator it = m_FileMap.find(szPath);
 		if (it == m_FileMap.end())
 		{
 			FileInfo * pFileInfo = new FileInfo;
 			if (pFileInfo)
 			{
-				pFileInfo->m_pSettingsMap = new SettingsMap;
+				// once again for compatibility reasons:
+                // all files opened with LCOpen() use the same SettingsMap
+                // to make $evars$ from step.rc work in those files.
+                // the question is if this is a bug or a feature
+                // 0.24.6 voted for feature, which means we should stay
+                // compatible for now
+                pFileInfo->m_pSettingsMap = &m_SettingsMap; //new SettingsMap;
 				pFileInfo->m_Count = 1;
 
 				FileParser fpParser(pFileInfo->m_pSettingsMap);
@@ -532,7 +572,8 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 			{
 				if (fmIt->second->m_Count == 1)
 				{
-					delete fmIt->second->m_pSettingsMap;
+					// no separate SettingsMaps for LCOpen, see above
+                    //delete fmIt->second->m_pSettingsMap;
 					delete fmIt->second;
 				}
 				else
@@ -597,3 +638,88 @@ BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_
 
 	return bReturn;
 }
+
+#ifdef LS_COMPAT_MATH
+//
+// double _MathEvaluate(LPCTSTR ptzInput)
+//
+// we're here to be compatible, not to be efficient or pretty.
+// leave it alone as long as it works exactly like the old function.
+double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
+{
+    int nCount, nBlock = 0, nStart;
+    int nLen = _tcslen(ptzInput);
+
+    for (nCount = 0; nCount <= nLen; nCount++)
+    {
+        if ((ptzInput[nCount] == _T('(')) && (++nBlock == 1))
+        {
+            nStart = nCount;
+        }
+        else if ((ptzInput[nCount] == _T(')')) && !--nBlock && !nStart &&
+                 (nCount == (nLen - 1)))
+        {
+            // one pair of parentheses surrounding the whole expression		
+            ptzInput[nCount] = 0;
+            return _MathEvaluate(ptzInput + 1);
+        }
+    }
+
+    char rcSign[4] = { _T('+'), _T('-'), _T('*'), _T('/') };
+
+	for(int nSign = 0; nSign < 4; nSign++)
+    {
+        for(nCount = nLen; nCount >= 0; nCount--)
+        {
+            if(ptzInput[nCount] == _T('('))
+            {
+                ++nBlock;
+            }
+            else if(ptzInput[nCount] == _T(')'))
+            {
+                --nBlock;
+            }
+            else if((ptzInput[nCount] == rcSign[nSign]) && !nBlock)
+            {
+                ptzInput[nCount] = 0;
+                
+                switch(nSign)
+                {
+                    case 0: return _MathEvaluate(ptzInput) +
+                                _MathEvaluate(ptzInput + nCount + 1);
+
+                    case 1: return _MathEvaluate(ptzInput) -
+                                _MathEvaluate(ptzInput + nCount + 1);
+                        
+                    case 2: return _MathEvaluate(ptzInput) *
+                                _MathEvaluate(ptzInput + nCount + 1);
+                        
+                    case 3: return _MathEvaluate(ptzInput) /
+                                _MathEvaluate(ptzInput + nCount + 1);
+                }
+            }
+        }
+    }
+    
+    TCHAR tzValue[MAX_LINE_LENGTH];
+    if(GetVariable(ptzInput, tzValue, MAX_LINE_LENGTH))
+    {
+        double nTemp = _tcstod(tzValue, NULL);
+        return nTemp;
+    }
+    else
+    {
+        double dReturn = _tcstod(ptzInput, NULL);
+        
+        if (dReturn == 0)
+        {
+            // Not exactly a good way to handle errors.
+            // But I suppose the user will know something went wrong when s/he
+            // sees such a large value as the result
+            dReturn = INT_MAX;
+        }
+        
+        return dReturn;
+    }
+}
+#endif // LS_COMPAT_MATH

@@ -55,13 +55,9 @@ BOOL FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 
 #ifdef _UNICODE
 					StringCchCopyNExW(ptzName, MAX_RCCOMMAND, pwzCurrent, nEndConfig, NULL, NULL, STRSAFE_NULL_ON_FAILURE);
-					ptzName[nEndConfig] = '\0';
-					CharLowerBuffW(ptzName, MAX_RCCOMMAND);
 #else // _UNICODE
 					WCHAR wzName[MAX_RCCOMMAND];
 					StringCchCopyNExW(wzName, MAX_RCCOMMAND, pwzCurrent, nEndConfig, NULL, NULL, STRSAFE_NULL_ON_FAILURE);
-					wzName[nEndConfig] = '\0';
-					CharLowerBuffW(wzName, MAX_RCCOMMAND);
 
 					WideCharToMultiByte(CP_ACP, 0, wzName, -1, ptzName, MAX_RCCOMMAND, NULL, NULL);
 #endif // _UNICODE
@@ -79,7 +75,7 @@ BOOL FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 							pwzValueStart = pwzCurrent + nEndConfig;
 						}
 
-						_StripString(pwzValueStart);
+                        _StripString(pwzValueStart);
 
 #ifdef _UNICODE
 						StringCchCopyExW(ptzValue, MAX_LINE_LENGTH, pwzValueStart, NULL, NULL, STRSAFE_NULL_ON_FAILURE);
@@ -147,13 +143,13 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 
 void FileParser::_StripString(LPWSTR pwzString)
 {
-	LPWSTR pwzCurrent = pwzString;
+    LPWSTR pwzCurrent = pwzString;
 	LPWSTR pwzStart = NULL;
 	LPWSTR pwzLast = NULL;
 	int nQuoteLevel = 0;
 	WCHAR wLastQuote = 0;
 
-	while (*pwzCurrent != L'\0')
+    while (*pwzCurrent != L'\0')
 	{
 		if (StrChrW(WHITESPACEW, *pwzCurrent) == NULL)
 		{
@@ -217,11 +213,11 @@ void FileParser::_StripString(LPWSTR pwzString)
 
 void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
-	if (lstrcmp(ptzName, _T("if")) == 0)
+    if (lstrcmpi(ptzName, _T("if")) == 0)
 	{
 		_ProcessIf(ptzValue);
 	}
-	else if (lstrcmp(ptzName, _T("include")) == 0)
+	else if (lstrcmpi(ptzName, _T("include")) == 0)
 	{
 		TCHAR tzPath[MAX_PATH_LENGTH];
 
@@ -269,14 +265,14 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 				// all lines until we reach ElseIf, Else, or EndIf
 				while (_ReadLineFromFile(tzName, tzValue))
 				{
-					if ((lstrcmp(tzName, _T("else")) == 0) || (lstrcmp(tzName, _T("elseif")) == 0))
+                    if ((lstrcmpi(tzName, _T("else")) == 0) || (lstrcmpi(tzName, _T("elseif")) == 0))
 					{
 						// if we find an ElseIf or Else then we read and ignore
 						// all lines until we find EndIf
 						_SkipIf();
 						break;
 					}
-					else if (lstrcmp(tzName, _T("endif")) == 0)
+					else if (lstrcmpi(tzName, _T("endif")) == 0)
 					{
 						// we're done
 						break;
@@ -294,18 +290,18 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 				// all lines until we find an ElseIf, Else, or EndIf
 				while (_ReadLineFromFile(tzName, tzValue))
 				{
-					if (lstrcmp(tzName, _T("if")) == 0)
+					if (lstrcmpi(tzName, _T("if")) == 0)
 					{
 						// nested Ifs are a special case
 						_SkipIf();
 					}
-					else if (lstrcmp(tzName, _T("elseif")) == 0)
+					else if (lstrcmpi(tzName, _T("elseif")) == 0)
 					{
 						// we handle ElseIfs by recursively calling ProcessIf
 						_ProcessIf(tzValue);
 						break;
 					}
-					else if (lstrcmp(tzName, _T("else")) == 0)
+					else if (lstrcmpi(tzName, _T("else")) == 0)
 					{
 						// since the If expression was false, when we see Else
 						// we start process lines until EndIf
@@ -316,7 +312,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 							// such an error
 
 							// break on EndIf
-							if (lstrcmp(tzName, _T("endif")) == 0)
+							if (lstrcmpi(tzName, _T("endif")) == 0)
 								break;
 
 							// otherwise process the line
@@ -326,7 +322,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 						// we're done
 						break;
 					}
-					else if (lstrcmp(tzName, _T("endif")) == 0)
+					else if (lstrcmpi(tzName, _T("endif")) == 0)
 					{
 						// we're done
 						break;
@@ -343,11 +339,11 @@ void FileParser::_SkipIf()
 
 	while (_ReadLineFromFile(tzName, NULL))
 	{
-		if (lstrcmp(tzName, _T("if")) == 0)
+		if (lstrcmpi(tzName, _T("if")) == 0)
 		{
 			_SkipIf();
 		}
-		else if (lstrcmp(tzName, _T("endif")) == 0)
+		else if (lstrcmpi(tzName, _T("endif")) == 0)
 		{
 			break;
 		}
