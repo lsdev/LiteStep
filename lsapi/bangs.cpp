@@ -73,7 +73,7 @@ void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
     CloseHandle(hThread);
 }*/
     MessageBox(NULL,
-        "LiteStep 0.24.7\nPrerelease test build.\n\nBuild Date: "__DATE__"\nWebsite TBA\n\nCopyright © 1997-2003\nThe LiteStep Development Team.",
+        "LiteStep 0.24.7 Beta 2\nPrerelease test build.\n\nBuild Date: "__DATE__"\nWebsite TBA\n\nCopyright © 1997-2003\nThe LiteStep Development Team.",
         "About LiteStep...",
         MB_OK | MB_TOPMOST | MB_SETFOREGROUND | MB_ICONINFORMATION);
 }
