@@ -33,8 +33,10 @@ public:
 private:
 	static bool _IsFirstRunThisSession();
 	static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
-	static void _RunStartupMenu();
+	static void _RunRunOnceEx();
+    static void _RunStartupMenu();
 	static void _RunFolderContents(LPCTSTR ptzPath);
+    static bool _CreateProcess(LPTSTR ptzCommandLine, DWORD dwFlags);
 };
 
 #endif // __STARTUPRUNNER_H
