@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/lsapi.dll"
+				OutputFile="../litestep/Debug/lsapi.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/lsapi.pdb"
@@ -87,7 +87,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="FALSE"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
 				CompileAs="0"/>
 			<Tool
@@ -95,7 +95,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib libpng13.lib"
-				OutputFile="$(OutDir)/lsapi.dll"
+				OutputFile="../litestep/Release/lsapi.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="FALSE"

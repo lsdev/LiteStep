@@ -90,7 +90,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="FALSE"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
 				CompileAs="0"/>
 			<Tool
