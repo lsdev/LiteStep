@@ -789,6 +789,8 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
                     
                 case 3: return _MathEvaluate(ptzInput) /
                             _MathEvaluate(ptzInput + nCount + 1);
+                            
+                default: break;
                 }
             }
         }

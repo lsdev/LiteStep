@@ -202,9 +202,15 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 					{ // Description
 						pszDescription = pszParamList[1];
 					}
+					
+					default:
+					break;
 				}
 				bReturn = _AddItem(pszParamList[0], pszDescription, pszIconPath, nIconIndex, pszDefDir, dwHotKey, bMinimize, bSepMemSpace);
 			}
+			break;
+			
+            default:
 			break;
 		}
 	}

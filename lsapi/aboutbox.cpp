@@ -200,7 +200,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
 
 			// add options to combo box
-			for (int i = 0; i < aboutOptionsCount; ++i)
+			for (unsigned int i = 0; i < aboutOptionsCount; ++i)
             {
                 SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_ADDSTRING,
                     0, (LPARAM)aboutOptions[i].option);
@@ -306,7 +306,7 @@ void AboutDevTeam(HWND hListView)
 
 	ListView_InsertColumn(hListView, 1, &columnInfo);
 
-	for (int i = 0; i < theDevTeamCount; i++)
+	for (unsigned int i = 0; i < theDevTeamCount; i++)
 	{
 		LVITEM itemInfo;
 

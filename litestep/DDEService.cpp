@@ -187,9 +187,6 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
     DWORD lData1,
     DWORD lData2)
 {
-	static HANDLE hToken;
-	static TOKEN_PRIVILEGES tp;
-	static LUID luid;
 	HDDEDATA hReturn = (HDDEDATA)FALSE;
 
 	switch (wType)
@@ -263,6 +260,9 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
 				}
 			}
 		}
+		break;
+		
+		default:
 		break;
 	}
 

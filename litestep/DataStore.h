@@ -28,7 +28,7 @@ class DataHolder
 {
 private:
 	WORD m_wLength;
-	void *m_pvData;
+	BYTE* m_pvData;
 public:
 	DataHolder();
 	DataHolder(void *pvData, WORD wLength);

@@ -27,12 +27,11 @@ class ThreadedBangCommand : public CountedBase
 {
 public:
     ThreadedBangCommand(HWND hCaller, LPCSTR pszParams, Bang* pBang) :
-      m_hCaller(hCaller), m_pBang(pBang)
+      m_pBang(pBang), m_hCaller(hCaller)
 	{
 		ASSERT_ISWRITEPTR(pBang);
         ASSERT((pszParams == NULL) || !IsBadStringPtr(pszParams, UINT_MAX));
 
-        m_pBang = pBang;
         m_pBang->AddRef();
 
         if (pszParams)

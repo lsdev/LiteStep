@@ -314,6 +314,9 @@ LRESULT CALLBACK HookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			processHooks = FALSE;
 		}
 		break;
+		
+		default:
+		break;
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
