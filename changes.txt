@@ -1,0 +1,2063 @@
+- Fixed [litestep, stepsets, lsapi, desktop2 / Message / 2002-01-03]
+  - You can use variables with all settings now
+    Example: ThemeBackgroundColor FF00FF
+             CommandBackgroundColor $ThemeBackgroundColor$
+    This should work with Colors, Int, Bools, and String... so everything pretty much
+  - Moved the recovery menu function into seperate files just organize the source a little
+    bit more
+  - Added !SwitchUser to change users in XP (from [steev])
+  - Added DesktopOnDisplayChange setting... will run the specified command when the display
+    properties are changed
+
+- Fixed [vwm2 / Message / 2001-12-10]
+  - Fixed placement of windows in the vmw on multiple monitor systems
+
+- Fixed [popup2, litestep, code / Message / 2001-12-09]
+  - Removed litestep project dependency on gui modules
+  - Moved source into folders in the project view for easier navigation
+  - Removed ILogDispatch from core, litestepclass, never used
+  - Fixed a bug in popup2.dll with popupicons and popupfolderpix
+  - Renamed the following popup settings to be more consistent
+		NoPopupFolderIcon = PopupNoFolderArrow
+		NoPopupTransparent = PopupNotTransparent
+		NoPopupTitles = PopupNoTitles
+		NoPopupTitleText = PopupNoTitleText
+		NoPopupCloseButton = PopupNoCloseButton
+		MinPopupWidth = PopupMinWidth
+		MaxPopupWidth = PopupMaxWidth
+		NoPopupBevel = PopupNoBevel
+		NoPopupMenuBevel = PopupNoMenuBevel  
+
+- Fixed [systray2, litestep / Message / 2001-11-26]
+  - Systray2, Stripped everything out of it except for basic gui, this module will 
+    not run without a new build
+  - More Traymanager fixes, uses new LSNOTIFYICONDATA structure to support longer
+    tooltips. System tray modules will have to be updated before being used with this
+    build. System tray must issue the LM_SYSTRAYREADY message when they are ready to
+    receive the icons, and must not post the "TaskbarCreated" message.
+  - Removed the tray project from the LiteStep workspace
+
+- Changed [lsapi / Message / 2001-11-25 ]
+  - Made the default build of lsapi now include PNG support
+    Use "Release/Debug Without PNG" to build an lsapi.dll without PNG  
+
+- Fixed [litestep, systray2 / Message / 2001-11-21]
+  - Added TrayManager to LiteStep, this takes over the function of managing the system
+    tray from systray modules. Now includes W2k support.
+  - LM_SAVESYSTRAY, LM_RESTORESYSTRAY messages no longer required and do no function
+  - Modified systray2 to only activate it's w2k support if used on a system without
+    TrayManager
+    
+  NOTE: Do not use Maduin's Systray 1.05b with w2k support with this build, it will
+  probably result in multiple icons or other weirdness
+
+- Fixed [systray2 / Message / 2001-11-21]
+  - Added Windows2000 and WindowxXP support. Seems to work fine when first loaded,
+    but after a recycle w2k loses its volume icon and xp loses all icons (?). A simple fix
+    for w2k is to run trayfix.exe after a recycle, and that will put the volume icon back.
+    
+    NOTES:
+    The DUN icon uses 4 icons to display status, when NIM_ADD the icons, they all have the
+    same HWND, but differ in NOTIFYICONDATA.uID. To get around this, we only check to see
+    if an icon already exists by HWND only, and not uID. On NIM_MODIFY, we set the uID
+    of any found icon to the modifying icon's uID or problems occur with the mouse handling.
+    
+    UnloadShellServiceObjects needs to be called before LM_SAVESYSTRAY is handled or
+    the DUN/Volume icons get saved also and won't be handled properly when the tray is
+    restarted after a recycle.
+    
+    The tooltip on the DUN icon still doesn't handle well. I think this is our implementation
+    and not MS related.
+    
+- Fixed [everything / Message / 2001-11-20]
+  - Removed all the TCHAR, _TEXT hoopla (it was never properly implemented fully
+    and just made the source look like poo)
+  - Source formatting! All the source should have a standard look now.
+    (formatting done using the astyle @ http://www.sourceforge.net/projects/astyle)
+    (command line options were: astyle -cbKpt *.cpp *.h *.c)
+    (Using tabs instead of spaces)
+    
+- Fixed [hook, hookmgr, litestep / Message / 2001-11-20]
+  - Removed WH_SHELL code, now using RegisterShellHook in LiteStep.exe only
+  - HookMgr and Hook only need to be loaded if a module uses their hooks
+    (mmsupport for instance) by settings "LSUseHooks" to true in the step.rc
+    
+- Fixed [lsapi / Message / 2001-11-19]
+-More fixes to png's extension checking, should fix the problem with tasks (thanks nivenh)"
+
+- Fixed [lsapi, hook, hookmgr / Message / 2001-11-17]
+  - Added support for RegisterShellHook, this will allow for cmd.exe windows
+    to be properly handled under NT/2K
+    
+- Fixed [lsapi, hook, hookmgr / Message / 2001-11-17]
+  - Fixed a bug in the png support extension checking (thanks nivenh for finding this)
+  - Removed the test code defines from hook and hookmgr since the code was always being used
+
+- Added [lsapi / Message / 2001-11-13]
+  - Png support added (Thanks nivenh for hte code and the help!)
+    Uses libpng (www.libpng.org) and zlib (www.zlib.org)
+    There is a special build to compile an lsapi with png support
+    NOTE: you should unzip libpng and zlib sources in the lsapi directory
+    and use the lpng120\projects\msvc\libpng.dsw to compile the lib versions
+    of libpng and zlib
+
+- Fixed [popup2, systray2 / Message / 2001-10-16]
+  - Fixed custom popups and multiple monitors
+  - Changes the start size of systray2 to 0,0 (per blkhawk)
+
+- Fixed [stepsets / Message / 2001-08-25]
+  - Fixed StripComment, test for qoute was incorrect
+
+- Deleted [console, script / Message / 2001-08-21]
+  - Removed the console and script projects (They weren't finished anyways)
+
+- Modified [popup2 / Maduin / 2001-08-19]
+  - Folder items can now have different bitmaps/colors than normal items; the
+    following step.rc commands are new:
+	  - PopupFolderColor, PopupSelFolderColor
+	  - PopupFolderBgColor, PopupSelFolderBgColor
+	  - PopupFolderPix, PopupSelFolderPix
+	  - PopupGradientFolder
+	  - PopupFolderFontFace
+	  - PopupFolderFontHeight
+  - The new settings work the same the existing PopupEntry*/PopupSelEntry* ones
+
+- Fixed [bangmgr, popup2 / Maduin / 2001-08-17]
+  - The !Popup bang command now work just like the other !Popup* bang commands
+
+- Fixed [stepsets / Maduin / 2001-08-16]
+  - Fixed a bug in VarExpansion which caused popup items to be lowercased
+
+- Fixed [popup2 / Maduin / 2001-08-16]
+  - Introduced a bug in the last build: If NoPopupTitleText was set the popup
+    did not paint itself properly.
+
+- Modified [popup2 / Maduin / 2001-08-15]
+  - Rewrote the icon/text layout routines
+  - Added PopupArrowImage and PopupSelArrowImage to specify a bitmap to be used
+    as the folder arrow.
+  - Added PopupIconsOnRight
+  - Got rid of that annoying "Re5ources_PopupMenu" tooltip
+  - Got rid of the shortcut overlay icons
+
+- Modified [lsapi.h, stepsettings.h, litestep.rc / Phil @ leaf / 2001-08-04]
+  - Increased MAX_BANG* and RCCOMMAND limits (blind change as uncommented, but assuming that this will increase the number of commands that LS can register).
+  - Updated LiteStep.rc copyright information and also the special build comment =b
+
+- Fixed [litestep, lsapi, dllmgr, hookmgr, hotkey/ Chaku / 2001-08-03]
+  - Fixed memory leak when displaying bang commands in about box.
+  - Fixed the problem that wrong error messages are shown in messagebox.
+  - Fixed the problem that after several times of recycle, a lot of blank
+    entries of rev ids are inserted in the about box.
+
+- Fixed [litestep, bangmgr, lsapi / Chaku / 2001-08-01]
+  - Fixed threaded-related bang command problems.
+
+- Fixed [lsapi / Message / 2001-06-26]
+  - Fixed memory leak in lsapi's GetShellFolderPath if SHGetMalloc Failed
+
+- Fixed [litestep, lsapi, dllmgr, bangmgr, taskbar / Chaku / 2001-06-26]
+  - Fixed memory leaks created by threading when handling the 
+	LM_THREAD_BANGCOMMAND message in dllmgr and litestep and added Relase().
+  - Fixed missing AddRef()'s in bangmgr AddBangCommand 
+	and ThreadedBangCommand::Execute.
+  - Fixed the problem of having a timer and shell window's created destroyed message to maintain the
+	internal task list.   
+
+- Fixed [hotkey / Message / 2001-06-01]
+  - Some of the _TEXT macros were borked, fixed now
+
+- Fixed [lsapi / NeXTer / 2001-05-29]
+  - Windows XP was erroneously reported as Windows 2000
+
+- Fixed [lsapi / Maduin / 2001-04-02]
+  - CommandTokenize wasn't accepting bracketed tokens
+
+- Modified [Stepsets / NeXTer / 2001-03-30]
+  - Modified the expansion of evars, so envvars are properly expanded
+
+- Added [lsapi / Headius / 2001-03-12]
+  - Added !Reload bang...reloads settings from disk but does not notify
+    modules with a refresh message like !Refresh does
+
+- Modified [multiple / Headius / 2001-03-10]
+  - Modified all uses of _bstr_t(value, false) to be just _bstr_t(value)
+    - May have been causing problems with memory allocation for bstrings
+
+- Fixed [lsapi / murphy / 2001-03-09]
+  - Fixed typo in devteam names ;-)
+  - Fixed loading of changes.txt in about-screen.
+  - Added 'Windows XP' in System Info of about-screen.
+
+- Fixed [popup2 / Maduin / 2001-03-09]
+  - PopupSeparatorPix now works with PopupAutoSeparator
+  - Fixed a minor focusing bug
+
+- Fixed [lsapi, stepsets / Maduin / 2001-03-01]
+  - Squashed some bugs in GetRCLine and LSExecute
+
+- Fixed [litestep / Headius / 2001-02-21]
+  - Run, RunOnce, and Startup items were being run in the wrong order
+
+- Fixed [lsapi / Headius / 2001-02-20]
+  - Fixed a memory violation in ParseBangCommand
+
+- Added, Modified [All / Chaku / 2001-02-19]
+  - Traditional Chinese translations added
+  - Added parentheses to some macros to prevent potential problems
+  - Changed desktop to use RESOURCE_MSGBOX to display warning box
+  - Modified the GetResStr and GetResStrEx to load string table resources properly
+
+- Added [All / NeXTer / 2001-02-18]
+  - Swedish translations added for most events
+
+- Fixed [lsapi, stepsets / Headius / 2001-02-09]
+  - Fixed !About bangs not populating list
+  - Fixed environment variables not being picked up
+
+- Fixed [stepsets, litestep / Headius / 2001-02-07]
+  - Fixed problem starting up under Win98/Win95 "file not found"
+  - Modified litestep to link to Multithreaded rather than Multithreaded DLL lib
+
+- Fixed [lsapi, stepsets, litestep / Headius / 2001-02-06]
+  - Fixed return values for successful/failed bang commands in LSExecuteEx
+  - Fixed several memory leaks in settings subsystem
+  - Began implementing configuration flags to trim LS functionality at will
+
+- Modified [stepsets, lsapi, litestep / Headius / 2001-02-05]
+  - Performance improvements to stepsets
+    - Added line iterator interface to replace ReadX functions, about 25% faster
+    - Moved GetX code from GetRCX functions, about 25% faster
+  - Litestep.exe now registers as a type library for core interfaces
+
+- Modified [stepsets, bangmgr, litestep, lsapi, misc / Headius / 2001-02-04]
+  - Modified IBangManager and IBangCommand interfaces to more close fit what
+    bang commands do
+    - No return value support (bang don't have return values anyway)
+    - No array of parameters (bangs accept a single string parameter)
+    - No OLE support in base interfaces (building and manipulating SAFEARRAY is slow)
+  - Modified other core modules to use new IBangManager interface correctly
+  - Fixed memory leak in startup code (thanks jugg)
+  - Fixed Settings bug that broke include support
+  - Minor performance cleanup in stepsettings
+
+- Fixed [stepsets, bangmgr / Headius / 2001-02-03]
+  - Fixed problem with ReadLine/ReadConfig and LCReadNextLine/LCReadNextConfig
+    - Continuing to read after a failed read would loop back to the start
+  - Fixed problem with include support in ParseInclude
+    - wchar_t string was not being converted correctly to char string
+  - Fixed build of bangmgr.tlb going to wrong directory
+
+- Modified [stepsets, winlist, misc / Headius / 2001-02-02]
+  - Reimplemented StepSettings internally with wide chars (wchar_t)
+    - Reduces number of conversions done to use the component
+    - COM uses wchar_t in the form of BSTR's
+    - Should improve settings performance
+    - One exception: GetFullPathName is not provided in wide char form under 9X,
+      so a conversion is done to ANSI char and back again. This will preclude the
+      parser from working with files with UNICODE chars in them without modification.
+      Normally you won't have to worry about it.
+  - Modified IWindowList interface to not use HRESULT to make it more simple to use.
+  - Reimplemented StandardWindowList to support new interface
+  - Made minor modifications to several pieces of code to allow LS to compile with
+    STLPort, a port of SGI's STL libraries. STLPort will not be used by default.
+    - STLPort causes binaries to be very slightly larger, and LS to take about
+      300k more memory, but is free and open. Recompile LS using STLPort headers
+      and libraries if you are interested. See www.stlport.org
+  - Added /opt:NOWIN98 linker option to projects that didn't have it
+    - Shrinks the binaries a touch
+
+- Modified [macros? / Headius / 2001/02/01]
+  - Fixed SCREEN_WIDTH and SCREEN_HEIGHT macros to work correctly on 95 and NT4
+    - Caused taskbar to not be visible
+
+- Added, Modified [core, stepsets, lsapi, litestep, sysvwm / Headius / 2001-01-31]
+  - Split IStepSettings and DStepSettings interfaces to avoid naming conflicts
+  - Added additional utility methods to IStepSettings and DStepSettings
+  - Completed implementation of IStepSettings and DStepSettings
+    - StepSettings in the stepsets project is the implementation of IStepSettings
+    - DStepSettingsImpl in the stepsets project is the implementation of DStepSettings
+  - Removed StepSettings code from lsapi
+  - Modified lsapi to use IStepSettings interface for settings retrieval
+  - Modified StepSettings to no longer manager StepName and ThemeName
+  - Modified lsapi to manage theme flags and caching locally
+  - Modified litestep to load stepsets.dll object library and create new instance
+    of IStepSettings for lsapi to use
+  - Modified lsapi exports to use IStepSettings interface
+  - Added type library to stepsettings
+    - Step settings should now be a full COM library. External applications can
+      use COM APIs to create an instance of the StepSettings parser
+    - Dispatch interface is not yet implemented
+  - Added core type libraries to bangmgr, stepsets, to allow them to be loaded
+    by OLEView
+
+- Modified [core, lsapi, sysvwm, popup / Headius / 2001-01-29]
+  - Cleaned up the IStepSettings and DStepSettings interface to be more usable
+  - Implemented business methods of both interfaces in StepSettings
+    - StepSettings will be moved to a seperate service DLL and registered as a
+      full-fledged COM component
+    - The StepSettings COM dll should be usable from any application, with or
+      without Litestep running, to allow third-party apps and scripts to utilize
+      the 24.6 step.rc parser.
+    - IDispatch support, component registration, and class factory pieces are not
+      yet implemented
+  - Renamed sysvwm.c to sysvwm.cpp and made appropriate changes to it
+  - Removed old popup module from core. Source and binary are available on modulo.
+    - popup2 will become core popup soon
+
+- Modified [ all / Message / 2001-01-29]
+  - Updated the copyright notices to 2001
+  - Removed txt files from modules (not needed since we actually have
+    great documentation that is updated with changes.txt)
+
+- Fixed [popup2 / Maduin / 2001-01-28]
+  - !PopupDesktops and !PopupTasks now hide when you click on the desktop
+
+- Modified [shortcut2, common.h / Headius / 2001-01-28]
+  - Cleaned up code to prevent warnings, performance problems with bools
+
+- Modified [ workspaces/project files / Message / 2001-01-28]
+  - Removed the "_vs6" from all project and workspace filenames
+  - Added .mak files to each project, not sure if these work or not
+    but there has been requests for mak files (these were generated
+    automatically by vs6)
+
+-Added, Modified [core, bangmgr, vwm2, script, litestep / Headius / 2001-01-28]
+  - Modified IBangManager/DBangManager to support OLE automation
+    - Allows a single class to be both dispinterface and vtbl interface
+  - Moved bangmgr coclass to bangmgr.idl from core
+    - coclass information is put in bangmgr.tlb, which compiles into bangmgr.dll
+  - Modified litestep to use bangmgr.dll typelib to load bangmgr
+  - Implemented IDispatch in StandardBangManager
+    - Functions are implemented as bangmanager.Execute("!Bang")
+    - Dynamic dispinterface may be possible, i.e. BangManager.Recycle()
+  - Added script project for activescripting support (not functional yet)
+    - Should support any installed activescripting language when finished
+      - VBScript, JScript, Perl, Python, and others
+    - Will allow full access to step.rc, bang commands, module manager
+  - Modified vwm2 to use EnumWindows rather than GetWindow loop
+    - Continuing to look for bugs
+
+- Modified [ShortCut2 / NeXTer / 2001-01-26]
+  - The topmost problem is finally fixed with a little assistance from jugg
+
+- Added [ bangmgr, core, lsapi, dllmgr, msgmgr, winlist / Headius / 2001-01-20 ]
+  - Modified core IStepSettings interface to make more sense, be more user friendly
+  - Added IStepSettings methods to StepSettings class in lsapi
+    - Methods not yet implemented
+  - Added component registration/unregistration code to four core services
+  - Modified manager startup to use COM apis instead of ugly kludge
+
+- Fixed [ bangmgr / Message / 2001-01-20]
+  - Bangs weren't being removed from the map, now they are
+
+- Modified [all / Message / 2001-01-19]
+  - Modifed all files to use TCHAR, this will enable us to
+    us UNICODE and MBCS in the future, will need to aadjust some
+    function to pass the size of string in bytes instead of the number
+    of characters.
+
+- Modified [taskbar / Headius / 2001-01-17]
+  - Added four new parameters:
+    - TaskbarWidth, defaults to screen width, sets width of taskbar
+	  - Also accepts percentage of screen width, as "TaskbarWidth 50%"
+	- TaskbarPositioning, defaults to false, enables absolute positioning
+	- TaskbarX, defaults to 0, requires TaskbarPositioning = true
+	- TaskbarY, defaults to 0, requires TaskbarPositioning = true
+
+- Modified [sysvwm / NeXTer / 2001-01-17]
+  - Fixed an issue with dragging under LSbox
+
+- Added [desktop2 / Message / 2001-01-11]
+  - Added four additional modifiers:  alt     alt key
+                                      lwin    left win button
+                                      rwin    right win button
+                                      apps    button next to the right win button
+
+- Modified [desktop2 / Message / 2001-01-10]
+  - Removed DesktopLeftClick, DesktopRightClick, DesktopMiddleClick,
+    DesktopX1Click, DesktopX2Click, !DesktopSetRightClick, !DesktopSetLeftClick,
+    !DesktopSetMiddleClick, !DesktopSetX1Click, !DesktopSetX2Click
+  - Fixed desktop getting focus when using xmouse
+  - Addednew support for key modifiers used as the following:
+    *desktop [main button]+[modifier]+[modifier]+.. command
+    Modifiers are:  lbutton     left mouse button up
+                    rbutton     right mouse button up
+                    mbutton     middle mouse button up
+                    x1button    x1 mouse button up
+                    x2button    x2 mouse button up
+                    ctrl        control key down
+                    shift       shift key down
+
+    Examples:
+    *desktop rbutton !popup // Right button up displays popup
+    *desktop lbutton !about // Left button up displays about box
+    *desktop lbutton+ctrl !recycle // Left button up while holding down control key
+                                      recycles LiteStep
+    *desktop rbutton+ctrl+shift !quit // You can figure it out =]
+
+    Note: you can do *desktop rbutton+lbutton !about and it will display the
+    about box when you hold down the lbutton and click the rbutton, *but* releasing
+    the lbutton will fire off the command set by *desktop lbutton
+  - Added !DesktopSetClick, you use this in the same way as the step.rc config, just
+    minus the "*desktop"
+    !DesktopSetClick lbutton+ctrl !recycle
+
+- Modified [hook / Message / 2001-01-10]
+	- Added code to exclude certain programs from having their messages
+		hooked. Add the executable exe name to HKCU\software\litestep\hookexclude
+		as a string.
+
+- Fixed [ popup2 / Message / 2001-01-09]
+  - Fixed the popup window showing up in task manager (set the owner to the
+    hidden litestep window
+
+- Modified [hook / Message / 2001-01-09]
+	- Removed some external dependencies
+	- GetMsgProc ignores messages that have the PM_NOREMOVE flag (they are just
+		being peek'd and not removed from the que)
+	- Removed CRT dependencies from the release build and made _DLLMainCRTStartup
+		a stub to call DLLMain
+
+== Build 2001-01-02 ===========================================================
+
+- Added [lsapi / Message / 2000-01-02]
+  - If changes.txt is present in the same directory as litestep.exe, an
+    additonal option "changes.txt" will appear in the drop down list, selecting
+    it will display the changes.txt
+
+- Added [command / Message / 2000-12-31]
+  - Added CommandRememberPosition to allow the module to remember where it
+    was last placed
+  - Added !CommandResetPos to move the module back to the settings sepecified
+    in the step.rc
+
+- Modified [ command / Message / 2000-12-20]
+  - Fixed some problems with always on top
+  - Added CommandNotMoveable, default is moveable
+
+- Fixed [lsapi / Maduin / 2000-12-19]
+  - Nested Ifs are handled correctly now
+
+- Added [ Popup2, lsapi / Message / 2000-12-19]
+  - Added !PopupRecycleBin and !PopupRecentDocuments (this works correctly
+    under W2K where as !DynamicFolder:$recent$ display everything
+  - Added following variables:
+      $commonadmintoolsdir$
+        All Users\Start Menu\Programs\Administrative Tools
+      $admintoolsdir$
+        <user name>\Start Menu\Programs\Administrative Tools
+
+- Modified [ShortCut2 / NeXTer / 2000-12-15]
+  - Hopefully the ontop problems are gone
+
+- New Feature [popup2 / Maduin / 2000-12-12]
+  - Added PopupSeparatorPix which lets you assign a bitmap to be used for all
+    !Separator items
+  - Added PopupTasksStartPinned which causes !PopupTasks to automatically be
+    pinned when it is shown (requested)
+
+- Modified [ShortCut2 / NeXTer / 2000-12-10]
+  - Code cleanup in preparation for LS coding standards draft
+
+- Modified [lsapi / Message / 2000-12-09]
+  - Split some of the functions in lsapi.cpp off into different files to be
+    more manageable.
+  - Added multimonitor functions to lsapi (these are basically the same
+    functions as those found in Microsoft's multimon.h)
+  - Some general house cleaning of unused varaibles and code
+  - Add common.h, this file include the common include files and definitions
+    for most LiteStep modules (Use this file if you are going to include
+    Multimonitor support in your application, it redefines the needed MS apis
+    with the LiteStep ones
+  - Modified existing modules that support multimonitors to use this file
+
+- Modified [all / Message / 2000-12-08]
+  - Added LiteStep copyright and gnu notice to all source files and headers
+    All cpp files have the comment space at top for individual files changes.
+
+- Added [desktop2 / Message / 2000-12-08]
+  - Added XButton support, DesktopX1Click, DesktopX2Click, !SetDesktopX1Click,
+    !SetDesktopX2Click (won't work if you have the MS mouse software loaded)
+
+- New Feature [taskbar / Maduin / 2000-12-07]
+  - Added TaskbarKeepDesktopArea to prevent taskbar from changing the desktop
+    area
+  - Added !TaskbarHide, !TaskbarToggle, and !TaskbarShow
+
+- Added [desktop2 / Message / 2000-12-07]
+  - Cleaned up the code some, added LM_REFRESH handling
+
+- Modified [popup2 / Message / 2000-12-06]
+  - Modified !PopupRun to use the mru class in lsapi\, it now shares
+    the same mru run list as command.dll
+
+- New Feature [taskbar / Maduin / 2000-12-06]
+  - Added TaskbarActiveFont, TaskbarActiveFontHeight, TaskbarActiveFontBold,
+    and TaskbarActiveFontItalic
+  - Added TaskbarFont, TaskbarFontHeight, TaskbarFontBold, and
+    TaskbarFontItalic
+
+- Modified [desktop2, lsapi / Message / 2000-12-06]
+  - Yet more work on desktop2's multimon support
+  - Added SetDesktopAreaMainMonitorOnly, SetDesktopArea<int>, SDALeft<int>
+    SDATop<int>, SDABottom<int>, SDARight<int> see desktop2.tx t for details.
+  - Removed lsmulitmon.cpp, .h from lsapi, removed SetDesktopAreaEx, they just
+    werent working out as planed.
+
+- Modified [desktop2, lsapi / Message / 2000-12-05]
+  - More work on multimonitor support in desktop2 for SetDesktopArea
+  - Added lsmultimon.cpp,.h to lsapi for enumerating desktops and setting
+    desktoparea via SetDesktopAreaEx (still beta testing)
+
+- Fixed [lsapi, popup2 / Message / 2000-12-04]
+  - Fixed the directoryfolders giving an access violation and causing them
+    not to display
+  - Fixed the "X" not working on a torn off popup
+  - Turned off warning message when using ShellExecute via LsExecute, this will
+    keep that annoying "access to the specified device, path, or file was
+    denied" window from popping up
+
+- Modified [command, lsapi / Message / 2000-12-01]
+  - Added CommandNotAlwaysOnTop, CommandSelectAllOnFocus to command.dll
+  - Cleaned up some of the multimon macros in macros.h, no need to check if
+    the system is multimon or not, multimon.h does that.
+
+- Fixed [popup2 / Chaku / 2000-12-01]
+  - Fixed the problem that when left or right clicking on an item that has
+    submenu the whole popup will be closed.
+
+- Modified [Shortcut2 / NeXTer / 2000-11-30]
+  - Cleaned up the new code
+
+- Fixed [Shortcut2 / Message / 2000-11-30]
+  - Added code to move a shortcut whose position was not on a display monitor
+    to the nearest monitor (This should cure the problem with shortcuts not
+    being visible because of different resolution in multimon systems)
+
+- Modified [Shortcut2 / NeXTer / 2000-11-30]
+  - Added the 'r' flag that makes the shortcut relative to the one before it
+
+- Modified [ command, lsapi, desktop2, shortcut2 / Message / 2000-11-28]
+             taskbar, vwm2, popup2
+  - Added basic Multimonitor support. (Top-Left corner of left most monitor is
+    given the coordinates (0,0), everything else is relative to that. Negative
+    coordinates are relative to the right side of the right most monitor or
+    relative to the bottom of the lowest monitor)
+
+- Modified [popup2 / Message / 2000-11-27]
+  - Per mindjunctions: !PopupFolder, !PopupDynamicFolder, & !DynamicFolder now
+    support an optional file pattern. this goes after the directory. Currently only
+    one patern is allowed, and it will no span subdirectories unless those
+    subdirectories match the pattern.
+    Example: *Popup 	"Documents" 	"!PopupDynamicFolder:$documentsdir$" *.doc
+    Makes a popup menu titled "Documents" containing only the *.doc files from the
+    My Documents directory
+
+- Modified [lsapi / Message / 2000-11-27]
+  - Fixed qouted paths in include
+  - General code cleaning in VarExpansion unitialized variable checking
+  - GetLitestepWnd() now caches the hwnd on the first call to prevent subsequent
+    calls to FindWindow
+  - Implemented some new macros for resource string loading in macros.h
+  - Modules using GetResStr and GetResStrEx have been converted to using the macros
+
+== Build 2000-11-28 ===========================================================
+
+- Modified [lsapi / Message / 2000-11-27]
+  - Added include to step.rc parsing, allows for inclusion
+    of other files when loading the step.rc
+    syntax is include <path & file name>
+    e.g. include $litestepdir$popup.rc
+    included files are processed where they are included
+    (so don't use variables defined after the include statement
+    in the included file)
+
+- Modified [vwm2, sysvwm, lsapi/ Chaku / 2000-11-27]
+  - Modified !VWMMoveApp, !VWMOpen, !VWMDesk to accept desktop names for vwm2
+  - Fixed the way desktop names are handled in sysvwm, so that first character of the desktop
+	name can be a number.
+  - Fixed !VWMDesk's boundary checking problem, but not !VWMMoveApp's yet
+  - Added my name to the about box :-)
+
+- Modified [Command, Lsapi / Message / 2000-11-27]
+  - Added CommandBevel to put a bevel around the command window
+  - Added CommandBevelSize, CommandBevelLightColor, CommandBevelDarkColor
+  - Fixed Frame3D, it was swapping some coordinates
+  - Added inclusion of lsdebug.h to macros.h
+  - Added some basic error checking to macros.h to verify proper order of
+    include files. (macros.h needs to be included before windows.h)
+
+- Modified [Popup2 / NeXTer / 2000-11-27]
+  - Fixed the RevID so that the right version number is reported
+
+- Modified [sysvwm / Chaku / 2000-11-25]
+  - Fixed UnRegisterBangCommands function, so that it actually remove all the bangs
+  - Modified !VWMMoveApp to accept desktop number(starts from 0).
+  - Modified !VWMMoveApp, !VWMOpen, !VWMDesk to accept desktop names.
+
+- Modified [command, lsapi, popup2, hookmgr, hook / Message / 2000-11-24]
+  - Added !CommandFocus - will show the command window if it is hidden and
+    set focus in the edit control
+  - Added response to LM_REFRESH & !Refresh
+  - Added _LSDEBUGPRINTMSG(text, msg) to lsdebug.h, msg is an int representing a
+    window message, when the output the int will be in hex form
+    E.G. _LSDEBUGPRINTMSG("WM_LBUTTONUP", 514) will output:
+    <filename>:<line number> WM_LBUTTONUP = 202
+  - Fixed drop files to inclose a path in qoutes if it included spaces when using
+    !PopupRun
+  - Readded code to hookmgr and hook to handle CallWndProc, evidently the cause
+    for the lockups was the hooking of the debugger (in my case deb.exe), so code
+    has been added to keep the deb.exe proccess from being hooked. Anyone using hooks
+    should replace "deb.exe" in hook.cpp with the name of their debugger. (The code to
+    enable CallWndProc is enabled by defining _TEST_CODE)
+
+- Modified [command / Message / 2000-11-24]
+  - Added !CommandShow, !CommandHide, !CommandToggle, CommandHideOnUnfocus,
+    CommandHiddenOnStart, CommandNoClearOnCommand (these all function exactly
+    like their lsxcommand counterparts)
+
+== Build 2000-11-24 ===========================================================
+
+- Modified [command, lsapi / Message / 2000-11-24]
+  - Command.dll is now functional on the basic level, see command.txt for details
+  - Added _LSDEBUGLASTERR to lsdebug.h, it calls GetLastError and passes it to
+    FormatMessage to retrieve the error message for the error number then outputs
+    the message using OutputDebugString
+  - Added _LSDEBUGLASTERR2(dword) to lsdebug.h, same functionality as _LSDEBUGLASTERR
+    but uses an error number passed into it instead of GetLastError
+  - Added macros.h to lsapi project to hold commonly used macros
+    - Added CONVERT_COORDINATE_X(x) and CONVERT_COORDINATE_Y(y) to macros.h, they convert
+      a negative coordinate to be relative from the right/bottom of the screen
+  - Changed to LSExecute and LSExecuteEx's return values to something more sensible, it would
+    return anything from 0, NULL or an error before if it failed, now it returns a value in
+    accordance with ShellExecute. A value greater than 32 if successful and a value less than
+    or equal to 32 if it fails. This should allow for the ability to tell if a command executed
+    failed or succeeded properly now
+  - Added MRUList class (mru.cpp and mru.h) to lsapi project, allows for the use of a common
+    storage for modules needing to maintain a MRU run list. See command.cpp for an example
+    implementation.
+
+- Modified [taskbar / Chaku / 2000-11-24]
+  - Fixed the start button text position problem, and the non-responsive mouse
+    clicking when start button is absent
+
+- Modified [Desktop2 / NeXTer / 2000-11-23]
+  - The !DesktopSetArea command is finally working, I must have been very
+    tired when I wrote that code. Not only did it call the wrong function,
+    but also registered the wrong command. That noone hasn't noticed before
+    now is pretty remarkable
+
+- Modified [taskbar / Chaku / 2000-11-22]
+  - Added the task flashing feature, TaskButtonFlash, and some flashing color
+    and skining code.
+
+- Fixed [popup2 / Kevin / 2000-11-21]
+  - Popups other than the default one did not adjust their position to make
+    sure they were within the screen.
+
+- Modified [LiteStep / NeXTer / 2000-11-21]
+  - Added the ability to specify bang commands on the command line. The bang
+    has to be the last argument since everything following it is assumed to
+    be the arguments for the bang (NOTE: This requires that LS is already
+    running)
+
+- Modified [ShortCut2 / NeXTer / 2000-11-21]
+  - Added the ability to place shortcuts relative the screen center. Just add
+    a 'c' after the relevant coordinate (i.e., -42c)
+
+== Build 2000-11-21 ===========================================================
+
+- New Feature [popup2 / Kevin / 2000-11-20]
+  - Merged in Chaku's code for multiple popups
+
+- New Feature [lsapi / Kevin / 2000-11-19]
+  - New bang command: !alert <message> <title>
+    - Displays a message box with the given message and title
+    - <title> is optional
+  - New bang command: !confirm <message> <title> <yes-command> <no-command>
+    - Displays a message box with the given message and title and lets
+      the user select "Yes" or "No"; then executes the appropriate
+      command.
+    - <title> is optional. <yes-command> and <no-command> must be
+      enclosed in brackets if they have parameters
+
+- Modified [LSAPI / NeXTer / 2000-11-17]
+  - Removed a little overhead in the function setting the internal variables
+  - Removed the appending of a '\' to environment variables (type set in a console)
+    since this screwed up if the var referenced a file (comspec), and making an
+    accurate identification would take too much time, and fail for removable media
+
+- Modified [sysvwm, vwm2 / Maduin / 2000-11-16]
+  - Added new messages to let other modules (popup2, namely) get desktop information.
+  - You can now give each desktop a name with the RC command VWMDeskNameN where
+    N is the desktop number. While these names aren't currently used by the VWM for
+    anything, popup2 (and eventually other modules) can use them.
+
+- Modified [popup2 / Maduin / 2000-11-16]
+  - !PopupTasks can now be used as a regular bang command
+  - Added !PopupDesktops which lists the VWM desktops (with names) and lets you
+      switch between them. This can also be used as a regular bang command.
+      (This requires the new sysvwm.dll or vwm2.dll)
+
+- Modified [popup2 / Maduin / 2000-11-15]
+  - Added PopupDefaultIcon to specify a default icon for entries with none
+  - Added PopupIconSpacing to set the number of pixels between the icon and the text
+  - Added PopupIconSize to resize icons
+  - Added PopupEntryAlignment and PopupTitleAlignment to set the horizontal
+      alignment of text. The value can be "left", "center", or "right". The default
+      is "left". These don't work perfectly with icons yet; but they're a work in
+      progress.
+  - Fixed a little memory leak
+
+- Changed [Popup2 / Message / 2000-11-12]
+  - Removed 2000-10-18 additions to popup2 for right click open
+  - Implemented right click context menus for the following items: !PopupFolder,
+    !PopupDynamicFolder, !DynamicFolder, !PopupMyComputer, !PopupNetwork, !PopupControlPanel,
+    !PopupPrinters (this code is by no means perfect, i.e. sub menus on the context menu
+    do not function, i.e. the send to menu)
+
+- Fixed [Litestep / Message / 2000-11-10]
+  - Finished converting void installLitestep(LPCSTR szPath) to use resource
+    strings, only void uninstallLitestep() in litestep.cpp is left to do
+  - Added an uninstall litestep option to the ctl-alt-f1 recovery menu
+  - Changed the recovery menu to use GetResStr instead of LoadString to allow
+    for localization
+
+- Fixed [Desktop2 / NeXTer / 2000-11-07]
+  - Oups... Setting the parent to the desktop made it show up in the task
+    list. Back to the drawing board
+
+- Rollback [Popup2 / NeXTer / 2000-11-07]
+  - Due to compatibility problems, Popup2 has been rolled back to the
+    pre-2000-11-04 state. The changes will be re-added when the problems have
+    been fixed
+
+- Modified [Desktop2 / NeXTer / 2000-11-07]
+  - Changed the parent window to the desktop and removed the clipping.
+    This should (theoretically) make it easier to adapt LS to a multi-monitor
+    setup
+
+- Modified [LSAPI / NeXTer / 2000-11-06]
+  - Added the envvar UserName
+
+- Modified [sysvwm / NeXTer / 2000-11-03]
+  - Added support for LSBox
+  - Fixed a lot of problems with the mouse handling
+
+- Added [Desktop2 / NeXTer / 2000-11-01]
+  - Added !DesktopSetArea left top right bottom, the rules are the same as
+    for the normal settings
+
+- Fixed [DllMgr / NeXTer / 2000-11-01]
+  - The module map was case sensitive, which is rather silly on a case insensitive
+    file system
+
+- Fixed [LiteStep / NeXTer / 2000-10-30]
+  - The -install/-uninstall feature is no longer broken under 9x (why hasn't
+    anyone reported this before?)
+
+- Modified [LSAPI / NeXTer / 2000-10-30]
+  - Cleaned up GetToken() a bit. Had forgotten a couple of silly things the
+    last time I changed it
+
+- Modified [Wharf / NeXTer / 2000-10-29]
+  - After inceasant pestering by DeViLbOi, WharfAlwaysOnTop now defaults to
+    false
+
+- Modified [lsapi / Maduin / 2000-10-19]
+  - Added simple expression support to If. Now supports boolean
+    connectives ("and", "or" and "not") and comparison of integers
+	using relational operators (=, <>, <=, <, >=, >). Support for
+	strings and arithmetic is coming.
+
+- Modified [lsapi / Message / 2000-10-18]
+  - Added two new variables ResolutionX and ResolutionY which is the screen height and
+    width in pixels, not very usefull with the current if,else implementation, but
+    provided for future use with expressions
+
+- Added [Popup2 / Message / 2000-10-18]
+  - Right clicking on a menu item that is a !PopupFolder or !PopupDynamicFolder, or one of
+    of their subfolders. will cause the directory to be opened in a single pane explorer
+    window
+
+- Modified [lsapi / Maduin / 2000-10-18]
+  - Added preliminary support for conditionals (If/ElseIf/Else/EndIf) to the
+    step.rc. It doesn't support real expressions yet, but you can conditionally
+	process blocks of commands based on variables.
+  - Added predefined variables for OS detection (useful with conditionals)
+  - LSAPI.TXT has more detailed information on both of these
+
+- Fixed [Lsapi / Message / 2000-10-14]
+  - If a variable is a system variable (i.e. $windir$) it will now append a
+    backslash to the variable, this should make all directory variables behave the
+    same with a back slash now
+
+== Build 2000-10-06 ===========================================================
+
+- Modified [Shortcut2 / NeXTer / 2000-10-06]
+  - The caption set for the shortcut is now set as the window caption for
+    the shortcut, so that operations can be performed on individual shortcuts
+    when using an advanced scripting module
+  - Added the ability to set whether or not captions are shown for all and
+    individual shortcuts. See shortcut2.txt for details
+
+- Modified [Wharf, LSAPI / NeXTer / 2000-10-03]
+  Wharf:
+  - Fixed the sound handling, thanks to DeViLbOi for pointing it out
+  LSAPI:
+  - Changed GetRCBoolDef() to interpret the value as true if declared but not
+    assigned a value, or assigned a value not recognized as a false
+
+- Modified [LiteStep, Hotkey / NeXTer / 2000-10-02]
+  LiteStep:
+  - Cleaned up the about dialog a bit
+  Hotkey:
+  - Enter, Mul, Div, Add, Sub and Dec (decimal key) are now supported
+
+- Added [command / Message / 2000-09-26]
+  - Added start of the "lsxcommand" type core module
+
+- Modified [taskbar, systray2 / noodge, Message / 2000-09-25]
+  - Added resource strings.
+
+- Modified [desktop, desktop2, dllmgr, hookmgr, hotkey, litestep / Message / 2000--09-25]
+  - Changed resource string identifier to use the following pattern IDS_<MODULENAME>_ERROR<#>
+
+- Modified [litestep / Maduin / 2000-09-21]
+  - If Litestep is rendered unusable due to problems with modules and/or
+    themes, you can hit Ctrl+Alt+F1 to bring up a recovery menu with a few
+	basic commands (recycle, quit, run, shutdown) that should help you fix
+	the problem.
+
+- Modified [popup2 / Maduin / 2000-09-21]
+  - Added the following menu items (these work just like !PopupTasks)
+    - !PopupMyComputer
+    - !PopupNetwork
+    - !PopupControlPanel
+    - !PopupPrinters
+  - Added NoPopupTitleText to prevent the display of title text while
+    still displaying the title graphic.
+  - The bottom bitmap (PopupBottomPix) can now be any height; before
+    it had to be the same height as the title bitmap.
+  - Integrated the .icon support from popup 9.3. If icons are enabled
+    (PopupIcons) then you can explicitly assign an icon to an entry with:
+	  *Popup .icon=custom.ico "Title" command.exe
+	This works for all popup item types. If the icon file name has spaces
+	in it then you must enclose the whole thing in quotes (".icon=a b.ico").
+
+- Modified [litestep, lsapi / Message / 2000-09-17]
+  - Added new settings for the about box, ThemeName and ThemeAuthor, to be displayed in the
+    about box, ThemeName can be 20 characters long and ThemeAuthor 15 characters long
+
+- Modified [install3 / Headius / 2000-09-04]
+  - Added a couple more dialogs to the install3 project
+
+- Fixed [hotkey / Headius / 2000-09-04]
+  - Hotkeys were case sensitive, and windows expected caps
+    - i.e. "Win A" worked..."Win a" did not
+	- Always registered as the capitolized version
+
+== Build 2000-09-04 ===========================================================
+
+- Fixed [lsapi, vwm2, wharf / Headius / 2000-09-04]
+  - Removed support for TransparentBlt Win32 API call
+    - Windows98 implementation seems to be leaking, may have been source of tasks.dll problems
+    - Let me know if this fixes tasks problems
+  - Removed extraneous call to destroyWindow in VWM2
+    - Resulted in window being destroyed twice, with subsequent memory errors
+  - Fixed calls to CombineRgn in Wharf
+    - Calls were made with a null destination, causing first-chance exceptions
+
+- Modified [LSAPI, Popup2, Wharf, SysTray2, Taskbar / NeXTer / 2000-08-31]
+  - Altered the WM_POPUP message to pass both mouse coords in lParam
+
+- Modified [Hotkey / NeXTer / 2000-08-30]
+  - Shouldn't reserve unused hotkeys anymore (specifically ctrl-esc), let me
+    know if it doesn't work
+
+- Added, Modified [console, core, litestep / Headius / 2000-08-29]
+  - Added console project
+    - Implemented a most basic console loadmodule
+    - Log messages sent to the core log dispatch will be displayed according to preferences
+    - Needs a lot of work.
+  - Added ILogDispatch, ILogHandler, IStepSettings interfaces to core
+  - Added StandardLogDispatch to litestep
+  - Modified ILitestep to support ILogDispatch retrieval
+
+
+== Build 2000-08-29 ==========================================================
+
+- Fixed [taskbar, systray2 / Headius / 2000-08-29]
+  - Repaired a memory fault bug in systray2 when running with another systray going
+  - Repaired a memory fault in systray2 when updating the tooltip for a new icon
+  - Repaired a memory fault in taskbar when adding windows to the taskbar
+
+- Modified [LSAPI / NeXTer / 2000-08-29]
+  - Cleaned up GetRCColor() after the change to the settings caching
+
+- Fixed [taskbar / Headius / 2000-08-29]
+  - Removed a couple small memory leaks
+
+- Modified [lsapi, desktop, desktop2, dllmgr, hookmgr, hotkey / Message / 2000-08-29]
+  LSAPI:
+    - Added GetResStr, and GetResStrEx to retrieve resource strings based on
+     locale, GetResStrEx does a sprintf on the resource string
+  The Rest:
+    Moved messages to resource string tables. (So far only English string tables are done
+     but other languages can easily be added now)
+
+- Rewrite [lsapi / Headius / 2000-08-28]
+  - Complete rewrite of the step.rc loading/caching internals
+    - Settings were cached based on how they were requested the first time
+	- Now cached once at startup, reinterpreted on request
+	- Possible symptoms of the old way causing problems:
+	  - Colors showing up as black, regardless of setting
+	  - Strings coming back as "TRUE" or "FALSE"
+	  - Integers always being 1 or 0, regardless of setting
+	  - Boolean values always being TRUE or FALSE
+	- Memory usage should be lower
+	- May be a bit faster
+	- Will lessen the effect of module order on settings validity
+  - Moved exported settings functions to StepSettings.cpp
+
+- Modified [Popup2 / NeXTer / 2000-08-28]
+  - Now handles scrolling of long menus, courtesy of Sylvain Rouquette (Syl)
+  - New setting: PopupScrollSpeed <int>, default is 1
+  - Errata: PopupTitleBold only works in conjunction with PopupFontFace, due
+    to the method for retreiving the default font
+
+- Modified [Popup2 / NeXTer / 2000-08-27]
+  - Should now handle gradients gracefully on newer builds, let me know if any
+    problems occur
+  - Added the settings PopupTitleBold <bool> and PopupEntryFontHeight <int>
+  - Made !DynamicFolder menus display the caption of their parent
+  - Fixed the vertical alignment of the text, should look better now
+
+
+== Build: 2000-08-25 ==========================================================
+
+- Modified [LSAPI, Wharf / NeXTer / 2000-08-26]
+  LSAPI:
+  - Added the function BOOL GetRCBoolDef(LPCTSTR szKeyName, BOOL bDefault)
+    If not found, or no value specified, it returns bDefault, otherwise it
+    returns the value
+  Wharf:
+  - Added the setting WharfAlwaysOnTop
+
+- Fixed [wharf / Headius / 2000-08-25]
+  - Rewrote the wharf types to be classes, subwharfType extends wharfType
+  - Moved painting code into wharf type classes
+  - Restructured paint handling to call class methods
+  - Fixed the immovable wharf bug
+  - Fixed (re-implemented) the right-click popup
+
+
+== Build: 2000-08-24b =========================================================
+
+- Fixed [lsapi / Headius / 2000-08-24]
+  - Fixed the GetRCXXX functions to cache a special string when a value was not
+    found to prevent arbitrary calls from setting their own default value into
+    the cache.
+  - Changed LSGetImagePath() again, to trust the results from GetRCXXX.
+
+- Modified [LSAPI / NeXTer / 2000-08-24]
+  - Changed LSGetImagePath() to work properly with the new caching system
+
+
+== Build: 2000-08-24 ==========================================================
+
+- Modified [Popup2 / NeXTer / 2000-08-24]
+  - Changed the min width default to 128px
+
+- Modified [LSAPI / NeXTer / 2000-08-23]
+  - Changed LoadLSImage() so that it uses the correct path if LSImageFolder
+    has been changed during a recycle.
+
+- Added [desktop / Headius / 2000-08-23]
+  - Added a dummy desktop.dll module that informs the user to use desktop2.dll
+    instead
+  - desktop.dll dummy will load desktop2.dll to aid upgrading older versions of
+    LS
+
+- Added [ShortCut2 / NeXTer / 2000-08-20]
+  - Added the ability to define default sounds, see shortcut2.txt for details
+
+
+== Build: 2000-08-17 ==========================================================
+
+- Modified [LiteStep / NeXTer / 2000-08-17]
+  - Unbroke the shell warning, sorry about that folks
+
+- Modified [dllmgr, lsapi, popup, lswinbase / Headius / 2000-08-17]
+  - Added code to force bang commands to be called from within the thread that
+    registered them
+  - Removed the return of HTNOWHERE from popup's hit testing, works threaded
+    now
+  - Modified failed class registration in Window to give it a second try
+  - Modified the thread waits in dllmgr to be non-blocking, prevents lockups
+    when mixing threaded and non-threaded modules
+
+- Modified [ShortCut2, Hotkey, LSAPI, Popup2 / NeXTer / 2000-08-17]
+  ShortCut2:
+  - Can be refreshed with the use of the !Refresh command
+  - The shortcuts now revert to the normal state before being shown
+  Hotkey:
+  - Now responds to the !Refresh command
+  LSAPI:
+  - Changed GetRCColor() back to the old way. Whatever the problem was, the fix
+    broke it...
+  Popup2:
+  - Hidden files and folders are no longer shown
+  - Hides the extensions for .bat and .pif files
+
+
+== Build: 2000-08-16 ==========================================================
+
+- Modified [lsapi / Headius / 2000-08-16]
+  - Changed !RecycleStep to !Refresh, see above for information on its use
+  - Added new Litestep Message LM_REFRESH
+    - Module dev: Register to recieve this message using LM_REGISTERMESSAGES
+          and your modules will be notified when settings have been refreshed.
+	- Ideally, modules will eventually not have to be completely recycled
+	  to re-load settings
+	- Please support this feature in your modules. It will not break any
+	  compatibility with other LS variants
+
+- Fixed [Popup2, Lsapi / Message / 2000-08-16]
+  - Fixed a bug in !PopupDynamicFolder causing it not to display
+  - Added !RecycleStep which clears the step.rc cache and reloads it with out a
+      hard recycle of litestep so now you can do this
+      !execute [!recyclestep][!reloadmodule $litestepdir$popup2.dll] and
+      changes made in the step.rc affecting only popup2.dll will take affect
+      without recycling all of litestep
+
+- Fixed [LSAPI / NeXTer / 2000-08-16]
+  - The BitmapToRegion() function had the wrong conditions for flagging
+    non-transparent sections
+  - GetRCColor() used BGR order when LSColorBGR wasn't specified. Noone knows
+    why it worked before
+
+- Modified [ShortCut2 / NeXTer / 2000-08-15]
+  - When using sounds you can now use .none for the mouseover to only get sound
+    on click
+
+- Fixed [lsapi / Headius / 2000-08-15]
+  - Flaw in GetRCBool that caused it to cache the passed-in value, rather than
+    the actual result of the variable
+  - May or may not have caused people problems, but it was in error
+
+== Build: 2000-08-15 ==========================================================
+
+- Fixed [lsapi, dllmgr / Headius / 2000-08-15]
+  - lsapi:
+    - Modified the line caching code to use a seperate map
+    - Modified FindLine to look up lines from the line cache, O(1) complexity
+      instead of O(n) before
+    - Fixed problem in the line/variable caches that resulted in variables
+      stored case-sensitive
+    - Fixed bug in TransparentBltLS where the results were not being blitted
+      correctly
+  - dllmgr:
+    - Further improvements to module threading
+      - Prevents LoadModule and QuitModule from running simultaneously
+      - Prevents multiple initModuleEx from running simultaneously
+      - initModuleEx calls fire in sequence
+
+- Fixed [lsapi / Headius / 2000-08-14]
+  - Added grd's code back, for testing and fixing purposes
+
+
+== Build: 2000-08-14 ==========================================================
+
+- Enhancement [lsapi / Headius / 2000-08-14]
+  - Added code to improve startup/recycle times by caching variables at the time they are read
+  - Backed down bitmap, icon, and transparency changes to test them further (my fault)
+
+- Rewrite [lsapi / grd / 2000-08-14]
+  - Recoded BitmapToRegion, using a combination of the old and the new versions
+  - Recoded TransparentBltLS and fixed:
+    a) issue that might have caused leakage or protection faults.
+    b) implementation that would make TransparentBltLS cause flicker.
+  - Experimental recoding of LoadLSIcon, might not be compatible with all modules
+
+- Fixed [dllmgr / Headius / 2000-08-13]
+  - Added critical section code to force module loading to be sequential
+    - Modules dependent on other modules to be loaded already required this
+  - Determined an issue with threading: Bang Commands are executed in a seperate
+    thread from the one they are running in. This is the problem with core popup.
+    - We will be exploring a couple different options for executing bang commands
+      in the appropriate context.
+
+- Created [install3 / Headius / 2000-08-11]
+  - Added install3 project to be the new installation
+  - Began creating installation dialogs
+
+
+== Build: 2000-08-11 ==========================================================
+
+- Enhancement [dllmgr / Headius / 2000-08-11]
+  - Added code to DLLModuleManager to optionally run modules in their own threads
+    - EXPERIMENTAL - please let me know what problems you have with it
+    - Add "threaded" after your LoadModule lines to load modules in their own threads
+      - Example: LoadModule "$LiteStepDir$\desktop2.dll" threaded
+    - Module developers that wish to handle their own message pumps may do so. specifying "nopump" in the
+      LoadModule line will defer to the module's pump. If there is no pump, the module will terminate immediately
+    - Certain modules appear to have problems running threaded, such as core popups. We are looking into it.
+    - You should see a performance improvement on multi-processor systems
+
+- Modified [LSAPI, ShortCut2 / NeXTer / 2000-08-10]
+  LSAPI:
+  - Made !UnloadModule and !ReloadModule able to handle an unlimited number
+    of modules. Each module should be enclosed in quotes to follow the
+    recommendations for forward compatibility.
+  ShortCut2:
+  - Added drag'n'drop, courtesy of Sylvain Rouquette (Syl)
+
+- Fixed [vwm2 / grd / 2000-08-07]
+  - fixed the list of windows so that GXExplorer and similar programs should work
+  - fixed a potential protection fault bug in the painting routine
+
+- Modified [ShortCut2 / NeXTer / 2000-08-07]
+  - Added sound support, courtesy of Sylvain Rouquette (Syl)
+
+
+== Build: 2000-08-06 ==========================================================
+
+- Fixed [systray2 / grd / 2000-08-06]
+  - fixed a resource leak upon tray icon deletion
+
+- Modified [LiteStep, Popup2 / NeXTer / 2000-08-05]
+  Popup2:
+  - Made the arrows static (doesn't resize)
+  - Now takes the folder arrow into account when calculating the width of items
+  LiteStep:
+  - Changed some VC code into more generic API code in the startup code
+
+- Fixed [systray2 / grd / 2000-08-05]
+  - fixed a bug where the icons got deleted on recycle
+  - fixed some other minor issues
+
+
+== Build: 2000-08-04 ==========================================================
+
+- Modified [LiteStep / NeXTer / 2000-08-03]
+  - Added the ability to pause a recycle by holding the shift key
+  - Made sure all messageboxes have the topmost flag set
+
+- Fixed [vwm2 / grd / 2000-08-03]
+  - fixed some bugs on recycling (I think)
+  - added support for sticky-windows
+  - added support for changing desk on window focus
+
+
+== Build: 2000-08-03 ==========================================================
+
+- Modified [LiteStep / NeXTer / 2000-08-02]
+  - Fixed a minor syntax error
+  - Added code to prevent the accidental launch of multiple instances
+  - Fixed the behavior of the -nostartup switch
+  - Implemented support for specifying an arbitrary step.rc on the
+    command line (the support was already there, but nonfunctional)
+
+- Fixed [litestep / Headius / 2000-08-01]
+  - Fixed /install flag to add a backslash between litestep dir and Litestep.exe if needed
+
+- Modified [SafeStr, LiteStep / NeXTer / 2000-08-01]
+  SafeStr:
+  - Modified change to CharInStr() to handle null characters.
+  LiteStep:
+  - Changed the about box slightly.
+
+- Modified [lsapi / Headius / 07-28-00]
+  - Modified CharInStr function to use strchr rather than current search method
+  - Moved all settings-related code out of lsapi into a StepSettings class
+  - lsapi exports make calls on the StepSettings class
+  - StepSettings encapsulates all the details of reading in step.rc format configs
+
+
+== Build: 2000-07-27 ==========================================================
+
+- Fixed [systray2 / grd / 07-26-00]
+  - systray2 would crash litestep when trying to remove icons
+  - systray2 default wrapping direction was up, now changed to down
+  - added systray2 documentation (systray2.txt)
+
+
+== Build: 2000-07-25 ==========================================================
+
+- Fixed [Wharf / Message / 07-21-00]
+  - Modules using LSWinbase would register for LM messages using hParent which
+    was set to the wharf, the wharf now passes these messages on to LiteStep
+
+- Modified [Popup2 / Message / 07-21-00]
+  - Added !PopupDynamicFolder for compatiability with old Popup
+  - Added folder merging capability to !DynamicFolder, !PopupDynamicFolder
+    and !PopupFolder
+
+- Modified [LSAPI / NeXTer / 07-21-00]
+  - Changed the parsing system to treat token"token" as a single token, to
+    make the use of older themes easier.
+
+
+== Build: 2000-07-21 ==========================================================
+
+- Fixed [LiteStep / NeXTer / 07-21-00]
+  - Fixed the icon. It got corrupted by the CVS system.
+  - setupVars() wasn't called soon enough on recycle, so anything that
+    relied on the system variables would cause errors.
+
+
+== Build: 2000-07-20 ==========================================================
+
+- Added [systray2, popup2 / Headius / 07-17-00]
+  - Added the new systray2 module, a cleaned up and updated version of grd's grdtray
+    - Credit goes to grd for this one, and in record time too!
+	- Very early implementation, not tested heavily
+  - Added popup2 as a new popup based on Re5ource's/Johan Redestig's popup v8
+    - It was decided that v8 was in better shape than 9.3x and a better candidate for integrating into LS core
+	- Credit goes to Johan for his wonderful contribution to Litestep!
+
+- Added [vwm2 / grd / 07-10-00]
+  - Complete rewrite from scratch. Yet not so great but quite stable
+    and most features works.
+
+- Modified [LiteStep / Message / 06-25-00]
+ - Updated the resource version information
+
+- Modified [core, winlist, msgmgr, dllmgr, bangmgr, litestep / Headius / 06-22-2000]
+ - split core service interfaces into ole and non-ole versions
+
+- Fixed [litestep / Maduin / 06-16-2000]
+  - Had to recycle twice to get step.rc changes to take effect
+
+- Fixed [litestep / Maduin / 06-15-2000]
+  - Minimized applications weren't being hidden
+
+
+== Build: 2000-06-10 ==========================================================
+
+- Modified [litestep / Message / 06-10-2000]
+ - Added new icon
+ - Removed old about box dialog from litestep.rc
+
+- Modified [lsapi / Maduin / 06-10-2000]
+  - Added new about box implementation
+
+- Modified [lsapi / Headius / 06-09-00]
+  - Added LitestepAPIInit function to contain one-time init code for lsapi.dll
+  - Added support for TransparentBlt to TransparentBltLS to speed up FF00FF-style
+    transparency under 98 and 2k
+
+- Fixed [ MsgMgr, WinList, LsTime2 / Message / 06-04-00]
+  MsgMgr:
+  - Changed from PostMessage to SendMessage in GetRevId since it was waiting
+     for a return string (per Maduin)
+  WinList:
+  - Was registering for LM_GETREVID, didn't need to, removed
+  LsTime2:
+  - hParent not being set, changed to GetLitetepWnd when sending LM_REGISTERMESSAGE
+     and LM_UNREGISTERMESSAGE, will now show in !about
+
+- Modified [ hook, hookmgr, litestep / Message / 06-03-00]
+  HookMgr:
+  - Yet another rewrite
+    - No longer uses lswinbase
+    - HookMgr uses a sepereate thread now
+    - Added HookCallback for modules to use when using HookMgr
+    - Probably should be using WM_CALLWNDPROC or WM_CALLWNDPROCRET but these
+     lock my system up everytime i try set one... =\ ( so the implementation
+     is commented out for now)
+  Hook:
+  - Aww... yet another rewrite of hook (Back to using WM_COPYDATA, silly me
+     you can't pass the pointer to the MSG struct from GetMsgProc)
+  - Probably should be using WM_CALLWNDPROC or WM_CALLWNDPROCRET but these
+     lock my system up everytime i try set one... =\ ( so the implementation
+     is commented out for now)
+  LiteStep:
+  - Removed call causing hookmgr to be unloaded twice
+  - Moved code that hides minimized windows  from hook.dll to litestep
+
+- Modified [core, litestep, msgmgr / Maduin / 05-29-2000]
+  - Modified the SendMessage function in IMessageManager to return a value as
+      some messages depend on this.
+  - Added functions GetWindowsForMessage and GetMessagesForWindow to the
+      IMessageManager interface and the StandardMessageManager implementation.
+
+- Modified [LSWinBase / NeXTer / 05-29-00]
+  - The windows' class pointer wasn't initialized early enough, resulting in
+    any messages originating from the WM_CREATE handler being unhandled.
+
+
+== Build: 2000-05-28 ==========================================================
+
+- Modified [Shortcut2 / NeXTer / 05-28-00]
+  - When using opaque shortcut images, you can speed up loading considerably
+    by adding an 'o' to the flags. This will prevent the use of regions for
+    the marked shortcut.
+
+- Fixed [lsapi, litestep / Headius / 05-28-00]
+  - Added arbitrary .rc file support to the .rc caching mechanism
+  - Added CacheRCFile to read/parse/cache an RC file
+  - Wired CacheRCFile into SetupRC and LCOpen to fix the problems with non-step/theme.rc open
+    requests failing with "File not found"
+  - Reorganized start/stop/load sequence in main executable to prevent it from loading
+    settings twice initially. Should speed up start time.
+
+- Fixed [ Laspi, Desktop2 / Message / 05-27-00]
+  - Fixed a memory leak in AddVariable, it was returning before deleting
+    lowerName
+  - Fixed a memory leak in ParseBangCommand, was not deleting tempCommand if
+    (FAILED(hr))
+  - Removed all references to BangMap, !About bangs not functioning at this
+    time
+  - Added __stdcall to bang commands for addition of BangManager
+  - Added lsdebug.h in \lsapi, contains macros for debugging
+
+- Added [bangmgr, core, lsapi, litestep / Headius / 05-26-00]
+ - Added new interfaces to the core:
+   * IBangManager - a bang command manager/executor
+   * IBangCommand - represents an executable bang command in some form
+   * ILitestep - overarching interface that contains all core services
+ - Created StandardBangManager implementation of IBangManager
+ - Created CallbackBangCommand implementation of IBangCommand
+   * Handles callback-style bang commands, like what exists today
+ - Wired StandardBangManager and CallbackBangCommand into the LSAPI bang functions:
+   * AddBangCommand and AddBangCommandEx to add callback bangs
+   * RemoveBangCommand to remove callback bangs
+   * ParseBangCommand to parse and execute bang commands with no return values
+   * Callback bangs currently do not support return values through LSAPI and Step.rc
+ - Created implementation of ILitestep interface in class "Litestep"
+ - Wired Litestep into existing services
+   * ILitestep supports querying for default services as well as finding/registering/unregistering
+     3rd-party implementations of core services
+ - Added functions to populate and clear IBangManager between recycles
+ - Cleaned up reference counting within StandardBangManager. Developers: AddRef before
+   you pass an IBangCommand to be added.
+
+
+== Build: 2000-05-26 ==========================================================
+
+- Modified [projects, lsapi / Headius / 05-25-00]
+ - Updated RC file buffers to be kept in a single map, indexed by the full path of the file
+ - Added caching mechanism for *Commands in the RC files
+ - Added map from file to *Command cache to allow support for arbitrary files
+ - Modified SetupRC to populate caches
+ - Updated LCOpen, LCClose, and the LCRead functions to use the caches, rather than
+   opening a file
+
+- Modified [LSTime2, Shortcut2, LiteStep / NeXTer / 05-25-00]
+  LSTime2:
+  - Added ntpfrac.cpp to avoid the irritating warnings about initialized data
+  Shortcut2:
+  - After a tip from blkhawk, all drawing is now done in the WM_ERASEBKGND
+    handler. Should be a wee bit smother than before.
+  LiteStep:
+  - Added a condition that makes it possible to build under BCB. This should be
+    a temporary fix until Borland releases a fix for the BSTR handling.
+
+- Workspaces [ Desktop2, Hotkey, Litestep, Lsapi, Lstime2, shortcut2, taskbar / Message / 05-24-00]
+  - Added text files to each workspace to document the step.rc, bang commands
+    and variables
+  - completed Desktop2, LStime2, and Lsapi - other still need to be done
+  - Add post-build steps to each workspace, the text file will be copied to
+    \litestep\release\docs for easy collection when releasing a build
+  - Add post-build steps to Litestep workspace to copy changes.txt and
+    doc\license.txt to \litestep\release
+
+- Modified [LSAPI / Headius / 05-24-00]
+  - Removing neato debug dialogs in lsapi
+  - Added hierarchical caching for rc file config lines
+  - Modified rc file caching to use vector entries in a map, to allow for additional files
+
+- Modified [LSAPI / NeXTer / 05-23-00]
+  - Due to popular demand, yesterdays syntax change is no longer in effect.
+    GetRCColor() will assume hex for single values and dec for triplets.
+  - However, GetRCInt() does, as of yesterday accept values in either octal,
+    decimal or hexadecimal. (Examples: Oct: 0370, Dec: 42, Hex: 0xF0E1D2C3)
+  - Fixed the problem with LSGetImagePath() where it wouldn't refresh the
+    setting after updating step.rc. (Thanks to Jugg for pointing it out)
+
+- Modified [Winlist / Message / 05-22-00]
+  - Changed LM_ADDWINDOW & LM_REMOVEWINDOW to LM_WINDOWCREATED &
+     LM_WINDOWDESTROYED for compatiability with changes in hook
+
+- Modified [LSAPI / NeXTer / 05-22-00]
+  - Fixed the use of vectors, since it caused a crash when built under
+    BCB. Should also be marginally faster since it now also makes proper
+    use of iterators.
+  - Also tweaked the GetRCxxx functions a bit. Bools can now be turned off with
+    either off, false and no.
+  - GetRCColor() now accepts color values as either a single value or a
+    triplet in the bases octal, decimal and hexadecimal. All values default to
+    decimal, so if you want hex, begin the value with 0x (zero x-ray), or just
+    0 (zero) for octal. (Examples: 1241245, 0x00FF8040, 255 0 0, 020 030 040)
+
+- Fixed [lstime2, lstime2 workspace / Message / 05-21-00]
+  - Added two new builds to lstime2, now have Win32 Release, Win32 Debug which ar non-ntp versions
+  of lstime, and Win32 Release NTP and Win32 Debug NTP which as NTP version of lstime2
+  - Setup dialog (NTP) is now displaying (code in this module could still use some
+     cleaning)
+
+- Modified [LSWinBase, Desktop2, Shortcut2 / NeXTer / 05-21-00]
+  LSWinBase:
+  - Added Window::init() to allow proper initialization regardless of the
+    project type.
+  Desktop2:
+  - Removed some superflous code, and fixed some other minor issues.
+  Shortcut2:
+  - Had forgotten to reset the region after changing the topmost attribute.
+
+- Fixed [lstime2 / Message / 05-20-00]
+  - Fixed a bug where the last character in the theme file was being
+     overwritten with a null-terminating character (\0) if the file did not
+     end in a newline (\n)
+  - General house cleaning in drawing routines and data validation
+
+- Modified [Shortcut2 / NeXTer / 05-20-00]
+  - !ShortcutGroupOnTopToggle now works... I had forgotten to add the actual code
+
+- Fixed [hook / Message / 05-19-00]
+  - Moved hInst into shared memory section
+  - Does not return HSHELL_WINDOWCREATED/DESTROYED for cmd.exe under w2k
+     (may have something to do with threading)
+  - Skip catching HSHELL_TASKMAN, HSHELL_LANGUAGE, HSHELL_ACTIVATESHELLWINDOW
+     they were causing lockups in win9x
+
+- Added [Lstime2 / Message / 05-19-00]
+  - Rewrote lstime to d2 format using cpp and lswinbase
+  - General cleaning (its finally working now)
+  - Added NTP to lstime2, right click on the clock for the menu
+  - First write of the ntpclient class (setup dialog doesnt display, but Ntp syncronization works)
+
+- Modified [hook, hookmgr, litestep / Message / 05-18-00]
+  - Removed the following libs from being linked (thet weren't needed):
+    uuid.lib odbc32.lib odbccp32.lib gdi32.lib winspool.lib comdlg32.lib
+    ole32.lib oleaut32.lib advapi32.lib
+  - Removed headers files that were not needed
+  - Revised shell message handling, the shell messages are now sent only to
+    litestep to be handled by msgmgr and not hookmgr
+  - Removed InstallShellFilter, shell hook is now install automatically
+  - GetMsgProc no longer uses WM_COPYDATA, instead the LM_SHELLMESSAGE is sent
+    to hookmgr with:
+    wParam: Specifies whether the message has been removed from the queue
+    lParam: Pointer to an MSG structure that contains details about the message
+  - Removed litestep call to hookmgr for shell messages
+  - Rewrote hookmgr to handle only WM messages and to d2 format
+
+- Modified [Shortcut2 / NeXTer / 05-17-00]
+  Shortcut2:
+  - Added the command !ShortcutGroupOnTopToggle.
+
+- Added [install2 / Message / 05-15-00]
+  - Added install2 which is the ls24.5 installer by jugg
+
+- Modified [lsapi, hookmgr / Headius / 05-15-00]
+  - Updated GetRCXXX functions to use the variable cache
+  - Fixed problem with variable cache not flushing during recycles
+  - Removed the handling of a couple shell messages to prevent Task Manager lockup problems
+
+- Modified [Shortcut2, LSAPI / NeXTer / 05-13-00]
+  Shortcut2:
+  - If a shortcut is started as hidden, the resources for it aren't created
+    until it is shown, substantially decreasing the time to load LS if there
+    are many hidden shortcuts.
+  LSAPI:
+  - Tweaked the parsers a little
+
+- Modified [lsapi / Headius / 05-12-00]
+  - changed RCBuffer, ThemeBuffer, and PicBuffer to use a vector internally
+
+- Modified [Shortcut2, SysVWM / NeXTer / 04-27-00]
+  Shortcut2:
+  - You now have to preceed any creation flags with '#', otherwise it'll be
+    assumed that it's the command.
+  SysVWM:
+  - Now uses the default LoadLSImage() function to load the images, so
+    specifying a path to it shouldn't cause any problems.
+
+- Modified [Shortcut2, LSAPI / NeXTer / 04-26-00]
+  Shortcut2:
+  - After som thorough testing by rootrider, it should now be pretty stable.
+    Currently supported bang commands are !ShortcutGroupToggle,
+    !ShortcutGroupShow, !ShortcutGroupHide, !ShortcutGroupOnTop &
+    !ShortcutGroupOnBottom, followed by one or more group numbers, or * to
+    perform the operation on all groups.
+  LSAPI:
+  - Now clears all evars on recycle.
+
+- Added [Shortcut2 / NeXTer / 04-25-00]
+  - Complete rewrite from scratch, 2nd edition. The first edition
+    accidentally got overwritten when I had finished it...
+
+- Modified [LSAPI, / MrJukes / 04-25-00]
+  - Replaced the BitmapToRegion() function with a streamlined version.
+
+- Modified [General, LSAPI / NeXTer / 04-23-00]
+  General:
+  - Added BCB project files for all the individual DLLs.
+  - Altered the core modules to use the safer prototypes for bang commands.
+  LSAPI:
+  - GetToken() is now an API function, but since the syntax might still change
+    I don't recommend it's use just yet, unless you like living on the edge.
+  - AddBangCommand() and AddBangCommandEx() will now only accept functions with
+    the currect format. For ABC this is
+    void BangProc(HWND sender, LPCSTR args) and for ABCE
+    void BangProcEx(HWND sender, LPCSTR args, LPCSTR command).
+    Please note that this does not in any way affect existing modules, it's
+    strictly a source code issue.
+
+- Modified [LSAPI, LSWinBase, Desktop2 / NeXTer / 04-21-00]
+  LSAPI:
+  - Fixed UniversalTokenize(): didn't clear the passed strings like it should.
+  LSWinBase:
+  - Added Window::handle(): returns the window handle for use outside the class.
+  Desktop2:
+  - The bang commands now use the recommended format of !ModuleNameFunctionName.
+    Third party module creators should preferably adopt the same style to
+    provide consistency
+
+- Modified [LSWinBase, Desktop2, Hotkey / NeXTer / 04-20-00]
+  LSWinBase:
+  - Most of said bumps have been smoothed out. Some were actually more or less
+    fatal, but that should be fixed.
+  Desktop2:
+  - Some minor fixes
+  Hotkey:
+  - Now uses the LSWinBase library
+
+- Added [LSWinBase, Desktop2 / NeXTer / 04-19-00]
+  LSWinBase:
+  - First revision, it's working nicely, and I don't think we want any more
+    features built in, perhaps smooth out a few bumps, but nothing major.
+  Desktop2:
+  - Now uses Window (in lswinbase) as base class, should simplify the process
+    of writing C++ based modules somewhat
+
+- Modified [ShortCut / NeXTer / 04-19-00]
+  - Commenced conversion to C++ style, lots of work remains, but it's a start.
+
+- Modified [LSAPI / NeXTer / 04-19-00]
+  - The parsing system is rewritten from scratch.
+  - Merged LCTokenize() and CommandTokenize() into a single function, both
+    remain for compatibility reasons.
+
+- Modified [LSAPI / NeXTer / 04-18-00]
+  - Added LS_GWL_CLASSPOINTER to lsapi.h to simplify the creation of classbased
+    modules. More along these lines are to be expected in the future.
+  - Rewrote CommandParse() from scratch. CommandTokenize() will follow shortly.
+
+- Modified [HotKey / Message / 04-18-00]
+  - Module rewritten based on the framework in Desktop2.
+
+
+== Build: 2000-04-17 ==========================================================
+
+- Fixed [LSAPI / NeXTer / 04-17-00]
+  - ParseBangCommand() didn't parse the information correctly if NULL was being passed
+    as the argument for the bang command.
+  - Also fixed a memory leak in the same function, for good measure.
+
+- Modified [Desktop2 / NeXTer / 04-17-00]
+  - The code is now almost crystal clear, if we can apply this structure
+    to the other modules, much will have been acheived.
+
+- Modified [LSAPI, Desktop2 / NeXTer / 04-17-00]
+  LSAPI:
+  - Merged new code for merging images in LoadLSImage(). Thank's to
+    Gustav Munkby (grd) for the new code.
+  - Removed some old junk.
+  - Added the struct Message for passing messages from the WndProc to the
+    actual message handlers.
+  Desktop2:
+  - Began a slight revision, to make this piece of code adhere to a "standard style"
+    that can be used in the future.
+
+- Fixed [Wharf / NeXTer / 04-16-00]
+  - Fixed a bug where the wharf wouldn't hide properly when the following
+    settings where used:
+      AutoHideWharf
+      WharfCloseOnSwitch
+      ;WharfNoAnim  (swithed off)
+    (Courtesy of Sergey Popov)
+    Still some work to do though.
+  - The message handling was radically overhauled to prepare the code for
+    a convertion to proper C++ style.
+
+- Modified [ Desktop2 / Message / 4-16-00]
+  - Changed the desktop clicks to use LSExecute instead of ParseBangCommand
+      This results in desktop2 not needing to parse the string before calling
+      LSExecute, removed some unneeded variables and functions
+      Can now do something like DesktopLeftClick cmd.exe to cause the left click
+      to open a command window in WinNT etc
+  - Fixed LM_GETREVID not being registered
+
+- Fixed [ Lsapi / Message / 4-16-00]
+  - Fixed popups displaying in upper left hand corner in certain cases
+
+
+== Build: 2000-04-16 ==========================================================
+
+- Modified [LSAPI / NeXTer / 04-16-00]
+  - Added the distinction between desktop and desktopdir in the above list.
+
+- Modified [LSAPI / NeXTer / 04-15-00]
+  - Reworked setupVars() to be more efficient, and added more predefined variables
+  - The following variables are available (several of them might be inaccessible
+    on your system, depending on your setup):
+      litestepdir, admintools, bitbucket, commondesktopdir, commondocuments,
+      commonfavorites, commonprograms, commonstartmenu, commonstartup, controls,
+      cookies, desktop, desktopdir, dialup, documents, drives, favorites, fonts,
+      history, internet, internetcache, nethood, network, networkanddialup,
+      printers, printhood, programs, recent, scheduled, sendto, startmenu,
+      startup, templates.
+
+- Fixed [ Lsapi / Message / 4-14-00 ]
+  - Fixed a variable redefinition error in GetRCString
+  - Uncommented _LMBANGCOMMANDA in lsapi.h, this was used in litestep.cpp for
+    the purpose of allowing non-litestep modules to run litestep bang commands
+
+- Modified [LSAPI / NeXTer / 04-14-00]
+  - Added a function to strip all comments, leading and trailing whitespace from
+    lines read with LCReadNextLine().
+  - Made some slight changes to GetRCString() to make it more "politically correct".
+
+- Fixed [Desktop2 / Message / 04-14-00]
+  - Made right click default to !popup
+
+- Modified [LSAPI / NeXTer / 04-14-00]
+  - Some general cleaning, some code commented out until we know nothing uses it.
+  - Desktop now properly resets the desktop area on resolution changes.
+
+- Fixed [Lsapi / Message / 04-14-00]
+  - Wasn't allowing modules to redefine bangs (e.g. sysvwm & lsvwm redefined !vwmleft..etc)
+
+- Modified, Added [Desktop2 / Message / 04-13-00]
+  -Reimplemented desktop clicks to use a function for setting their variables
+    (Thanks MrJukes and Dem0sh for your help)
+  -Added three new bang commands:
+    !SetDesktopLeftClick
+    !SetDesktopRightClick
+    !SetDesktopMiddleClick
+    These allow you to change what the mouse clicks do on the fly
+    e.g. !SetDesktopLeftClick !popup x=0 y=0
+  -Remove autorun functionality (was our understanding that this was flakey
+    and that a 3rd party module is available that better provides this
+    functionality, may be reimplemented in the future, but I see no reason
+    for it to be a desktop function)
+  -Did some more house cleaning (i.e. removed unused variables, added proper
+    headers, proper format)
+
+- Modified [Lsapi, Litestep / Message / 04-13-00]
+  -Bang commands now stored in a stl map structure
+  -Rewrote AddBangCommand, AddBangCommandEx, ParseBangCommand, RemoveBangCommand
+    If use multiple bangs in a command like this !vwmleft !about, you will now need
+    to use the proper method !execute [!vwmleft][!about]
+  -Change BangAbout to use the new map when displaying bang commands
+  -Added setupBangs called in litestep startup to register lsapi bangs
+  -Fixed GetRCString on returning the full line in the step if it was all qouted
+    now                   SetDesktopLeftClick !popup x=0 y=0
+    will work the same as SetDesktopLeftClick "!popup x=0 y=0"
+  -Added setupBangs() to litestep startup routine
+
+- Changed [LSAPI / NeXTer / 04-13-00 ]
+  - Rewrote LCTokenize() from scratch, now less than half the size of the original,
+    and not obfuscated at all!
+
+- Changed [Wharf / NeXTer / 04-12-00 ]
+  - The wharf now correctly updates its position on resolution changes.
+
+- Fixed [LSAPI / NeXTer / 04-11-00 ]
+  - Fixed LSReadNextConfig() not recognizing tab characters.
+  - Fixed a memory leak in LSExecuteEx().
+
+- Fixed [Desktop2 Workspace / Message (per CoreFile) / 4-09-00 ]
+  - Removed desktop2 linking to lsutil.lib
+
+
+== Build: 2000-04-08 ==========================================================
+
+- Modified/Fixed [MsgMgr / Message / 04-08-00]
+  -Added GetRevID method for handling !about (NOTE: this method is likely to
+    disappears when a method is implemented to return a list of hwnds for
+    a given message
+
+- Modified/Fixed [Popup / Message / 04-08-00]
+  -Fixed LM_POPUP not using the coordinates passed to it via wParam and
+    lParam
+
+- Modified/Fixed [LiteStep / Message / 04-08-00]
+  -Reimplemented !about, !about detailed via void GetRevId(WPARAM wParam, LPARAM lParam)
+    (NOTE: Uses msgmgr, implementation to change when msgmgr returns list of hwnd for given
+    message)
+
+- Modified/Fixed/Added [Popup / Message / 04-08-00]
+  -Added VarExpansion to ParseBangCommand (now when a third party module, i.e.
+    lsxcommand, sends a bang command to be parsed, variables will be expanded.
+    e.g. previously you had to do !unloadmodule c:\litestep\modules\systray.dll,
+    now you should be able to do !unloadmodule %moduledir%systray.dll, or
+    something similiar)
+  -Reimplemented !about, !about detailed
+  -Added !about bangs, will display all registered bang commands
+  -Changed About dialog to use a listbox instead of a textbox (modules will be
+    unaffected by this change)
+  -Changed !popup to take coordinates to display the popup (e.g. !popup x=0 y=0)
+
+- Modified [Desktop2 / Message, noodge / 04-06-00]
+  -Added the following step.rc settings:
+    DesktopLeftClick <command>
+    DesktopMiddleClick <command>
+    DesktopRightClick <command>
+    Causes click on desktop to execute the resepective command
+
+- Modified [DllMgr, Wharf / NeXTer / 04-06-00]
+  - Added direct support for modules compiled with Borland compilers
+    (leading underscore)
+  - Wharf now notices changes in screen resolution.
+
+- Fixed [Desktop, Popup / Message / 04-05-00]
+  - Removed some unused variables (ok, well really just commented them out until
+  this build is throughly tested)
+  - Did some more work on setting the desktop area, hopefully this is fixed now
+  - Fixed the implementation of list::reallocate, was crashing when using
+  opendynamic and showtasks
+
+
+== Build: 2000-03-31 ==========================================================
+
+- Modified [litestep / NeXTer / 03-31-2000]
+  - Changed the "blah" errors to tell what went wrong, easier to debug that way...
+
+
+== Build: 2000-03-30 ==========================================================
+
+- Fixed [desktop2/noodge/03-30-2000]
+  - Put the correct version of desktop2 in the builds. This should fix all the
+    popup problems people were having
+
+- Fixed [popup / NeXTer / 03-30-2000]
+  - Fixed an indexing problem in the hittest, to allow access to the last entry.
+
+
+== Build: 2000-03-28 ==========================================================
+
+- Fixed? [litestep, dllmgr / Headius / 3-27-2000]
+  - Added exception handling to main executable to punt exceptions during execution. Modules may act screwy because we're swallowing exceptions they are causing, but litestep shouldn't crash.
+  - Improved exception handling in DLLModuleManager to unload modules that except during initialization and to ignore exceptions while quitting modules.
+
+- Fixed [popup / NeXTer / 03-17-2000]
+  - Made the folder arrow static, so that it doesn't resize with the entries
+  - Added the removal (whatever) of the extension for .url files
+  - Removed the initModule() function, since it's obsolete
+  - Made necessary changes to allow compilation under Borland C++Builder
+  - Minor cosmetic changes to the code (more comming!)
+
+- Fixed [taskbar / Maduin / 03-15-2000]
+  - Taskbar retracts its always-on-top status when an application goes full screen
+  - Optimized update routines, should reduce CPU usage slightly
+
+
+== Build: 2000-03-13 ==========================================================
+
+- Modified [lsapi, workspace, popup / Message / 03-12-2000]
+  - Fixed lsapi crashing with an undeclared variable (envvar was being set to NULL, and then was being
+     added to the map)
+  - Removed lsutil from the desktop2 dependencies (per noodge)
+  - Added MessageBox warning if lsapi finds an unitialized variable, will tell the variable, and the line
+  - Fixed !popupdynamicfolder not displaying folders more than 3 levels deep
+  - Fixed !popupdynamicfolder using the combined paths when executing
+
+- Modified [desktop2 / Message / 03-09-2000]
+  - Removed use of LSSettings in desktop2, it was only using 7 variables from there, moved them to desktop.h
+     this resulted in a 4k decrease in dll size, and SetDesktopArea seems to function correctly.
+
+
+== Build: 2000-03-06 ==========================================================
+
+- Modified [lsapi / Message / 03-05-2000]
+  - Added $LiteStepDir$ which is the path to litestep. No longer need to define this in step.rc
+
+- Fixed [lsapi / Message, NeXTer / 03-04-2000]
+  - Moved stl code from lsapi.h to lsapi.cpp, otherwise it would conflict with c code
+  - convert all variable names to lower case before adding them to the variable cache
+  - Added deine to make the compile compatiable with version 4.0 system dll's, default was version 5.0
+     and caused problems with win95/NT
+
+
+== Build: 2000-03-03 ==========================================================
+
+- Modified [popup / Message / 03-02-2000]
+  - !PopupDynamicFolder can now merge folders together, | seperates paths
+    Ex *Popup 	"Programs2" 	"!PopupDynamicFolder:$StartMenu$|$CommonStartMenu$"
+
+- New code [lsapi / Message / 03-02-00]
+  - Added caching to step.rc variables (i.e. $LiteStepDir$)
+  - Added pre-defined variables, these variables are set by litestep
+    $StartMenu$       - returns the path to the start menu
+    $Programs$        - returns the path to the programs menu in the start menu
+    $CommonStartMenu$ - returns the path to the common start menu in Nt/2k
+    $CommonPrograms$  - returns the path to the common programs menu in the start menu in NT/2k
+    $Desktop$         - returns the path to the desktop folder
+    $Recent$          - returns the path to the recent folder
+    $Favorites$       - returns the path to the favorites folder
+    $Documents$       - returns the path to the document folder
+
+- Modified [taskbar / Maduin / 03-01-2000]
+  - Taskbar can now be docked to top or bottom screen edge
+  - Added command 'TaskbarEdge <edge>' where <edge> can be 'top' or 'bottom' (default)
+  - Fixed some minor autohide bugs
+  - Desktop area is now restored (if it was changed) when taskbar.dll is unloaded
+
+- Modified [taskbar / Maduin / 02-29-2000]
+  - Added tooltips to taskbar buttons
+  - Added transparency support for taskbar button skins
+
+
+== Build: 2000-02-28 ==========================================================
+
+- Fixed [desktop2, shortcut / Headius / 02-28-2000]
+  - SetDesktopArea was not being called
+  - Sounds were being terminated before a new one was played
+
+- Fixed [hook / Maduin / 02-28-2000]
+  - Shell hook notifications weren't being sent
+
+- Fixed [litestep / Maduin / 02-27-2000]
+  - Fixed bug in DataStore which caused sysvwm to crash LS after a couple recycles
+
+- Fixed [taskbar / Maduin / 02-27-2000]
+  - Restoring a previously maximized task did not re-maximize it
+  - Restoring a task caused the VWM to move to desktop 1
+  - Right-click context menu items were not properly enabled
+
+- Created [taskbar / Maduin / 02-25-2000]
+  - The taskbar module is designed to replace the functionality of desktop's taskbar
+  - All existing step.rc commands are supported
+  - Start button and tray are not implemented yet, everything else should be
+
+
+== Build: 2000-02-24 ==========================================================
+
+- Modification, bugfixes [winlist, msgmgr, core, hookmgr / Headius / 2-24-2000]
+  - Modified the IWindowList interface to explicitly use long values, updated clients appropriately
+  - Reimplemented StandardWindowList (winlist.dll) to use STL instead of static array
+  - Fixed the crashing bug in StandardMessageManager
+  - Fixed another recycling bug in hookmgr
+
+- New code, bug fixes [litestep, core, dllmgr, msgmgr, winlist, wharf, popup, lsapi / Headius / 2-23-2000]
+  - MessageManager moved into its own component, exposing IMessageManager interface
+  - Litestep modified to use the new IMessageManager component
+  - DataStore interface created
+  - Bug fixes to experimental popup2 code
+
+- Bugfixes, improved code [litestep, lsapi, dllmgr / Headius / 2-22-2000]
+  - Fixed the recycle crash bug
+  - Modified the core startup/recycle/stop sequence to be more efficient and reliable
+  - Minor cleanup in dllmgr
+  - Initial look at componentizing remaining services
+
+
+== Build: 2000-02-18 ==========================================================
+
+- Clean [lsapi / Message / 02-18-2000]
+  - Removed the EasterEgg Bang declaration =P
+
+- Fixed [litestep / Maduin / 02-17-2000]
+  - Reimplemented !reloadModule and !unloadModule
+
+- New code [desktop2 / Headius / 2-11-00]
+  - New desktop2 module to replace the base desktop window from desktop.dll. Equivalent to desktop.dll with no taskbar or tray.
+
+
+== Build: 2000-01-31 ==========================================================
+
+- Bugfixes, new code [litestep, winlist, core, popup, desktop, wharf / Headius / 1-29-00]
+  - Re-implemented Window List as a COM object (vtbl only; dispatch is forthcoming)
+  - Modified popup, wharf, desktop, litestep to use new IWindowList interface
+  - Modified litestep to load IWindowList instance from dll
+  - Re-fixed popup bug, thanks to Fahim for finding the original problem
+  - Re-implemented DLL Module Manager as a COM object (vtbl only; dispatch is forthcoming)
+  - Modified litestep to use the new IModuleManager interface
+  - Created new projects: core, winlist, dllmgr
+    - Core contains the interface definitions for the core services
+	- winlist contains the standard implementation of the IWindowList interface
+	- dllmgr contains the dll implementation of the IModuleManager interface
+  - Threading temporarily removed from module loading
+
+- Bugfixes [popup / Headius / 1-22-00]
+  - Transparency bug in popups under NT/W2k has been solved with a workaround.
+  - Known memory leaks in popups have been eliminated.
+
+
+== Build: 2000-01-21 ==========================================================
+
+- Bugfixes, code rewrite, new code [litestep, desktop, hookmgr / Headius, Message, NeXTer]
+  - Removed all hook-related code from desktop. Desktop is now no longer an integral part of core (internal) functionality.
+  - New HookManager code integrated into the system allows modules to register for system messages as well as shell messages.
+  - Core updated to use HookManager for hooks. Module hookmgr is loaded internally by the system, and runs in its own thread. DO NOT add hookmgr.dll to your step.rc
+  - Updated lsapi to use WindowList instead of winList. No core modules have dependency on the winList array or on the LM_WINLIST message anymore. It is still provided for backward compatibility, BUT WILL BE REMOVED. We will publish the preferred replacement soon.
+  - Updated lsapi to be .cpp, changes are as follows:
+    - There are two supported BangCommand prototypes currently, "void BangCommand(HWND hwnd, char* args)" and "void BangCommand(HWND hwnd, char* command, char* args)". Var-len param list version is deprecated and is not likely to work anymore. We would like people to move to the 3 param version.
+    - Minor typecasting fixes
+  - Minor rework of core module loading sequences, some exploration into exposing service interfaces to modules.
+  - Fixes to make old trayicons go away when the app is dead. Tray still seems to be broken, likely to be tossed and rewritten.
+  - Fixes to prevent error messages about AppBtnClass
+  - Removed the easter egg bang
+  - Modified DLLModuleManager.LoadModule to allow passing parameters to start a module in its own thread, with its own message pump
+  - Other stuff I'm forgetting.
+
+
+== Build: 2000-01-20 ==========================================================
+
+- Bugfixes [litestep, desktop / Headius]
+  - Fixed problems with desktop.dll reporting "Could not register window" for a couple window classes.
+  - Added error message to module loader to help identify problems in the future. ***NOTE*** initModule() will not be called in modules anymore. Use initModuleEx().
+  - Discovered the cause of the transparent popups, but no fix yet.
+
+
+== Build: 2000-01-18 ==========================================================
+
+- Bugfixes [litestep, popup, wharf / Headius]
+  - Fixes in DLLModuleManager to prevent modules that do not load from causing crash on shutdown
+  - Fixes in MessageManager to prevent the possibility of empty entries in the map that might have been causing crashes
+  - Fixes in popup to use the new WindowList, fixes work but not quite thread-safe yet
+  - Fixes in wharf to use the new WindowList, fixes work but not quite thread-safe yet
+  - Wharf.c file updated to be .cpp, minor type casting fixes
+
+
+== Build: ????-??-?? ==========================================================
+
+- Bugfixes/Code Rewrite [litestep, desktop / Headius]
+  - Initial work to encapsulate window list. WindowList is now an interface to the list of windows, for apps that do not want to maintain a list themselves. Currently still uses the old winList array internally.
+  - Incorporated WindowList into litestep.cpp. Legacy apps that require access to the winList array still will work, but this is temporary..apps must move away from this method.
+  - Rewrite of desktop to remove window list logic. WindowList will maintain a litestep-wide list on its own now. Desktop is just another client of that list.
+  - Rewrite of desktop to use a map of LSTaskButtons rather than a giant array. Memory will be saved by doing this, but STL might take that memory over.
+  - Rewrite of LSTaskButton to control its own destiny. It now handles its own repainting, window activation, and other logic.
+  - Task buttons will not show tooltips for now. I need to rework how this is done.
+  - Desktop will be phased out in favor of new UI modules that aren't so badly written. Bugfixes will continue to be made to keep desktop around for those that need it.
+  - Initial look at loading functionality as COM objects. Interfaces are starting to solidify, the next steps will be simple ones.
+  - Investigation of scripting support. Scripting support will be trivial to add once core objects have been COMified.
+
+
+== Build: 2000-01-16 ==========================================================
+
+- Bugfixes [desktop, litestep / Headius]
+  - Fix for bug: desktop window showing up in sysvwm. The magic dword was only being set if there was an appbar. Moved it to always be set.
+  - Fix for bug: tray icons not showing up without taskbar. The icons now will show up as they did before, on the desktop according to settings.
+  - Fix for bug: data store was being accessed after having been deleted. Data store is now deleted only after we are finished with it.
+
+
+== Build: 2000-01-15 ==========================================================
+
+- BugFix/Code Rewrite [litestep.cpp / Headius]
+  - The data storage code in litestep.cpp was moved to a seperate class. You
+    can have LS store data (generally for during a recycle) by sending
+    LM_SAVEDATA with the high word of WPARAM set to the ID of the data, the low
+    word set to the size, and LPARAM a pointer to the data.
+  - The data can be retrieved by sending the same information in an
+    LM_RESTOREDATA message, with an empty buffer. This will also remove it from
+    the data store.
+
+
+== Build: 2000-01-13 ==========================================================
+
+- Update of changes since November 99 [desktop, litestep / Headius]
+  - Desktop has been rewritten in C++. Portions of functionality have been split into seperate classes as much as possible. It is unlikely any class will be removable from the dll, the code is too cohesive.
+    - A fix was made to desktop to repair problems with painting and taskbar size
+  - Various utility classes have been created in the lsutil project for the desktop port to C++
+  - Tray icon management (internal) has been split off into tray.dll
+  - Litestep has had portions rewritten in C++ to better manage memory and abstract away various functional interfaces
+    - DLL module management has been split off and ported
+    - Message management and distribution has been split off and ported
+    - The running of startup programs has been split off into a static class
+
+
+== (Earlier builds not tracked) ===============================================
+
+- BugFix [VS_6 workspace / Message]:
+  - Added lsutil to the dependencies for desktop, was getting a linker error otherwise
+  - Converted sources back to dos format, somehow had become saved in UNIX format.
+
+- Feature Addition [sysvwm/vwm.c / Maduin]:
+  - Can now execute commands on VWM switch:
+    VWMOnSwitchToN <commands>, where N is desktop number
+
+- BugFix [hotkey/hotkey.c / jugg]:
+  - Fixed crash bug when pressing WIN key by itself.
+
+- BugFix [VS_6 workspace / jugg]:
+  - lsapi project command line had two conflicting compile options.
+
+- Changes [lsapi/lsapi.c, litestep/litestep.c / jugg]:
+  - Made the color format RGB default. Thus removing the ColorRGB command.
+    However, added the command LSColorBGR for those who still want it reversed.
+  - Changed all core commands to start with "LS" so now you have "LSNoShellWarning"
+    replacing "ExplorerNoWarn", "LSSetAsShell" replacing "SetAsShell",
+    "LSImageFolder" replacing "PixmapPath".
+  - updated all modules to reflect these changes (wharf/lsvwm/sysvwm/shortcut/desktop)
+
+- Feature Addition/Change [hotkey/hotkey.c / jugg]:
+  - disabled dynamic hotkey loading of explorer start menu hotkeys by default.
+    To turn them on use "HotkeyLoadExplorerKeys"
+  - Changed command "WinKeyNoPopup" to "HotkeyNoWinKeyPopup"
+
+- BugFix [lsapi/lsapi.c / visigoth]:
+  - Fixed jugg's fix to ParseBangCommand()
+    (NOTE: lsxcommand is fine - strlen doesn't check for null pointers)
+    (ADDENDUM: Well blow me down! How about that. - jugg)
+
+- BugFix / Change [lsapi/lsapi.c, litestep/litestep.c / jugg]:
+  - Fixed ParsebangCommand function, so it removes extra whitespace. (NOTE:
+    this seems to break lsxcommand when entering a !bang command that doesn't
+    pass an argument. Everything else works great.)
+  - Did a little clean up on litestep.c (removed code for that weird
+    HideApplication thing that never worked anyway and was useless)
+
+- Major['ish] Change [litestep/litestep.c / Ender]:
+  - Done some major restructuring and pruning of litestep.c, removing some
+    obsolete code and just generally making the code neater :)
+
+- Feature Addition / BugFix [lsapi/lsapi.c / visigoth]:
+  - Added CommandParse library function - parses a command and its arguments.
+  - LSExecute / CommandTokenize seem to be fixed now...
+  - LSExecuteEx now defaults to SW_SHOWNORMAL if passed 0 for final argument.
+
+- BugFix [changes.txt, desktop/desktop.c, hotkey/hotkey2.c / visigoth]:
+  - Fixed jugg's entry from BugFux to BugFix :P (changes.txt)
+  - Merged fix from Jay Kramer (jkramer@depcoinc.com) for minimize/maximize
+    problems.  Code now checks for system menu before doing so (desktop.c)
+  - Fixed compiler warning: LSExecute not declared (hotkey2.c)
+
+- BugFix [sysvwm\vwm.c / jugg]:
+  - Fixed erroneous refresh of sysvwm when using the autohide feature
+    without "VWMAutoHideFix" set.
+  - Fixed autohide bug, when the vwm was docked to two sides of the screen,
+    the vwm would appear when mouse was moved to either side.
+
+- BugFix [lsapi.c / jugg]:
+  - Fixed CommandTokenize function so that you no longer are forced to place
+    all commands completely in quotation marks or brackets.
+
+- Bugfix [litestep.c / Maduin]:
+  - Fixed the Loadmodule code so that the modules get passed the correct
+    Instance now. Thanks to MrJukes for spotting this.
+
+- Bugfix [shortcut.h / murphy]:
+   - Added char extra_group[10]; to struct shortcutType. Was made to
+     make shortcut.c compile.
+
+- Feature Addition [desktop.c / (e)]:
+   - Added code by Jay Kramer (jkramer@depcoinc.com)
+     min/max click update for start bar (new explorer functionality)
+
+- Feature Addition / Bugfix [vwm.c / (e)]:
+   - Added VWMAutohideFix. This makes the autohide VWM only appear
+     when the mouse hovers in the actual VWM area (as opposed to the
+     entire screen edge).
+
+- Feature Addition [Shortcut.c / Ender]:
+   - Semi-working Shortcut Multiple Mastergroups. Some strange behavior I
+     can't figure out, someone fix it :P
+     [Method: #3M{2,5}T  : Master for group's 3, 2 AND 5]
+
+== Older changes in oldchanges.txt ============================================

@@ -1,0 +1,662 @@
+/*
+
+This is a part of the LiteStep Shell Source code.
+
+Copyright (C) 1997-98 The LiteStep Development Team
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/ 
+/****************************************************************************
+****************************************************************************/
+#include "../utility/common.h"
+#include "../utility/macros.h"
+
+#include "lsapi.h"
+
+#include "../litestep/BangManager.h"
+#include "BangCommand.h"
+#include "SettingsManager.h"
+#include "bangs.h"
+#include "match.h"
+#define STRSAFE_NO_DEPRECATE
+#include "../utility/safestr.h" // Always include last in cpp file
+
+extern const char rcsRevision[];
+const char rcsRevision[] = "$Revision: 1.1 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.1 2002/09/23 02:43:27 message Exp $"; // The Full RCS ID.
+
+extern SettingsManager *gSettingsManager = NULL;
+
+HWND hLiteStep = NULL;
+
+int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
+
+class LSAPIInit
+{
+public:
+	LSAPIInit();
+	~LSAPIInit();
+
+	DWORD GetMainThreadID()
+	{
+		return m_dwMainThreadID;
+	}
+
+	BangManager* GetBangManager()
+	{
+		return m_bmBangManager;
+	}
+
+	HWND GetLiteStepWnd();
+	BOOL GetLiteStepPath(LPSTR pszPath, size_t cchPath);
+
+private:
+	DWORD m_dwMainThreadID;
+	BangManager* m_bmBangManager;
+
+	SAFE_CHAR_H(m_szLiteStepPath, MAX_PATH);
+	SAFE_CHAR_H(m_szLiteStepImagePath, MAX_PATH);
+
+	HWND m_hLiteStepWnd;
+
+};
+
+LSAPIInit::LSAPIInit()
+{
+	m_dwMainThreadID = GetCurrentThreadId();
+	m_bmBangManager = new BangManager;
+
+	m_szLiteStepPath[0] = '\0';
+	m_szLiteStepImagePath[0] = '\0';
+
+	m_hLiteStepWnd = NULL;
+}
+
+LSAPIInit::~LSAPIInit()
+{
+	if (m_bmBangManager)
+	{
+		delete m_bmBangManager;
+	}
+}
+
+HWND LSAPIInit::GetLiteStepWnd()
+{
+	if (!m_hLiteStepWnd)
+	{
+		m_hLiteStepWnd = FindWindow("TApplication", "LiteStep");
+	}
+	return m_hLiteStepWnd;
+}
+
+BOOL LSAPIInit::GetLiteStepPath(LPSTR pszPath, size_t cchPath)
+{
+	BOOL bReturn = FALSE;
+
+	if (IsValidStringPtr(pszPath, cchPath))
+	{
+		if (!m_szLiteStepPath[0])
+		{
+			if (GetRCString("litestepdir", m_szLiteStepPath, NULL, MAX_PATH))
+			{
+				bReturn = TRUE;
+			}
+			else
+			{
+				HINSTANCE hInstance = NULL;
+				int nLen = 0;
+
+				hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
+				if (hInstance)
+				{
+					if (GetModuleFileName(hInstance, m_szLiteStepPath, MAX_PATH))
+					{
+						PathRemoveFileSpec(m_szLiteStepPath);
+						PathAddBackslash(m_szLiteStepPath);
+						bReturn = TRUE;
+					}
+				}
+			}
+
+		}
+		else
+		{
+			bReturn = TRUE;
+		}
+		if (bReturn)
+		{
+			StringCchCopy(pszPath, cchPath, m_szLiteStepPath);
+		}
+
+	}
+
+	return bReturn;
+}
+
+static LSAPIInit LSAPIManager;
+
+
+BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath)
+{
+	//StringCchCopy(szAppPath, MAX_PATH, pszLiteStepPath);
+	//StringCchCopy(szRcPath, MAX_PATH, pszRCPath);
+	BOOL bReturn = FALSE;
+
+	if (gSettingsManager == NULL)
+	{
+		gSettingsManager = new SettingsManager(pszLiteStepPath);
+
+		if (IsValidReadPtr(gSettingsManager))
+		{
+			gSettingsManager->ParseFile(pszRCPath);
+			bReturn = TRUE;
+		}
+	}
+
+	return bReturn;
+}
+
+
+void DeleteSettingsManager(void)
+{
+	if (gSettingsManager)
+	{
+		delete gSettingsManager;
+		gSettingsManager = NULL;
+	}
+}
+
+
+//
+// AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
+//
+BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
+{
+	BOOL bReturn = FALSE;
+
+	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
+	{
+		DWORD dwCurrentThreadID = GetCurrentThreadId();
+
+		Bang *bBang = new Bang(dwCurrentThreadID, pfnBangCommand);
+		if (IsValidReadPtr(bBang))
+		{
+			//bBang->AddRef();
+			LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, bBang);
+			bBang->Release();
+			bReturn = TRUE;
+		}
+	}
+
+	return bReturn;
+}
+
+
+//
+// AddBangCommandEx(LPCSTR pszCommand, BangCommand pfnBangCommand)
+//
+BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
+{
+	BOOL bReturn = FALSE;
+
+	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
+	{
+		DWORD dwCurrentThreadID = GetCurrentThreadId();
+
+		Bang *bBang = new Bang(dwCurrentThreadID, pfnBangCommand, pszCommand);
+		if (IsValidReadPtr(bBang))
+		{
+			//bBang->AddRef();
+			LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, bBang);
+			bBang->Release();
+			bReturn = TRUE;
+		}
+	}
+
+	return bReturn;
+}
+
+
+//
+// RemoveBangCommand(LPCSTR pszCommand)
+//
+BOOL RemoveBangCommand(LPCSTR pszCommand)
+{
+	return LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+}
+
+
+//
+// ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
+//
+BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
+{
+	SAFE_CHAR(szExpandedArgs, MAX_LINE_LENGTH);
+	BOOL bReturn = FALSE;
+
+	if (IsValidStringPtr(pszCommand))
+	{
+		if (IsValidStringPtr(pszArgs))
+		{
+			VarExpansionEx(szExpandedArgs, pszArgs, MAX_LINE_LENGTH);
+		}
+
+		bReturn = LSAPIManager.GetBangManager()->ExecuteBangCommand(pszCommand, hCaller, szExpandedArgs);
+	}
+
+	return bReturn;
+}
+
+
+//
+// CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs)
+//
+void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs)
+{
+	SAFE_CHAR(szCommand, MAX_LINE_LENGTH)
+	SAFE_CHAR(szTempCommand, MAX_LINE_LENGTH)
+	LPCSTR pszTempArgs = NULL;
+
+	if (IsValidStringPtr(pszCommand))
+	{
+		if (IsValidStringPtr(pszOutCommand, cchOutCommand))
+		{
+			VarExpansionEx(szCommand, pszCommand, MAX_LINE_LENGTH);
+
+			GetToken(szCommand, szTempCommand, &pszTempArgs, true);
+
+			StringCchCopy(pszOutCommand, cchOutCommand, szTempCommand);
+		}
+		if (IsValidStringPtr(pszOutArgs, cchOutArgs))
+		{
+			StringCchCopy(pszOutArgs, cchOutArgs, pszTempArgs);
+		}
+	}
+}
+
+
+//
+// LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCSTR pszArgs, LPCSTR pszDirectory, int nShowCmd)
+//
+HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCSTR pszArgs, LPCSTR pszDirectory, int nShowCmd)
+{
+	HINSTANCE hReturn = HINSTANCE(32);
+
+	if (IsValidStringPtr(pszCommand))
+	{
+		if (pszCommand[0] == '!')
+		{
+			hReturn = ParseBangCommand(hOwner, pszCommand, pszArgs) ? HINSTANCE(33) : HINSTANCE(32);
+		}
+		else
+		{
+			DWORD dwType = GetFileAttributes(pszCommand);
+			if ((dwType & FILE_ATTRIBUTE_DIRECTORY) && (dwType != 0xFFFFFFFF))
+			{
+				hReturn = ShellExecute(hOwner, pszOperation, pszCommand, pszArgs, NULL, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
+			}
+			else
+			{
+				SHELLEXECUTEINFO seiCommand;
+				memset(&seiCommand, 0, sizeof(seiCommand));
+
+				seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
+				seiCommand.hwnd = hOwner;
+				seiCommand.lpVerb = pszOperation;
+				seiCommand.lpFile = pszCommand;
+				seiCommand.lpParameters = pszArgs;
+				seiCommand.lpDirectory = pszDirectory;
+				seiCommand.nShow = nShowCmd;
+				seiCommand.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
+
+				ShellExecuteEx(&seiCommand);
+
+				hReturn = seiCommand.hInstApp;
+			}
+		}
+	}
+
+	return hReturn;
+}
+
+
+//
+// LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
+//
+HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
+{
+	SAFE_CHAR(szCommand, MAX_LINE_LENGTH);
+	SAFE_CHAR(szExpandedCommand, MAX_LINE_LENGTH);
+	LPCSTR pszArgs;
+	HINSTANCE hResult = HINSTANCE(32);
+
+	if (IsValidStringPtr(pszCommand))
+	{
+		VarExpansionEx(szExpandedCommand, pszCommand, MAX_LINE_LENGTH);
+
+		if (GetToken(szExpandedCommand, szCommand, &pszArgs, true))
+		{
+			if (pszArgs > (szExpandedCommand + lstrlen(szExpandedCommand)))
+			{
+				pszArgs = NULL;
+			}
+
+			if (szCommand[0] == '!')
+			{
+				hResult = LSExecuteEx(hOwner, NULL, szCommand, pszArgs, NULL, 0);
+			}
+			else
+			{
+				SAFE_CHAR(szDir, _MAX_DIR);
+				SAFE_CHAR(szFullDir, _MAX_DIR + _MAX_DRIVE);
+
+				_splitpath(szCommand, szFullDir, szDir, NULL, NULL);
+				StringCchCat(szFullDir, _MAX_DIR + _MAX_DRIVE, szDir);
+
+				hResult = LSExecuteEx(hOwner, "open", szCommand, pszArgs, szFullDir, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
+			}
+		}
+	}
+
+	return hResult;
+}
+
+//
+// SetDesktopArea(int left, int top, int right, int bottom)
+//
+void SetDesktopArea(int left, int top, int right, int bottom)
+{
+	RECT r = { left, top, right, bottom };
+
+	SystemParametersInfo(SPI_SETWORKAREA, 0, (PVOID) & r, SPIF_SENDCHANGE);
+	SystemParametersInfo(SPI_GETWORKAREA, 0, (PVOID) & r, SPIF_SENDCHANGE);
+}
+
+
+//
+//	GetLitestepWnd()
+//
+HWND GetLitestepWnd()
+{
+	return LSAPIManager.GetLiteStepWnd();
+}
+
+
+//
+// void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText)
+//
+void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText)
+{
+	if (IsValidStringPtr(pszText, cchText))
+	{
+		if (LoadString(hInstance, uIDText, pszText, cchText) == 0)
+		{
+			StringCchCopy(pszText, cchText, pszDefText);
+		}
+	}
+}
+
+
+//
+// GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
+//
+void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
+{
+	SAFE_CHAR(szFormat, MAX_LINE_LENGTH)
+	va_list vargs;
+
+	if (IsValidStringPtr(pszText, cchText))
+	{
+		GetResStr(hInstance, uIDText, szFormat, MAX_LINE_LENGTH, pszDefText);
+
+		va_start(vargs, pszDefText);
+		StringCchVPrintf(pszText, cchText, szFormat, vargs);
+		va_end(vargs);
+	}
+}
+
+
+//
+// LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
+//
+BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
+{
+	return LSAPIManager.GetLiteStepPath(pszPath, cchPath);
+}
+
+
+//
+// LSGetImagePath(LPSTR pszPath, size_t cchPath)
+//
+BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
+{
+	BOOL bReturn = FALSE;
+
+	if (IsValidStringPtr(pszPath, cchPath))
+	{
+		if (GetRCString("LSImageFolder", pszPath, NULL, cchPath))
+		{
+			PathAddBackslash(pszPath);
+			bReturn = TRUE;
+		}
+		else
+		{
+			if (LSAPIManager.GetLiteStepPath(pszPath, cchPath))
+			{
+				StringCchCat(pszPath, cchPath, "images\\");
+				bReturn = TRUE;
+			}
+		}
+	}
+
+	return bReturn;
+}
+
+
+int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets)
+{
+	SAFE_CHAR(szBuffer, MAX_LINE_LENGTH);
+	LPCSTR pszNextToken;
+	DWORD dwTokens = 0;
+
+	if (IsValidStringPtr(pszString))
+	{
+		pszNextToken = pszString;
+
+		if ((lpszBuffers != NULL) && (dwNumBuffers > 0))
+		{
+			for (dwTokens = 0; pszNextToken && (dwTokens < dwNumBuffers); dwTokens++)
+			{
+				GetToken(pszNextToken, szBuffer, &pszNextToken, bUseBrackets);
+
+				if (IsValidStringPtr(lpszBuffers[dwTokens]))
+				{
+					StringCchCopy(lpszBuffers[dwTokens], strlen(szBuffer) + 1, szBuffer);
+				}
+			}
+
+			for (DWORD dwClearTokens = dwTokens; dwClearTokens < dwNumBuffers; dwClearTokens++)
+			{
+				if (IsValidStringPtr(lpszBuffers[dwClearTokens]))
+				{
+					lpszBuffers[dwClearTokens][0] = '\0';
+				}
+			}
+
+			if (IsValidStringPtr(pszExtraParameters))
+			{
+				if (pszNextToken)
+				{
+					StringCchCopy(pszExtraParameters, strlen(pszNextToken) + 1, pszNextToken);
+				}
+				else
+				{
+					pszExtraParameters[0] = '\0';
+				}
+			}
+		}
+		else
+		{
+			while (GetToken(pszNextToken, NULL, &pszNextToken, bUseBrackets))
+			{
+				++dwTokens;
+			}
+		}
+	}
+
+	return dwTokens;
+}
+
+int LCTokenize (LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
+{
+	return _Tokenize(szString, lpszBuffers, dwNumBuffers, szExtraParameters, FALSE);
+}
+
+BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseBrackets)
+{
+	BOOL bReturn = FALSE;
+
+	LPCSTR pszCurrent = pszString;
+	LPCSTR pszStartMarker = NULL;
+	int iBracketLevel = 0;
+	CHAR cQoute = '\0';
+	bool bIsToken = false;
+	bool bAppendNextToken = false;
+
+	if (pszString != NULL)
+	{
+		if (pszToken)
+			pszToken[0] = '\0';
+		if (pszNextToken)
+			* pszNextToken = NULL;
+
+		pszCurrent += strspn(pszCurrent, WHITESPACE);
+
+		for (; *pszCurrent; pszCurrent++)
+		{
+			if (isspace(*pszCurrent) && !cQoute)
+				break;
+
+			if (bUseBrackets && strchr("[]", *pszCurrent) && (!strchr("\'\"", cQoute) || !cQoute))
+			{
+				if (*pszCurrent == '[')
+				{
+					if (bIsToken && !cQoute)
+						break;
+
+					iBracketLevel++;
+					cQoute = '[';
+					continue;
+				}
+				else
+				{
+					iBracketLevel--;
+					if (iBracketLevel <= 0)
+						break;
+				}
+			}
+
+			if (strchr("\'\"", *pszCurrent) && (cQoute != '['))
+			{
+				if (!cQoute)
+				{
+					if (bIsToken)
+					{
+						bAppendNextToken = true;
+						break;
+					}
+					cQoute = *pszCurrent;
+					continue;
+				}
+				else if (*pszCurrent == cQoute)
+				{
+					break;
+				}
+			}
+
+			if (!bIsToken)
+			{
+				bIsToken = true;
+				pszStartMarker = pszCurrent;
+			}
+		}
+
+		if (pszStartMarker && pszToken)
+		{
+			strncpy(pszToken, pszStartMarker, pszCurrent - pszStartMarker);
+			pszToken[pszCurrent - pszStartMarker] = '\0';
+		}
+
+
+		if (!bAppendNextToken && *pszCurrent)
+			pszCurrent++;
+
+		pszCurrent += strspn(pszCurrent, WHITESPACE);
+
+		if (*pszCurrent && pszNextToken)
+			* pszNextToken = pszCurrent;
+
+		if (bAppendNextToken && *pszCurrent)
+			GetToken(pszCurrent, pszToken + strlen(pszToken), pszNextToken, bUseBrackets);
+
+		return pszStartMarker != NULL;
+	}
+
+	return bReturn;
+}
+
+int CommandTokenize(LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
+{
+	return _Tokenize(szString, lpszBuffers, dwNumBuffers, szExtraParameters, TRUE);
+}
+
+
+//
+// VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
+//
+void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
+{
+	if (IsValidStringPtr(pszExpandedString) && IsValidStringPtr(pszTemplate))
+	{
+		SAFE_CHAR(szTempBuffer, MAX_LINE_LENGTH);
+
+		VarExpansionEx(szTempBuffer, pszTemplate, MAX_LINE_LENGTH);
+
+		StringCchCopy(pszExpandedString, strlen(szTempBuffer) + 1, szTempBuffer);
+	}
+}
+
+
+//
+// VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchLength)
+//
+// Taken in part from Raptor's rlib\rutil.cpp\UtilExpandString
+//
+void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString)
+{
+	if (IsValidStringPtr(pszExpandedString, cchExpandedString) &&
+	        IsValidStringPtr(pszTemplate))
+	{
+		if (gSettingsManager != NULL)
+		{
+			gSettingsManager->VarExpansionEx(pszExpandedString, pszTemplate, cchExpandedString);
+		}
+		else
+		{
+			StringCchCopy(pszExpandedString, cchExpandedString, pszTemplate);
+		}
+	}
+}
