@@ -53,7 +53,7 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
 		if (pInfo != NULL)
 		{
 			// target thread releases pInfo
-            PostThreadMessage(m_dwThreadID, LM_THREAD_BANGCOMMAND, (WPARAM)pInfo, NULL);
+            PostThreadMessage(m_dwThreadID, LM_THREAD_BANGCOMMAND, (WPARAM)pInfo, 0);
         }
     }
     else
