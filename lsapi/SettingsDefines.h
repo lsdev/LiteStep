@@ -10,7 +10,7 @@
 
 
 typedef std::multimap<std::string, std::string, stringicmp> SettingsMap;
-typedef std::map<std::string, SettingsMap::iterator> IteratorMap;
+typedef std::map<std::string, SettingsMap::iterator, stringicmp> IteratorMap;
 
 
 #endif // __SETTINGSDEFINES_H_
