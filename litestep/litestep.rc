@@ -70,9 +70,9 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen ?"
+    IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen?"
     IDS_LITESTEP_ERROR2     "Konnte die Datei ""%s"" nicht finden.\nBitte stellen Sie sicher, daß der Pfad korrekt ist und die Datei existiert."
-    IDS_LITESTEP_ERROR3     "Es läuftt gerade eine andere Benutzeroberfläche. Auch wenn Litesten b24\nes ihnen erlaubt parallel zum Windows Explorer zu laufen, empfehlen wir es nicht für unerfahrenen Benutzer\n und werden es nicht unterstützen. Sie tun es also auf eigene Gefahr\n\nWenn Sie fortfahren, werden einige der fortgeschrittenen Funktionen von Litestep,\nwie z.B. der Desktopm abgeschaltet. Das Dock, Tastenkombinationen, und Verknüpfungen werden funktionieren.\n\nUm diese Warnung für das nächste Mal abzuschalten, ergänzen Sie LSNoShellWarning in ihre step.rc .\n\nWeitermachen?"
+    IDS_LITESTEP_ERROR3     "Es läuftt gerade eine andere Benutzeroberfläche. Auch wenn Litesten b24\nes ihnen erlaubt, parallel zum Windows Explorer zu laufen, empfehlen wir es nicht für unerfahrene Benutzer\n und werden es nicht unterstützen. Sie tun es also auf eigene Gefahr.\n\nWenn Sie fortfahren, werden einige der fortgeschrittenen Funktionen von Litestep,\nwie z.B. der Desktop abgeschaltet. Das Dock, Tastenkombinationen, und Verknüpfungen werden funktionieren.\n\nUm diese Warnung für das nächste Mal abzuschalten, ergänzen Sie Ihre step.rc um die Zeile ""LSNoShellWarning"".\n\nWeitermachen?"
     IDS_LITESTEP_TITLE_WARNING "Warnung"
     IDS_LITESTEP_ERROR4     "Fehler beim registrieren der Litestep Hauptfensterklasse."
     IDS_LITESTEP_TITLE_ERROR "Fehler"
@@ -82,7 +82,7 @@ BEGIN
     IDS_LITESTEP_TITLE_FATAL_ERROR "Fataler Fehler."
     IDS_LITESTEP_RECYCLELS  "Litestep &recyclen"
     IDS_LITESTEP_QUITLS     "Litestep Be&enden"
-    IDS_LITESTEP_TERMINATELS "Litestep ab&brechen\n"
+    IDS_LITESTEP_TERMINATELS "Litestep ab&brechen"
     IDS_LITESTEP_RUN        "&Starte..."
     IDS_LITESTEP_SHUTDOWNWIN "Windows &Herunterfahren"
 END
@@ -279,6 +279,7 @@ BEGIN
     IDS_HOOKMGR_LOADHOOK_ERROR "Could not load hook.dll"
     IDS_LITESTEP_BANGEXCEPTION 
                             "Error: Exception during bang command execution.\nPlease contact the module writer.\n\nBang parameters: %s"
+    IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."
 END
 
 #endif    // English (U.S.) resources
