@@ -628,10 +628,10 @@ protected:
 		return ::GetLastActivePopup(hWnd);
 	}
 
-	BOOL IsChild(HWND hWnd) const
+	BOOL IsChild(HWND hChild) const
 	{
 		ASSERT(::IsWindow(hWnd));
-		return ::IsChild(hWnd, hWnd);
+		return ::IsChild(hWnd, hChild);
 	}
 
 	HWND GetParent() const
