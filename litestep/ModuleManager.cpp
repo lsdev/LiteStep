@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ModuleManager.h"
 #include "../utility/macros.h"
 #include <algorithm>
+#include <vector>
 #include "../utility/core.hpp"
 
 ModuleManager::ModuleManager()
@@ -89,14 +90,20 @@ HRESULT ModuleManager::rStop()
 
 UINT ModuleManager::_LoadModules()
 {
-	UINT uReturn = 0;
+	ASSERT(m_ModuleQueue.empty());
+
+    UINT uReturn = 0;
 	char szLine[MAX_LINE_LENGTH];
 	
     FILE* f = LCOpen(NULL);
 
 	if (f)
 	{
-		while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
+		// need to use a separate queue as modules may load other modules (e.g.
+        // mzscript via LoadModule) during the startup process
+        ModuleQueue mqModules;
+
+        while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
 		{
             // LCTokenize clears these buffers if necessary
             char szToken1[MAX_LINE_LENGTH];
@@ -125,13 +132,13 @@ UINT ModuleManager::_LoadModules()
 				Module* pModule = _MakeModule(szToken1, dwFlags);
 				if (pModule)
 				{
-					m_ModuleQueue.push_back(pModule);
+					mqModules.push_back(pModule);
 				}
 			}
 		}
 		LCClose (f);
 
-		uReturn = _StartModules(m_ModuleQueue);
+        uReturn = _StartModules(mqModules);
 	}
 
 	return uReturn;
@@ -149,11 +156,6 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 	{
 		ModuleQueue	mqModule(1, pModule);
         bReturn = (_StartModules(mqModule) == 1);
-
-        if (bReturn)
-        {
-            m_ModuleQueue.push_back(pModule);
-        }
 	}
 
 	return bReturn;
@@ -165,6 +167,7 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 	Module* pModule = NULL;
 
 	ModuleQueue::iterator it = _FindModule(pszLocation);
+
 	if (it == m_ModuleQueue.end())
 	{
 		try
@@ -173,11 +176,8 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 		}
 		catch (...)
 		{
-			if (pModule)
-			{
-				delete pModule;
-				pModule = NULL;
-			}
+            delete pModule;
+            pModule = NULL;
 		}
 	}
 
@@ -185,77 +185,47 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 }
 
 
-UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
+UINT ModuleManager::_StartModules(const ModuleQueue& mqModules)
 {
 	UINT uReturn = 0;
 
 	if (mqModules.size() > 0)
 	{
 		HWND hLiteStep = NULL;
-		CHAR szAppPath[MAX_PATH];
-		HRESULT hr;
-
-		hr = m_pILiteStep->get_Window((LONG*)&hLiteStep);
-		if (SUCCEEDED(hr))
+        char szAppPath[MAX_PATH] = { 0 };
+		
+        HRESULT hr = m_pILiteStep->get_Window((LONG*)&hLiteStep);
+		
+        if (SUCCEEDED(hr))
 		{
 			hr = m_pILiteStep->get_AppPath(szAppPath, MAX_PATH);
-			if (SUCCEEDED(hr))
+			
+            if (SUCCEEDED(hr))
 			{
                 std::vector<HANDLE> vecInitEvents;;
-				ModuleQueue::iterator iter = mqModules.begin();
+				ModuleQueue::const_iterator iter = mqModules.begin();
 
 				while (iter != mqModules.end())
 				{
 					if (*iter)
 					{
-						// delaying the LoadLibrary call is necessary to make
-						// grdtransparent work
-						if ((*iter)->LoadDll())
-						{
-							HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
-							
-                            if (hEvent)
-							{
-								vecInitEvents.push_back(hEvent);
-							}
-							++uReturn;
-						}
+                        HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
+                        
+                        if (hEvent)
+                        {
+                            vecInitEvents.push_back(hEvent);
+                        }
+                        
+                        m_ModuleQueue.push_back(*iter);
+                        ++uReturn;
 					}
 
 					++iter;
 				}
 
 				// Wait for all modules to signal that they have started
-				size_t stModuleCount = vecInitEvents.size();
-                size_t stIndex = stModuleCount;
-				
-                DWORD dwWaitStatus = MsgWaitForMultipleObjects(stModuleCount,
-                    &vecInitEvents[0], FALSE, INFINITE, QS_ALLINPUT);
-
-				while (stIndex)
-				{
-					if (dwWaitStatus == (WAIT_OBJECT_0 + stModuleCount))
-					{
-						MSG message;
-						// if we use NULL instead of hLiteStep here.. it locks us up...
-						if (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
-						{
-							TranslateMessage(&message);
-							DispatchMessage (&message);
-						}
-					}
-					else if ((dwWaitStatus >= WAIT_OBJECT_0) &&
-                        (dwWaitStatus <= (WAIT_OBJECT_0 + stModuleCount - 1)))
-					{
-						--stIndex;
-					}
-
-					if (stIndex)
-					{
-						dwWaitStatus = MsgWaitForMultipleObjects(stModuleCount,
-                            &vecInitEvents[0], FALSE, INFINITE, QS_ALLINPUT);
-					}
-				}
+                _WaitForModules(&vecInitEvents[0], vecInitEvents.size(),
+                    hLiteStep);
 			}
 		}
 	}
@@ -265,189 +235,132 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 
 void ModuleManager::_QuitModules()
 {
-	int nModuleCount = m_ModuleQueue.size();
-
-	if (nModuleCount)
-	{
-		HANDLE * pQuitEvents = new HANDLE[nModuleCount];
-		ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
-
-		int nIndex = 0;
-		while (iter != m_ModuleQueue.rend())
-		{
-			if (*iter)
-			{
-				HANDLE hEvent = (*iter)->Quit();
-				if (hEvent)
-				{
-					pQuitEvents[nIndex++] = hEvent;
-				}
-			}
-
-			iter++;
-		}
-
-		// Wait for all modules to signal that they have quit before deleting them
-		nModuleCount = nIndex;
-		DWORD dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
-		HWND hLiteStep = GetLitestepWnd();
-		while (nIndex)
-		{
-			if (dwWaitStatus == (WAIT_OBJECT_0 + nModuleCount))
-			{
-				MSG message;
-				// if we use NULL instead of hLiteStep here.. it locks us up...
-				while (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
-				{
-					TranslateMessage(&message);
-					DispatchMessage (&message);
-				}
-			}
-			else if ((dwWaitStatus >= WAIT_OBJECT_0) && (dwWaitStatus <= (WAIT_OBJECT_0 + nModuleCount - 1)))
-			{
-				nIndex--;
-			}
-
-			if (nIndex)
-			{
-				dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
-			}
-		}
-
-
-		delete [] pQuitEvents;
-
-		// Clean it all up
-		iter = m_ModuleQueue.rbegin();
-		while (iter != m_ModuleQueue.rend())
-		{
-			if (*iter)
-			{
-				//CloseHandle(iter->second->GetThread());
-				delete *iter;
-			}
-			++iter;
-		}
-		m_ModuleQueue.clear();
-
-	}
+    std::vector<HANDLE> vecQuitEvents;;
+    ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
+    
+    while (iter != m_ModuleQueue.rend())
+    {
+        if (*iter)
+        {
+            HANDLE hEvent = (*iter)->Quit();
+            if (hEvent)
+            {
+                vecQuitEvents.push_back(hEvent);
+            }
+        }
+        
+        ++iter;
+    }
+    
+    _WaitForModules(&vecQuitEvents[0], vecQuitEvents.size(),
+        GetLitestepWnd());
+    
+    // Clean it all up
+    iter = m_ModuleQueue.rbegin();
+    while (iter != m_ModuleQueue.rend())
+    {
+        delete *iter;
+        ++iter;
+    }
+    
+    m_ModuleQueue.clear();
 }
 
 
-BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
+BOOL ModuleManager::QuitModule(HINSTANCE hModule)
 {
-	if (IsValidStringPtr(pszLocation))
-	{
-		ModuleQueue::iterator iter = _FindModule(pszLocation);
-
-		if (iter != m_ModuleQueue.end())
-		{
-			HANDLE hQuitEvents[1];
-			HANDLE hEvent = (*iter)->Quit();
-			if (hEvent)
-			{
-				hQuitEvents[0] = hEvent;
-
-                DWORD dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
-				HWND hLiteStep = GetLitestepWnd();
-				while (1)
-				{
-					if (dwWaitStatus == (WAIT_OBJECT_0 + 1))
-					{
-						MSG message;
-						// if we use NULL instead of hLiteStep here.. it locks us up...
-						while (PeekMessage(&message, hLiteStep, 0, 0, PM_REMOVE) > 0)
-						{
-							TranslateMessage(&message);
-							DispatchMessage (&message);
-						}
-					}
-					else if (dwWaitStatus == WAIT_OBJECT_0)
-					{
-						break;
-					}
-
-					dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
-				}
-			}
-			
-            // better safe than sorry
-            if (*iter)
-            {
-                delete *iter;
-            }
-            m_ModuleQueue.erase(iter);
-		}
-	}
+    ModuleQueue::iterator iter = _FindModule(hModule);
+    
+    if (iter != m_ModuleQueue.end() && *iter)
+    {
+        HANDLE hQuitEvent = (*iter)->Quit();
+        
+        if (hQuitEvent)
+        {
+            _WaitForModules(&hQuitEvent, 1, GetLitestepWnd());
+        }
+        
+        delete *iter;
+        m_ModuleQueue.erase(iter);
+    }
 	
 	return TRUE;
 }
 
 
-// need to put this at global scope because of mingw issues
-struct ModuleLookup
+BOOL ModuleManager::ReloadModule(HINSTANCE hModule)
 {
-	ModuleLookup(LPCSTR pszName) : m_pszName(pszName){}
-	
-	bool operator() (const Module* pModule) const
-	{
-		return (stricmp(m_pszName, pModule->GetLocation()) == 0);
-	}
-	
-    private:
-        LPCSTR m_pszName;
-};
+    BOOL bReturn = FALSE;
+
+    ModuleQueue::iterator iter = _FindModule(hModule);
+    
+    if (iter != m_ModuleQueue.end())
+    {
+        std::string sLocation = (*iter)->GetLocation();
+        DWORD dwFlags = (*iter)->GetFlags();
+
+        QuitModule(hModule);
+        bReturn = LoadModule(sLocation.c_str(), dwFlags);
+    }
+
+    return bReturn;
+}
+
+
+HINSTANCE ModuleManager::GetModuleInstance(LPCSTR pszLocation)
+{
+    ASSERT_ISSTRING(pszLocation);
+
+    HINSTANCE hReturn = NULL;
+    ModuleQueue::iterator iter = _FindModule(pszLocation);
+
+    if (iter != m_ModuleQueue.end())
+    {
+        hReturn = (*iter)->GetInstance();
+    }
+
+    return hReturn;
+}
 
 
 ModuleQueue::iterator ModuleManager::_FindModule(LPCSTR pszLocation)
 {
     return std::find_if(m_ModuleQueue.begin(), m_ModuleQueue.end(),
-		ModuleLookup(pszLocation));
+        IsLocationEqual(pszLocation));
 }
 
 
-UINT ModuleManager::GetModuleList(LPSTR *lpszModules, DWORD dwSize)
+ModuleQueue::iterator ModuleManager::_FindModule(HINSTANCE hModule)
 {
-	/*long lBound;
-	long uBound;
-	long size;
-	int i;
-
-	BSTR *outList;
-
-	SafeArrayGetLBound(strlist, 1, &lBound);
-	SafeArrayGetUBound(strlist, 1, &uBound);
-
-	size = uBound - lBound + 1;
-
-	SafeArrayAccessData(strlist, (void**)&outList);
-
-	string2module::iterator iter = LoadModuleMap.begin();
-	for (i = 0; i < size && iter != LoadModuleMap.end(); i++, iter++)
-	{
-		outList[i] = SysAllocString(iter->first.c_str());
-	}
-
-	SafeArrayUnaccessData(strlist);
-
-	*count = i;
-
-	return S_OK;*/ 
-	return 0;
+    return std::find_if(m_ModuleQueue.begin(), m_ModuleQueue.end(),
+        IsInstanceEqual(hModule));
 }
 
-STDMETHODIMP ModuleManager::get_Count(long* pCount)
+
+void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount,
+                                    HWND hWnd) const
 {
-	HRESULT hr = E_INVALIDARG;
-
-	if (pCount != NULL)
-	{
-		//Lock();
-		*pCount = m_ModuleQueue.size();
-		//Unlock();
-
-		hr = S_OK;
-	}
-
-	return hr;
+    DWORD dwRest = dwCount;
+    
+    while (dwRest)
+    {
+        DWORD dwWaitStatus = MsgWaitForMultipleObjects(dwCount, pHandles,
+            FALSE, INFINITE, QS_ALLINPUT);
+        
+        if (dwWaitStatus == (WAIT_OBJECT_0 + dwCount))
+        {
+            MSG message;
+            // if we use NULL instead of hLiteStep here.. it locks us up...
+            if (PeekMessage(&message, hWnd, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&message);
+                DispatchMessage (&message);
+            }
+        }
+        else if ((dwWaitStatus >= WAIT_OBJECT_0) &&
+            (dwWaitStatus <= (WAIT_OBJECT_0 + dwCount - 1)))
+        {
+            --dwRest;
+        }
+    }
 }

@@ -61,11 +61,11 @@ SettingsManager::~SettingsManager()
 }
 
 
-BOOL SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
+bool SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
     char szPath[MAX_PATH];
 
-    BOOL bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
+    bool bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
     
     if (bReturn)
     {
@@ -89,7 +89,7 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 	
     if (GetWindowsDirectory(szTemp, MAX_PATH))
     {
-        PathAddBackslash(szTemp);
+        PathAddBackslashEx(szTemp, MAX_PATH);
         SetVariable("windir", szTemp);
     }
 
@@ -153,11 +153,17 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
         SetVariable("Win9x", "true");
 
         if (OsVersionInfo.dwMinorVersion >= 90) // Windows ME (4.90)
-			SetVariable("WinME", "true");
+        {
+            SetVariable("WinME", "true");
+        }
 		else if (OsVersionInfo.dwMinorVersion >= 10) // Windows 98 (4.10)
-			SetVariable("Win98", "true");
+        {
+            SetVariable("Win98", "true");
+        }
 		else // Windows 95 (4.00)
-			SetVariable("Win95", "true");
+        {
+            SetVariable("Win95", "true");
+        }
 	}
 	else if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 	{
@@ -205,7 +211,7 @@ BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
     // first appearance of a setting takes effect
     it = m_SettingsMap.lower_bound(pszName);
     
-    if (it != m_SettingsMap.end() && stricmp(pszName, it->first.c_str()) == 0)
+    if (it != m_SettingsMap.end() && lstrcmpi(pszName, it->first.c_str()) == 0)
 	{
 		bReturn = TRUE;
 	}
@@ -492,9 +498,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             }
                             catch (std::invalid_argument& ia)
                             {
-                                ErrorEx(LOCALIZE_THIS,
+                                Error(LOCALIZE_THIS,
                                     "Variable \"%s\" not defined.\n\n"
-                                    "Used in: %s",
+                                    "Expression: %s",
                                     ia.what(), pszOriginalTemplate);
                                 
                                 pszTempExpandedString[0] = '\0';

@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
 :m_szCommand(pszCommand)
 {
-	m_bEX = false;
+    m_bEX = false;
 	m_bBang = pfnBang;
 	m_dwThreadID = dwThread;
 }
@@ -71,15 +71,10 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
         }
         catch (...)
         {
-            char szError[MAX_PATH] = { 0 };
-            
-            GetResStrEx(NULL, IDS_LITESTEP_BANGEXCEPTION, szError, MAX_PATH,
-                "Error: Exception during bang command execution.\n\
-                \rPlease contact the module writer.\n\nBang parameters: %s",
-                pszParams);
-            
-            MessageBox(NULL, szError, m_szCommand.c_str(),
-                MB_TOPMOST | MB_SETFOREGROUND | MB_ICONEXCLAMATION);
+            ErrorEx(m_szCommand.c_str(), IDS_LITESTEP_BANGEXCEPTION,
+                _T("Exception during bang command execution.\n")
+                _T("Please contact the module author.\n\nBang parameters: %s"),
+                pszParams != NULL ? pszParams : _T("(null)"));
         }
 	}
 }

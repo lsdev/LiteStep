@@ -207,4 +207,11 @@ LSDESKTOPINFO;
 #define	LR_QUIT			2
 #define LR_MSSHUTDOWN	3
 
+
+//---------------------------------------------------------
+// LM_UN/RELOADMODULE DEFINES
+//---------------------------------------------------------
+#define LMM_HINSTANCE 0x1000
+
+
 #endif // __LSAPIDEFINES_H

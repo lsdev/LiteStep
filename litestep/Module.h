@@ -56,8 +56,6 @@ public:
 	Module(LPCTSTR ptzLoc, DWORD dwFlags);
 	virtual ~Module();
 
-	BOOL LoadDll();
-
 	HANDLE Init(HWND hMainWindow, LPCTSTR ptzAppPath);
 	HANDLE Quit();
 
@@ -88,7 +86,12 @@ public:
 		return m_tzLocation.c_str();
 	};
 
-	BOOL HasMessagePump() const
+	DWORD GetFlags() const
+    {
+        return m_dwFlags;
+    }
+
+    BOOL HasMessagePump() const
 	{
 		return !(m_dwFlags & MODULE_NOTPUMPED);
 	};
@@ -104,7 +107,9 @@ public:
 
 
 private:
-	int CallInit();
+    bool _LoadDll();
+    
+    int CallInit();
     void CallQuit();
 };
 

@@ -54,8 +54,8 @@ private:
 	LANGID m_wLanguageID;
 };
 
-void Error(UINT uId, const TCHAR* ptzDefault);
-void ErrorEx(UINT uId, const TCHAR* ptzDefault, ...);
+void Error(UINT uMessageId, LPCTSTR ptzDefault, ...);
+void ErrorEx(LPCTSTR ptzCaption, UINT uMessageId, LPCTSTR ptzDefault, ...);
 
 #define LOCALIZE_THIS 0
 

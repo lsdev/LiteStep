@@ -80,9 +80,12 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     }
     else
     {
-        ErrorEx(LOCALIZE_THIS,
-            _T("Error opening \"%s\" for parsing.\n")
-            _T("Requested as: %s"), tzFullPath, ptzFileName);
+// Should display an error message here, but it breaks some themes. Should push
+// it back until 0.25.0 or something.
+//        Error(LOCALIZE_THIS,
+//            _T("Error opening \"%s\" for parsing.\n\n")
+//            _T("Requested as: %s\nResolved to: %s"),
+//            tzExpandedPath, ptzFileName, tzFullPath);
     }
 }
 
@@ -241,7 +244,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 	}
 	else if (lstrcmpi(ptzName, _T("include")) == 0)
 	{
-		TCHAR tzPath[MAX_PATH_LENGTH];
+        TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
 
 		GetToken(ptzValue, tzPath, NULL, FALSE);
 		
@@ -277,8 +280,8 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 
         if (!m_pEvalParser->evaluate(ptzExpression, &bResult))
 		{
-            ErrorEx(LOCALIZE_THIS,
-                _T("Syntax error in If expression:\n%s"), ptzExpression);
+            Error(LOCALIZE_THIS,
+                _T("Syntax error in IF expression:\n%s"), ptzExpression);
 		}
 		else
 		{

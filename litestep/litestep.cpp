@@ -675,43 +675,50 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 						MSWinShutdown(m_hMainWindow);
 					}
 				}
-				break;
-			}
-		}
+                break;
+            }
+        }
+        break;
+        
+        case LM_RELOADMODULE:
+        case LM_UNLOADMODULE:
+        {
+            if (m_pModuleManager)
+            {
+                if (lParam & LMM_HINSTANCE)
+                {
+                    if (uMsg == LM_UNLOADMODULE)
+                    {
+                        m_pModuleManager->QuitModule((HINSTANCE)wParam);
+                    }                    
+                    else
+                    {
+                        m_pModuleManager->ReloadModule((HINSTANCE)wParam);
+                    }
+                }
+                else
+                {
+                    LPCSTR pszPath = (LPCSTR)wParam;
+                    
+                    if (IsValidStringPtr(pszPath))
+                    {
+                        HINSTANCE hInst = m_pModuleManager->GetModuleInstance(pszPath);
+                        
+                        if (hInst != NULL)
+                        {
+                            PostMessage(hWnd, uMsg, (WPARAM)hInst, lParam | LMM_HINSTANCE);
+                        }
+                        else if (uMsg == LM_RELOADMODULE)
+                        {
+                            m_pModuleManager->LoadModule(pszPath, (DWORD)lParam);
+                        }
+                    }
+                }
+            }
+        }
 		break;
 
-		case LM_UNLOADMODULE:
-		{ // Module Handler Message
-
-			LPCSTR pszPath = (LPCSTR)wParam;
-
-			if (IsValidStringPtr(pszPath))
-			{
-				if (m_pModuleManager)
-				{
-					m_pModuleManager->QuitModule(pszPath);
-				}
-			}
-		}
-		break;
-
-		case LM_RELOADMODULE:
-		{ // Module Handler Message
-
-			LPCSTR pszPath = (LPCSTR)wParam;
-
-			if (IsValidStringPtr(pszPath))
-			{
-				if (m_pModuleManager)
-				{
-					m_pModuleManager->QuitModule(pszPath);
-					m_pModuleManager->LoadModule(pszPath, 0);
-				}
-			}
-		}
-		break;
-
-		case LM_BANGCOMMAND:
+        case LM_BANGCOMMAND:
 		{
 			PLMBANGCOMMAND plmbc = (PLMBANGCOMMAND)lParam;
 
