@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2003 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -237,7 +237,7 @@ void BangPopup(HWND /* hCaller */, LPCSTR pszArgs)
 	{
 		if (GetCursorPos((LPPOINT) & p) == 0)
 		{
-			p.x = p.y = 0;
+            p.x = p.y = 0;
 		}
 		if (nCountTokens > 1)
 		{
@@ -303,11 +303,10 @@ void BangRefresh(HWND hCaller, LPCSTR pszArgs)
 }
 
 
-void BangReload(HWND hCaller, LPCSTR pszArgs)
+void BangReload(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	//CloseRC();
-	//setupVars(szAppPath);
-	//SetupRC(szRcPath);
+    DeleteSettingsManager();
+    SetupSettingsManager(NULL, NULL);
 }
 
 
@@ -323,13 +322,13 @@ void BangReloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 		if (hLiteStep)
 		{
 			LPCSTR pszNextToken = pszArgs;
-			char szPath[MAX_PATH];
+			char szModuleString[MAX_PATH];
 
-			while (GetToken(pszNextToken, szPath, &pszNextToken, false))
+			while (GetToken(pszNextToken, szModuleString, &pszNextToken, true))
 			{
-				SendMessage(hLiteStep, LM_RELOADMODULE, (WPARAM)szPath, 0);
+				SendMessage(hLiteStep, LM_RELOADMODULE, (WPARAM)szModuleString, 0);
 			}
-		}
+        }
 	}
 }
 
