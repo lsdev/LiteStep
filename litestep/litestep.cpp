@@ -255,7 +255,7 @@ CLiteStep::~CLiteStep()
 HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
 {
 	HRESULT hr;
-	bool bUnderExplorer = false;
+	m_bUnderExplorer = false;
 
 	m_sAppPath.assign(pszAppPath);  // could throw length_error
 	m_sConfigFile.assign(pszRcPath);
@@ -304,7 +304,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 				return E_ABORT;
 			}
 		}
-		bUnderExplorer = true;
+		m_bUnderExplorer = true;
 	}
 
 	// Register Window Class
@@ -364,7 +364,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         }
 
 		// Set Shell Window
-		if (!bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
+		if (!m_bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
 		{
 			FARPROC (__stdcall * SetShellWindow)(HWND) = NULL;
 			SetShellWindow = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("USER32.DLL"), "SetShellWindow");
@@ -897,7 +897,7 @@ HRESULT CLiteStep::_InitServices()
     //
     // Tray Service
     //
-    if (GetRCBoolDef("LSTrayService", TRUE))
+    if (!m_bUnderExplorer && GetRCBoolDef("LSTrayService", TRUE))
     {
         m_pTrayService = new TrayService();
         
