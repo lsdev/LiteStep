@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "litestep.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.3 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.3 2002/12/07 11:36:34 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.4 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.4 2003/01/02 11:06:14 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -955,7 +955,7 @@ HRESULT CLiteStep::_StartManagers()
 	//SetBangManager(gBangManager);
 
 	// Setup bang commands in lsapi
-	setupBangs();
+	SetupBangs();
 
 	// Load modules
 	m_pModuleManager->Start(this);
@@ -982,6 +982,7 @@ HRESULT CLiteStep::_StopManagers()
 	m_pMessageManager->ClearMessages();
 
 	//ClearBangManager();
+    ClearBangs();
 
 	return hr;
 }
