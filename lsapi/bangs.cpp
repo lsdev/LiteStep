@@ -25,29 +25,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void SetupBangs()
 {
-	AddBangCommand("!ABOUT", BangAbout);
-	AddBangCommand("!ALERT", BangAlert);
-	AddBangCommand("!CASCADEWINDOWS", BangCascadeWindows);
-	AddBangCommand("!CONFIRM", BangConfirm);
-	AddBangCommand("!EXECUTE", BangExecute);
-	AddBangCommand("!GATHER", BangGather);
-	AddBangCommand("!LOGOFF", BangLogoff);
-	AddBangCommand("!MINIMIZEWINDOWS", BangMinimizeWindows);
-	AddBangCommand("!QUIT", BangQuit);
-	AddBangCommand("!RECYCLE", BangRecycle);
-	AddBangCommand("!REFRESH", BangRefresh);
-	AddBangCommand("!RELOAD", BangReload);
-	AddBangCommand("!RELOADMODULE", BangReloadModule);
-	AddBangCommand("!RESTOREWINDOWS", BangRestoreWindows);
-	AddBangCommand("!RUN", BangRun);
-	AddBangCommand("!SHUTDOWN", BangShutdown);
-	AddBangCommand("!SWITCHUSER", BangSwitchUser);
-	AddBangCommand("!TILEWINDOWSH", BangTileWindowsH);
-	AddBangCommand("!TILEWINDOWSV", BangTileWindowsV);
-	AddBangCommand("!UNLOADMODULE", BangUnloadModule);
-	AddBangCommand("!HIDEMODULES", BangHideModules);
-	AddBangCommand("!SHOWMODULES", BangShowModules);
-    AddBangCommand("!TOGGLEMODULES", BangToggleModules);
+	AddBangCommand("!About", BangAbout);
+	AddBangCommand("!Alert", BangAlert);
+	AddBangCommand("!CascadeWindows", BangCascadeWindows);
+	AddBangCommand("!Confirm", BangConfirm);
+	AddBangCommand("!Execute", BangExecute);
+	AddBangCommand("!Gather", BangGather);
+	AddBangCommand("!Logoff", BangLogoff);
+	AddBangCommand("!MinimizeWindows", BangMinimizeWindows);
+	AddBangCommand("!Quit", BangQuit);
+	AddBangCommand("!Recycle", BangRecycle);
+	AddBangCommand("!Refresh", BangRefresh);
+	AddBangCommand("!Reload", BangReload);
+	AddBangCommand("!ReloadModule", BangReloadModule);
+	AddBangCommand("!RestoreWindows", BangRestoreWindows);
+	AddBangCommand("!Run", BangRun);
+	AddBangCommand("!Shutdown", BangShutdown);
+	AddBangCommand("!SwitchUser", BangSwitchUser);
+	AddBangCommand("!TileWindowsH", BangTileWindowsH);
+	AddBangCommand("!TileWindowsV", BangTileWindowsV);
+	AddBangCommand("!UnloadModule", BangUnloadModule);
+	AddBangCommand("!HideModules", BangHideModules);
+	AddBangCommand("!ShowModules", BangShowModules);
+    AddBangCommand("!ToggleModules", BangToggleModules);
 }
 
 
