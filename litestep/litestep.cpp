@@ -189,6 +189,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         return 1;
     }
 
+    // Tell the Welcome Screen to close
+    // This has to be done before the first MessageBox call, else that box
+    // would pop up "under" the welcome screen
+    HANDLE hShellReadyEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE,
+        "msgina: ShellReadyEvent");
+
+    if (hShellReadyEvent != NULL)
+    {
+        SetEvent(hShellReadyEvent);
+        CloseHandle(hShellReadyEvent);
+    }
+
 	// If we can't find "step.rc", there's no point in proceeding
 	if (!PathFileExists(szRcPath))
 	{
@@ -255,7 +267,7 @@ CLiteStep::~CLiteStep()
 HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
 {
 	HRESULT hr;
-	m_bUnderExplorer = false;
+	bool bUnderExplorer = false;
 
 	m_sAppPath.assign(pszAppPath);  // could throw length_error
 	m_sConfigFile.assign(pszRcPath);
@@ -304,7 +316,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 				return E_ABORT;
 			}
 		}
-		m_bUnderExplorer = true;
+		bUnderExplorer = true;
 	}
 
 	// Register Window Class
@@ -364,7 +376,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         }
 
 		// Set Shell Window
-		if (!m_bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
+		if (!bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
 		{
 			FARPROC (__stdcall * SetShellWindow)(HWND) = NULL;
 			SetShellWindow = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("USER32.DLL"), "SetShellWindow");
@@ -897,7 +909,7 @@ HRESULT CLiteStep::_InitServices()
     //
     // Tray Service
     //
-    if (!m_bUnderExplorer && GetRCBoolDef("LSTrayService", TRUE))
+    if (GetRCBoolDef("LSTrayService", TRUE))
     {
         m_pTrayService = new TrayService();
         
