@@ -202,12 +202,12 @@ const unsigned short NID_6W_SIZE = sizeof(NID_6W); // IE 6 (XP)
 
 #ifndef NIF_STATE
 #define NIF_STATE       0x00000008
-#define NIF_INFO        0x00000010 // partial support: used as tooltip
+#define NIF_INFO        0x00000010
 #define NIF_GUID        0x00000020 // not supported
 #define NIS_HIDDEN		0x00000001
 #define NIS_SHAREDICON  0x00000002
-#define NIM_SETFOCUS    0x00000003 // not supported
-#define NIM_SETVERSION  0x00000004 // not supported
+#define NIM_SETFOCUS    0x00000003 // relayed to systray module
+#define NIM_SETVERSION  0x00000004 // relayed to systray module
 #endif
 
 // data sent by shell via Shell_NotifyIcon -- Maduin
@@ -342,6 +342,7 @@ private:
     //
     //
     //
+    bool m_bWin2000;
     HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
 	HWND m_hLiteStep;

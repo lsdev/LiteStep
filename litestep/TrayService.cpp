@@ -34,7 +34,10 @@ Note 3:  The window handling the DUN/Networking icons has a class and caption of
 Note 4:  Tooltip (NIF_TIP) for the DUN/Networking icons isn't created until the
          tray icon receives its first mouseover event (W2K/XP)
  
-Note 5:  The DUN/Networking Icons appear to use NIS_SHAREDICON with two
+Note 5:  There are two different approaches to handle the DUN icon on XP. See
+         Note 5a (old way) and Note 5b (new way).
+
+Note 5a: The DUN/Networking Icons appear to use NIS_SHAREDICON with two
          different uIDs. This will cause two icons to display with the same
          functionality. One icon will not show a tooltip. Therefore as a
          workaround, find the "Connections Tray" window, and everytime a
@@ -44,6 +47,14 @@ Note 5:  The DUN/Networking Icons appear to use NIS_SHAREDICON with two
          true icon next time it is sent. The other icon will remain with out a
          tooltip and can be ignored. (XP)
  
+Note 5b: The DUN icon sends three NIM_ADDs; none of them has a tooltip.
+         The first one has NIS_HIDDEN and a valid hIcon, but not NIF_MESSAGE.
+         The second one has a valid hIcon.
+         The third one has hIcon == NULL but nevertheless has NIF_ICON.
+         The second and the third both have NIS_SHAREDICON but different uIDs.
+         Since the second one on its own is complete we use it and discard the
+         first and the third. This means we show icons that don't have NIF_TIP.
+
 Note 6:  RegisterWindowMessage("TaskbarCreated") should be sent with
          HWND_BROADCAST before the shell service objects are loaded (sending
          afterwards would result in a Volume icon flicker or loss because the
@@ -58,6 +69,12 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
 		 Exec each SSO with a group id of CGID_ShellServiceObject and command id 
 		 of 2 to start. Exec each SSO with a group id of CGID_ShellServiceObject 
 		 and a command id of 3 to stop.
+
+Note 8:  The pre-XP language indicator, internat.exe, checks the existence of
+         a window with the window class TrayNotifyWnd on startup. If the window
+         doesn't exist internat.exe terminates. The window needs to be a child
+         of Shell_TrayWnd. Internat calculates the position of its context menu
+         from the position of TrayNotifyWnd.
 ****************************************************************************/
 #include "TrayService.h"
 #include <regstr.h>
@@ -90,7 +107,7 @@ const char szNotifyClass[] = "TrayNotifyWnd";
 //
 TrayService::TrayService() :
 m_hNotifyWnd(NULL), m_hTrayWnd(NULL), m_hLiteStep(NULL),
-m_hInstance(NULL)
+m_hInstance(NULL), m_bWin2000(false)
 {
 }
 
@@ -117,6 +134,17 @@ HRESULT TrayService::Start()
     
     if (m_hLiteStep && m_hInstance)
     {
+        OSVERSIONINFO OsVersionInfo = { 0 };
+        OsVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+        GetVersionEx(&OsVersionInfo);
+
+        if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+            OsVersionInfo.dwMajorVersion >= 5)
+        {
+            m_bWin2000 = true;
+        }
+
         _CreateWindows();
         
         // Our main window is enough to start up, we can do without the
@@ -130,7 +158,10 @@ HRESULT TrayService::Start()
             PostMessage(HWND_BROADCAST,
                 RegisterWindowMessage("TaskbarCreated"), 0, 0);
             
-            _LoadShellServiceObjects();
+            if (m_bWin2000)
+            {
+                _LoadShellServiceObjects();
+            }
             
             hr = S_OK;
         }
@@ -148,7 +179,10 @@ HRESULT TrayService::Stop()
 {
 	HRESULT hr = S_OK;
 
-    _UnloadShellServiceObjects();
+    if (m_bWin2000)
+    {
+        _UnloadShellServiceObjects();
+    }
 
     _DestroyWindows();
 
@@ -203,7 +237,7 @@ bool TrayService::_CreateWindows()
         if (m_hTrayWnd)
         {
             //
-            // Register "TrayNotifyWnd" class and create window
+            // Register "TrayNotifyWnd" class and create window (see Note 8)
             //
             ZeroMemory(&wc, sizeof(wc));
             wc.cbSize = sizeof(WNDCLASSEX);
@@ -238,7 +272,7 @@ bool TrayService::_CreateWindows()
             else
             {
                 RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
-                    "Error registering window class.", szTrayClass);
+                    "Error registering window class.", szNotifyClass);
             }
         }
         else
@@ -564,6 +598,8 @@ bool TrayService::_AddIcon(const NOTIFYICONDATA& nid)
     bool bReturn = false;
 
     //
+    // See Note 5b.
+    //
     // Ignore adds if NIS_SHAREDICON is set and hIcon is NULL. This fixes the
     // "ghost" DUN icon on XP. It sends three NIM_ADDs, one of them with
     // NIS_HIDDEN and another one with hIcon == NULL. The former doesn't pass
@@ -722,7 +758,6 @@ void TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid)
     ASSERT_ISREADPTR(plnid);
     SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)plnid);
 }
-
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
