@@ -321,7 +321,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 						pszArgs = PathGetArgs(tzValueBuffer);
 						if (*pszArgs)
 						{
-							tzValueBuffer[tzValueBuffer - pszArgs] = _T('\0');
+							tzValueBuffer[pszArgs - tzValueBuffer - 1] = _T('\0');
 						}
 
 						PathUnquoteSpaces(tzValueBuffer);
