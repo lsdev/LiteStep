@@ -35,7 +35,7 @@ public:
 private:
 	SettingsMap* m_pSettingsMap;
 	FILE* m_phFile;
-    std::auto_ptr<EvalParser> m_pEvalParser;
+    EvalParser* m_pEvalParser;
 
 	bool _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
 	void _StripString(LPTSTR ptzString);
