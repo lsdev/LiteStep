@@ -132,6 +132,4 @@ inline bool EvalParser::isWhiteSpace(int ch)
 	return (ch == ' ') || (ch == '\t');
 }
 
-BOOL Evaluate(LPCSTR expr, int *result);
-
 #endif
