@@ -21,7 +21,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __PNG_SUPPORT_H
 
 #include "../utility/common.h"
-#include <libpng/png.h>
+
+#ifdef __GNUC__  // for mingw
+#  include <png.h>
+#else
+#  include <libpng/png.h>
+#endif
 
 typedef struct _PNGERROR
 {
