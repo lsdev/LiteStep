@@ -33,14 +33,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 SettingsManager::SettingsManager(LPCSTR pszLiteStepPath)
 {
-	_SetupVars(pszLiteStepPath);
+    _SetupVars(pszLiteStepPath);
 }
 
 
 SettingsManager::~SettingsManager()
 {
-	m_SettingsMap.clear();
+    m_SettingsMap.clear();
 }
+
+
+BOOL SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
+{
+    char szTemp[MAX_PATH];
+
+    BOOL bReturn = GetShellFolderPath(nFolder, szTemp, MAX_PATH);
+    SetVariable(pszVariable, szTemp);
+
+    return bReturn;    
+}
+
 
 void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 {
@@ -73,54 +85,30 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 	SetVariable("scheduled", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
 	SetVariable("admintools", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
 
-	GetShellFolderPath(CSIDL_COMMON_DESKTOPDIRECTORY, szTemp, MAX_PATH);
-	SetVariable("commondesktopdir", szTemp);
-	GetShellFolderPath(CSIDL_COMMON_FAVORITES, szTemp, MAX_PATH);
-	SetVariable("commonfavorites", szTemp);
-	GetShellFolderPath(CSIDL_COMMON_PROGRAMS, szTemp, MAX_PATH);
-	SetVariable("commonprograms", szTemp);
-	GetShellFolderPath(CSIDL_COMMON_STARTMENU, szTemp, MAX_PATH);
-	SetVariable("commonstartmenu", szTemp);
-	GetShellFolderPath(CSIDL_COMMON_STARTUP, szTemp, MAX_PATH);
-	SetVariable("commonstartup", szTemp);
-	GetShellFolderPath(CSIDL_COOKIES, szTemp, MAX_PATH);
-	SetVariable("cookies", szTemp);
-	GetShellFolderPath(CSIDL_DESKTOP, szTemp, MAX_PATH);
-	SetVariable("desktop", szTemp);
-	GetShellFolderPath(CSIDL_DESKTOPDIRECTORY, szTemp, MAX_PATH);
-	SetVariable("desktopdir", szTemp);
-	GetShellFolderPath(CSIDL_FAVORITES, szTemp, MAX_PATH);
-	SetVariable("favorites", szTemp);
-	GetShellFolderPath(CSIDL_FONTS, szTemp, MAX_PATH);
-	SetVariable("fonts", szTemp);
-	GetShellFolderPath(CSIDL_HISTORY, szTemp, MAX_PATH);
-	SetVariable("history", szTemp);
-	GetShellFolderPath(CSIDL_INTERNET, szTemp, MAX_PATH);
-	SetVariable("internet", szTemp);
-	GetShellFolderPath(CSIDL_INTERNET_CACHE, szTemp, MAX_PATH);
-	SetVariable("internetcache", szTemp);
-	GetShellFolderPath(CSIDL_NETHOOD, szTemp, MAX_PATH);
-	SetVariable("nethood", szTemp);
-	GetShellFolderPath(CSIDL_PERSONAL, szTemp, MAX_PATH);
-	SetVariable("documentsdir", szTemp);
-	GetShellFolderPath(CSIDL_PRINTHOOD, szTemp, MAX_PATH);
-	SetVariable("printhood", szTemp);
-	GetShellFolderPath(CSIDL_PROGRAMS, szTemp, MAX_PATH);
-	SetVariable("programs", szTemp);
-	GetShellFolderPath(CSIDL_RECENT, szTemp, MAX_PATH);
-	SetVariable("recent", szTemp);
-	GetShellFolderPath(CSIDL_SENDTO, szTemp, MAX_PATH);
-	SetVariable("sendto", szTemp);
-	GetShellFolderPath(CSIDL_STARTMENU, szTemp, MAX_PATH);
-	SetVariable("startmenu", szTemp);
-	GetShellFolderPath(CSIDL_STARTUP, szTemp, MAX_PATH);
-	SetVariable("startup", szTemp);
-	GetShellFolderPath(CSIDL_TEMPLATES, szTemp, MAX_PATH);
-	SetVariable("templates", szTemp);
-	GetShellFolderPath(CSIDL_COMMON_ADMINTOOLS, szTemp, MAX_PATH);
-	SetVariable("commonadmintoolsdir", szTemp);
-	GetShellFolderPath(CSIDL_ADMINTOOLS, szTemp, MAX_PATH);
-	SetVariable("admintoolsdir", szTemp);
+    _SetShellFolderVariable("commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
+    _SetShellFolderVariable("commonfavorites", CSIDL_COMMON_FAVORITES);
+    _SetShellFolderVariable("commonprograms", CSIDL_COMMON_PROGRAMS);
+    _SetShellFolderVariable("commonstartmenu", CSIDL_COMMON_STARTMENU);
+    _SetShellFolderVariable("commonstartup", CSIDL_COMMON_STARTUP);
+    _SetShellFolderVariable("cookies", CSIDL_COOKIES);
+    _SetShellFolderVariable("desktop", CSIDL_DESKTOP);
+    _SetShellFolderVariable("desktopdir", CSIDL_DESKTOPDIRECTORY);
+    _SetShellFolderVariable("favorites", CSIDL_FAVORITES);
+    _SetShellFolderVariable("fonts", CSIDL_FONTS);
+    _SetShellFolderVariable("history", CSIDL_HISTORY);
+    _SetShellFolderVariable("internet", CSIDL_INTERNET);
+    _SetShellFolderVariable("internetcache", CSIDL_INTERNET_CACHE);
+    _SetShellFolderVariable("nethood", CSIDL_NETHOOD);
+    _SetShellFolderVariable("documentsdir", CSIDL_PERSONAL);
+    _SetShellFolderVariable("printhood", CSIDL_PRINTHOOD);
+    _SetShellFolderVariable("programs", CSIDL_PROGRAMS);
+    _SetShellFolderVariable("recent", CSIDL_RECENT);
+    _SetShellFolderVariable("sendto", CSIDL_SENDTO);
+    _SetShellFolderVariable("startmenu", CSIDL_STARTMENU);
+    _SetShellFolderVariable("startup", CSIDL_STARTUP);
+    _SetShellFolderVariable("templates", CSIDL_TEMPLATES);
+    _SetShellFolderVariable("commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
+    _SetShellFolderVariable("admintoolsdir", CSIDL_ADMINTOOLS);
 
 	OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
 	GetVersionEx(&OsVersionInfo);
