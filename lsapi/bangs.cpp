@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "lsapi.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-extern char szAppPath[MAX_PATH + 1];
-extern char szRcPath[MAX_PATH + 1];
 
 void SetupBangs()
 {
@@ -38,7 +36,6 @@ void SetupBangs()
 	AddBangCommand("!LOGOFF", BangLogoff);
 	AddBangCommand("!MINIMIZEWINDOWS", BangMinimizeWindows);
 	AddBangCommand("!QUIT", BangQuit);
-	AddBangCommand("!POPUP", BangPopup);
 	AddBangCommand("!RECYCLE", BangRecycle);
 	AddBangCommand("!REFRESH", BangRefresh);
 	AddBangCommand("!RELOAD", BangReload);
@@ -49,7 +46,6 @@ void SetupBangs()
 	AddBangCommand("!SWITCHUSER", BangSwitchUser);
 	AddBangCommand("!TILEWINDOWSH", BangTileWindowsH);
 	AddBangCommand("!TILEWINDOWSV", BangTileWindowsV);
-	AddBangCommand("!TOGGLEWHARF", BangToggleWharf);
 	AddBangCommand("!UNLOADMODULE", BangUnloadModule);
 	AddBangCommand("!HIDEMODULES", BangHideModules);
 	AddBangCommand("!SHOWMODULES", BangShowModules);
@@ -225,48 +221,6 @@ void BangMinimizeWindows(HWND /* hCaller */, LPCSTR /* pszArgs */)
 
 
 //
-// BangPopup(HWND hCaller, LPCSTR pszArgs)
-//
-void BangPopup(HWND /* hCaller */, LPCSTR pszArgs)
-{
-	HWND hLiteStep = GetLitestepWnd();
-	POINT p;
-	int nCountTokens = 0;
-	char szFirst[MAX_LINE_LENGTH];
-	char szSecond[MAX_LINE_LENGTH];
-	LPSTR aszTokens[] = { szFirst, szSecond };
-
-	if (IsValidStringPtr(pszArgs))
-	{
-		nCountTokens = LCTokenize(pszArgs, aszTokens, 2, NULL);
-	}
-	if (hLiteStep)
-	{
-		if (GetCursorPos((LPPOINT) & p) == 0)
-		{
-            p.x = p.y = 0;
-		}
-		if (nCountTokens > 1)
-		{
-			for (int i = 0; i <= 1; i++)
-			{
-				if (strnicmp(aszTokens[i], "X=", 2) == 0)
-				{
-					p.x = atol(aszTokens[i] + 2);
-				}
-				else if (strnicmp(aszTokens[i], "Y=", 2) == 0)
-				{
-					p.y = atol(aszTokens[i] + 2);
-				}
-			}
-		}
-		SendMessage(hLiteStep, LM_HIDEPOPUP, 0, 0);
-		SendMessage(hLiteStep, LM_POPUP, 0, MAKELPARAM(p.x, p.y));
-	}
-}
-
-
-//
 // BangQuit(HWND hCaller, LPCSTR pszArgs)
 //
 void BangQuit(HWND /* hCaller */, LPCSTR /* pszArgs */)
@@ -405,20 +359,6 @@ void BangTileWindowsH(HWND /* hCaller */, LPCSTR /* pszArgs */)
 void BangTileWindowsV(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
 	TileWindows(NULL, MDITILE_VERTICAL, NULL, 0, NULL);
-}
-
-
-//
-// BangToggleWharf(HWND hCaller, LPCSTR pszArgs)
-//
-void BangToggleWharf(HWND /* hCaller */, LPCSTR /* pszArgs */)
-{
-	HWND hLiteStep = GetLitestepWnd();
-
-	if (hLiteStep)
-	{
-		SendMessage(hLiteStep, LM_SHADETOGGLE, 0, 0);
-	}
 }
 
 
