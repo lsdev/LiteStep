@@ -560,7 +560,7 @@ BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
         {
             if (itIcon != m_siVector.end())
             {
-                _Notify(pstd->dwMessage, *itIcon);
+                bReturn = _Notify(pstd->dwMessage, *itIcon);
             }
         }
         break;
@@ -756,10 +756,10 @@ bool TrayService::_CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
 //
 // Notify all listeners of a systray event
 //
-void TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid)
+bool TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid)
 {
     ASSERT_ISREADPTR(plnid);
-    SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)plnid);
+    return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)plnid);
 }
 
 
