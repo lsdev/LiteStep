@@ -20,11 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef  __LSAPI_H
 #define  __LSAPI_H
 
-#include "../utility/common.h"
-
+#include <windows.h>
+#include <stdio.h>
 #include "lsapidefines.h"
-#include "../litestep/resource.h"
-#include "../lsapi/lsmultimon.h"
+#include "lsmultimon.h"
 
 
 #ifdef LSAPI_INTERNAL
