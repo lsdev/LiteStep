@@ -73,7 +73,7 @@ bool Module::_LoadDll()
 			else if (!m_pQuit)
 			{
 				RESOURCE_STR(NULL, IDS_QUITMODULENOTFOUND_ERROR,
-					"Error: Could not find quitModule().\n\nPlease conirm that the dll is a Litestep module.");
+					"Error: Could not find quitModule().\n\nPlease confirm that the dll is a Litestep module.");
 			}
 			else
 			{
