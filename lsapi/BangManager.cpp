@@ -35,8 +35,7 @@ BangManager::~BangManager()
 // Add a bang command to the manager
 BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
 {
-	Lock lock (cs)
-		;
+	Lock lock (cs);
 
 	BangMap::iterator iter = bang_map.find(pszName);
 
@@ -55,8 +54,7 @@ BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
 // Remove a bang command from the manager
 BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 {
-	Lock lock (cs)
-		;
+	Lock lock (cs);
 	BOOL bReturn = FALSE;
 
 	BangMap::iterator iter = bang_map.find(pszName);
@@ -75,8 +73,7 @@ BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 // Retrieve a bang command from the manager
 Bang* BangManager::GetBangCommand(LPCSTR pszName)
 {
-	Lock lock (cs)
-		;
+	Lock lock (cs);
 
 	BangMap::const_iterator iter = bang_map.find(pszName);
 
@@ -91,8 +88,14 @@ Bang* BangManager::GetBangCommand(LPCSTR pszName)
 // Execute a bang command with the specified name, passing params, getting result
 BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams)
 {
-	Lock lock (cs)
-		;
+    // Not locking the BangManager any more due to unresolved issues. For
+    // example calling a !bang which loads or unloads (threaded) modules
+    // (!recycle, !reloadmodule...) would result in a deadlock if the BangManger
+    // was locked here. !Bangs like !execute might also call !bangs in other
+    // threads which would again be a deadlock.
+    // It is not clear if this function even needs to be locked.
+//	Lock lock (cs);
+
 	BOOL bReturn = FALSE;
 
 	BangMap::const_iterator iter = bang_map.find(pszName);
@@ -109,8 +112,7 @@ BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszPar
 
 void BangManager::ClearBangCommands()
 {
-	Lock lock (cs)
-		;
+	Lock lock (cs);
 
 	BangMap::iterator iter = bang_map.begin();
 
@@ -126,8 +128,7 @@ void BangManager::ClearBangCommands()
 
 UINT BangManager::GetBangCommandNames(LPCSTR pszNames, UINT nSize)
 {
-	Lock lock (cs)
-		;
+	Lock lock (cs);
 
 	BangMap::iterator iter = bang_map.begin();
 
