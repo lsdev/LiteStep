@@ -39,12 +39,10 @@ static DWORD GetDllVersionWorker(HINSTANCE hDll)
 		// be a useful indicator of the version.
         if (pDllGetVersion)
 		{
-			DLLVERSIONINFO dvi;
-			HRESULT hr;
-
-			INIT_STRUCT_CBSIZE(dvi);
-
-			hr = (*pDllGetVersion)(&dvi);
+            DLLVERSIONINFO dvi = { 0 };
+            dvi.cbSize = sizeof(DLLVERSIONINFO);
+			
+            HRESULT hr = (*pDllGetVersion)(&dvi);
 
 			if (SUCCEEDED(hr))
 			{
