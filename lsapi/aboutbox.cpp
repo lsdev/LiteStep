@@ -144,11 +144,11 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 				SetTextColor(hDC, GetSysColor(COLOR_WINDOWTEXT));
 				SetBkColor(hDC, GetSysColor(COLOR_WINDOW));
 
-				return (GetSysColorBrush(COLOR_WINDOW) != NULL);
+				return (BOOL)GetSysColorBrush(COLOR_WINDOW);
 			}
 			else if (id == IDC_HEADER || id == IDC_LOGO)
 			{
-				return (GetSysColorBrush(COLOR_WINDOW) != NULL);
+				return (BOOL)GetSysColorBrush(COLOR_WINDOW);
 			}
 
 			return FALSE;
