@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Misc Helpers
 #include "RecoveryMenu.h"
 #include "StartupRunner.h"
-#include "../lsapi/lsapi.h"
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
 
@@ -44,10 +43,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // STL headers
 #include <algorithm>
-#include <memory>
 
-// Always include last in cpp file
-#include "../utility/safestr.h"
+#include "../utility/core.hpp"
 
 
 // namespace stuff

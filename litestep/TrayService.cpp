@@ -62,11 +62,10 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
 #include "TrayService.h"
 #include <regstr.h>
 #include <shlobj.h>
-#include "../lsapi/lsapi.h"
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include <algorithm>
-#include "../utility/safestr.h"
+#include "../utility/core.hpp"
 
 
 const char szTrayClass[] = "Shell_TrayWnd";

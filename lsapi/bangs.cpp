@@ -19,10 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#include "../utility/common.h"
 #include "bangs.h"
-#include "lsapi.h"
-#include "../utility/safestr.h" // Always include last in cpp file
+#include "../utility/core.hpp"
 
 
 void SetupBangs()

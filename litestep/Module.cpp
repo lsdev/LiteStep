@@ -21,9 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include <process.h>
 #include "module.h"
-#include "resource.h"
 #include "../utility/macros.h"
 #include "../lsapi/ThreadedBangCommand.h"
+#include "../utility/core.hpp"
 
 
 Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)

@@ -123,6 +123,10 @@ SOURCE=.\common.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\core.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\criticalsection.h
 # End Source File
 # Begin Source File

@@ -21,9 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "settingsiterator.h"
 #include "settingsmanager.h"
-#include "lsapidefines.h"
 #include <algorithm>
-#include "../utility/safestr.h" // Always include last in cpp file
+#include "../utility/core.hpp"
 
 using std::string;
 

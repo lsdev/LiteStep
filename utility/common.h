@@ -36,17 +36,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #  include <windows.h>
 #endif // _WINDOWS_
 
-
-// Common includes
 #include <stdlib.h>
-#include <shellapi.h>
-#include <shlwapi.h>
 #include <tchar.h>
 
+#include <memory>
+
 #include "debug.hpp"
-#include "../litestep/resource.h"
 #include "../lsapi/lsapidefines.h"
-#include "safeptr.h"
 
 
 #endif // __COMMON_H

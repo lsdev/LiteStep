@@ -21,8 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "BangCommand.h"
 #include "ThreadedBangCommand.h"
-#include "../lsapi/lsapi.h"
-#include "../utility/safestr.h" // Always include last in cpp file
+#include "../utility/core.hpp"
 
 Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
 :m_szCommand(pszCommand)
