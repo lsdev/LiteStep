@@ -153,28 +153,24 @@ HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
 	return m_hInitEvent;
 }
 
-ULONG Module::CallInit()
+int Module::CallInit()
 {
-	ULONG ulReturn = 0;
+	int nReturn = 0;
 
 	try
 	{
-		m_pInitEx(m_hMainWindow, m_hInstance, m_tzAppPath.c_str());
+		nReturn = m_pInitEx(m_hMainWindow, m_hInstance, m_tzAppPath.c_str());
 	}
 	catch (...)
 	{
-		FreeLibrary(m_hInstance);
+ 		FreeLibrary(m_hInstance);
 		m_hInstance = NULL;
 
-		ulReturn = -1;
-        // There should be a "throw" here (or the return value should be used)
-		// to let the ModuleManager know that something went wrong. At the
-		// moment this only seems to cause more problems so it's commented out
-		// for the time being.
-		//throw;
+        // Propagate the exception to ModuleManager
+		throw;
 	}
 
-	return ulReturn;
+	return nReturn;
 }
 
 HANDLE Module::Quit()
