@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 
 
-Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
+Module::Module(const std::string& sLocation, DWORD dwFlags)
 {
 	m_hInstance = NULL;
 	m_hThread = NULL;
@@ -36,10 +36,7 @@ Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 	m_pQuit = NULL;
 	m_dwFlags = dwFlags;
 
-	if (IsValidStringPtr(ptzLoc))
-	{
-		m_tzLocation = ptzLoc;
-	}
+	m_tzLocation = sLocation;
 }
 
 
@@ -85,18 +82,18 @@ bool Module::_LoadDll()
 			RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
 				"Error: Could not locate module.\nPlease check your configuration.");
 		}
-	}
 
-	if (!bReturn)
-	{
-		MessageBox(NULL, resourceTextBuffer, m_tzLocation.c_str(),
-			MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST | MB_SETFOREGROUND);
-
-		if (m_hInstance)
-		{
-			FreeLibrary(m_hInstance);
-			m_hInstance = NULL;
-		}
+        if (!bReturn)
+        {
+            MessageBox(NULL, resourceTextBuffer, m_tzLocation.c_str(),
+                MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST | MB_SETFOREGROUND);
+            
+            if (m_hInstance)
+            {
+                FreeLibrary(m_hInstance);
+                m_hInstance = NULL;
+            }
+        }
 	}
 
 	return bReturn;
@@ -119,7 +116,7 @@ Module::~Module()
 	}
 }
 
-HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
+HANDLE Module::Init(HWND hMainWindow, const std::string& sAppPath)
 {
     ASSERT(m_hInstance == NULL);
     
@@ -131,7 +128,7 @@ HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
         ASSERT(m_pQuit != NULL);
 
         m_hMainWindow = hMainWindow;
-        m_tzAppPath = ptzAppPath;
+        m_tzAppPath = sAppPath;
         
         if (m_dwFlags & LS_MODULE_THREADED)
         {
