@@ -70,7 +70,9 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
 #ifdef __GNUC__ // mingw workarounds
 #  include <initguid.h>
 #  include <docobj.h>
-  DEFINE_GUID(CGID_ShellServiceObject, 0x000214D2, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
+#  if __MINGW32_MAJOR_VERSION < 3 // mingw 3.x headers already have this symbol
+     DEFINE_GUID(CGID_ShellServiceObject, 0x000214D2, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
+#  endif
 #endif
 
 #ifndef REGSTR_PATH_SHELLSERVICEOBJECTDELAYED

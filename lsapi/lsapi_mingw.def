@@ -1,0 +1,79 @@
+; DEF file for MinGW to make the exports compatible
+; with Microsoft Visual C++
+; MinGW uses name@nn for stdcall, MSVC uses _name@nn
+
+EXPORTS
+    LCOpen
+    LCClose
+    LCReadNextCommand
+    LCReadNextConfig
+    LCReadNextLine
+    LCTokenize
+
+    GetRCInt
+    GetRCString
+    GetRCBool
+    GetRCBoolDef
+    GetRCLine
+    GetRCColor
+
+    LSGetVariable
+    LSGetVariableEx
+    LSSetVariable
+
+    AddBangCommand
+    AddBangCommandEx
+    RemoveBangCommand
+    ParseBangCommand
+
+    BitmapToRegion
+    BitmapFromIcon
+    LoadLSImage
+    LoadLSIcon
+    GetLSBitmapSize
+    TransparentBltLS
+
+    CommandTokenize
+    CommandParse
+
+    LSExecute
+    LSExecuteEx
+
+    GetLitestepWnd
+    _LSGetLitestepPath@8   = LSGetLitestepPath@8
+    _LSGetImagePath        = LSGetImagePath@8
+
+    VarExpansion
+    VarExpansionEx
+
+    GetToken
+    Frame3D
+    SetDesktopArea
+
+    match
+    matche
+    is_valid_pattern
+
+    GetResStr
+    GetResStrEx
+
+    LSGetSystemMetrics
+    LSMonitorFromWindow
+    LSMonitorFromRect
+    LSMonitorFromPoint
+    LSGetMonitorInfo
+    LSEnumDisplayMonitors
+    LSEnumDisplayDevices
+
+    _LSLog@12              = LSLog@12
+    LSLogPrintf
+    GetRCCoordinate
+    ParseCoordinate
+
+    EnumLSData
+
+    SetupSettingsManager
+    DeleteSettingsManager
+    SetupBangs
+    ClearBangs
+
