@@ -49,9 +49,15 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 	OSVERSIONINFO OsVersionInfo;
 
 	SetVariable("litestepdir", pszLiteStepPath);
-	szTemp[0] = 0;
+	
+    if (GetWindowsDirectory(szTemp, MAX_PATH))
+    {
+        PathAddBackslash(szTemp);
+        SetVariable("windir", szTemp);
+    }
+
 	GetUserName(szTemp, &dwLength);
-	SetVariable("username", szTemp);
+    SetVariable("username", szTemp);
 	SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
 	SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
 	SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
@@ -117,25 +123,36 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 
 	if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
 	{
-		if (OsVersionInfo.dwMinorVersion >= 90) // Windows ME (4.90)
+        // Any Win9x-series OS
+        SetVariable("Win9x", "true");
+
+        if (OsVersionInfo.dwMinorVersion >= 90) // Windows ME (4.90)
 			SetVariable("WinME", "true");
 		else if (OsVersionInfo.dwMinorVersion >= 10) // Windows 98 (4.10)
 			SetVariable("Win98", "true");
 		else // Windows 95 (4.00)
 			SetVariable("Win95", "true");
-
-		// Any Win9x-series OS
-		SetVariable("Win9x", "true");
 	}
 	else if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 	{
-		if (OsVersionInfo.dwMajorVersion >= 5) // Windows 2000 (5.0)
-			SetVariable("Win2000", "true");
-		else if (OsVersionInfo.dwMajorVersion >= 4) // Windows NT 4.0
-			SetVariable("WinNT4", "true");
+        // Any WinNT-series OS
+        SetVariable("WinNT", "true");
 
-		// Any WinNT-series OS
-		SetVariable("WinNT", "true");
+        if (OsVersionInfo.dwMajorVersion == 5)
+        {
+            if (OsVersionInfo.dwMinorVersion >= 1)
+            {
+                SetVariable("WinXP", "true");       // Windows XP (5.1)
+            }
+            else
+            {
+                SetVariable("Win2000", "true");     // Windows 2000 (5.0)
+            }
+        }
+		else if (OsVersionInfo.dwMajorVersion >= 4) // Windows NT 4.0
+        {
+            SetVariable("WinNT4", "true");
+        }
 	}
 
 	// screen resolution
@@ -314,6 +331,9 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 		else if (nCount >= 1)
 		{
 			crReturn = strtol(szFirst, NULL, 16);
+            // convert from BGR to RGB
+            crReturn = RGB(GetBValue(crReturn), GetGValue(crReturn),
+                           GetRValue(crReturn));
 		}
 	}
 
