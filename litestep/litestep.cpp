@@ -19,11 +19,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#include "litestep.h"
-#include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.7 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.7 2003/03/11 19:24:56 ilmcuts Exp $"; // The Full RCS ID.
+#include "litestep.h"
+
+// Misc Helpers
+#include "RecoveryMenu.h"
+#include "StartupRunner.h"
+#include "../lsapi/lsapi.h"
+#include "../lsapi/ThreadedBangCommand.h"
+#include "../utility/macros.h"
+
+// Managers
+#include "HookManager.h"
+
+ // Always include last in cpp file
+#include "../utility/safestr.h"
+
+
+// const char rcsRevision[] = "$Revision: 1.8 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.8 2003/03/15 22:01:34 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
