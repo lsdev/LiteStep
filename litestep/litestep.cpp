@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "StartupRunner.h"
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
+#include "../utility/shellhlp.h"
 
 // Services
 #include "DDEService.h"
@@ -178,7 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (GetModuleFileName (hInstance, szAppPath, sizeof (szAppPath)) > 0)
 	{
 		PathRemoveFileSpec(szAppPath);
-		PathAddBackslash(szAppPath);
+		PathAddBackslashEx(szAppPath, MAX_PATH);
 	}
 	PathCombine(szRcPath, szAppPath, "step.rc");
 
