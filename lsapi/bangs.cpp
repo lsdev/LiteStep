@@ -272,7 +272,7 @@ void BangReloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 			LPCSTR pszNextToken = pszArgs;
 			char szModuleString[MAX_PATH];
 
-			while (GetToken(pszNextToken, szModuleString, &pszNextToken, true))
+			while (GetToken(pszNextToken, szModuleString, &pszNextToken, TRUE))
 			{
 				SendMessage(hLiteStep, LM_RELOADMODULE, (WPARAM)szModuleString, 0);
 			}
@@ -361,7 +361,7 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 		LPCSTR pszNextToken = pszArgs;
 		char szPath[MAX_PATH];
 
-		while (GetToken(pszNextToken, szPath, &pszNextToken, false))
+		while (GetToken(pszNextToken, szPath, &pszNextToken, TRUE))
 		{
 			SendMessage(hLiteStep, LM_UNLOADMODULE, (WPARAM)szPath, 0);
 		}
