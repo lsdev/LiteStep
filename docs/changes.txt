@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Release Candidate 2
+    LiteStep 0.24.7 Release Candidate 3
     Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -28,6 +28,8 @@
    This is the same method that Explorer uses to detect if it should rerun
    startup items in the event that the shell crashes. Thus the -nostartup switch
    is obsolete on NT systems.
+
+ - Fixed XP logon delay
 
  - Miscellaneous StartupRunner fixes and additions. Now has RunOnceEx support.
 
