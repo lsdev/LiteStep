@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "lswinbase.h"
 
-const GWL_CLASSPOINTER = 0;
+const unsigned int GWL_CLASSPOINTER = 0;
 
 
 struct CreationData
@@ -137,9 +137,9 @@ bool Window::createWindow(DWORD dwExStyle, LPCSTR lpWindowName, DWORD dwStyle,
 		throw;
 	}
 
-	const_cast<HWND>(hParent) = hWndParent;
+	hParent = hWndParent;
 
-	const_cast<HWND>(hWnd) = CreateWindowEx(dwExStyle, className, lpWindowName, dwStyle,
+	hWnd = CreateWindowEx(dwExStyle, className, lpWindowName, dwStyle,
 	                                        x, y, nWidth, nHeight, hParent, NULL, hInstance, &creationData);
 	if (!hWnd)
 		return false;
@@ -166,7 +166,11 @@ bool Window::destroyWindow()
 //---------------------------------------------------------
 LRESULT CALLBACK Window::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	Message message = {uMsg, wParam, lParam, 0};
+	Message message = { 0 };
+	message.uMsg = uMsg;
+	message.wParam = wParam;
+	message.lParam = lParam;
+	
 	Window* window = NULL;
 
 	if (uMsg == WM_CREATE)
@@ -185,10 +189,10 @@ LRESULT CALLBACK Window::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	if (window)
 	{
 		if (uMsg == WM_CREATE)
-			const_cast<HWND>(window->hWnd) = hWnd;
+			window->hWnd = hWnd;
 		window->windowProc(message);
 		if (uMsg == WM_NCDESTROY)
-			const_cast<HWND>(window->hWnd) = NULL;
+			window->hWnd = NULL;
 		return message.lResult;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);

@@ -307,7 +307,7 @@ void TrayService::_LoadShellServiceObjects()
             MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, 40);
             
             CLSIDFromString(wszCLSID, &clsid);
-            
+
             HRESULT hr = CoCreateInstance(clsid, NULL,
                 CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
                 IID_IOleCommandTarget, (void **)&pCmdTarget);
@@ -717,15 +717,16 @@ void TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _FindIconPredicate
+// FindIconPredicate
 //
 // Predicate for std::find_if, used by _FindIcon
+// Needs to be at global scope because of mingw issues
 //
-struct TrayService::_FindIconPredicate
+struct FindIconPredicate
 {
-    _FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID) {}
+    FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID) {}
     
-    bool operator() (const LSNOTIFYICONDATA*& plnid) const
+    bool operator() (const LSNOTIFYICONDATA* plnid) const
     {
         return (plnid->hWnd == m_hWnd && plnid->uID == m_uID);
     }
@@ -745,7 +746,7 @@ private:
 IconVector::iterator TrayService::_FindIcon(HWND hWnd, UINT uId)
 {
     return std::find_if(m_siVector.begin(), m_siVector.end(),
-        TrayService::_FindIconPredicate(hWnd, uId));
+        FindIconPredicate(hWnd, uId));
 }
 
 

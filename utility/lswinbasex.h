@@ -791,7 +791,7 @@ protected:
 
 protected:
 	bool bAlwaysOnTop;
-	const HWND hDesktop;
+	HWND hDesktop;
 };
 
 #endif // __LSWINBASEX_H

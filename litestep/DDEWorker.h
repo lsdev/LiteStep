@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include <ddeml.h>
-#include <shtypes.h>
+#include <shlobj.h>
 
 #define DDE_REQUEST_NONE			0x0000
 #define DDE_REQUEST_CREATEGROUP		0x0001

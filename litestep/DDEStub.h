@@ -34,8 +34,9 @@ public:
 	HRESULT Stop();
 
 private:
+    typedef void (__stdcall ShellDDEFunc)(BOOL);
     static HMODULE m_hShDocVw;
-    static void (__stdcall *m_pShellDDEInit)(BOOL bInit); 
+    static ShellDDEFunc* m_pShellDDEInit; 
 };
 
 #endif // __DDESERVICE_H

@@ -26,7 +26,7 @@ WindowX::WindowX(LPCSTR className):
 		Window(className),
 		hDesktop(NULL)
 {
-	bAlwaysOnTop = NULL;
+	bAlwaysOnTop = false;
 }
 
 WindowX::~WindowX()
@@ -77,10 +77,10 @@ void WindowX::onTop(bool bSetAlwaysOnTop)
 
 		if (!hDesktop)
 		{
-			const_cast<HWND>(hDesktop) = FindWindow("DesktopBackgroundClass", NULL);
+			hDesktop = FindWindow("DesktopBackgroundClass", NULL);
 			if (!hDesktop)
 			{
-				const_cast<HWND>(hDesktop) = GetDesktopWindow();
+				hDesktop = GetDesktopWindow();
 			}
 		}
 

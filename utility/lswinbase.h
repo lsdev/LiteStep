@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 struct Message
 {
 	UINT uMsg;
-	union
+	union 
 	{
 		struct
 		{
@@ -58,8 +58,8 @@ protected:
 	static LPCSTR className;
 	static DWORD instanceCount;
 	static HINSTANCE hInstance;
-	const volatile HWND hWnd;
-	const HWND hParent;
+	HWND hWnd;
+	HWND hParent;
 
 public:
 	Window(LPCSTR className);

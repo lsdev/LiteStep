@@ -59,9 +59,6 @@ private:
 	ModuleQueue::iterator _FindModule(LPCSTR pszLocation);
 	Module* _MakeModule(LPCSTR pszLocation, DWORD dwFlags);
 	
-    // predicate to be used with std::find_if
-	struct ModuleLookup;
-	
 	ModuleQueue m_ModuleQueue;
 	ILiteStep *m_pILiteStep;
 };
