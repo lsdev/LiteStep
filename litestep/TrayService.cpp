@@ -64,7 +64,6 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
 #include <shlobj.h>
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
-#include <algorithm>
 #include "../utility/core.hpp"
 
 #ifdef __GNUC__ // mingw workarounds
@@ -875,7 +874,7 @@ int TrayService::_ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
     ASSERT(!IsBadStringPtrW(pwzInput, cchInputMax));
     ASSERT_ISWRITEDATA(pszOutput, cchOutput);
     
-    size_t cchRealInputMax = std::min((wcslen(pwzInput) + 1), cchInputMax);
+    size_t cchRealInputMax = min((wcslen(pwzInput) + 1), cchInputMax);
     
     int nReturn = WideCharToMultiByte(CP_ACP, 0, pwzInput, cchRealInputMax,
         pszOutput, cchOutput, NULL, NULL);

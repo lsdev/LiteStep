@@ -33,7 +33,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #  define WIN32_LEAN_AND_MEAN
 #  define STRICT
 #  define NOCRYPT
-#  define NOMINMAX
 #  include <windows.h>
 #endif // _WINDOWS_
 
