@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 //#include "../../utility/safestring.h"
 #include "resource.h"
-#include "../utility/wizardpage.h"
-#include "../utility/wizardmain.h"
+#include "wizardpage.h"
+#include "wizardmain.h"
 
 #endif // __INCLUDE_STDAFX_H

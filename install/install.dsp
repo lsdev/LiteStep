@@ -125,6 +125,14 @@ SOURCE=.\installntuser.cpp
 
 SOURCE=.\installstart.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\wizardmain.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\wizardpage.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

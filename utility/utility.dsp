@@ -109,14 +109,6 @@ SOURCE=.\shellhlp.cpp
 
 SOURCE=.\versioning.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\wizardmain.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\wizardpage.cpp
-# End Source File
 # End Group
 # Begin Group "Headers"
 
@@ -188,14 +180,6 @@ SOURCE=.\versioning.h
 # Begin Source File
 
 SOURCE=.\wharfdata.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\wizardmain.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\wizardpage.h
 # End Source File
 # End Group
 # End Target
