@@ -119,41 +119,8 @@ void BangManager::ClearBangCommands()
 	while (iter != bang_map.end())
 	{
 		iter->second->Release();
-		iter++;
+		++iter;
 	}
 
 	bang_map.clear();
-
-}
-
-UINT BangManager::GetBangCommandNames(LPCSTR pszNames, UINT nSize)
-{
-	Lock lock (cs);
-
-	BangMap::iterator iter = bang_map.begin();
-
-	UINT nCount = 0;
-
-	while ((nCount < nSize) && (iter != bang_map.end()))
-	{
-		//names[i++] = SysAllocString( iter->first.c_str() );
-		iter++;
-	}
-
-	return nCount;
-}
-
-STDMETHODIMP BangManager::get_Count(PLONG plCount)
-{
-	HRESULT hr = E_POINTER;
-
-	if (plCount != NULL)
-	{
-		Lock lock (cs)
-			;
-		*plCount = bang_map.size();
-		hr = S_OK;
-	}
-
-	return hr;
 }
