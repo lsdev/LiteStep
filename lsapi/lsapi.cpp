@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.7 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.7 2003/03/15 21:55:17 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.8 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.8 2003/03/30 18:21:54 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -112,7 +112,6 @@ BOOL LSAPIInit::GetLiteStepPath(LPSTR pszPath, size_t cchPath)
 			else
 			{
 				HINSTANCE hInstance = NULL;
-				int nLen = 0;
 
 				hInstance = (HINSTANCE)GetWindowLong(GetLitestepWnd(), GWL_HINSTANCE);
 				if (hInstance)
