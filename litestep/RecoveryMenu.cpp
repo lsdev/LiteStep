@@ -20,12 +20,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "RecoveryMenu.h"
+#include "../lsapi/lsapi.h"
 
 struct
 {
 	int nStringID;
 	int nCommandID;
-	LPSTR pszDefText;
+	LPCSTR pszDefText;
 }
 rgMenuCommands[] =
     {
@@ -41,7 +42,10 @@ rgMenuCommands[] =
 
 const int cMenuCommands = sizeof(rgMenuCommands) / sizeof(rgMenuCommands[0]);
 
+const char szRecoveryMenuWndClass[] = "RecoveryMenuWndClass";
+
 extern HINSTANCE hLSInstance;
+
 
 // this thread provides a recovery menu which can be accessed in
 // case errors render Litestep unusable
@@ -55,31 +59,36 @@ DWORD WINAPI RecoveryThreadProc(LPVOID)
 	wc.hInstance = hLSInstance;
 	wc.lpszClassName = szRecoveryMenuWndClass;
 
-	RegisterClassEx(&wc);
-
-	HWND hRecoveryWnd =
+	if (RegisterClassEx(&wc))
+    {
+        HWND hRecoveryWnd =
             CreateWindowEx(0,
-	               szRecoveryMenuWndClass,
-	               NULL,
-	               WS_POPUP,
-	               0, 0, 0, 0,
-	               NULL,
-	               NULL,
-	               hLSInstance,
-	               NULL);
+            szRecoveryMenuWndClass,
+            NULL,
+            WS_POPUP,
+            0, 0, 0, 0,
+            NULL,
+            NULL,
+            hLSInstance,
+            NULL);
+        
+        if (IsWindow(hRecoveryWnd))
+        {
+            MSG msg;
+            
+            while (GetMessage(&msg, NULL, 0, 0))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            
+            DestroyWindow(hRecoveryWnd);
+        }
 
-	MSG msg;
+        UnregisterClass(szRecoveryMenuWndClass, hLSInstance);
+    }
 
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	DestroyWindow(hRecoveryWnd);
-    UnregisterClass(szRecoveryMenuWndClass, hLSInstance);
-
-	return 0;
+    return 0;
 }
 
 LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM lParam)
@@ -129,13 +138,16 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 			{
 				case ID_RECYCLE:
 				{
-					SendMessage(GetLitestepWnd(), LM_RECYCLE, 0, 0);
+					// using PostMessage so the user can still use this menu
+                    // to kill LS should the message queue be blocked
+                    PostMessage(GetLitestepWnd(), LM_RECYCLE, LR_RECYCLE, 0);
 				}
 				break;
 
 				case ID_QUIT:
 				{
-					SendMessage(GetLitestepWnd(), LM_RECYCLE, 2, 0);
+					// ditto
+                    PostMessage(GetLitestepWnd(), LM_RECYCLE, LR_QUIT, 0);
 				}
 				break;
 
@@ -180,7 +192,7 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 						FreeLibrary(hInstall);
 						hInstall = NULL;
 
-						exit(0);
+						ExitProcess(0);
 					}
 				}
 				break;
