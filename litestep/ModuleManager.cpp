@@ -188,9 +188,8 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 {
 	UINT uReturn = 0;
-	int nModuleCount = mqModules.size();
 
-	if (nModuleCount)
+	if (mqModules.size() > 0)
 	{
 		HWND hLiteStep = NULL;
 		CHAR szAppPath[MAX_PATH];
@@ -202,10 +201,9 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 			hr = m_pILiteStep->get_AppPath(szAppPath, MAX_PATH);
 			if (SUCCEEDED(hr))
 			{
-				HANDLE* pInitEvents = new HANDLE[nModuleCount];
+                std::vector<HANDLE> vecInitEvents;;
 				ModuleQueue::iterator iter = mqModules.begin();
 
-				int nIndex = 0;
 				while (iter != mqModules.end())
 				{
 					if (*iter)
@@ -215,24 +213,28 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 						if ((*iter)->LoadDll())
 						{
 							HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
-							if (hEvent)
+							
+                            if (hEvent)
 							{
-								pInitEvents[nIndex++] = hEvent;
+								vecInitEvents.push_back(hEvent);
 							}
 							++uReturn;
 						}
 					}
 
-					iter++;
+					++iter;
 				}
 
-				// Wait for all modules to signal that they have started before exiting this function
-				nModuleCount = nIndex;
-				DWORD dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pInitEvents, FALSE, INFINITE, QS_ALLINPUT);
-				HWND hLiteStep = GetLitestepWnd();
-				while (nIndex)
+				// Wait for all modules to signal that they have started
+				size_t stModuleCount = vecInitEvents.size();
+                size_t stIndex = stModuleCount;
+				
+                DWORD dwWaitStatus = MsgWaitForMultipleObjects(stModuleCount,
+                    &vecInitEvents[0], FALSE, INFINITE, QS_ALLINPUT);
+
+				while (stIndex)
 				{
-					if (dwWaitStatus == (WAIT_OBJECT_0 + nModuleCount))
+					if (dwWaitStatus == (WAIT_OBJECT_0 + stModuleCount))
 					{
 						MSG message;
 						// if we use NULL instead of hLiteStep here.. it locks us up...
@@ -242,18 +244,18 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 							DispatchMessage (&message);
 						}
 					}
-					else if ((dwWaitStatus >= WAIT_OBJECT_0) && (dwWaitStatus <= (WAIT_OBJECT_0 + nModuleCount - 1)))
+					else if ((dwWaitStatus >= WAIT_OBJECT_0) &&
+                        (dwWaitStatus <= (WAIT_OBJECT_0 + stModuleCount - 1)))
 					{
-						nIndex--;
+						--stIndex;
 					}
 
-					if (nIndex)
+					if (stIndex)
 					{
-						dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pInitEvents, FALSE, INFINITE, QS_ALLINPUT);
+						dwWaitStatus = MsgWaitForMultipleObjects(stModuleCount,
+                            &vecInitEvents[0], FALSE, INFINITE, QS_ALLINPUT);
 					}
 				}
-
-				delete [] pInitEvents;
 			}
 		}
 	}
