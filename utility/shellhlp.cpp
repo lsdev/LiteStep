@@ -29,14 +29,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 BOOL GetShellFolderPath(int nFolder, LPSTR szPath, size_t cchPath)
 {
-	LPITEMIDLIST pidl;
-	IMalloc *pMalloc;
-	HRESULT hr;
+	// LPITEMIDLIST pidl;
+	// IMalloc *pMalloc;
+	// HRESULT hr;
 	BOOL bReturn = FALSE;
 
 	if (IsValidStringPtr(szPath, cchPath) && (cchPath >= MAX_PATH))
 	{
-		if (SUCCEEDED(SHGetMalloc(&pMalloc)))
+        bReturn = SHGetSpecialFolderPath(NULL, szPath, nFolder, FALSE);
+
+        if (bReturn)
+        {
+            PathAddBackslash(szPath);
+            PathQuoteSpaces(szPath);
+        }
+        
+/*        if (SUCCEEDED(SHGetMalloc(&pMalloc)))
 		{
 
 			hr = SHGetSpecialFolderLocation(NULL, nFolder, &pidl);
@@ -54,7 +62,7 @@ BOOL GetShellFolderPath(int nFolder, LPSTR szPath, size_t cchPath)
 				pMalloc->Free(pidl);
 				pMalloc->Release();
 			}
-		}
+		}*/
 	}
 
 	return bReturn;
