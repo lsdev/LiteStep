@@ -410,7 +410,7 @@ protected:
 
 	// Timer Functions
 
-	UINT SetTimer(UINT nIDEvent, UINT nElapse)
+	UINT_PTR SetTimer(UINT nIDEvent, UINT nElapse)
 	{
 		ASSERT(::IsWindow(hWnd));
 		return ::SetTimer(hWnd, nIDEvent, nElapse, NULL);
@@ -786,7 +786,7 @@ protected:
 	DWORD GetHotKey() const
 	{
 		ASSERT(::IsWindow(hWnd));
-		return ::SendMessage(hWnd, WM_GETHOTKEY, 0, 0);
+		return static_cast<DWORD>(::SendMessage(hWnd, WM_GETHOTKEY, 0, 0));
 	}
 
 protected:
