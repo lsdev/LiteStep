@@ -20,26 +20,56 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __CRITICALSECTION_H
 #define __CRITICALSECTION_H
 
+class CriticalSection
+{
+    CriticalSection(const CriticalSection& rhs);
+    CriticalSection& operator=(const CriticalSection& rhs);
+    
+    CRITICAL_SECTION m_CritSection;
+    
+public:
+    CriticalSection()
+    {
+        InitializeCriticalSection(&m_CritSection);
+    }
+    
+    ~CriticalSection()
+    {
+        DeleteCriticalSection (&m_CritSection);
+    }
+    
+    void Acquire()
+    {
+        EnterCriticalSection(&m_CritSection);
+    }
+    
+    void Release()
+    {
+        LeaveCriticalSection(&m_CritSection);
+    }
+};
+
+
 class Lock
 {
 public:
-	Lock(CRITICAL_SECTION &cs)
-			: _cs(cs)
+	Lock(CriticalSection& cs) : m_cs(cs)
 	{
-		EnterCriticalSection(&_cs);
+		m_cs.Acquire();
 	}
 
 	~Lock()
 	{
-		LeaveCriticalSection(&_cs);
+		m_cs.Release();
 	}
 
 protected:
-	CRITICAL_SECTION &_cs;
+	CriticalSection& m_cs;
 
 private:
     Lock(const Lock& rhs);
     Lock& operator=(const Lock& rhs);
 };
+
 
 #endif // __CRITICALSECTION_H

@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __SETTINGSMANAGER_H
 
 #include "../utility/common.h"
+#include "../utility/criticalsection.h"
 #include <string>
 #include <map>
 #include <set>
@@ -41,6 +42,8 @@ class SettingsManager
 	IteratorSet m_Iterators;
 	SettingsMap m_SettingsMap;
 	FileMap m_FileMap;
+
+    CriticalSection m_CritSection;
 
 
 protected:

@@ -34,7 +34,7 @@ class BangManager
 {
 private:
 	BangMap bang_map;
-	CRITICAL_SECTION cs;
+	CriticalSection cs;
 
 public:
 	BangManager();
