@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Services
 #include "DDEService.h"
+#include "DDEStub.h"
 #include "TrayService.h"
 
 // Managers
@@ -41,12 +42,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Misc Helpers
 #include "DataStore.h"
 
+// STL headers
+#include <algorithm>
+
 // Always include last in cpp file
 #include "../utility/safestr.h"
 
 
-// const char rcsRevision[] = "$Revision: 1.12 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.12 2003/04/21 15:24:16 ilmcuts Exp $"; // The Full RCS ID.
+// namespace stuff
+using std::for_each;
+using std::mem_fun;
+
+
+// const char rcsRevision[] = "$Revision: 1.13 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.13 2003/05/01 17:35:19 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -267,8 +276,6 @@ CLiteStep::CLiteStep()
 	m_pDataStoreManager = NULL;
 	m_pMessageManager = NULL;
 	bHookManagerStarted = FALSE;
-	m_cxServiceItems = 0;
-	m_pDDEService = NULL;
 	m_pTrayService = NULL;
 }
 
@@ -880,20 +887,45 @@ STDMETHODIMP CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ si
 //
 HRESULT CLiteStep::_InitServices()
 {
-	HRESULT hr = S_OK;
+    IService* pService;
 
-	IID iidNULL = {0};
+	//
+    // DDE Service
+    //
+    if (GetRCBool("LSUseSystemDDE", TRUE))
+    {
+        // M$ DDE
+        pService = new DDEStub();
+    }
+    else
+    {
+        // liteman
+        pService = new DDEService();
+    }
 
-	m_ServiceItems[0] = ServiceItem(Service<DDEService>::CreateInstance, (IService**) & m_pDDEService);
-	m_ServiceItems[1] = ServiceItem(Service<TrayService>::CreateInstance, (IService**) & m_pTrayService);
-	m_cxServiceItems = 2;
+    if (pService)
+    {
+        m_Services.push_back(pService);
+    }
+    else
+    {
+        return E_OUTOFMEMORY;
+    }
 
-	for (int i = 0; ((i < m_cxServiceItems) && SUCCEEDED(hr)); i++)
-	{
-		hr = m_ServiceItems[i].pfnFactory(iidNULL, (void**)m_ServiceItems[i].ppService);
-	}
+    //
+    // Tray Service
+    //
+    m_pTrayService = new TrayService();
+    if (m_pTrayService)
+    {
+        m_Services.push_back(m_pTrayService);
+    }
+    else
+    {
+        return E_OUTOFMEMORY;
+    }
 
-	return hr;
+	return S_OK;
 }
 
 
@@ -902,17 +934,9 @@ HRESULT CLiteStep::_InitServices()
 //
 HRESULT CLiteStep::_StartServices()
 {
-	HRESULT hr = S_OK;
-
-	for (int i = 0; ((i < m_cxServiceItems) /*&& SUCCEEDED(hr)*/); i++)
-	{
-		if (*m_ServiceItems[i].ppService)
-		{
-			hr = (*m_ServiceItems[i].ppService)->Start();
-		}
-	}
-
-	return hr;
+    // use std::transform to add error checking to this
+    for_each(m_Services.begin(), m_Services.end(), mem_fun(&IService::Start));
+	return S_OK;
 }
 
 
@@ -921,17 +945,8 @@ HRESULT CLiteStep::_StartServices()
 //
 HRESULT CLiteStep::_StopServices()
 {
-	HRESULT hr = S_OK;
-
-	for (int i = m_cxServiceItems - 1; i >= 0 ; i--)
-	{
-		if (*m_ServiceItems[i].ppService)
-		{
-			(*m_ServiceItems[i].ppService)->Stop();
-		}
-	}
-
-	return hr;
+    for_each(m_Services.begin(), m_Services.end(), mem_fun(&IService::Stop));
+	return S_OK;
 }
 
 
@@ -940,13 +955,10 @@ HRESULT CLiteStep::_StopServices()
 //
 void CLiteStep::_CleanupServices()
 {
-	for (int i = 0; i < m_cxServiceItems; i++)
-	{
-		if (*m_ServiceItems[i].ppService)
-		{
-			(*m_ServiceItems[i].ppService)->Release();
-		}
-	}
+    std::for_each(m_Services.begin(), m_Services.end(),
+        std::mem_fun(&IService::Release));
+    
+    m_Services.clear();
 }
 
 

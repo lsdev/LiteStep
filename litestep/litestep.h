@@ -22,12 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include "../utility/ILiteStep.h"
+#include <vector>
 
 
 // forward declarations
 class IService;
 class TrayService;
-class DDEService;
 class DataStore;
 class MessageManager;
 class ModuleManager;
@@ -46,27 +46,6 @@ const LPCSTR szMainWindowTitle = "LiteStep";
 
 #define GWL_CLASSPOINTER	0
 
-// Service Item Definitions
-typedef HRESULT (*PFNCLASSFACTORY)(REFIID iid, void **ppvObject);
-class ServiceItem
-{
-public:
-	PFNCLASSFACTORY pfnFactory;
-	IService** ppService;
-
-	ServiceItem()
-	{
-		pfnFactory = NULL;
-		ppService = NULL;
-	};
-
-	ServiceItem(PFNCLASSFACTORY pfnFactory, IService** ppService)
-	{
-		this->pfnFactory = pfnFactory;
-		this->ppService = ppService;
-	};
-
-};
 
 class CLiteStep: public ILiteStep
 {
@@ -120,12 +99,9 @@ private:
 	//
 	// Service Related
 	//
-	ServiceItem m_ServiceItems[2];
-	int m_cxServiceItems;
-
-	DDEService *m_pDDEService; // = NULL;
-	TrayService *m_pTrayService; // = NULL;
-
+	TrayService* m_pTrayService; // = NULL;
+    std::vector<IService*> m_Services;
+    
 	HRESULT _InitServices();
 	HRESULT _StartServices();
 	HRESULT _StopServices();
