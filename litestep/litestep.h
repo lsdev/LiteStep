@@ -54,7 +54,7 @@ public:
 	CLiteStep();
 	~CLiteStep();
 
-	HRESULT Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, BOOL bRunStartup);
+	HRESULT Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode);
 
 	LRESULT ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

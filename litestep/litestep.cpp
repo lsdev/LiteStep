@@ -57,9 +57,17 @@ static bool ParseCmdLine(LPCSTR pszCmdLine);
 static void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
 
 CLiteStep gLiteStep;
-BOOL bRunStartup = TRUE;
 CHAR szAppPath[MAX_PATH];
 CHAR szRcPath[MAX_PATH];
+
+enum StartupMode
+{
+    STARTUP_DONT_RUN  = -1,
+    STARTUP_DEFAULT   = 0,  // run only if first time
+    STARTUP_FORCE_RUN = TRUE
+};
+
+int g_nStartupMode = STARTUP_DEFAULT;
 
 
 //
@@ -119,8 +127,12 @@ static bool ParseCmdLine(LPCSTR pszCmdLine)
 				{
 					if (!stricmp(szToken, "-nostartup"))
 					{
-						bRunStartup = FALSE;
+						g_nStartupMode = STARTUP_DONT_RUN;
 					}
+                    else if (!stricmp(szToken, "-startup"))
+                    {
+                        g_nStartupMode = STARTUP_FORCE_RUN;
+                    }                    
 					else if (!stricmp(szToken, "-install"))
 					{
 						HMODULE hInstall = LoadLibrary("install.dll");
@@ -241,7 +253,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if (SUCCEEDED(hr))
     {
-        hr = gLiteStep.Start(szAppPath, szRcPath, hInstance, bRunStartup);
+        hr = gLiteStep.Start(szAppPath, szRcPath, hInstance, g_nStartupMode);
     }
 
     CloseHandle(hMutex);
@@ -277,12 +289,11 @@ CLiteStep::~CLiteStep()
 
 
 //
-// Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, BOOL bRunStartup)
+// Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
 //
-HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, BOOL bRunStartup)
+HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
 {
 	HRESULT hr;
-	BOOL bDoRunStartup;
 	bool bUnderExplorer = false;
 
 	m_sAppPath.assign(pszAppPath);  // could throw length_error
@@ -311,7 +322,11 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 
 	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
 
-	bDoRunStartup = ((bRunStartup) ? GetRCBool("LSNoStartup", FALSE) : FALSE);
+    if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
+        (nStartupMode != STARTUP_FORCE_RUN && !GetRCBool("LSNoStartup", FALSE)))
+    {
+        nStartupMode = STARTUP_DONT_RUN;
+    }
 
     m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
 
@@ -406,11 +421,12 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		}
 
 		// Run startup items if the SHIFT key is not down
-		if (!(GetAsyncKeyState(VK_SHIFT) & 0x8000) && bDoRunStartup)
+		if (nStartupMode != STARTUP_DONT_RUN)
 		{
 			DWORD dwThread;
-			CloseHandle(CreateThread(NULL, 0, StartupRunner::Run, NULL, 0, &dwThread));
-			bRunStartup = FALSE;
+			
+            CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
+                (void*)nStartupMode, 0, &dwThread));
 		}
 
 		hr = _InitManagers();
