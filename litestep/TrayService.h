@@ -239,13 +239,22 @@ public:
     BOOL HandleNotification(SHELLTRAYDATA* pstd);
     
     // resend all icon data
-    void SendSystemTray();
+    HWND SendSystemTray();
     
     // Message Handler
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         LPARAM lParam);
     
 private:
+    bool _CreateWindows();
+    void _DestroyWindows();
+
+    //
+    // manage COM based shell services
+    //
+    void _LoadShellServiceObjects();
+    void _UnloadShellServiceObjects();
+
     //
     // NIM_* handlers
     //
@@ -265,12 +274,6 @@ private:
     int _ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
         const wchar_t* pwzInput, size_t cchInputMax) const;
 
-    //
-    // manage COM based shell services
-    //
-    void _LoadShellServiceObjects();
-    void _UnloadShellServiceObjects();
-    
     //
     // _FindIcon variants
     //
@@ -300,7 +303,7 @@ private:
     //
     //
     //
-    bool m_bWin2000;
+    HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
 	HWND m_hLiteStep;
     HINSTANCE m_hInstance;
