@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.8 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.8 2003/03/30 18:21:54 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.9 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.9 2003/04/17 19:44:29 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -190,28 +190,36 @@ void ClearBangs()
 }
 
 
+template<typename T>
+BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
+{
+    BOOL bReturn = false;
+    
+    if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
+    {
+        DWORD dwCurrentThreadID = GetCurrentThreadId();
+        
+        Bang* pBang = new Bang(dwCurrentThreadID, pfnBangCommand, pszCommand);
+        
+        if (IsValidReadPtr(pBang))
+        {
+            //bBang->AddRef();
+            LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, pBang);
+            pBang->Release();
+            bReturn = TRUE;
+        }
+    }
+
+    return bReturn;
+}
+
+
 //
 // AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 //
 BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 {
-	BOOL bReturn = FALSE;
-
-    if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
-	{
-		DWORD dwCurrentThreadID = GetCurrentThreadId();
-
-		Bang *bBang = new Bang(dwCurrentThreadID, pfnBangCommand);
-		if (IsValidReadPtr(bBang))
-		{
-			//bBang->AddRef();
-            LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, bBang);
-			bBang->Release();
-			bReturn = TRUE;
-		}
-	}
-
-    return bReturn;
+    return AddBangCommandWorker(pszCommand, pfnBangCommand);
 }
 
 
@@ -220,23 +228,7 @@ BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 //
 BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
 {
-	BOOL bReturn = FALSE;
-
-	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
-	{
-		DWORD dwCurrentThreadID = GetCurrentThreadId();
-
-		Bang *bBang = new Bang(dwCurrentThreadID, pfnBangCommand, pszCommand);
-		if (IsValidReadPtr(bBang))
-		{
-			//bBang->AddRef();
-			LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, bBang);
-			bBang->Release();
-			bReturn = TRUE;
-		}
-	}
-
-	return bReturn;
+    return AddBangCommandWorker(pszCommand, pfnBangCommand);
 }
 
 
