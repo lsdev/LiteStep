@@ -241,7 +241,7 @@ void BangRecycle(HWND /* hCaller */, LPCSTR /* pszArgs */)
 
 	if (hLiteStep)
 	{
-		SendMessage(hLiteStep, LM_RECYCLE, LR_RECYCLE, 0);
+		PostMessage(hLiteStep, LM_RECYCLE, LR_RECYCLE, 0);
 	}
 }
 
