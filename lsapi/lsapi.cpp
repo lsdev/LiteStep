@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.15 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.15 2004/03/15 10:34:32 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.16 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.16 2004/05/01 13:49:25 ilmcuts Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -522,15 +522,13 @@ int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR ps
 	return dwTokens;
 }
 
-int LCTokenize (LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
+int LCTokenize(LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
 {
 	return _Tokenize(szString, lpszBuffers, dwNumBuffers, szExtraParameters, FALSE);
 }
 
 BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseBrackets)
 {
-	BOOL bReturn = FALSE;
-
 	LPCSTR pszCurrent = pszString;
 	LPCSTR pszStartMarker = NULL;
 	int iBracketLevel = 0;
@@ -538,26 +536,36 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 	bool bIsToken = false;
 	bool bAppendNextToken = false;
 
-	if (pszString != NULL)
+	if (pszString)
 	{
 		if (pszToken)
-			pszToken[0] = '\0';
-		if (pszNextToken)
-			* pszNextToken = NULL;
+        {
+            pszToken[0] = '\0';
+        }
+
+        if (pszNextToken)
+        {
+            *pszNextToken = NULL;
+        }
 
 		pszCurrent += strspn(pszCurrent, WHITESPACE);
 
 		for (; *pszCurrent; pszCurrent++)
 		{
-			if (isspace(*pszCurrent) && !cQuote)
-				break;
+			if (isspace((unsigned char)*pszCurrent) && !cQuote)
+            {
+                break;
+            }
 
-			if (bUseBrackets && strchr("[]", *pszCurrent) && (!strchr("\'\"", cQuote) || !cQuote))
+			if (bUseBrackets && strchr("[]", *pszCurrent) &&
+                (!strchr("\'\"", cQuote) || !cQuote))
 			{
 				if (*pszCurrent == '[')
 				{
 					if (bIsToken && !cQuote)
-						break;
+                    {
+                        break;
+                    }
 
 					iBracketLevel++;
 					cQuote = '[';
@@ -570,8 +578,11 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 				else
 				{
 					iBracketLevel--;
-					if (iBracketLevel <= 0)
-						break;
+					
+                    if (iBracketLevel <= 0)
+                    {
+                        break;
+                    }
 				}
 			}
 
@@ -584,6 +595,7 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 						bAppendNextToken = true;
 						break;
 					}
+
 					cQuote = *pszCurrent;
 					continue;
 				}
@@ -608,20 +620,27 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 
 
 		if (!bAppendNextToken && *pszCurrent)
-			pszCurrent++;
+        {
+            pszCurrent++;
+        }
 
 		pszCurrent += strspn(pszCurrent, WHITESPACE);
 
 		if (*pszCurrent && pszNextToken)
-			* pszNextToken = pszCurrent;
+        {
+            *pszNextToken = pszCurrent;
+        }
 
 		if (bAppendNextToken && *pszCurrent)
-			GetToken(pszCurrent, pszToken + strlen(pszToken), pszNextToken, bUseBrackets);
+        {
+            GetToken(pszCurrent, pszToken + strlen(pszToken),
+                pszNextToken, bUseBrackets);
+        }
 
 		return pszStartMarker != NULL;
 	}
 
-	return bReturn;
+	return FALSE;
 }
 
 int CommandTokenize(LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
