@@ -29,7 +29,6 @@ EvalParser::EvalParser()
 	inputPosition = 0;
 	currentChar = 0;
 	lookaheadChar = 0;
-	stringValue = '\0';
 	currentToken = TT_NONE;
 };
 
@@ -391,13 +390,13 @@ bool EvalParser::nextChar()
 {
 	// first time?
 	if (inputPosition == 0)
-		lookaheadChar = input[inputPosition++];
+		lookaheadChar = input.c_str()[inputPosition++];
 
 	// read in wchar_t
 	currentChar = lookaheadChar;
 
-	if (lookaheadChar != 0)
-		lookaheadChar = input[inputPosition++];
+    if (lookaheadChar != 0)
+		lookaheadChar = input.c_str()[inputPosition++];
 
 	return true;
 }
