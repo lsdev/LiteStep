@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "lsapidefines.h"
 #include <string>
 
-using namespace std;
 
 class SettingsManager;
 
@@ -65,7 +64,7 @@ public:
 private:
 
 	// input source
-	string input;
+    std::string input;
 
 	// scanner state
 	int inputPosition;
@@ -78,7 +77,7 @@ private:
 	// current token value
 	bool boolValue;
 	int intValue;
-	string stringValue;
+    std::string stringValue;
 
 private:
 

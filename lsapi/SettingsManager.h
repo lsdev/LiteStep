@@ -21,11 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __SETTINGSMANAGER_H
 
 #include "../utility/common.h"
-#include "../utility/stringutility.h"
 #include <string>
 #include <map>
 #include <set>
-#include "parser.h"
 #include "settingsdefines.h"
 #include "settingsiterator.h"
 
@@ -35,8 +33,8 @@ struct FileInfo
 	UINT m_Count;
 };
 
-typedef set<SettingsIterator*> IteratorSet;
-typedef map<string, FileInfo*, stringicmp> FileMap;
+typedef std::set<SettingsIterator*> IteratorSet;
+typedef std::map<std::string, FileInfo*, stringicmp> FileMap;
 
 class SettingsManager
 {

@@ -21,8 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __THREADEDBANGCOMMAND_H
 
 #include "../utility/common.h"
-#include "lsapidefines.h"
 #include "../utility/base.h"
+#include "lsapidefines.h"
 #include "bangcommand.h"
 
 class ThreadedBangCommand: public CountedBase
