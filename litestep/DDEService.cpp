@@ -41,7 +41,7 @@ DDEService::DDEService()
 	m_hszGroups = NULL;
 	m_hszFolders = NULL;
 	m_hszAppProperties = NULL;
-	m_dwDDEInst = NULL;
+	m_dwDDEInst = 0;
     m_hStartEvent = NULL;
 }
 
@@ -171,7 +171,7 @@ void DDEService::_DoStop()
     }
     DdeUninitialize(m_dwDDEInst);
 
-    m_dwDDEInst = NULL;
+    m_dwDDEInst = 0;
 
     CoUninitialize();
 }

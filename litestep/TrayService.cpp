@@ -87,10 +87,13 @@ Note 8:  The pre-XP language indicator, internat.exe, checks the existence of
 #ifdef __GNUC__ // mingw workarounds
 #  include <initguid.h>
 #  include <docobj.h>
+
 #  if __MINGW32_MAJOR_VERSION < 3 // mingw 3.x headers already have this symbol
      DEFINE_GUID(CGID_ShellServiceObject, 0x000214D2, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
 #  endif
-#endif
+
+using std::min;
+#endif // defined(__GNUC__)
 
 #ifndef REGSTR_PATH_SHELLSERVICEOBJECTDELAYED
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")

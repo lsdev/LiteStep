@@ -32,10 +32,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.14 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.14 2004/02/21 22:34:01 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.15 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.15 2004/03/15 10:34:32 ilmcuts Exp $"; // The Full RCS ID.
 
-extern SettingsManager *gSettingsManager = NULL;
+SettingsManager* gSettingsManager = NULL;
 
 int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
