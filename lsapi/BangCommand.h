@@ -23,11 +23,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "lsapidefines.h"
 #include "../utility/base.h"
+#include <string>
 
 class Bang: public CountedBase
 {
 public:
-	Bang(DWORD dwThread, BangCommand* pfnBang);
+	Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand);
 	Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand);
 	~Bang();
 
@@ -39,7 +40,7 @@ private:
 	bool m_bEX;
 	BangCommand* m_bBang;
 	BangCommandEx* m_bBangEX;
-	char m_szCommand[MAX_BANGCOMMAND];
+    std::string m_szCommand;
 };
 
 #endif // __BANG_H
