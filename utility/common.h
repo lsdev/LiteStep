@@ -30,18 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 #ifndef _WINDOWS_
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#ifndef STRICT
-#define STRICT
-#endif
-#ifndef NOCRYPT
-#define NOCRYPT
-#endif
-
-#include <windows.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define STRICT
+#  define NOCRYPT
+#  include <windows.h>
 #endif // _WINDOWS_
 
 
@@ -49,7 +41,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <shellapi.h>
 #include <shlwapi.h>
-//#include <basetyps.h>
 #include <tchar.h>
 
 // Include debugging macros
@@ -58,10 +49,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include "lsdebug.h"
 
-#ifndef MAX_LINE_LENGTH
-#define MAX_LINE_LENGTH				4096
-#endif // MAX_LINE_LENGTH
-
+#include "../litestep/resource.h"
+#include "../lsapi/lsapidefines.h"
 #include "safeptr.h"
 
 
