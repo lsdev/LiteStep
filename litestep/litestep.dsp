@@ -43,8 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /WX /GX /O2 /I "../lsapi" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /nologo /MD /W3 /WX /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
+# SUBTRACT CPP /Fr /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "NDEBUG" /o /win32 "NUL"
 # SUBTRACT MTL /mktyplib203
@@ -55,12 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 ..\lsapi\release\lsapi.lib ../hook/release/hook.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib kernel32.lib user32.lib delayimp.lib shlwapi.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"libc.lib" /opt:NOWIN98 /delayload:"hook.dll"
-# SUBTRACT LINK32 /pdb:none
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=xcopy                           /y                           ..\*.txt                           release\ 
-# End Special Build Tool
+# ADD LINK32 ..\lsapi\release\lsapi.lib ../hook/release/hook.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib kernel32.lib user32.lib delayimp.lib shlwapi.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib:"libcmt.lib" /opt:NOWIN98 /delayload:"hook.dll"
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
 

@@ -43,8 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /WX /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "LSAPI_INTERNAL" /FR /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /nologo /MD /W3 /WX /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "LSAPI_INTERNAL" /FD /c
+# SUBTRACT CPP /Fr /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
@@ -55,8 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 libpng13.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib version.lib kernel32.lib user32.lib shlwapi.lib /nologo /base:"0x13000000" /subsystem:windows /dll /machine:I386 /out:"..\litestep\Release\lsapi.dll" /opt:NOWIN98
-# SUBTRACT LINK32 /pdb:none
+# ADD LINK32 libpng13.lib gdi32.lib winspool.lib comdlg32.lib ole32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib version.lib kernel32.lib user32.lib shlwapi.lib /nologo /base:"0x13000000" /subsystem:windows /dll /pdb:none /machine:I386 /nodefaultlib:"libcmt.lib" /out:"..\litestep\Release\lsapi.dll" /opt:NOWIN98
 
 !ELSEIF  "$(CFG)" == "lsapi - Win32 Debug"
 
