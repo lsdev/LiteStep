@@ -63,7 +63,7 @@ SettingsManager::~SettingsManager()
 
 bool SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
-    char szPath[MAX_PATH];
+    char szPath[MAX_PATH] = { 0 };
 
     bool bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
     
@@ -427,12 +427,8 @@ void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
     if ((pszKeyName) && (pszValue))
     {
         // in order for LSSetVariable to work evars must be redefinable
-
-        // m_SettingsMap.insert(SettingsMap::value_type(pszKeyName, pszValue));
-        SettingsMap::iterator it = m_SettingsMap.lower_bound(pszKeyName);
-        
-        if (it != m_SettingsMap.end() &&
-            stricmp(pszKeyName, it->first.c_str()) == 0)
+        SettingsMap::iterator it;
+        if (_FindLine(pszKeyName, it))
         {
             it->second.assign(pszValue);
         }
