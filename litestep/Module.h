@@ -67,41 +67,41 @@ public:
 
 	static ULONG __stdcall ThreadProc(void* dllModPtr);
 
-	HINSTANCE GetInstance()
+	HINSTANCE GetInstance() const
 	{
 		return m_hInstance;
 	};
 
-	HANDLE GetThread()
+	HANDLE GetThread() const
 	{
 		return m_hThread;
 	};
 
-	HANDLE GetInitEvent()
+	HANDLE GetInitEvent() const
 	{
 		return m_hInitEvent;
 	};
 
-	HANDLE GetQuitEvent()
+	HANDLE GetQuitEvent() const
 	{
 		return m_hQuitEvent;
 	};
 
-	LPCSTR GetLocation()
+	LPCSTR GetLocation() const
 	{
 		return m_szLocation.c_str();
 	};
 
-	BOOL HasMessagePump()
+	BOOL HasMessagePump() const
 	{
 		return !(m_dwFlags & MODULE_NOTPUMPED);
 	};
 
-	ModuleQuitFunc GetQuit()
+	ModuleQuitFunc GetQuit() const
 	{
 		return m_pQuit;
 	};
-	ModuleInitExFunc GetInitEx()
+	ModuleInitExFunc GetInitEx() const
 	{
 		return m_pInitEx;
 	};
