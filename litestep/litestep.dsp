@@ -59,7 +59,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=xcopy                          /y                          ..\*.txt                          release\ 
+PostBuild_Cmds=xcopy                           /y                           ..\*.txt                           release\ 
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
@@ -112,6 +112,10 @@ SOURCE=.\DDEService.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DDEStub.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DDEWorker.cpp
 # End Source File
 # Begin Source File
@@ -161,6 +165,10 @@ SOURCE=.\DataStore.h
 # Begin Source File
 
 SOURCE=.\DDEService.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DDEStub.h
 # End Source File
 # Begin Source File
 
