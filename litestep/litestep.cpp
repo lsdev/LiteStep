@@ -866,7 +866,7 @@ STDMETHODIMP CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ si
 //
 HRESULT CLiteStep::_InitServices()
 {
-    IService* pService;
+    IService* pService = NULL;
 
 	//
     // DDE Service
@@ -894,14 +894,18 @@ HRESULT CLiteStep::_InitServices()
     //
     // Tray Service
     //
-    m_pTrayService = new TrayService();
-    if (m_pTrayService)
+    if (GetRCBoolDef("LSTrayService", TRUE))
     {
-        m_Services.push_back(m_pTrayService);
-    }
-    else
-    {
-        return E_OUTOFMEMORY;
+        m_pTrayService = new TrayService();
+        
+        if (m_pTrayService)
+        {
+            m_Services.push_back(m_pTrayService);
+        }
+        else
+        {
+            return E_OUTOFMEMORY;
+        }
     }
 
 	return S_OK;
