@@ -25,9 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vector>
 #include "../utility/core.hpp"
 
-ModuleManager::ModuleManager()
+ModuleManager::ModuleManager() : 
+m_pILiteStep(NULL), m_hLiteStep(NULL)
 {
-	m_pILiteStep = NULL;
 }
 
 ModuleManager::~ModuleManager()
@@ -36,16 +36,26 @@ ModuleManager::~ModuleManager()
 
 HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
 {
-	HRESULT hr;
+	ASSERT(m_pILiteStep == NULL);
+
+    HRESULT hr = E_FAIL;
 
 	if (pILiteStep != NULL)
 	{
 		m_pILiteStep = pILiteStep;
 		m_pILiteStep->AddRef();
 
-		_LoadModules();
+        char szAppPath[MAX_PATH] = { 0 };
 
-		hr = S_OK;
+        if (SUCCEEDED(m_pILiteStep->get_Window((LONG*)&m_hLiteStep)) &&
+            SUCCEEDED(m_pILiteStep->get_AppPath(szAppPath, MAX_PATH)))
+        {
+            m_sAppPath = szAppPath;
+
+            _LoadModules();
+            
+            hr = S_OK;
+        }
 	}
 	else
 	{
@@ -64,6 +74,7 @@ HRESULT ModuleManager::Stop()
 	if (m_pILiteStep)
 	{
 		m_pILiteStep->Release();
+        m_pILiteStep = NULL;
 	}
 
 	return hr;
@@ -191,44 +202,30 @@ UINT ModuleManager::_StartModules(const ModuleQueue& mqModules)
 
 	if (mqModules.size() > 0)
 	{
-		HWND hLiteStep = NULL;
-        char szAppPath[MAX_PATH] = { 0 };
-		
-        HRESULT hr = m_pILiteStep->get_Window((LONG*)&hLiteStep);
-		
-        if (SUCCEEDED(hr))
-		{
-			hr = m_pILiteStep->get_AppPath(szAppPath, MAX_PATH);
-			
-            if (SUCCEEDED(hr))
-			{
-                std::vector<HANDLE> vecInitEvents;;
-				ModuleQueue::const_iterator iter = mqModules.begin();
-
-				while (iter != mqModules.end())
-				{
-					if (*iter)
-					{
-                        HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
-                        
-                        if (hEvent)
-                        {
-                            vecInitEvents.push_back(hEvent);
-                        }
-                        
-                        m_ModuleQueue.push_back(*iter);
-                        ++uReturn;
-					}
-
-					++iter;
-				}
-
-				// Wait for all modules to signal that they have started
-                _WaitForModules(&vecInitEvents[0], vecInitEvents.size(),
-                    hLiteStep);
-			}
-		}
-	}
+        std::vector<HANDLE> vecInitEvents;;
+        ModuleQueue::const_iterator iter = mqModules.begin();
+        
+        while (iter != mqModules.end())
+        {
+            if (*iter)
+            {
+                HANDLE hEvent = (*iter)->Init(m_hLiteStep, m_sAppPath);
+                
+                if (hEvent)
+                {
+                    vecInitEvents.push_back(hEvent);
+                }
+                
+                m_ModuleQueue.push_back(*iter);
+                ++uReturn;
+            }
+            
+            ++iter;
+        }
+        
+        // Wait for all modules to signal that they have started
+        _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
+    }
 
 	return uReturn;
 }
@@ -252,8 +249,7 @@ void ModuleManager::_QuitModules()
         ++iter;
     }
     
-    _WaitForModules(&vecQuitEvents[0], vecQuitEvents.size(),
-        GetLitestepWnd());
+    _WaitForModules(&vecQuitEvents[0], vecQuitEvents.size());
     
     // Clean it all up
     iter = m_ModuleQueue.rbegin();
@@ -277,7 +273,7 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
         
         if (hQuitEvent)
         {
-            _WaitForModules(&hQuitEvent, 1, GetLitestepWnd());
+            _WaitForModules(&hQuitEvent, 1);
         }
         
         delete *iter;
@@ -336,8 +332,7 @@ ModuleQueue::iterator ModuleManager::_FindModule(HINSTANCE hModule)
 }
 
 
-void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount,
-                                    HWND hWnd) const
+void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
 {
     DWORD dwRest = dwCount;
     
@@ -350,7 +345,7 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount,
         {
             MSG message;
             // if we use NULL instead of hLiteStep here.. it locks us up...
-            if (PeekMessage(&message, hWnd, 0, 0, PM_REMOVE))
+            if (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
             {
                 TranslateMessage(&message);
                 DispatchMessage (&message);

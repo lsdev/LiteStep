@@ -61,10 +61,13 @@ private:
     ModuleQueue::iterator _FindModule(HINSTANCE hModule);
     Module* _MakeModule(LPCSTR pszLocation, DWORD dwFlags);
     
-    void _WaitForModules(const HANDLE* pHandles, DWORD dwCount, HWND hWnd) const;
+    void _WaitForModules(const HANDLE* pHandles, DWORD dwCount) const;
     
     ModuleQueue m_ModuleQueue;
     ILiteStep *m_pILiteStep;
+
+    HWND m_hLiteStep;
+    std::string m_sAppPath;
     
     struct IsLocationEqual
     {
