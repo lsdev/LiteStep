@@ -88,7 +88,8 @@ const char szNotifyClass[] = "TrayNotifyWnd";
 //
 TrayService::TrayService() :
 m_hNotifyWnd(NULL), m_hTrayWnd(NULL), m_hLiteStep(NULL),
-m_hInstance(NULL)
+m_hInstance(NULL),
+m_hConnectionsTray(NULL)
 {
 }
 
@@ -592,6 +593,24 @@ bool TrayService::_AddIcon(const NOTIFYICONDATA& nid)
             _CopyIconHandle(*plnid, nid);
             _CopyVersionSpecifics(*plnid, nid);
             
+            // This is a specific workaround for the second "ghost" DUN icon on
+            // XP. Should be removed as soon as we figure out NIS_SHAREDICON.
+            if (_IsShared(*plnid))
+            {
+                if (!m_hConnectionsTray)
+                {
+                    m_hConnectionsTray = FindWindowEx(NULL, NULL,
+                        "Connections Tray", NULL);
+                }
+
+                if (m_hConnectionsTray && (plnid->uFlags & ~NIF_TIP) &&
+                    plnid->hWnd == m_hConnectionsTray)
+                {
+                    PostMessage(plnid->hWnd, plnid->uCallbackMessage,
+                        plnid->uID, WM_MOUSEMOVE);
+                }
+            }
+
             //
             // This needs to be stored even if there is no icon or no callback
             // message. A subsequent NIM_MODIFY could add the missing
