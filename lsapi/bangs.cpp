@@ -93,7 +93,7 @@ void BangAlert(HWND hCaller, LPCSTR pszArgs)
 			StringCchCopy(szTitle, MAX_PATH, "Litestep");
 		}
 
-		MessageBox(hCaller, szMessage, szTitle, MB_OK | MB_TOPMOST);
+		MessageBox(hCaller, szMessage, szTitle, MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
 	}
 }
 
@@ -129,7 +129,7 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 				StringCchCopy(szFourth, MAX_PATH, "Litestep");
 			}
 
-			if (MessageBox(hCaller, szFirst, (nTokenCount == 3) ? szFourth : szSecond, MB_YESNO | MB_TOPMOST) == IDYES)
+			if (MessageBox(hCaller, szFirst, (nTokenCount == 3) ? szFourth : szSecond, MB_YESNO | MB_TOPMOST | MB_SETFOREGROUND) == IDYES)
 			{
 				LSExecute(hCaller, (nTokenCount == 3) ? szSecond : szThird, SW_SHOWNORMAL);
 			}
