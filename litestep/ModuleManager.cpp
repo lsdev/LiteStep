@@ -140,22 +140,20 @@ UINT ModuleManager::_LoadModules()
 
 BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 {
-	Module * module = NULL;
-	LPSTR pszLowerLocation = _strlwr(_strdup(pszLocation));
+	Module* pModule = NULL;
 	BOOL bReturn = FALSE;
 
-	ModuleMap::iterator it = m_ModuleMap.find(pszLowerLocation);
+	ModuleMap::iterator it = m_ModuleMap.find(pszLocation);
 	if (it == m_ModuleMap.end())
 	{
 		try
 		{
-			// #pragma COMPILE_WARN(NOTE: Need to do threading stuff)
-			module = new Module(pszLowerLocation, dwFlags);
-			m_ModuleMap.insert(ModuleMap::value_type(pszLowerLocation, module));
+			pModule = new Module(pszLocation, dwFlags);
+			m_ModuleMap.insert(ModuleMap::value_type(pszLocation, pModule));
+            bReturn = TRUE;
 		}
 		catch (int error)
 		{
-
 			switch (error)
 			{
 				case MODULE_BAD_PATH:
@@ -172,16 +170,15 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 				break;
 			}
 
-			if (module)
+			if (pModule)
 			{
-				delete module;
+				delete pModule;
 			}
 
-			MessageBox(NULL, resourceTextBuffer, pszLowerLocation, MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
+			MessageBox(NULL, resourceTextBuffer, pszLocation,
+                MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST | MB_SETFOREGROUND);
 		}
 	}
-
-	free(pszLowerLocation);
 
 	return bReturn;
 }
@@ -203,7 +200,7 @@ void ModuleManager::_StartModules()
 			hr = m_pILiteStep->get_AppPath(szAppPath, MAX_PATH);
 			if (SUCCEEDED(hr))
 			{
-				HANDLE * pQuitEvents = new HANDLE[nModuleCount];
+				HANDLE* pInitEvents = new HANDLE[nModuleCount];
 				ModuleMap::iterator iter = m_ModuleMap.begin();
 
 				int nIndex = 0;
@@ -216,7 +213,7 @@ void ModuleManager::_StartModules()
 							HANDLE hEvent = iter->second->Init(hLiteStep, szAppPath);
 							if (hEvent)
 							{
-								pQuitEvents[nIndex++] = hEvent;
+								pInitEvents[nIndex++] = hEvent;
 							}
 						}
 						catch (...)
@@ -232,7 +229,7 @@ void ModuleManager::_StartModules()
 
 				// Wait for all modules to signal that they have started before exiting this function
 				nModuleCount = nIndex;
-				DWORD dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
+				DWORD dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pInitEvents, FALSE, INFINITE, QS_ALLINPUT);
 				HWND hLiteStep = GetLitestepWnd();
 				while (nIndex)
 				{
@@ -253,11 +250,11 @@ void ModuleManager::_StartModules()
 
 					if (nIndex)
 					{
-						dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
+						dwWaitStatus = MsgWaitForMultipleObjects(nModuleCount, pInitEvents, FALSE, INFINITE, QS_ALLINPUT);
 					}
 				}
 
-				delete [] pQuitEvents;
+				delete [] pInitEvents;
 			}
 		}
 	}
@@ -346,10 +343,7 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 {
 	if (IsValidStringPtr(pszLocation))
 	{
-		LPSTR pszLowerLocation = _strlwr(_strdup(pszLocation));
-
-		ModuleMap::iterator iter = m_ModuleMap.find(pszLowerLocation);
-		free(pszLowerLocation);
+		ModuleMap::iterator iter = m_ModuleMap.find(pszLocation);
 
 		if (iter != m_ModuleMap.end())
 		{
@@ -383,13 +377,19 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 						dwWaitStatus = MsgWaitForMultipleObjects(1, hQuitEvents, FALSE, INFINITE, QS_ALLINPUT);
 					}
 				}
-				m_ModuleMap.erase(iter);
 			}
 			catch (...)
 			{
 				// quietly swallow exceptions
 				// debugging/logging code should go here
 			}
+
+            // better safe than sorry
+            if (iter->second)
+            {
+                delete iter->second;
+            }
+            m_ModuleMap.erase(iter);
 		}
 	}
 
