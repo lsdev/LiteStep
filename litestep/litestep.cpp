@@ -45,8 +45,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h"
 
 
-// const char rcsRevision[] = "$Revision: 1.11 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.11 2003/04/09 18:34:15 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.12 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.12 2003/04/21 15:24:16 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -408,23 +408,23 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		hr = _InitManagers();
 		if (SUCCEEDED(hr))
 		{
-			hr = _StartManagers();
-			// Quietly swallow manager errors... in the future.. do something
-		}
-
-		// Undocumented call: Shell Loading Finished
-		SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
-
-		// Main message pump
+            hr = _StartManagers();
+            // Quietly swallow manager errors... in the future.. do something
+        }
+        
+        // Undocumented call: Shell Loading Finished
+        SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
+        
+        // Main message pump
         MSG message;
-		while (GetMessage(&message, 0, 0, 0) > 0)
-		{
-			__try
-			{
-			    if (message.hwnd == NULL)
-		    {
-			    if (message.message == NULL)
-				    {
+        while (GetMessage(&message, 0, 0, 0) > 0)
+        {
+            try
+            {
+                if (message.hwnd == NULL)
+		        {
+                    if (message.message == NULL)
+                    {
 					    //something's wacked, break out of this
 					    break;
 				    }
@@ -450,7 +450,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 				    DispatchMessage (&message);
 			    }
 			}
-			__except(1)
+			catch(...)
 			{}
 		}
 
@@ -504,7 +504,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 //
 LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CLiteStep * pLiteStep = NULL;
+	static CLiteStep* pLiteStep = NULL;
 
 	if (uMsg == WM_CREATE)
 	{
@@ -537,7 +537,7 @@ LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		//return lReturn;
 	}
 
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 
@@ -546,9 +546,9 @@ LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 //
 LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	LRESULT lReturn = FALSE;
-
-	switch (uMsg)
+    LRESULT lReturn = FALSE;
+    
+    switch (uMsg)
 	{
 		case WM_KEYDOWN:
 		case WM_SYSCOMMAND:
@@ -836,7 +836,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		break;
 	}
 
-	return lReturn;
+    return lReturn;
 }
 
 
@@ -904,7 +904,7 @@ HRESULT CLiteStep::_StartServices()
 {
 	HRESULT hr = S_OK;
 
-	for (int i = 0; ((i < m_cxServiceItems) && SUCCEEDED(hr)); i++)
+	for (int i = 0; ((i < m_cxServiceItems) /*&& SUCCEEDED(hr)*/); i++)
 	{
 		if (*m_ServiceItems[i].ppService)
 		{
