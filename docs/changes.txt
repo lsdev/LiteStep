@@ -1,6 +1,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Beta 4
-    Prerelease Changelog
+    LiteStep 0.24.7 Release Candidate 1
+    Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
@@ -21,6 +21,8 @@
 
  - Switched to STLport (http://www.stlport.com) due to threading issues and
    other general issues with the version of STL included with the VC 6.0 package.
+
+ - Massive improvements in StartupRunner and TrayService.
 
  - On NT systems, LiteStep detects if startup items have been run before or not.
    This is the same method that Explorer uses to detect if it should rerun
@@ -88,21 +90,10 @@
 
  - Removed !ToggleWharf and !Popup from the core.
 
+ - Added EnumLSData export to lsapi. This gives modules like lscp a consistent
+   interface to poll core data.
+
  - etc. etc.
-
-
--- TODO UNTIL 0.24.7 RELEASE ---------------------------------------------------
-
- - The aboutbox will be implemented as a separate DLL exporting a function for
-   LiteStep to call. This should give modules like lscp a chance to be more
-   integrated with LiteStep.
-   
- - Fix LS locking up if a PNG is used and libpng13.dll is not present.
-
- - Fix problems with automatic module hiding (e.g.modules are hidden if BSPlayer
-   is in desktop mode or if certain installers [e.g. ObjectDock] are used).
-
- - Merge this file and readme.txt.
 
 
 -- INDIE LS CHANGES ADDED TO 0.24.7 --------------------------------------------
@@ -126,7 +117,7 @@
  - c0atzin's RegisterShellHook() fix for Win9x.
 
 
--- INDIE LS CHANGES NOT (YET) ADDED TO 0.24.7 ----------------------------------
+-- INDIE LS CHANGES NOT ADDED TO 0.24.7 ----------------------------------------
 
  - All changes made to the recovery menu and the aboutbox.
 
