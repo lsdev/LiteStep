@@ -43,13 +43,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 0.24.7 default: ENABLED
 #define LS_COMPAT_TRANSPTOL
 
-// Using this switch all files opened with LCOpen use the same SettingsMap as
-// step.rc. Among other things this means that $evars$ from step.rc work in such
-// files. The question is whether this is a bug or a feature. 0.24.6 voted for
-// feature...
-// 0.24.7 default: ENABLED
-#define LS_COMPAT_LCOPEN
-
 // Adds basic logging functions to lsapi. LSLogFile and LSLogLevel are supported.
 // 0.24.7 default: ENABLED
 #define LS_COMPAT_LOGGING
