@@ -62,7 +62,7 @@ Note 7:  Volume/DUN/Networking icons are controlled by shell service objects (SS
 #define _WIN32_IE 0x0500 // Ensure we get the new defines.
 #include "TrayService.h"
 #include "../lsapi/lsapi.h"
-#define STRSAFE_NO_DEPRECATE
+#include <shlobj.h>
 #include "../utility/safestr.h"
 
 
@@ -75,11 +75,6 @@ TrayService::TrayService()
 	m_hTrayWnd = NULL;
 	m_hLiteStep = NULL;
 	m_hConnectionsTray = NULL;
-
-	m_pFirst = NULL;
-	m_pLast = NULL;
-
-	m_ssoList = NULL;
 
 	m_bWin2000 = FALSE;
 }
@@ -183,7 +178,6 @@ HRESULT TrayService::Start()
 HRESULT TrayService::Stop()
 {
 	HRESULT hr = S_OK;
-	PSYSTRAYICONDATA pnidFound, pnidNext = NULL;
 
 	if (m_bWin2000)
 	{
@@ -197,55 +191,15 @@ HRESULT TrayService::Stop()
 		UnregisterClass(TRAYSERVICE_CLASS, m_hInstance); // unregister window class
 	}
 
-	pnidFound = m_pFirst;
-	while (pnidFound)
+	while (m_siVector.size())
 	{
-		pnidNext = pnidFound->pNext;
-		if (pnidFound)
-		{
-			// if it's first or last, move those pointers
-			if (m_pFirst == pnidFound)
-				m_pFirst = pnidFound->pNext;
-			else
-				pnidFound->pPrev->pNext = pnidFound->pNext;
-
-			if (m_pLast == pnidFound)
-				m_pLast = pnidFound->pPrev;
-			else
-				pnidFound->pNext->pPrev = pnidFound->pPrev;
-
-			if (pnidFound->nid.hIcon)
-			{
-				DestroyIcon(pnidFound->nid.hIcon);
-			}
-			delete pnidFound;
-		}
-		pnidFound = pnidNext;
-	}
-
-	return hr;
-}
-
-
-STDMETHODIMP TrayService::get_hWnd(HWND* phWnd)
-{
-	HRESULT hr;
-
-	if (phWnd != NULL)
-	{
-		*phWnd = m_hTrayWnd;
-		if (m_hTrayWnd)
-		{
-			hr = S_OK;
-		}
-		else
-		{
-			hr = E_FAIL;
-		}
-	}
-	else
-	{
-		hr = E_INVALIDARG;
+		if (m_siVector.back()->nid.hIcon)
+        {
+            DestroyIcon(m_siVector.back()->nid.hIcon);
+        }
+        
+        delete m_siVector.back();
+        m_siVector.pop_back();
 	}
 
 	return hr;
@@ -287,28 +241,39 @@ LRESULT TrayService::WindowProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	{
 		case WM_COPYDATA:
 		{
-			PSYSTRAYICONDATA pnidFound = m_pFirst;
 			PCOPYDATASTRUCT pcds;
 			PSHELLTRAYDATA pstd;
-			BOOL bNewIcon = TRUE;
-			BOOL result = TRUE;
+            LRESULT lResult = 0;
+            bool bNewIcon = false;
+            
+            // Get the WM_COPYDATA structure from the lParam
+            pcds = (PCOPYDATASTRUCT) lParam;
+            
+            if (pcds->dwData != 1)
+                return FALSE;
+            
+            // Get the shell tray data from the WM_COPYDATA structure
+            pstd = (PSHELLTRAYDATA)pcds->lpData;
+            
+            // New actions for W2K and after, we don't handle these right now
+            // so we will just bail out if we receive them
+            if ((pstd->dwMessage == NIM_SETFOCUS) || (pstd->dwMessage == NIM_SETVERSION))
+                return FALSE;
+            
+            PSYSTRAYICONDATA pnidFound = NULL;
+            
+            // See if the NOTIFYICONDATA already exists in our list
+            SystrayIconVector::iterator itIcon =
+                _FindItem(pstd->nid.w9X.hWnd, pstd->nid.w9X.uID);
 
-			// Get the WM_COPYDATA structure from the lParam
-			pcds = (PCOPYDATASTRUCT) lParam;
-
-			if (pcds->dwData != 1)
-				return FALSE;
-
-			// Get the shell tray data from the WM_COPYDATA structure
-			pstd = (PSHELLTRAYDATA)pcds->lpData;
-
-			// New actions for W2K and after, we don't handle these right now
-			// so we will just bail out if we receive them
-			if ((pstd->dwMessage == NIM_SETFOCUS) || (pstd->dwMessage == NIM_SETVERSION))
-				return FALSE;
-
-			// See if the NOTIFYICONDATA already exists in our list
-			bNewIcon = !SUCCEEDED(_FindItem(pstd->nid.w9X.hWnd, pstd->nid.w9X.uID, &pnidFound));
+            if (itIcon == m_siVector.end())
+            {
+                bNewIcon = true;
+            }
+            else
+            {
+                pnidFound = *itIcon;
+            }
 
 			if (pstd->dwMessage != NIM_DELETE)
 			{
@@ -499,30 +464,17 @@ LRESULT TrayService::WindowProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 					if (bNewIcon)
 					{
-						// add to last position in the list
-						if (!m_pFirst)
+						m_siVector.push_back(pnidFound);
+                        if (pnidFound->bHidden == FALSE)
 						{
-							m_pFirst = pnidFound;
-							pnidFound->pPrev = NULL;
-						}
-						if (m_pLast)
-						{
-							pnidFound->pPrev = m_pLast;
-							m_pLast->pNext = pnidFound;
-						}
-						m_pLast = pnidFound;
-						pnidFound->pNext = NULL;
-
-						if (pnidFound->bHidden == FALSE)
-						{
-							result = SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_ADD, (LPARAM) & pnidFound->nid);
+							lResult = SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_ADD, (LPARAM) & pnidFound->nid);
 						}
 					}
 					else
 					{
 						if (pnidFound->bHidden == FALSE)
 						{
-							result = SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_MODIFY, (LPARAM) & pnidFound->nid);
+							lResult = SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_MODIFY, (LPARAM) & pnidFound->nid);
 						}
 					}
 
@@ -536,22 +488,7 @@ LRESULT TrayService::WindowProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 				{
 					if ((pnidFound) && !(bNewIcon))
 					{
-						if (pnidFound->bHidden == FALSE)
-						{
-							// if it's first or last, move those pointers
-							if (m_pFirst == pnidFound)
-								m_pFirst = pnidFound->pNext;
-							else
-								pnidFound->pPrev->pNext = pnidFound->pNext;
-
-							if (m_pLast == pnidFound)
-								m_pLast = pnidFound->pPrev;
-							else
-								pnidFound->pNext->pPrev = pnidFound->pPrev;
-						}
-
-						// remove the icon class
-						result = SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_DELETE, (LPARAM) & pnidFound->nid);
+						lResult = SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_DELETE, (LPARAM) & pnidFound->nid);
 
 						if (pnidFound->bHidden == FALSE)
 						{
@@ -559,51 +496,41 @@ LRESULT TrayService::WindowProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 							{
 								DestroyIcon(pnidFound->nid.hIcon);
 							}
-							delete pnidFound;
-							pnidFound = NULL;
+                            delete pnidFound;
+                            m_siVector.erase(itIcon);
 						}
 					}
 					break;
 				}
 				default:
 				{
-					result = FALSE;
+					lResult = FALSE;
 					break;
 				}
 			}
 
-			return result;
+			return lResult;
 
-		}
-		break;
-
-		case LM_SYSTRAYREADY:
-		{
-			_SendSystemTray();
-			return TRUE;
 		}
 		break;
 	}
 
-	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 
 //
 // SendSystemTray
 //
-void TrayService::_SendSystemTray()
+void TrayService::SendSystemTray()
 {
-	PSYSTRAYICONDATA pnidFound = m_pFirst;
-
-	// See if the NOTIFYICONDATA already exists in our list
-	while (pnidFound)
+    for (SystrayIconVector::iterator itIcon = m_siVector.begin();
+         itIcon != m_siVector.end(); ++itIcon)
 	{
-		if (pnidFound->bHidden == FALSE)
+		if ((*itIcon)->bHidden == FALSE)
 		{
-			SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_ADD, (LPARAM) & pnidFound->nid);
+			SendMessage(m_hLiteStep, LM_SYSTRAY, NIM_ADD, (LPARAM)&(*itIcon)->nid);
 		}
-		pnidFound = pnidFound->pNext;
 	}
 }
 
@@ -651,11 +578,7 @@ void TrayService::_LoadShellServiceObjects()
 			if (SUCCEEDED(hr))
 			{
 				pCmdTarget->Exec(&CGID_ShellServiceObject, 2, 0, NULL, NULL);
-
-				ShellServiceObjectList *entry = new ShellServiceObjectList;
-				entry->object = pCmdTarget;
-				entry->next = m_ssoList;
-				m_ssoList = entry;
+                m_ssoVector.push_back(pCmdTarget);
 			}
 		}
 
@@ -671,46 +594,28 @@ void TrayService::_LoadShellServiceObjects()
 //
 void TrayService::_UnloadShellServiceObjects()
 {
-	ShellServiceObjectList * ssoCurrent = m_ssoList;
-	ShellServiceObjectList *ssoNext;
-
-	while (ssoCurrent)
+	while (m_ssoVector.size())
 	{
-		ssoNext = ssoCurrent->next;
-
-		ssoCurrent->object->Exec(&CGID_ShellServiceObject, 3, 0, NULL, NULL);
-		ssoCurrent->object->Release();
-		delete ssoCurrent;
-
-		ssoCurrent = ssoNext;
+		m_ssoVector.back()->Exec(&CGID_ShellServiceObject, 3, 0, NULL, NULL);
+		m_ssoVector.back()->Release();
+        m_ssoVector.pop_back();
 	}
-
-	m_ssoList = NULL;
 }
 
 
 
-HRESULT TrayService::_FindItem(const HWND hWnd, const UINT uID, SYSTRAYICONDATA** ppnid)
+SystrayIconVector::iterator TrayService::_FindItem(const HWND hWnd, const UINT uID)
 {
-	HRESULT hr = E_FAIL;
+    SystrayIconVector::iterator	itReturn;
+	
+	for (itReturn = m_siVector.begin(); itReturn != m_siVector.end();
+         ++itReturn)
+    {
+        if (((*itReturn)->nid.hWnd == hWnd) && ((*itReturn)->nid.uID == uID))
+        {
+            break;
+        }
+    }
 
-	if ((*ppnid != NULL) && hWnd)
-	{
-		*ppnid = m_pFirst;
-		while (*ppnid != NULL)
-		{
-			if (((*ppnid)->nid.hWnd == hWnd) && ((*ppnid)->nid.uID == uID))
-			{
-				hr = S_OK;
-				break;
-			}
-			*ppnid = (*ppnid)->pNext;
-		}
-	}
-	else
-	{
-		hr = E_INVALIDARG;
-	}
-
-	return hr;
+	return itReturn;
 }

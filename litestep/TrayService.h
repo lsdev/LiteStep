@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include "../utility/IService.h"
-#include <shlobj.h>
+#include <vector>
 
 #define TRAYSERVICE_CLASS "Shell_TrayWnd"
 #define TRAYSERVICE_TITLE "Litestep Tray Manager"
@@ -45,16 +45,13 @@ struct SYSTRAYICONDATA
 {
 	LSNOTIFYICONDATA nid;
 	BOOL bHidden;
-	SYSTRAYICONDATA *pNext, *pPrev;
 };
 typedef SYSTRAYICONDATA* PSYSTRAYICONDATA;
 
-typedef struct ShellServiceObjectList
-{
-	IOleCommandTarget *object;
-	struct ShellServiceObjectList *next;
-}
-ShellServiceObjectList;
+struct IOleCommandTarget;
+typedef std::vector<IOleCommandTarget*> ShellServiceObjectVector;
+typedef std::vector<SYSTRAYICONDATA*> SystrayIconVector;
+
 
 // version of NOTIFYICONDATA used by 9x
 typedef struct _NOTIFYICONDATAV4A
@@ -200,16 +197,16 @@ public:
 	HRESULT Start();
 	HRESULT Stop();
 
-	static LRESULT CALLBACK WndProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void SendSystemTray();
+
+    static LRESULT CALLBACK WndProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT WindowProcTray(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	STDMETHOD(get_hWnd)( /*[out, retval]*/ HWND* phWnd);
 
 private:
 	BOOL _PrepIcon(PSYSTRAYICONDATA pnidFound, PSHELLTRAYDATA pstd, BOOL bNewIcon);
 	LRESULT _AddIcon(PSYSTRAYICONDATA pnidFound, PSHELLTRAYDATA pstd);
 	LRESULT _ModifyIcon(PSYSTRAYICONDATA pnidFound, PSHELLTRAYDATA pstd);
-	void _SendSystemTray();
 	void _LoadShellServiceObjects();
 	void _UnloadShellServiceObjects();
 
@@ -218,7 +215,7 @@ private:
 		return ((dwFlags & NIF_MESSAGE) && (dwFlags & NIF_ICON) && (dwFlags & NIF_TIP));
 	}
 
-	HRESULT _FindItem(const HWND hWnd, const UINT uID, SYSTRAYICONDATA** ppnid);
+    SystrayIconVector::iterator _FindItem(const HWND hWnd, const UINT uID);
 
 	HINSTANCE m_hInstance;
 
@@ -226,10 +223,8 @@ private:
 	HWND m_hLiteStep;
 	HWND m_hConnectionsTray;
 
-	PSYSTRAYICONDATA m_pFirst;
-	PSYSTRAYICONDATA m_pLast;
-
-	ShellServiceObjectList *m_ssoList;
+	ShellServiceObjectVector m_ssoVector;
+    SystrayIconVector m_siVector;
 	BOOL m_bWin2000;
 };
 
