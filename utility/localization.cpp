@@ -48,7 +48,7 @@ void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText,
 //
 void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
 {
-	SAFE_CHAR(szFormat, MAX_LINE_LENGTH)
+	char szFormat[MAX_LINE_LENGTH];
 	va_list vargs;
 
 	if (IsValidStringPtr(pszText, cchText))

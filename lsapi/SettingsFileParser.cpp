@@ -203,7 +203,7 @@ void FileParser::_StripString(LPWSTR pwzString)
 				}
 			}
 		}
-		pwzCurrent = _wcsinc(pwzCurrent);
+		++pwzCurrent;
 	}
 	if (pwzLast != NULL)
 	{

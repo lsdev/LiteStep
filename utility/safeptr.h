@@ -4,31 +4,82 @@
 
 #include "common.h"
 
-BOOL IsValidStringPtr(LPCSTR lpsz);
+//
+// Valid String Pointer Functions
+//
+
+//
+// Unicode
+//
+BOOL IsValidStringPtrW(LPCWSTR lpwz);
 #ifdef __cplusplus
-BOOL IsValidStringPtr(LPCSTR lpsz, UINT_PTR ucchMax);
-#else
-BOOL IsValidStringPtrCch(LPCSTR lpsz, UINT_PTR ucchMax);
-#endif
+BOOL IsValidStringPtrW(LPCWSTR lpwz, UINT_PTR ucchMax);
+#else // __cplusplus
+BOOL IsValidStringPtrCchW(LPCWSTR lpwz, UINT_PTR ucchMax);
+#endif // __cplusplus
 #ifdef __cplusplus
-BOOL IsValidStringPtr(LPSTR lpsz);
-BOOL IsValidStringPtr(LPSTR lpsz, UINT_PTR ucchMax);
+BOOL IsValidStringPtrW(LPWSTR lpwz);
+BOOL IsValidStringPtrW(LPWSTR lpwz, UINT_PTR ucchMax);
 #else
-BOOL IsValidStringReadPtr(LPSTR lpsz);
-BOOL IsValidStringReadPtrCch(LPSTR lpsz, UINT_PTR ucchMax);
-#endif
+BOOL IsValidStringReadPtrW(LPWSTR lpwz);
+BOOL IsValidStringReadPtrCchW(LPWSTR lpwz, UINT_PTR ucchMax);
+#endif // __cplusplus
+
+//
+// Ansi
+//
+BOOL IsValidStringPtrA(LPCSTR lpsz);
+#ifdef __cplusplus
+BOOL IsValidStringPtrA(LPCSTR lpsz, UINT_PTR ucchMax);
+#else // __cplusplus
+BOOL IsValidStringPtrCchA(LPCSTR lpsz, UINT_PTR ucchMax);
+#endif // __cplusplus
+#ifdef __cplusplus
+BOOL IsValidStringPtrA(LPSTR lpsz);
+BOOL IsValidStringPtrA(LPSTR lpsz, UINT_PTR ucchMax);
+#else // __cplusplus
+BOOL IsValidStringReadPtrA(LPSTR lpsz);
+BOOL IsValidStringReadPtrCchA(LPSTR lpsz, UINT_PTR ucchMax);
+#endif // __cplusplus
+
+//
+// TCHAR defines
+//
+#ifdef _UNICODE
+#ifdef __cplusplus
+#define IsValidStringPtr IsValidStringPtrW
+#else // __cplusplus
+#define IsValidStringPtr(lpwz) IsValidStringPtrW(lpwz)
+#define IsValidStringPtrCch(lpwz, ucchMax) IsValidStringPtrCchW(lpwz, ucchMax)
+#define IsValidStringReadPtr(lpwz) IsValidStringReadPtrW(lpwz)
+#define IsValidStringReadPtrCch(lpwz, ucchMax) IsValidStringReadPtrCchW(lpwz, ucchMax)
+#endif // _cplusplus
+#else // _UNICODE
+#ifdef __cplusplus
+#define IsValidStringPtr IsValidStringPtrA
+#else // __cplusplus
+#define IsValidStringPtr(lpsz) IsValidStringPtrA(lpsz)
+#define IsValidStringPtrCch(lpsz, ucchMax) IsValidStringPtrCchA(lpsz, ucchMax)
+#define IsValidStringReadPtr(lpsz) IsValidStringReadPtrA(lpsz)
+#define IsValidStringReadPtrCch(lpsz, ucchMax) IsValidStringReadPtrCchA(lpsz, ucchMax)
+#endif // _cplusplus
+#endif // _UNICODE
+
+//
+// Valid Pointer Functions
+//
 BOOL IsValidReadPtr(CONST VOID *lp);
 #ifdef __cplusplus
 BOOL IsValidReadPtr(CONST VOID *lp, UINT_PTR ucb);
-#else
+#else // __cplusplus
 BOOL IsValidReadPtrUcb(CONST VOID *lp, UINT_PTR ucb);
-#endif
+#endif // __cplusplus
 BOOL IsValidWritePtr(LPVOID lp);
 #ifdef __cplusplus
 BOOL IsValidWritePtr(LPVOID lp, UINT_PTR ucb);
-#else
+#else // __cplusplus
 BOOL IsValidWritePtrUcb(LPVOID lp, UINT_PTR ucb);
-#endif
+#endif // __cplusplus
 BOOL IsValidCodePtr(FARPROC lfpn);
 
 #endif // _SAFEPTR_H

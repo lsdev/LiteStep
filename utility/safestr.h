@@ -55,6 +55,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
         StringCchCatExA(pszDest, cchDest, pszSrc, NULL, NULL, STRSAFE_NO_TRUNCATION)
 #endif // _UNICODE
 
+
+/*
 #ifndef SAFE_CHAR
 #define SAFE_CHAR_W(name, length) WCHAR name[length+1]; name[0] = L'\0';
 #define SAFE_CHAR_H_W(name, length) WCHAR name[length+1];
@@ -69,6 +71,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SAFE_CHAR_H(name, length)	SAFE_CHAR_H_A(name, length)
 #endif // _UNICODE
 #endif // SAFE_CHAR
+*/
 
 #endif // __SAFESTR_H
 

@@ -44,8 +44,8 @@ private:
 	HWND m_hThreadWnd;
 	DWORD m_dwThreadID;
 
-	string m_szLocation;
-	string m_szAppPath;
+	basic_string<TCHAR> m_tzLocation;
+	basic_string<TCHAR> m_tzAppPath;
 
 
 	ModuleInitExFunc m_pInitEx;
@@ -59,10 +59,10 @@ private:
 public:
 	void HandleThreadMessage(MSG &msg);
 
-	Module(LPCSTR pszLoc, DWORD dwFlags);
+	Module(LPCTSTR ptzLoc, DWORD dwFlags);
 	virtual ~Module();
 
-	HANDLE Init(HWND hMainWindow, LPCSTR pszAppPath);
+	HANDLE Init(HWND hMainWindow, LPCTSTR ptzAppPath);
 	HANDLE Quit();
 
 	static ULONG __stdcall ThreadProc(void* dllModPtr);
@@ -87,9 +87,9 @@ public:
 		return m_hQuitEvent;
 	};
 
-	LPCSTR GetLocation() const
+	LPCTSTR GetLocation() const
 	{
-		return m_szLocation.c_str();
+		return m_tzLocation.c_str();
 	};
 
 	BOOL HasMessagePump() const

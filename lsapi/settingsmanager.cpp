@@ -172,7 +172,7 @@ void SettingsManager::ParseFile(LPCSTR pszFileName)
 BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
 {
 	BOOL bReturn = FALSE;
-	SAFE_CHAR(wzKey, MAX_RCCOMMAND);
+	char wzKey[MAX_RCCOMMAND];
 
 	StringCchCopy(wzKey, MAX_RCCOMMAND, pszName);
 	CharLowerBuff(wzKey, MAX_RCCOMMAND);
@@ -310,9 +310,9 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 
 	if (_FindLine(pszKeyName, it))
 	{
-		SAFE_CHAR(szFirst, MAX_LINE_LENGTH);
-		SAFE_CHAR(szSecond, MAX_LINE_LENGTH);
-		SAFE_CHAR(szThird, MAX_LINE_LENGTH);
+		char szFirst[MAX_LINE_LENGTH];
+		char szSecond[MAX_LINE_LENGTH];
+		char szThird[MAX_LINE_LENGTH];
 
 		LPSTR lpszTokens[3] = { szFirst, szSecond, szThird	};
 
@@ -348,7 +348,7 @@ BOOL SettingsManager::GetVariable(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLen
 
 void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
 {
-	SAFE_CHAR(szKey, MAX_RCCOMMAND);
+	char szKey[MAX_RCCOMMAND];
 
 	if ((pszKeyName) && (pszValue))
 	{
@@ -479,7 +479,7 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 	}
 	else
 	{
-		SAFE_CHAR(szPath, MAX_PATH);
+		char szPath[MAX_PATH];
 		VarExpansionEx(szPath, pszPath, MAX_PATH);
 		CharLowerBuff(szPath, MAX_PATH);
 		FileMap::iterator it = m_FileMap.find(szPath);
@@ -555,7 +555,7 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 BOOL SettingsManager::LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
-	SAFE_CHAR(szTempValue, MAX_LINE_LENGTH);
+	char szTempValue[MAX_LINE_LENGTH];
 
 	if ((pFile != NULL) && IsValidStringPtr(pszConfig) && IsValidStringPtr(pszValue, cchValue))
 	{
@@ -580,7 +580,7 @@ BOOL SettingsManager::LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszV
 BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
-	SAFE_CHAR(szTempValue, MAX_LINE_LENGTH);
+	char szTempValue[MAX_LINE_LENGTH];
 
 	if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
 	{

@@ -39,7 +39,7 @@ private:
 	bool m_bEX;
 	BangCommand* m_bBang;
 	BangCommandEx* m_bBangEX;
-	SAFE_CHAR_H(m_szCommand, MAX_BANGCOMMAND);
+	char m_szCommand[MAX_BANGCOMMAND];
 };
 
 #endif // __BANG_H

@@ -1,33 +1,84 @@
+/*
+This is a part of the LiteStep Shell Source code.
+
+Copyright (C) 1997-2002 The LiteStep Development Team
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/ 
+/****************************************************************************
+****************************************************************************/
 #include "safeptr.h"
 
-BOOL IsValidStringPtr(LPCSTR lpsz)
+BOOL IsValidStringPtrW(LPCWSTR lpwz)
 {
-	return ((lpsz != NULL) && (IsBadStringPtr(lpsz, (UINT) - 1) == 0));
+	return ((lpwz != NULL) && (IsBadStringPtrW(lpwz, (UINT) - 1) == 0));
 }
 #ifdef __cplusplus
-BOOL IsValidStringPtr(LPCSTR lpsz, UINT_PTR ucchMax)
+BOOL IsValidStringPtrW(LPCWSTR lpwz, UINT_PTR ucchMax)
 #else
-BOOL IsValidStringPtrCch(LPCSTR lpsz, UINT_PTR ucchMax)
+BOOL IsValidStringPtrCchW(LPCWSTR lpwz, UINT_PTR ucchMax)
 #endif
 {
-	return ((lpsz != NULL) && (IsBadStringPtr(lpsz, ucchMax) == 0));
+	return ((lpwz != NULL) && (IsBadStringPtrW(lpwz, ucchMax) == 0));
 }
 #ifdef __cplusplus
-BOOL IsValidStringPtr(LPSTR lpsz)
+BOOL IsValidStringPtrW(LPWSTR lpwz)
 #else
-BOOL IsValidStringWritePtr(LPSTR lpsz)
+BOOL IsValidStringWritePtrW(LPWSTR lpwz)
+#endif
+{
+	return ((lpwz != NULL) && (IsBadWritePtr(lpwz, (wcslen(lpwz) * sizeof(WCHAR))) == 0));
+}
+#ifdef __cplusplus
+BOOL IsValidStringPtrW(LPWSTR lpwz, UINT_PTR ucchMax)
+#else
+BOOL IsValidStringWritePtrCchW(LPWSTR lpwz, UINT_PTR ucchMax)
+#endif
+{
+	return ((ucchMax > 0) && (lpwz != NULL) && (IsBadWritePtr(lpwz, (ucchMax * sizeof(WCHAR))) == 0));
+}
+
+BOOL IsValidStringPtrA(LPCSTR lpsz)
+{
+	return ((lpsz != NULL) && (IsBadStringPtrA(lpsz, (UINT) - 1) == 0));
+}
+#ifdef __cplusplus
+BOOL IsValidStringPtrA(LPCSTR lpsz, UINT_PTR ucchMax)
+#else
+BOOL IsValidStringPtrCchA(LPCSTR lpsz, UINT_PTR ucchMax)
+#endif
+{
+	return ((lpsz != NULL) && (IsBadStringPtrA(lpsz, ucchMax) == 0));
+}
+#ifdef __cplusplus
+BOOL IsValidStringPtrA(LPSTR lpsz)
+#else
+BOOL IsValidStringWritePtrA(LPSTR lpsz)
 #endif
 {
 	return ((lpsz != NULL) && (IsBadWritePtr(lpsz, (strlen(lpsz) * sizeof(char))) == 0));
 }
 #ifdef __cplusplus
-BOOL IsValidStringPtr(LPSTR lpsz, UINT_PTR ucchMax)
+BOOL IsValidStringPtrA(LPSTR lpsz, UINT_PTR ucchMax)
 #else
-BOOL IsValidStringWritePtrCch(LPSTR lpsz, UINT_PTR ucchMax)
+BOOL IsValidStringWritePtrCchA(LPSTR lpsz, UINT_PTR ucchMax)
 #endif
 {
 	return ((ucchMax > 0) && (lpsz != NULL) && (IsBadWritePtr(lpsz, (ucchMax * sizeof(char))) == 0));
 }
+
 BOOL IsValidReadPtr(CONST VOID *lp)
 {
 	return ((lp != NULL) && (IsBadReadPtr(lp, sizeof(lp)) == 0));

@@ -50,7 +50,7 @@ HRESULT DDEService::Start()
 	// which will still pass SUCCEEDED()
 	if (!m_dwDDEInst)
 	{
-		if (FindWindow("Progman", NULL) == NULL)
+		if (FindWindow(_T("Progman"), NULL) == NULL)
 		{
 			HMODULE hInstance = GetModuleHandle(NULL);
 			UINT uInitReturn;
@@ -148,10 +148,10 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
 		{
 			if ((hszTopic == m_hszGroups) || (hszTopic == m_hszAppProperties))
 			{
-				CHAR szBuf[MAX_PATH];
-				DdeGetData(hData, (LPBYTE)szBuf, MAX_PATH, 0);
-				szBuf[MAX_PATH - 1] = '\0';
-				if (m_DDEWorker.ParseRequest(szBuf))
+				TCHAR tzBuf[MAX_PATH];
+				DdeGetData(hData, (LPBYTE)tzBuf, MAX_PATH, 0);
+				tzBuf[MAX_PATH - 1] = '\0';
+				if (m_DDEWorker.ParseRequest(tzBuf))
 				{
 					hReturn = (HDDEDATA)DDE_FACK;
 				}
@@ -191,21 +191,26 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
 	return hReturn;
 }
 
+#ifdef _UNICODE
+#define DDE_CP CP_WINUNICODE
+#else // _UNICODE
+#define DDE_CP CP_WINANSI 
+#endif // _UNICODE
 
 HRESULT DDEService::_RegisterDDE()
 {
 	HRESULT hr = E_FAIL;
 
-	m_hszProgman = DdeCreateStringHandle(m_dwDDEInst, "PROGMAN", 0);
+	m_hszProgman = DdeCreateStringHandle(m_dwDDEInst, _T("PROGMAN"), DDE_CP);
 	if (m_hszProgman != 0L)
 	{
-		m_hszGroups = DdeCreateStringHandle(m_dwDDEInst, "Groups", 0);
+		m_hszGroups = DdeCreateStringHandle(m_dwDDEInst, _T("Groups"), DDE_CP);
 		if (m_hszGroups != 0L)
 		{
-			m_hszFolders = DdeCreateStringHandle(m_dwDDEInst, "Folders", 0);
+			m_hszFolders = DdeCreateStringHandle(m_dwDDEInst, _T("Folders"), DDE_CP);
 			if (m_hszGroups != 0L)
 			{
-				m_hszAppProperties = DdeCreateStringHandle(m_dwDDEInst, "AppProperties", 0);
+				m_hszAppProperties = DdeCreateStringHandle(m_dwDDEInst, _T("AppProperties"), DDE_CP);
 				if (m_hszAppProperties != 0L)
 				{
 					if (DdeNameService(m_dwDDEInst, m_hszProgman, 0L, DNS_REGISTER) != 0L)

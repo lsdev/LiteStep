@@ -80,8 +80,8 @@ void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangAlert(HWND hCaller, LPCSTR pszArgs)
 {
-	SAFE_CHAR(szMessage, MAX_PATH);
-	SAFE_CHAR(szTitle, MAX_PATH);
+	char szMessage[MAX_PATH];
+	char szTitle[MAX_PATH];
 	LPSTR aszTokens[] = { szMessage, szTitle };
 
 	int nTokenCount = LCTokenize(pszArgs, aszTokens, 2, 0);
@@ -114,10 +114,10 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 {
 	if (IsValidStringPtr(pszArgs))
 	{
-		SAFE_CHAR(szFirst, MAX_PATH);
-		SAFE_CHAR(szSecond, MAX_PATH);
-		SAFE_CHAR(szThird, MAX_PATH);
-		SAFE_CHAR(szFourth, MAX_PATH);
+		char szFirst[MAX_PATH];
+		char szSecond[MAX_PATH];
+		char szThird[MAX_PATH];
+		char szFourth[MAX_PATH];
 		LPSTR aszTokens[] = { szFirst, szSecond, szThird, szFourth };
 
 		int nTokenCount = CommandTokenize(pszArgs, aszTokens, 4, 0);
@@ -150,7 +150,7 @@ void BangExecute(HWND hCaller, LPCSTR pszArgs)
 	if (IsValidStringPtr(pszArgs))
 	{
 		LPCSTR pszNextToken = pszArgs;
-		SAFE_CHAR(szCommand, MAX_LINE_LENGTH);
+		char szCommand[MAX_LINE_LENGTH];
 
 		while (GetToken(pszNextToken, szCommand, &pszNextToken, true))
 		{
@@ -225,8 +225,8 @@ void BangPopup(HWND /* hCaller */, LPCSTR pszArgs)
 	HWND hLiteStep = GetLitestepWnd();
 	POINT p;
 	int nCountTokens = 0;
-	SAFE_CHAR(szFirst, MAX_LINE_LENGTH);
-	SAFE_CHAR(szSecond, MAX_LINE_LENGTH);
+	char szFirst[MAX_LINE_LENGTH];
+	char szSecond[MAX_LINE_LENGTH];
 	LPSTR aszTokens[] = { szFirst, szSecond };
 
 	if (IsValidStringPtr(pszArgs))
@@ -323,7 +323,7 @@ void BangReloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 		if (hLiteStep)
 		{
 			LPCSTR pszNextToken = pszArgs;
-			SAFE_CHAR(szPath, MAX_PATH);
+			char szPath[MAX_PATH];
 
 			while (GetToken(pszNextToken, szPath, &pszNextToken, false))
 			{
@@ -426,7 +426,7 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 	if (hLiteStep)
 	{
 		LPCSTR pszNextToken = pszArgs;
-		SAFE_CHAR(szPath, MAX_PATH);
+		char szPath[MAX_PATH];
 
 		while (GetToken(pszNextToken, szPath, &pszNextToken, false))
 		{
