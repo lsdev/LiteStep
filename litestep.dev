@@ -10,11 +10,11 @@ Libs=
 PrivateResource=litestep_private.rc
 ResourceIncludes=
 MakeIncludes=
-Compiler=-D__GNUWIN32__ -W -DWIN32 -DNDEBUG -D_MBCS_@@_
-CppCompiler=-D__GNUWIN32__ -W -DWIN32 -DNDEBUG -D_MBCS_@@_
+Compiler=-D__GNUWIN32__ -DWIN32 -DNDEBUG -D_MBCS_@@_
+CppCompiler=-D__GNUWIN32__ -DWIN32 -DNDEBUG -D_MBCS_@@_
 Linker=-lshlwapi_@@_-luuid_@@_output/libhook.a_@@_output/liblsapi.a_@@_output/utility.a_@@_-lole32_@@_
 IsCpp=1
-Icon=litestep.ico
+Icon=
 ExeOutput=output
 ObjectOutput=output/temp/litestep
 OverrideOutput=0
@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0000001001001000010
+CompilerSettings=0000001001001000010000
 
 [Unit1]
 FileName=litestep\TrayService.cpp
@@ -336,3 +336,4 @@ OriginalFilename=litestep.exe
 ProductName=Litestep
 ProductVersion=0, 24, 7, 0
 AutoIncBuildNr=0
+

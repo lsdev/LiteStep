@@ -32,9 +32,7 @@ DataStore::~DataStore()
 
 void DataStore::Clear()
 {
-	DataHolderMap::iterator iter;
-
-	iter = m_dhmData.begin();
+	DataHolderMap::iterator iter = m_dhmData.begin();
 
 	while (iter != m_dhmData.end())
 	{
@@ -99,9 +97,8 @@ BOOL DataStore::ReleaseData(WORD wIdent, void *pvData, WORD wLength)
 }
 
 DataHolder::DataHolder()
+: m_wLength(0),	m_pvData(NULL)
 {
-	m_wLength = 0;
-	m_pvData = NULL;
 }
 
 DataHolder::DataHolder(void *pvData, WORD wLength)

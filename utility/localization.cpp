@@ -104,6 +104,9 @@ HFONT LocalCreateFont(int nHeight,
 			dwCharSet = CHINESESIMPLIFIED_CHARSET;
 		}
 		break;
+		
+		default:
+		break;
 	}
 
 	return CreateFont(nHeight, nWidth, nEscapement, nOrientation, fnWeight,
@@ -139,6 +142,9 @@ HFONT LocalCreateFontIndirect(LOGFONT *lplf)
 			lplf->lfCharSet = CHINESESIMPLIFIED_CHARSET;
 		}
 		break;
+		
+		default:
+		break;
 	}
 
 	return CreateFontIndirect(lplf);
@@ -146,10 +152,8 @@ HFONT LocalCreateFontIndirect(LOGFONT *lplf)
 
 
 Localization::Localization()
+: m_hRes(NULL), m_wLanguageID(0xFFFF)
 {
-	m_hRes = NULL;
-	m_wLanguageID = 0xFFFF;
-	
 	LANGID wLanguageID;
 	
 	LANGID (__stdcall * GetUserDefaultUILanguage)(VOID) = NULL;
