@@ -31,32 +31,120 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // the returned path is to append another string to it, which doesn't work with
 // quotes.
 //
-BOOL GetShellFolderPath(int nFolder, LPTSTR tzPath, size_t cchPath)
+bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
-	LPITEMIDLIST pidl;
+	ASSERT(cchPath >= MAX_PATH);
+    ASSERT_ISWRITEDATA(ptzPath, cchPath);
+
+    LPITEMIDLIST pidl;
 	IMalloc* pMalloc;
-	BOOL bReturn = FALSE;
+	bool bReturn = false;
 
-	if (IsValidStringPtr(tzPath, cchPath) && (cchPath >= MAX_PATH))
-	{
-        // SHGetSpecialFolderPath is not available on Win95
-        // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
-        if (SUCCEEDED(SHGetMalloc(&pMalloc)))
-		{
-			if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
-			{
-				bReturn = SHGetPathFromIDList(pidl, tzPath);
-
-				if (bReturn)
-				{
-					PathAddBackslash(tzPath);
-				}
-
-				pMalloc->Free(pidl);
-				pMalloc->Release();
-			}
-		}
-	}
-
+    // SHGetSpecialFolderPath is not available on Win95
+    // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
+    if (SUCCEEDED(SHGetMalloc(&pMalloc)))
+    {
+        if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
+        {
+            bReturn = SHGetPathFromIDList(pidl, ptzPath) ? true : false;
+            
+            if (bReturn)
+            {
+                PathAddBackslashEx(ptzPath, cchPath);
+            }
+            
+            pMalloc->Free(pidl);
+            pMalloc->Release();
+        }
+    }
+    
     return bReturn;
+}
+
+
+//
+// PathAddBackslashEx
+//
+// Checked version of PathAddBackslash which also handles quoted paths
+//
+// Return values:  S_OK          - backslash appended
+//                 S_FALSE       - path already ended with a backslash
+//                 E_OUTOFMEMORY - buffer too small
+//                 E_FAIL        - other failure (invalid input string)
+//
+HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
+{
+    ASSERT(cchPath > 0); ASSERT(cchPath <= STRSAFE_MAX_CCH);
+    ASSERT_ISWRITEDATA(ptzPath, cchPath);
+
+    HRESULT hr = E_FAIL;
+    size_t cchCurrentLength = 0;
+
+    if (SUCCEEDED(StringCchLength(ptzPath, cchPath, &cchCurrentLength)))
+    {
+        bool bHasQuote = false;
+        LPTSTR ptzEnd = ptzPath + cchCurrentLength;
+        
+        if ((ptzEnd > ptzPath) && (*(ptzEnd-1) == _T('\"')))
+        {
+            --ptzEnd;
+            bHasQuote = true;
+        }
+
+        if (ptzEnd > ptzPath)
+        {
+            if (*(ptzEnd-1) != _T('\\'))
+            {
+                if (cchPath - cchCurrentLength > 1)
+                {
+                    if (bHasQuote)
+                    {
+                        *(ptzEnd+1) = *ptzEnd;
+                    }
+                    
+                    *ptzEnd = _T('\\');
+                    
+                    if (bHasQuote)
+                    {
+                        ++ptzEnd;
+                    }
+                    
+                    ASSERT((ptzEnd - ptzPath) < cchPath);
+                    *(ptzEnd+1) = _T('\0');
+                    
+                    hr = S_OK;
+                }
+                else
+                {
+                    hr = E_OUTOFMEMORY;
+                }
+            }
+            else
+            {
+                hr = S_FALSE;
+            }
+        }
+    }
+
+    return hr;
+}
+
+
+//
+// GetSystemString
+//
+bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
+{
+    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
+
+    return (0 != FormatMessage(
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dwCode,
+        0,
+        ptzBuffer,
+        cchBuffer,
+        NULL
+        ));
 }
