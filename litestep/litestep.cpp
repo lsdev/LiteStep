@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "litestep.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.2 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.2 2002/10/20 18:42:10 message Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.3 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.3 2002/12/07 11:36:34 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -177,7 +177,7 @@ void ParseCmdLine(LPCSTR pszCmdLine)
 //
 //
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow)
+                   LPSTR lpCmdLine, int /* nCmdShow */)
 {
 	HRESULT hr = S_OK;
 	hLSInstance = hInstance;
@@ -188,7 +188,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		PathRemoveFileSpec(szAppPath);
 		PathAddBackslash(szAppPath);
 	}
-	StringCchPrintfEx(szRcPath, MAX_PATH, NULL, NULL, STRSAFE_NULL_ON_FAILURE, "%sstep.rc", szAppPath);
+	PathCombine(szRcPath, szAppPath, "step.rc");
 
 	// Parse command line, setting appropriate variables
 	ParseCmdLine(lpCmdLine);
@@ -203,7 +203,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	}
 
 	// Check for previous instance
-	CreateMutex(NULL, FALSE, "LiteStep");
+	HANDLE hMutex = CreateMutex(NULL, FALSE, "LiteStep");
+    
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
 		// Prevent multiple instances of LiteStep
@@ -211,13 +212,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		             "A previous instance of LiteStep was detected.\nAre you sure you want to continue?");
 		if (IDNO == MessageBox(NULL, resourceTextBuffer, "LiteStep", MB_TOPMOST | MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2))
 		{
-			exit(0);
+			hr = E_ABORT;
 		}
 	}
 
-	hr = gLiteStep.Start(szAppPath, szRcPath, hInstance, bRunStartup);
+	if (SUCCEEDED(hr))
+    {
+        hr = gLiteStep.Start(szAppPath, szRcPath, hInstance, bRunStartup);
+    }
 
-	return (int)hr;
+    CloseHandle(hMutex);
+
+	return HRESULT_CODE(hr);
 }
 
 
@@ -271,10 +277,9 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	OleInitialize(NULL);
 
 	// before anything else, start the recovery menu thread
-	DWORD dwThreadID;
-	CloseHandle(CreateThread(NULL, 0, RecoveryThreadProc, NULL, 0, &dwThreadID));
-
-	// Get undocumented APIs
+	DWORD dwRecoveryThreadID;
+	HANDLE hRecoveryThread = 
+        CreateThread(NULL, 0, RecoveryThreadProc, NULL, 0, &dwRecoveryThreadID);
 
 	// configure the Win32 window manager to hide windows when they are minimized
 	MINIMIZEDMETRICS mm;
@@ -288,7 +293,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
 	}
 
-	SetupSettingsManager(szAppPath, szRcPath);
+	SetupSettingsManager(m_szAppPath, m_szRcPath);
 
 	bDoRunStartup = ((bRunStartup) ? GetRCBool("LSNoStartup", FALSE) : FALSE);
 
@@ -302,7 +307,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 			RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning")
 			if (MessageBox(0, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
 			{
-				return 0;
+				return E_ABORT;
 			}
 		}
 		bUnderExplorer = TRUE;
@@ -322,7 +327,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		                  "Error registering main Litestep window class.",
 		                  IDS_LITESTEP_TITLE_ERROR, "Error")
 
-		exit(0);
+		return E_FAIL;
 	}
 
 	UACreationData cdCreationData = {sizeof(UACreationData), this};
@@ -448,14 +453,21 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	// Unreg class
 	UnregisterClass(szMainWindowClass, m_hInstance);
 
-	// deinitialie stepsettings
+	// deinitialize stepsettings
 	DeleteSettingsManager();
 
 	// Uninitialize OLE/COM
 	OleUninitialize();
 
-	// close the recovery thread
-	DestroyWindow(FindWindow(szRecoveryMenuWndClass, NULL));
+	// close the recovery thread: tell the thread to quit
+    PostThreadMessage(dwRecoveryThreadID, WM_QUIT, 0, 0);
+    // wait until the thread is done quitting, at most three seconds though
+    if (WaitForSingleObject(hRecoveryThread, 3000) == WAIT_TIMEOUT)
+    {
+        TerminateThread(hRecoveryThread, 0);
+    }
+    // close the thread handle
+    CloseHandle(hRecoveryThread);
 
 	return S_OK;
 }
