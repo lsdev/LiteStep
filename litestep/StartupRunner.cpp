@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ERK_NONE				0x0000
 #define ERK_RUNSUBKEYS			0x0001
 #define ERK_DELETE				0x0002
-#define REGSTR_PATH_RUN_POLICY	REGSTR_PATH_POLICIES "\\Explorer\\Run"
+#define REGSTR_PATH_RUN_POLICY	REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
 
 StartupRunner::StartupRunner()
 {}
@@ -43,10 +43,10 @@ DWORD StartupRunner::Run(void* pvVoid)
 	if (bRunStartup)
 	{
 		// When MS releases the SHRestricted API, we will use it
-		BOOL bHKLMRun = TRUE; // = !SHRestricted(REST_NOLOCALMACHINERUN);
-		BOOL bHKCURun = TRUE; // = !SHRestricted(REST_NOCURRENTUSERRUN);
-		BOOL bHKLMRunOnce = TRUE; // = !SHRestricted(REST_NOLOCALMACHINERUNONCE);
-		BOOL bHKCURunOnce = TRUE; // = !SHRestricted(REST_NOCURRENTUSERRUNONCE);
+		BOOL bHKLMRun = !SHRestricted(REST_NOLOCALMACHINERUN);
+		BOOL bHKCURun = !SHRestricted(REST_NOCURRENTUSERRUN);
+		BOOL bHKLMRunOnce = !SHRestricted(REST_NOLOCALMACHINERUNONCE);
+		BOOL bHKCURunOnce = !SHRestricted(REST_NOCURRENTUSERRUNONCE);
 
 		// Ini Sections
 
@@ -103,30 +103,30 @@ void StartupRunner::_RunStartupMenu()
 	    };
 	const ULONG STARTUPMENU_SIZE = sizeof(STARTUPMENU_TABLE) / sizeof(UINT);
 
-	char szPath[MAX_PATH];
+	TCHAR tzPath[MAX_PATH];
 
 	for (int i = 0; i < STARTUPMENU_SIZE; ++i)
 	{
-		if (GetShellFolderPath(STARTUPMENU_TABLE[i], szPath, MAX_PATH))
+		if (GetShellFolderPath(STARTUPMENU_TABLE[i], tzPath, MAX_PATH))
 		{
-			PathUnquoteSpaces(szPath);
-			_RunFolderContents(szPath);
+			PathUnquoteSpaces(tzPath);
+			_RunFolderContents(tzPath);
 		}
 	}
 }
 
-void StartupRunner::_RunFolderContents(LPCSTR pszPath)
+void StartupRunner::_RunFolderContents(LPCTSTR ptzPath)
 {
-	char szSearchPath[MAX_PATH];
+	TCHAR tzSearchPath[MAX_PATH];
 	WIN32_FIND_DATA findData;
 	HANDLE hSearch;
 
-	if (IsValidStringPtr(pszPath) && (pszPath[0] != '\0'))
+	if (IsValidStringPtr(ptzPath) && (ptzPath[0] != _T('\0')))
 	{
-		StringCchCopy(szSearchPath, MAX_PATH, pszPath);
-		PathAppend(szSearchPath, "*.*");
+		StringCchCopy(tzSearchPath, MAX_PATH, ptzPath);
+		PathAppend(tzSearchPath, _T("*.*"));
 
-		hSearch = FindFirstFile(szSearchPath, &findData);
+		hSearch = FindFirstFile(tzSearchPath, &findData);
 		while (hSearch != INVALID_HANDLE_VALUE)
 		{
 			if (!PathIsDirectory(findData.cFileName) &&
@@ -138,7 +138,7 @@ void StartupRunner::_RunFolderContents(LPCSTR pszPath)
 				seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
 
 				seiCommand.lpFile = findData.cFileName;
-				seiCommand.lpDirectory = pszPath;
+				seiCommand.lpDirectory = ptzPath;
 				seiCommand.nShow = SW_SHOWNORMAL;
 				seiCommand.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
 
@@ -163,7 +163,7 @@ BOOL StartupRunner::_IsFirstRunThisSession()
 {
 	BOOL bReturn = FALSE;
 	HKEY hkExplorer;
-	char szSessionInfo[30];
+	TCHAR tzSessionInfo[30];
 	LONG lResult;
 
 	OSVERSIONINFO OsVersionInfo;
@@ -183,7 +183,7 @@ BOOL StartupRunner::_IsFirstRunThisSession()
 			{
 				CloseHandle(hToken);
 
-				StringCchPrintf(szSessionInfo, 30, "SessionInfo\\%08x%08x", tsStats.AuthenticationId.HighPart, tsStats.AuthenticationId.LowPart);
+				StringCchPrintf(tzSessionInfo, 30, _T("SessionInfo\\%08x%08x"), tsStats.AuthenticationId.HighPart, tsStats.AuthenticationId.LowPart);
 
 				// Create the SessionInfo and StartUpHasBeenRun keys
 				lResult = RegCreateKeyEx(HKEY_CURRENT_USER, REGSTR_PATH_EXPLORER, 0, NULL, REG_OPTION_NON_VOLATILE,
@@ -192,14 +192,14 @@ BOOL StartupRunner::_IsFirstRunThisSession()
 				{
 					HKEY hkSessionInfo;
 
-					lResult = RegCreateKeyEx(hkExplorer, szSessionInfo, 0, NULL, REG_OPTION_VOLATILE,
+					lResult = RegCreateKeyEx(hkExplorer, tzSessionInfo, 0, NULL, REG_OPTION_VOLATILE,
 					                         KEY_WRITE, NULL, &hkSessionInfo, NULL);
 					RegCloseKey(hkExplorer);
 					if (lResult == ERROR_SUCCESS)
 					{
 						DWORD dwDisposition;
 						HKEY hkStartup;
-						lResult = RegCreateKeyEx(hkSessionInfo, "StartupHasBeenRun", 0, NULL, REG_OPTION_VOLATILE,
+						lResult = RegCreateKeyEx(hkSessionInfo, _T("StartupHasBeenRun"), 0, NULL, REG_OPTION_VOLATILE,
 						                         KEY_WRITE, NULL, &hkStartup, &dwDisposition);
 						RegCloseKey(hkSessionInfo);
 						
@@ -229,36 +229,36 @@ BOOL StartupRunner::_IsFirstRunThisSession()
 //
 // RunRegKeys(HKEY hkParent, LPCSTR pszSubKey, DWORD dwFlags)
 //
-void StartupRunner::_RunRegKeys(HKEY hkParent, LPCSTR pszSubKey, DWORD dwFlags)
+void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 {
 	HKEY hkSubKey;
 	LONG lResult;
 
-	lResult = RegOpenKeyEx(hkParent, pszSubKey, 0, MAXIMUM_ALLOWED, &hkSubKey);
+	lResult = RegOpenKeyEx(hkParent, ptzSubKey, 0, MAXIMUM_ALLOWED, &hkSubKey);
 	if (lResult == ERROR_SUCCESS)
 	{
 		if (dwFlags & ERK_RUNSUBKEYS)
 		{
 			DWORD dwNewFlags = dwFlags & ~(ERK_RUNSUBKEYS);
 
-			char szNameBuffer[255];
+			TCHAR tzNameBuffer[255];
 			DWORD dwLoop, dwNameSize;
 
 			for (dwLoop = 0; ; ++dwLoop)
 			{
 				dwNameSize = 255;
-				lResult = RegEnumKey(hkSubKey, dwLoop, szNameBuffer, dwNameSize);
+				lResult = RegEnumKey(hkSubKey, dwLoop, tzNameBuffer, dwNameSize);
 				if (lResult == ERROR_MORE_DATA)
 				{
 					continue;
 				}
 				else if (lResult == ERROR_SUCCESS)
 				{
-					_RunRegKeys(hkSubKey, szNameBuffer, dwNewFlags);
+					_RunRegKeys(hkSubKey, tzNameBuffer, dwNewFlags);
 
 					if (dwFlags & ERK_DELETE)
 					{
-						if (RegDeleteValue(hkSubKey, szNameBuffer) == ERROR_SUCCESS)
+						if (RegDeleteValue(hkSubKey, tzNameBuffer) == ERROR_SUCCESS)
 						{
 							dwLoop--;
 						}
@@ -272,15 +272,15 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCSTR pszSubKey, DWORD dwFlags)
 		}
 		else
 		{
-			char szNameBuffer[255], szValueBuffer[MAX_LINE_LENGTH];
+			TCHAR tzNameBuffer[255], tzValueBuffer[MAX_LINE_LENGTH];
 			DWORD dwLoop, dwNameSize, dwValueSize, dwType;
 
 			for (dwLoop = 0; ; ++dwLoop)
 			{
 				dwNameSize = 255;
-				dwValueSize = sizeof(szValueBuffer);
-				lResult = RegEnumValue(hkSubKey, dwLoop, szNameBuffer, &dwNameSize, NULL, &dwType,
-				                       (LPBYTE)szValueBuffer, &dwValueSize);
+				dwValueSize = sizeof(tzValueBuffer);
+				lResult = RegEnumValue(hkSubKey, dwLoop, tzNameBuffer, &dwNameSize, NULL, &dwType,
+				                       (LPBYTE)tzValueBuffer, &dwValueSize);
 				if (lResult == ERROR_MORE_DATA)
 				{
 					continue;
@@ -310,32 +310,32 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCSTR pszSubKey, DWORD dwFlags)
 							}
 						}*/
 
-						if ((dwFlags & ERK_DELETE) && (szNameBuffer[0] != '!'))
+						if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
 						{
-							if (RegDeleteValue(hkSubKey, szNameBuffer) == ERROR_SUCCESS)
+							if (RegDeleteValue(hkSubKey, tzNameBuffer) == ERROR_SUCCESS)
 							{
 								dwLoop--;
 							}
 						}
 
-						pszArgs = PathGetArgs(szValueBuffer);
+						pszArgs = PathGetArgs(tzValueBuffer);
 						if (*pszArgs)
 						{
-							szValueBuffer[szValueBuffer - pszArgs] = '\0';
+							tzValueBuffer[tzValueBuffer - pszArgs] = _T('\0');
 						}
 
-						PathUnquoteSpaces(szValueBuffer);
+						PathUnquoteSpaces(tzValueBuffer);
 
-						seiCommand.lpFile = szValueBuffer;
+						seiCommand.lpFile = tzValueBuffer;
 						seiCommand.lpParameters = pszArgs;
 						seiCommand.nShow = SW_SHOWNORMAL;
 						seiCommand.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
 
 						ShellExecuteEx(&seiCommand);
 
-						if ((dwFlags & ERK_DELETE) && (szNameBuffer[0] == '!'))
+						if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] == _T('!')))
 						{
-							if (RegDeleteValue(hkSubKey, szNameBuffer) == ERROR_SUCCESS)
+							if (RegDeleteValue(hkSubKey, tzNameBuffer) == ERROR_SUCCESS)
 							{
 								dwLoop--;
 							}
