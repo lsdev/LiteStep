@@ -36,7 +36,6 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 	ASSERT(cchPath >= MAX_PATH);
     ASSERT_ISWRITEDATA(ptzPath, cchPath);
 
-    LPITEMIDLIST pidl;
 	IMalloc* pMalloc;
 	bool bReturn = false;
 
@@ -44,6 +43,8 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
     // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
     if (SUCCEEDED(SHGetMalloc(&pMalloc)))
     {
+        LPITEMIDLIST pidl;
+
         if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
         {
             bReturn = SHGetPathFromIDList(pidl, ptzPath) ? true : false;
@@ -54,8 +55,9 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
             }
             
             pMalloc->Free(pidl);
-            pMalloc->Release();
         }
+
+        pMalloc->Release();
     }
     
     return bReturn;
