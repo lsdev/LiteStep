@@ -219,7 +219,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     CloseHandle(hMutex);
 
-	FreeLibrary(hShell32);
     return HRESULT_CODE(hr);
 }
 
