@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Beta 2
+    LiteStep 0.24.7 Beta 3
     Prerelease Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -7,8 +7,9 @@
 -- NOTE ------------------------------------------------------------------------
 
  The 0.24.7 code is based on the 2002-01-03 pre-0.24.6 source. Some of the
- functionality that was added to the 0.24.6 branch after this date was
- reimplemented in 0.24.7. See below for a list of these functions.
+ functionality that was added to the 0.24.6 branch after this date (mostly Indie
+ LS changes) was reimplemented in 0.24.7. See below for a list of these
+ functions and for what is missing.
 
 
 -- CHANGES SINCE 0.24.6 --------------------------------------------------------
@@ -26,27 +27,50 @@
    startup items in the event that the shell crashes. Thus the -nostartup switch
    is obsolete on NT systems.
 
- - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core.
+ - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core. It is now
+   called DDEService and loaded by default. Liteman.dll should no longer be
+   loaded.
 
- - Modules are loaded and unloaded asynchronously (at the same time) if threaded.
-   This should lead to faster start and recycle times if threading is used.
+ - Added "LSUseSystemDDE". This loads Windows' DDE server instead of the
+   DDEService. Results in larger memory usage but "proper" DDE support.
+   LSUseSystemDDE takes effect on startup only, not on !recycle.
+   Requires shdocvw.dll from IE.
+
+ - Added !HideModules and !ShowModules to hide or show all module windows.
+
+ - If "LSAutoHideModules" is specified LS tries to automatically hide all module
+   windows if a full-screen app is detected. Once the full-screen app exits
+   !ShowModules is called.
+
+ - LCOpen uses a separate SettingsMap for each file opened with LCOpen. This is
+   the thread-safe approach but makes it impossible for modules to use the
+   GetRC* APIs to retrieve settings from those files. For example this affects
+   Rabidvwm which can no longer read its settings directly from .box files. Put
+   the settings into step.rc instead or "include" the .box file(s) as a
+   workaround.
+
+ - Added inform-sega's ShellExecute fix for .lnk files. This enables LSExecute()
+   to execute .lnk files.
 
  - Removed support for PixmapPath (use LSImageFolder instead), ThemeFile,
    LSThemeFile, and LSColorBGR.
  
- - Both the !alert and the !confirm MessageBoxes should now always have focus
+ - Modules are loaded and unloaded asynchronously (at the same time) if
+   threaded. This should lead to faster start and recycle times if threading is
+   used.
+
+ - All MessageBoxes (including !alert and !confirm) should now always have focus
    and appear ontop of the active window.
  
  - The Recovery Menu cannot be closed permanently with ALT-F4 any more.
- 
- - Added !HideModules and !ShowModules to hide or show all module windows.
 
- - If a full-screen app is detected all module windows will be hidden
-   automatically using !HideModules. Once the full-screen app exits !ShowModules
-   is called. This behavior can be disabled by specifying "LSNoAutoHideModules"
-   in step.rc.
+ - Improved handling of exceptions in threaded modules.
+
+ - Improved handling of exceptions during !bang execution.
 
  - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
+
+ - Rewrote the TrayService.
 
  - etc. etc.
 
@@ -59,13 +83,9 @@
    
  - Fix the managers so that they are thread safe and accessible by the aboutbox.
 
- - Fix deadlock in BangManager (esp. on !recycle).
-
  - Complete -install/-uninstall updates, which will include a new wizards
    interface.
    
- - Check DDEWorker.cpp for Path* related bugs.
-
  - Make sure CListeStep::Start frees all allocated resources on failure before
    returning.
 
@@ -91,9 +111,9 @@
  - Math evaluation in VarExpansion (can be disabled at compiletime).
 
  - Stubs in lsapi for the logging APIs (minimal logging support can be enabled
-   at compiletime).
+   at compiletime) and for the Get-/SetVariable APIs.
 
- - $WinXP$, $compiledate$.
+ - Addition of $WinXP$, $compiledate$, and $quicklaunch$.
 
 
 -- INDIE LS CHANGES NOT (YET) ADDED TO 0.24.7 ----------------------------------
@@ -102,7 +122,7 @@
 
  - !setvar, !emptytrashbin
 
- - $quicklaunch$, system color / font variables, OS-* variables.
+ - system color / font variables, OS-* variables.
 
  - LSCP (including !lscp)
 

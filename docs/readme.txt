@@ -1,39 +1,68 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Beta 2
+    LiteStep 0.24.7 Beta 3
     Readme/Release Notes
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
 -- PREFACE ---------------------------------------------------------------------
 
- Here's the next update from your friendly devteam. Once more it is assumed that
- you are familiar with the last 0.24.7 build (Beta 1). If you are not familiar
- with the 0.24.7 prerelease builds please check changes.txt before reading this
- document.
- Compared to Beta 1 this build fixes some of the most reported bugs. Both the
- list of known bugs and the "what needs to be tested" section were updated, so
- please read those again. It would be a great help if you could notify us if a
- problem you reported is neither fixed nor included in the list of known bugs.
- For experienced users only; installation instructions are not included. As
- always, use at your own risk.
- This document only covers the most important issues, for details check
- changes.txt (still slightly incomplete).
+ Once more here's an update from your friendly devteam, this time announcing
+ 0.24.7 beta 3. Below is a list of changes since beta 2, check changes.txt for a
+ list of changes since 0.24.6.
+ This build hopefully fixes all bugs reported for beta 1 and beta 2. All
+ sections below were updated to reflect these changes, so read them carefully.
+ If there are still bugs and/or annoyances in this beta please let us know.
+ As usual, here's the disclaimer: This build is for experienced users only;
+ installation instructions are not included. Use at your own risk.
 
 
--- CHANGES SINCE BETA 1 --------------------------------------------------------
+-- CHANGES SINCE BETA 2 --------------------------------------------------------
 
- - Fixed StartupRunner's handling of unquoted paths and of programs with command
-   line arguments.
+ - DDEService now runs in its own thread, this should fix a few deadlocks.
+   Do NOT load liteman.dll with this build.
 
- - Fixed math evaluation not supporting zeroes or spaces.
+ - Added "LSUseSystemDDE". This loads Windows' DDE server instead of the
+   DDEService. Results in larger memory usage but "proper" DDE support.
+   LSUseSystemDDE takes effect on startup only, not on !recycle.
+   Requires shdocvw.dll (bundled with Internet Explorer 4).
 
- - Fixed LCReadNext* APIs not using case insensitive string comparison.
+ - Autmatic module hiding is disabled by default; replaced LSNoAutoHideModules
+   with LSAutoHideModules to enable it. It is recommended to bind !HideModules
+   and !ShowModules to hotkeys instead.
 
- - Fixed exceptions during module initialization not being propagated to
-   the ModuleManager.
+ - LCOpen uses a separate SettingsMap for each file opened with LCOpen. This is
+   the thread-safe approach but makes it impossible for modules to use the
+   GetRC* APIs to retrieve settings from those files. For example this affects
+   Rabidvwm which can no longer read its settings directly from .box files. Put
+   the settings into step.rc instead or "include" the .box file(s) as a
+   workaround.
 
- - Added a temporary aboutbox (after frequent requests from various parties via
-   Phil Stopford).
+ - Improved handling of exceptions in threaded modules.
+
+ - Improved handling of exceptions during the execution of !bangs.
+
+ - Added inform-sega's ShellExecute fix for .lnk files. This should enable you
+   to use .lnk files as LS commands; e.g.
+     LabelOnLeftClick c:\path\browser.lnk
+
+ - TrayService rewritten. Should fix most (hopefully all) tray problems.
+
+ - Fixed $username$ not accepting names with spaces.
+ 
+ - Added a SHGetSpecialFolderPath workaround to improve Win95 compatibility.
+
+ - Fixed minor resource leaks in StartupRunner.
+
+ - Fixed bugs in the DDEService implementation (paths with spaces were quoted
+   incorrectly).
+
+ - Added $quicklaunch$ from Indie LS.
+
+ - litestep.exe build option changed to "Multithreaded DLL" - reduces filesize.
+
+ - Removed some code duplication.
+
+ - Reduced header dependency.
 
 
 -- WHAT NEEDS TO BE TESTED -----------------------------------------------------
@@ -46,24 +75,23 @@
    except to work around the missing features listed in changes.txt. If you
    experience any problems during this process please report them.
 
- - Loading Liteman.dll with 0.24.7. This should NOT have any sideeffects.
+ - Module threading.
 
- - Threading.
+ - Windows 9x compatibility, especially Windows 95.
 
- - jKey (especially if used with vk104.txt).
-
- - LSMail - it can cause other modules to act very strangely. If you are loading
-   LSMail and there is a module showing unusual behavior try disabling LSMail.
-   In case that fixes the other module's behavior please include the name and
-   version of both modules in your bugreport.
-
- - LSWChanger.
-
- - Windows 9x compatibility. LS apparently does not load under Win95.
-
- - Systray. Some icons appear to be missing.
+ - Systray. The reported issues should be fixed but you never know.
 
  - Loading ICQ Lite and/or Crazy Browser while LS is running.
+
+ - System DDE.
+
+ - Locking the workstation while Litestep is running, both with and without
+   LSUseSystemDDE. There were reports of Litestep locking up after the
+   workstation is unlocked.
+
+ - DUN icon on Windows XP.
+
+ - McAfee Antivirus. Apparently there should be two icons but LS only shows one.
 
 
 -- KNOWN PROBLEMS --------------------------------------------------------------
@@ -71,23 +99,16 @@
  - No fully functional aboutbox. The current MessageBox is a temporary solution.
 
  - -install/-uninstall command line switches not finished (and thus
-   dysfunctional). The question has arisen whether this is even the job of
+   disfunctional). The question has arisen whether this is even the job of
    litestep.exe or if it should be moved to a separate app. Please comment if
    you have any thoughts on this.
 
- - LSMail can interfere with other modules.
+ - Deadlocks in (hopefully) rare circumstances.
 
- - Loading liteman may cause LS to freeze after locking the workstation.
-
- - Threading issues in (hopefully) rare circumstances.
-
- - Fullscreen app detection suffers from false positives. Because of that it may
-   be disabled by default in the final release. Any thoughts?
+ - Fullscreen app detection suffers from false positives.
 
  - #include dependencies in lsapi.h make it very difficult to distribute lsapi.h
    with a module's sourcecode.
-
- - TrayService doesn't catch all icons. Blank entries in the systray.
 
  - LS locks up if a PNG is used and libpng13.dll or zlib.dll is not present.
 
@@ -95,11 +116,9 @@
 -- FINAL WORDS -----------------------------------------------------------------
 
  Thanks to Phil Stopford for hosting the binaries, and to everyone for the
- immensely use- and helpful feedback. I don't think I have ever received such
- detailed bugreports before. You're definitely a huge help for shaping up
- 0.24.7.
- Please direct any suggestions/bug reports to ilmcuts@gmx.net and/or post on the
- LS Mailing List.
+ feedback. You are a great help in tracking down bugs and other little glitches.
+ Please direct any suggestions/bug reports to ilmcuts_AT_gmx_DOT_net and/or post
+ on the LS Mailing List (http://wuzzle.org/list/litestep.php).
  Thanks for your support,
 
  The LiteStep Development Team.
