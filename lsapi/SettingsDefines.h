@@ -10,7 +10,7 @@
 
 using namespace std;
 
-typedef multimap<string, string, stringcmp > SettingsMap;
+typedef multimap<string, string, stringicmp> SettingsMap;
 typedef SettingsMap::value_type value_type;
 typedef map<string, SettingsMap::iterator> IteratorMap;
 
