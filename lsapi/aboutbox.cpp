@@ -114,7 +114,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 }
 
 				// get new selection
-				i = SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_GETCURSEL, 0, 0);
+				i = (int)SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_GETCURSEL, 0, 0);
 
 				// fill the listview
 				aboutOptions[i].function(GetDlgItem(hWnd, IDC_LISTVIEW));
