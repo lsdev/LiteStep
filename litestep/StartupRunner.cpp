@@ -24,6 +24,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <regstr.h>
 #include "../utility/core.hpp"
 
+#ifdef __GNUC__ // mingw
+enum RESTRICTIONS
+{
+    REST_NOLOCALMACHINERUN     = 0x40000046,
+    REST_NOCURRENTUSERRUN      = 0x40000047,
+    REST_NOLOCALMACHINERUNONCE = 0x40000048,
+    REST_NOCURRENTUSERRUNONCE  = 0x40000049
+};
+#endif
+
 #define ERK_NONE				0x0000
 #define ERK_RUNSUBKEYS			0x0001 // runs key and its subkeys
 #define ERK_DELETE				0x0002
@@ -40,16 +50,32 @@ StartupRunner::~StartupRunner()
 DWORD StartupRunner::Run(void* pvVoid)
 {
     bool bRunStartup = _IsFirstRunThisSession();
-
+    
     // by keeping the call to _IsFirstRunThisSession() above we make sure the
     // regkey is created even if we're in "force startup" mode
     if (bRunStartup || (BOOL)pvVoid == TRUE)
-	{
-		bool bHKLMRun = !SHRestricted(REST_NOLOCALMACHINERUN);
-		bool bHKCURun = !SHRestricted(REST_NOCURRENTUSERRUN);
-		bool bHKLMRunOnce = !SHRestricted(REST_NOLOCALMACHINERUNONCE);
-		bool bHKCURunOnce = !SHRestricted(REST_NOCURRENTUSERRUNONCE);
+    {
+        bool bHKLMRun = true;
+        bool bHKCURun = true;
+        bool bHKLMRunOnce = true;
+        bool bHKCURunOnce = true;
+        
+        //
+        // SHRestricted is not available on Windows 95
+        //
+        typedef DWORD (WINAPI* SHREST_PROC)(RESTRICTIONS);
 
+        SHREST_PROC pSHRestricted = (SHREST_PROC)GetProcAddress(
+            GetModuleHandle(_T("shell32.dll")), (LPCSTR)100);
+
+        if (pSHRestricted)
+        {
+            bHKLMRun = !pSHRestricted(REST_NOLOCALMACHINERUN);
+            bHKCURun = !pSHRestricted(REST_NOCURRENTUSERRUN);
+            bHKLMRunOnce = !pSHRestricted(REST_NOLOCALMACHINERUNONCE);
+            bHKCURunOnce = !pSHRestricted(REST_NOCURRENTUSERRUNONCE);
+        }
+        
         if (bHKLMRunOnce)
         {
             _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUNONCE,
