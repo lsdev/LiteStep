@@ -408,7 +408,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
             {
                 if (message.hwnd == NULL)
 		        {
-                    if (message.message == NULL)
+                    if (message.message == 0)
                     {
 					    //something's wacked, break out of this
 					    break;

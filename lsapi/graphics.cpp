@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "png_support.h"
 #include "../utility/core.hpp"
 
+#ifdef __GNUC__
+using std::max;
+#endif
 
 void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent);
 
