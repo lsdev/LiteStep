@@ -277,6 +277,8 @@ BEGIN
     IDS_LITESTEP_CREATEWINDOW_ERROR "Unable to create window."
     IDS_HOOKMGR_CREATETHREAD_ERROR "Could not create Hook Manager Thread"
     IDS_HOOKMGR_LOADHOOK_ERROR "Could not load hook.dll"
+    IDS_LITESTEP_BANGEXCEPTION 
+                            "Error: Exception during bang command execution.\nPlease contact the module writer.\n\nBang parameters: %s"
 END
 
 #endif    // English (U.S.) resources
