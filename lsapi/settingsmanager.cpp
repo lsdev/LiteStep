@@ -600,7 +600,7 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 
         FileMap::iterator it = m_FileMap.find(szPath);
 
-		if (it == m_FileMap.end())
+		if (it == m_FileMap.end() && PathFileExists(szPath))
 		{
 			FileInfo* pFileInfo = new FileInfo;
 			
@@ -619,14 +619,17 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 			}
 		}
         
-        SettingsIterator * psiNew =
-            new SettingsIterator(it->second->m_pSettingsMap, szPath);
-        
-        if (psiNew)
+        if (it != m_FileMap.end())
         {
-            it->second->m_Count++;
-            m_Iterators.insert(psiNew);
-            pFile = (FILE*)psiNew;
+            SettingsIterator * psiNew =
+                new SettingsIterator(it->second->m_pSettingsMap, szPath);
+
+            if (psiNew)
+            {
+                it->second->m_Count++;
+                m_Iterators.insert(psiNew);
+                pFile = (FILE*)psiNew;
+            }
         }
 	}
 
