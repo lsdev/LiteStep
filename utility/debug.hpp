@@ -89,10 +89,41 @@ namespace debug
         char szBuffer[512];
         StringCchVPrintfExA(szBuffer, 512, NULL, NULL, STRSAFE_NULL_ON_FAILURE,
             pszFormat, args);
-
+        
         Tracer::Output(szBuffer);
         va_end(args);
     }
+
+    
+    template <class Tracer> class PrefixedOutput
+    {
+        unsigned int m_uLine;
+        const char* m_pszFile;
+        
+    public:
+        PrefixedOutput(unsigned int uLine, const char* pszFile) :
+          m_uLine(uLine), m_pszFile(pszFile) {}
+          
+        void operator()(const char* pszFormat, ...)
+        {
+            ASSERT_ISSTRING(pszFormat);
+            char szFormatBuffer[512] = { 0 };
+            
+            StringCchPrintfExA(szFormatBuffer, 512, NULL, NULL,
+                STRSAFE_NULL_ON_FAILURE, "%s (%u) : %s", m_pszFile, m_uLine,
+                pszFormat);
+            
+            va_list args;
+            va_start(args, pszFormat);
+            char szBuffer[4096] = { 0 };
+            
+            StringCchVPrintfExA(szBuffer, 4096, NULL, NULL,
+                STRSAFE_NULL_ON_FAILURE, szFormatBuffer, args);
+            
+            Tracer::Output(szBuffer);
+            va_end(args);              
+        }
+    };
 }
 #endif // defined(_DEBUG)
 
@@ -114,19 +145,10 @@ struct DebugOutputTracer
         OutputDebugStringA(pszText);
         OutputDebugStringA("\n");
     }
-
-    static void PrefixOutput(int nLine, const char* pszFile)
-    {
-        char szBuffer[512] = { 0 };
-        StringCchPrintfExA(szBuffer, 512, NULL, NULL, STRSAFE_NULL_ON_FAILURE,
-            "%s (%d) : ", nLine, pszFile);
-
-        OutputDebugStringA(szBuffer);
-    }
 };
     
 #define TRACE  debug::Trace<DebugOutputTracer>
-#define INFO   DebugOutputTracer::PrefixOutput(__LINE__, __FILE__); TRACE
+#define INFO   debug::PrefixedOutput<DebugOutputTracer>(__LINE__, __FILE__)
 
 #else	// !defined(_DEBUG)
 
