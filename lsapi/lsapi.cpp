@@ -35,8 +35,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.5 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.5 2003/01/03 04:59:05 message Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.6 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.6 2003/02/27 20:57:33 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -149,17 +149,27 @@ static LSAPIInit LSAPIManager;
 
 BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath)
 {
-	//StringCchCopy(szAppPath, MAX_PATH, pszLiteStepPath);
-	//StringCchCopy(szRcPath, MAX_PATH, pszRCPath);
-	BOOL bReturn = FALSE;
+    BOOL bReturn = FALSE;
+
+    // Storing the paths here to make !reload work. It calls this function
+    // with NULL, NULL as parameters. In the future SettingsManager or LSAPIInit
+    // could store these paths and/or SettingsManager could provide a Reload().
+    static char szAppPath[MAX_PATH] = { 0 };
+    static char szRcPath[MAX_PATH] = { 0 };
+
+    if (pszLiteStepPath && pszRCPath)
+    {
+        StringCchCopy(szAppPath, MAX_PATH, pszLiteStepPath);
+        StringCchCopy(szRcPath, MAX_PATH, pszRCPath);
+    }
 
 	if (gSettingsManager == NULL)
 	{
-		gSettingsManager = new SettingsManager(pszLiteStepPath);
+		gSettingsManager = new SettingsManager(szAppPath);
 
 		if (IsValidReadPtr(gSettingsManager))
 		{
-			gSettingsManager->ParseFile(pszRCPath);
+			gSettingsManager->ParseFile(szRcPath);
 			bReturn = TRUE;
 		}
 	}
@@ -191,7 +201,7 @@ BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 {
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
+    if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
 	{
 		DWORD dwCurrentThreadID = GetCurrentThreadId();
 
@@ -199,13 +209,13 @@ BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 		if (IsValidReadPtr(bBang))
 		{
 			//bBang->AddRef();
-			LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, bBang);
+            LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, bBang);
 			bBang->Release();
 			bReturn = TRUE;
 		}
 	}
 
-	return bReturn;
+    return bReturn;
 }
 
 
@@ -248,7 +258,7 @@ BOOL RemoveBangCommand(LPCSTR pszCommand)
 //
 BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 {
-	char szExpandedArgs[MAX_LINE_LENGTH];
+    char szExpandedArgs[MAX_LINE_LENGTH] = { 0 };
 	BOOL bReturn = FALSE;
 
 	if (IsValidStringPtr(pszCommand))
@@ -258,7 +268,7 @@ BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 			VarExpansionEx(szExpandedArgs, pszArgs, MAX_LINE_LENGTH);
 		}
 
-		bReturn = LSAPIManager.GetBangManager()->ExecuteBangCommand(pszCommand, hCaller, szExpandedArgs);
+        bReturn = LSAPIManager.GetBangManager()->ExecuteBangCommand(pszCommand, hCaller, szExpandedArgs);
 	}
 
 	return bReturn;
