@@ -69,7 +69,7 @@ void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
     }*/
 
     MessageBox(NULL,
-        "LiteStep 0.24.7 Beta 3\nBeta release.\n\n"
+        "LiteStep 0.24.7 Beta 4\nBeta release.\n\n"
         "Build Date: "__DATE__"\n"
         "Website TBA\n\n"
         "Copyright © 1997-2003\nThe LiteStep Development Team.",
