@@ -49,7 +49,7 @@ DDEWorker::~DDEWorker()
 BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 {
 	// 10 is the Maximum number of parameters passed in PROGMAN DDE call (AddItem)
-	LPCSTR pszParamList[10];      // This holds a list of pointers to args
+	LPSTR pszParamList[10];      // This holds a list of pointers to args
 	LPSTR pszTmp;
 	LPSTR pszWorkRequest;
 	BOOL bReturn = FALSE;
@@ -302,27 +302,26 @@ DWORD DDEWorker::_MatchRequest(LPCSTR pszCommand)
 }
 
 
-BOOL DDEWorker::_FindFiles(LPCSTR pszPath, BOOL bFindFolder)
+BOOL DDEWorker::_FindFiles(LPSTR pszPath, BOOL bFindFolder)
 {
 	LPMALLOC pMalloc = NULL;
-	HRESULT hr;
 	BOOL bReturn = FALSE;
-	WCHAR wzPath[MAX_PATH];
+    WCHAR wzPath[MAX_PATH] = { 0 };
 
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszPath, -1, wzPath, MAX_PATH);
+	PathUnquoteSpaces(pszPath);
+    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszPath, -1, wzPath, MAX_PATH);
 
-	hr = SHGetMalloc(&pMalloc);
+	HRESULT hr = SHGetMalloc(&pMalloc);
 	if (SUCCEEDED(hr))
 	{
-		IShellFolder * psfParent = NULL;
+		IShellFolder* psfParent = NULL;
 
 		hr = SHGetDesktopFolder(&psfParent);
 		if (SUCCEEDED(hr))
 		{
 			LPITEMIDLIST pidl = NULL;
-			ULONG cchEaten;
 
-			hr = psfParent->ParseDisplayName(NULL, NULL, wzPath, &cchEaten, &pidl, NULL);
+			hr = psfParent->ParseDisplayName(NULL, NULL, wzPath, NULL, &pidl, NULL);
 			if (SUCCEEDED(hr))
 			{
 				if (bFindFolder) // FindFolder
@@ -333,9 +332,13 @@ BOOL DDEWorker::_FindFiles(LPCSTR pszPath, BOOL bFindFolder)
 				{
 					bReturn = (BOOL)SHFindFiles(NULL, pidl);
 				}
+
+                pMalloc->Free(pidl);
 			}
+
 			psfParent->Release();
 		}
+
 		pMalloc->Release();
 	}
 
