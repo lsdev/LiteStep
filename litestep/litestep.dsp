@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /WX /GX /O2 /I "../lsapi" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /FD /c
+# ADD CPP /nologo /MD /W3 /WX /GX /O2 /I "../lsapi" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "NDEBUG" /o /win32 "NUL"
@@ -59,7 +59,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=xcopy                         /y                         ..\*.txt                         release\ 
+PostBuild_Cmds=xcopy                          /y                          ..\*.txt                          release\ 
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
