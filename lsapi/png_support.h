@@ -20,11 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __PNG_SUPPORT_H
 #define __PNG_SUPPORT_H
 
-#pragma include_alias("zlib.h", "../../zlib/zlib.h")
-#pragma comment(linker, "/NODEFAULTLIB:libc.lib")
-
 #include "../utility/common.h"
-#include "../../libpng/png.h"
+#include <libpng/png.h>
 
 typedef struct _PNGERROR
 {
