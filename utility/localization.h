@@ -42,5 +42,19 @@ HFONT LocalCreateFont(int nHeight,
                       LPCTSTR lpszFace);
 
 
+class Localization
+{
+public: 
+	Localization();
+	~Localization();
+	
+	void LoadLanguage(LANGID wLanguageID);
+	void LoadString(UINT uID, LPTSTR ptzBuffer, size_t cchMax);
+	int MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType);
+	
+private:
+	HINSTANCE m_hRes;
+	LANGID m_wLanguageID;
+};
 
 #endif // __INCLUDE_LOCALIZATION_H

@@ -142,3 +142,88 @@ HFONT LocalCreateFontIndirect(LOGFONT *lplf)
 
 	return CreateFontIndirect(lplf);
 }
+
+
+Localization::Localization()
+{
+	m_hRes = NULL;
+	m_wLanguageID = -1;
+	
+	LANGID wLanguageID;
+	
+	LANGID (__stdcall * GetUserDefaultUILanguage)(VOID) = NULL;
+	GetUserDefaultUILanguage = (LANGID (__stdcall *)(VOID))GetProcAddress(GetModuleHandle(_T("KERNEL32.DLL")), "GetUserDefaultUILanguage");
+	if (GetUserDefaultUILanguage)
+	{
+		wLanguageID = GetUserDefaultUILanguage();
+	}
+	else
+	{
+		wLanguageID = GetUserDefaultLangID();
+	}
+	
+	LoadLanguage(wLanguageID);
+}
+
+
+Localization::~Localization()
+{
+	if (m_hRes != GetModuleHandle(NULL))
+	{
+		FreeLibrary(m_hRes);
+	}
+}
+
+
+void Localization::LoadLanguage(LANGID wLanguageID)
+{
+	if (wLanguageID != m_wLanguageID)
+	{
+		TCHAR tzResourceDll[MAX_PATH];
+		HINSTANCE hRes;
+		
+		StringCchPrintf(tzResourceDll, MAX_PATH, _T("res%04x.dll"), wLanguageID);
+		
+		hRes = LoadLibrary(tzResourceDll);
+		if (hRes)
+		{
+			m_hRes = hRes;
+			m_wLanguageID = wLanguageID;
+		}
+		else
+		{
+			m_hRes = GetModuleHandle(NULL);
+			m_wLanguageID = 0x0404; // English (United States)
+		}
+	}
+}
+
+
+void Localization::LoadString(UINT uID, LPTSTR ptzBuffer, size_t cchMax)
+{
+	if (IsValidStringPtr(ptzBuffer, cchMax))
+	{
+		if (::LoadString(m_hRes, uID, ptzBuffer, cchMax) == 0)
+		{
+			if (::LoadString(GetModuleHandle(NULL), uID, ptzBuffer, cchMax) == 0)
+		 	{
+		 		ptzBuffer[0] = _T('\0');
+		 	}
+		}
+	}
+}
+
+
+int Localization::MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType)
+{
+	int nReturn = 0;
+	TCHAR tzCaption[MAX_LINE_LENGTH];
+	TCHAR tzText[MAX_LINE_LENGTH];
+	
+	LoadString(uText, tzText, MAX_LINE_LENGTH);
+	LoadString(uCaption, tzCaption, MAX_LINE_LENGTH);
+	
+	nReturn = ::MessageBox(hWnd, tzText, tzCaption, uType);
+	
+	return nReturn;
+}
