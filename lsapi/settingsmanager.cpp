@@ -384,37 +384,37 @@ void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
 }
 
 
-void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, DWORD dwLength)
+void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
 {
 	LPCSTR pszVariable;
 	CHAR szVariable[MAX_LINE_LENGTH + 1];
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
 	LPSTR pszTempExpandedString = szTempExpandedString;
-	DWORD dwWorkLength = dwLength;
+	size_t stWorkLength = stLength;
 
-	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (dwWorkLength > 0))
+	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stWorkLength > 0))
 	{
 		//szTempExpandedString[0] = '\0';
 
-		while ((*pszTemplate != '\0') && (dwWorkLength > 0))
+		while ((*pszTemplate != '\0') && (stWorkLength > 0))
 		{
 			if (*pszTemplate != '$')
 			{
 				*pszTempExpandedString = *pszTemplate;
-				pszTemplate++;
-				pszTempExpandedString++;
-				dwWorkLength--;
+				++pszTemplate;
+				++pszTempExpandedString;
+				--stWorkLength;
 			}
 			else
 			{
 				//
 				// This is a variable so we need to find the end of it:
 				//
-                pszTemplate++;
+                ++pszTemplate;
                 pszVariable = pszTemplate;
                 while ((*pszTemplate != '$') && (*pszTemplate != '\0'))
                 {
-                    pszTemplate++;
+                    ++pszTemplate;
                 }
 
 				bool bSucceeded = false;
@@ -443,7 +443,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
                             bSucceeded = true;
                         }
-                        else if (GetEnvironmentVariable(szVariable, pszTempExpandedString, dwLength))
+                        else if (GetEnvironmentVariable(szVariable,
+							pszTempExpandedString,
+							static_cast<DWORD>(stLength)))
                         {
                             bSucceeded = true;
                         }
@@ -454,7 +456,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             
                             if (nValue != INT_MAX)
                             {
-                                StringCchPrintf(pszTempExpandedString, dwLength,
+                                StringCchPrintf(pszTempExpandedString, stLength,
                                     "%d", nValue);
                                 
                                 bSucceeded = true;
@@ -475,7 +477,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				//
 				if (bSucceeded)
 				{
-					dwWorkLength -= strlen(pszTempExpandedString);
+					stWorkLength -= strlen(pszTempExpandedString);
 					pszTempExpandedString += strlen(pszTempExpandedString);
 				}
 
@@ -484,7 +486,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				//
 				if (*pszTemplate != '\0')
 				{
-					pszTemplate++;
+					++pszTemplate;
 				}
 			}
 		}
@@ -492,11 +494,11 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 
 		if (strchr(szTempExpandedString, '$'))
 		{
-			VarExpansionEx(pszExpandedString, szTempExpandedString, dwLength);
+			VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
 		}
 		else
 		{
-			StringCchCopy(pszExpandedString, dwLength, szTempExpandedString);
+			StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
 		}
 	}
 }
@@ -646,22 +648,23 @@ BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_
 // leave it alone as long as it works exactly like the old function.
 double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
 {
-    int nCount, nBlock = 0, nStart;
+    int nBlock = 0;
+	size_t stStart = 0;
     
     PathRemoveBlanks(ptzInput);
-    int nLen = _tcslen(ptzInput);
+    size_t stLen = _tcslen(ptzInput);
 
-    for (nCount = 0; nCount <= nLen; nCount++)
+    for (size_t stCount = 0; stCount <= stLen; ++stCount)
     {
-        if ((ptzInput[nCount] == _T('(')) && (++nBlock == 1))
+        if ((ptzInput[stCount] == _T('(')) && (++nBlock == 1))
         {
-            nStart = nCount;
+            stStart = stCount;
         }
-        else if ((ptzInput[nCount] == _T(')')) && !--nBlock && !nStart &&
-                 (nCount == (nLen - 1)))
+        else if ((ptzInput[stCount] == _T(')')) && !--nBlock && !stStart &&
+                 (stCount == (stLen - 1)))
         {
             // one pair of parentheses surrounding the whole expression		
-            ptzInput[nCount] = 0;
+            ptzInput[stCount] = 0;
             return _MathEvaluate(ptzInput + 1);
         }
     }
@@ -670,33 +673,33 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
 
 	for(int nSign = 0; nSign < 4; nSign++)
     {
-        for(nCount = nLen; nCount >= 0; nCount--)
+        for(size_t stCount = stLen; stCount >= 0; --stCount)
         {
-            if(ptzInput[nCount] == _T('('))
+            if(ptzInput[stCount] == _T('('))
             {
                 ++nBlock;
             }
-            else if(ptzInput[nCount] == _T(')'))
+            else if(ptzInput[stCount] == _T(')'))
             {
                 --nBlock;
             }
-            else if((ptzInput[nCount] == rcSign[nSign]) && !nBlock)
+            else if((ptzInput[stCount] == rcSign[nSign]) && !nBlock)
             {
-                ptzInput[nCount] = 0;
+                ptzInput[stCount] = 0;
                 
                 switch(nSign)
                 {
                     case 0: return _MathEvaluate(ptzInput) +
-                                _MathEvaluate(ptzInput + nCount + 1);
+                                _MathEvaluate(ptzInput + stCount + 1);
 
                     case 1: return _MathEvaluate(ptzInput) -
-                                _MathEvaluate(ptzInput + nCount + 1);
+                                _MathEvaluate(ptzInput + stCount + 1);
                         
                     case 2: return _MathEvaluate(ptzInput) *
-                                _MathEvaluate(ptzInput + nCount + 1);
+                                _MathEvaluate(ptzInput + stCount + 1);
                         
                     case 3: return _MathEvaluate(ptzInput) /
-                                _MathEvaluate(ptzInput + nCount + 1);
+                                _MathEvaluate(ptzInput + stCount + 1);
                 }
             }
         }
