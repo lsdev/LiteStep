@@ -59,7 +59,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=xcopy                        /y                        ..\*.txt                        release\ 
+PostBuild_Cmds=xcopy                         /y                         ..\*.txt                         release\ 
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
@@ -150,6 +150,10 @@ SOURCE=.\TrayService.cpp
 # Begin Group "Headers"
 
 # PROP Default_Filter "*.h"
+# Begin Source File
+
+SOURCE=.\buildoptions.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\DataStore.h
