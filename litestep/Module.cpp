@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 {
+	m_hInstance = NULL;
 	m_hThread = NULL;
 	m_pInitEx = NULL;
 	m_hInitEvent = NULL;
@@ -38,9 +39,18 @@ Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 	if (IsValidStringPtr(ptzLoc))
 	{
 		m_tzLocation = ptzLoc;
+	}
+}
 
-		m_hInstance = LoadLibrary(ptzLoc);
 
+BOOL Module::LoadDll()
+{
+	BOOL bReturn = FALSE;
+
+	if (!m_hInstance)
+	{
+		m_hInstance = LoadLibrary(m_tzLocation.c_str());
+		
 		if (m_hInstance)
 		{
 			m_pInitEx = (ModuleInitExFunc)GetProcAddress(m_hInstance, "initModuleEx");
@@ -48,27 +58,50 @@ Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 			{
 				m_pInitEx = (ModuleInitExFunc)GetProcAddress(m_hInstance, "_initModuleEx");
 			}
-			if (!m_pInitEx)
-			{
-				throw MODULE_BAD_INIT;
-			}
 
 			m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "quitModule");
 			if (!m_pQuit)   // Might be a BC module, check for underscore
 			{
                 m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "_quitModule");
 			}
-			if (!m_pQuit)
+
+			if (!m_pInitEx)
 			{
-				throw MODULE_BAD_QUIT;
+				RESOURCE_STR(NULL, IDS_INITMODULEEXNOTFOUND_ERROR,
+					"Error: Could not find initModuleEx().\n\nPlease confirm that the dll is a Litestep module,\nand check with the author for updates.");
+			}
+			else if (!m_pQuit)
+			{
+				RESOURCE_STR(NULL, IDS_QUITMODULENOTFOUND_ERROR,
+					"Error: Could not find quitModule().\n\nPlease conirm that the dll is a Litestep module.");
+			}
+			else
+			{
+				bReturn = TRUE;
 			}
 		}
 		else
 		{
-			throw MODULE_BAD_PATH;
+			RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
+				"Error: Could not locate module.\nPlease check your configuration.");
 		}
 	}
+
+	if (!bReturn)
+	{
+		MessageBox(NULL, resourceTextBuffer, m_tzLocation.c_str(),
+			MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST | MB_SETFOREGROUND);
+
+		if (m_hInstance)
+		{
+			FreeLibrary(m_hInstance);
+			m_hInstance = NULL;
+		}
+	}
+
+	return bReturn;
 }
+
 
 Module::~Module()
 {
@@ -134,10 +167,10 @@ ULONG Module::CallInit()
 		m_hInstance = NULL;
 
 		ulReturn = -1;
-        // There should wither be a "throw" here (or the return value should be
-		// used) so the ModuleManager gets to know that something went wrong. At
-		// the moment this only seems to cause more problems so it's commented
-		// out for the time being.
+        // There should be a "throw" here (or the return value should be used)
+		// to let the ModuleManager know that something went wrong. At the
+		// moment this only seems to cause more problems so it's commented out
+		// for the time being.
 		//throw;
 	}
 

@@ -123,15 +123,16 @@ UINT ModuleManager::_LoadModules()
 					dwFlags |= MODULE_NOTPUMPED;
 				}
 
-				if (LoadModule(szToken1, dwFlags))
+				Module* pModule = _MakeModule(szToken1, dwFlags);
+				if (pModule)
 				{
-					++uReturn;
+					m_ModuleQueue.push_back(pModule);
 				}
 			}
 		}
 		LCClose (f);
 
-		_StartModules();
+		uReturn = _StartModules(m_ModuleQueue);
 	}
 
 	return uReturn;
@@ -140,8 +141,29 @@ UINT ModuleManager::_LoadModules()
 
 BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 {
-	Module* pModule = NULL;
 	BOOL bReturn = FALSE;
+	
+	// _MakeModule checks if the module is already loaded
+	Module* pModule = _MakeModule(pszLocation, dwFlags);
+	
+	if (pModule)
+	{
+		ModuleQueue	mqModule(1, pModule);
+        bReturn = (_StartModules(mqModule) == 1);
+
+        if (bReturn)
+        {
+            m_ModuleQueue.push_back(pModule);
+        }
+	}
+
+	return bReturn;
+}
+
+
+Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
+{
+	Module* pModule = NULL;
 
 	ModuleQueue::iterator it = _FindModule(pszLocation);
 	if (it == m_ModuleQueue.end())
@@ -149,44 +171,25 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 		try
 		{
 			pModule = new Module(pszLocation, dwFlags);
-			m_ModuleQueue.push_back(pModule);
-            bReturn = TRUE;
 		}
-		catch (int error)
+		catch (...)
 		{
-			switch (error)
-			{
-				case MODULE_BAD_PATH:
-				RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
-				             "Error: Could not locate module.\nPlease check your configuration.");
-				break;
-				case MODULE_BAD_INIT:
-				RESOURCE_STR(NULL, IDS_INITMODULEEXNOTFOUND_ERROR,
-				             "Error: Could not find initModuleEx().\n\nPlease confirm that the dll is a Litestep module,\nand check with the author for updates.");
-				break;
-				case MODULE_BAD_QUIT:
-				RESOURCE_STR(NULL, IDS_QUITMODULENOTFOUND_ERROR,
-				             "Error: Could not find quitModule().\n\nPlease conirm that the dll is a Litestep module.");
-				break;
-			}
-
 			if (pModule)
 			{
 				delete pModule;
+				pModule = NULL;
 			}
-
-			MessageBox(NULL, resourceTextBuffer, pszLocation,
-                MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST | MB_SETFOREGROUND);
 		}
 	}
 
-	return bReturn;
+	return pModule;
 }
 
 
-void ModuleManager::_StartModules()
+UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 {
-	int nModuleCount = m_ModuleQueue.size();
+	UINT uReturn = 0;
+	int nModuleCount = mqModules.size();
 
 	if (nModuleCount)
 	{
@@ -201,26 +204,32 @@ void ModuleManager::_StartModules()
 			if (SUCCEEDED(hr))
 			{
 				HANDLE* pInitEvents = new HANDLE[nModuleCount];
-				ModuleQueue::iterator iter = m_ModuleQueue.begin();
+				ModuleQueue::iterator iter = mqModules.begin();
 
 				int nIndex = 0;
-				while (iter != m_ModuleQueue.end())
+				while (iter != mqModules.end())
 				{
 					if (*iter)
 					{
-						try
+						// delaying the LoadLibrary call is necessary to make
+						// grdtransparent work
+						if ((*iter)->LoadDll())
 						{
-							HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
-							if (hEvent)
+							try
 							{
-								pInitEvents[nIndex++] = hEvent;
+								HANDLE hEvent = (*iter)->Init(hLiteStep, szAppPath);
+								if (hEvent)
+								{
+									pInitEvents[nIndex++] = hEvent;
+								}
+								++uReturn;
 							}
-						}
-						catch (...)
-						{
-							RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
-											"Error: Exception during module initialization.\n\nPlease contact the module writer.",
-											(*iter)->GetLocation());
+							catch (...)
+							{
+								RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
+									"Error: Exception during module initialization.\n\nPlease contact the module writer.",
+									(*iter)->GetLocation());
+							}
 						}
 					}
 
@@ -258,6 +267,8 @@ void ModuleManager::_StartModules()
 			}
 		}
 	}
+
+	return uReturn;
 }
 
 void ModuleManager::_QuitModules()

@@ -56,10 +56,11 @@ public:
 	
 private:
 	UINT _LoadModules();
-	void _StartModules();
+	UINT _StartModules(ModuleQueue& mqModules);
 	void _QuitModules();
 	
 	ModuleQueue::iterator _FindModule(LPCSTR pszLocation);
+	Module* _MakeModule(LPCSTR pszLocation, DWORD dwFlags);
 	
     // predicate to be used with std::find_if
 	struct ModuleLookup;
