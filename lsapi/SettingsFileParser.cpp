@@ -106,7 +106,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
     TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
     bool bReturn = false;
     
-    while (!feof(m_phFile))
+    while (!feof(m_phFile) && !bReturn)
     {
         if (!_fgetts(tzBuffer, MAX_LINE_LENGTH, m_phFile))
         {
@@ -136,12 +136,10 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     
                     StringCchCopyEx(ptzValue, MAX_LINE_LENGTH, ptzValueStart,
                         NULL, NULL, STRSAFE_NULL_ON_FAILURE);
+
+                    bReturn = true;
                 }
-                
-                bReturn = true;
             }
-            
-            break;
         }
     }
 
