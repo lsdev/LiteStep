@@ -73,7 +73,7 @@ void MessageManager::ClearMessages(void)
 
 LRESULT MessageManager::SendMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	LRESULT lResult;
+	LRESULT lResult = 0;
 
 	messageMapT::iterator it = m_MessageMap.find(message);
 	if (it != m_MessageMap.end())
