@@ -47,6 +47,7 @@ void SetupBangs()
 	AddBangCommand("!UNLOADMODULE", BangUnloadModule);
 	AddBangCommand("!HIDEMODULES", BangHideModules);
 	AddBangCommand("!SHOWMODULES", BangShowModules);
+    AddBangCommand("!TOGGLEMODULES", BangToggleModules);
 }
 
 
@@ -58,14 +59,15 @@ ULONG WINAPI AboutBoxThread(void *);
 //
 void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-/*DWORD dwThread;
+    /*DWORD dwThread;
 
-  HANDLE hThread = CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread);
-  
+    HANDLE hThread = CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread);
+
     if (hThread)
     {
-    CloseHandle(hThread);
-}*/
+        CloseHandle(hThread);
+    }*/
+
     MessageBox(NULL,
         "LiteStep 0.24.7 Beta 3\nBeta release.\n\n"
         "Build Date: "__DATE__"\n"
@@ -380,20 +382,34 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 }
 
 
-//
-// CALLBACK EnumHideWindowsProc(HWND hWnd, LPARAM lParam)
-//
-BOOL CALLBACK EnumHideWindowsProc(HWND hWnd, LPARAM /* lParam */)
-{
-	if (IsWindow(hWnd) &&
-        (GetWindowLong(hWnd, GWL_USERDATA) == magicDWord) &&
-        IsWindowVisible(hWnd))
-	{
-		SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
-		ShowWindow(hWnd, SW_HIDE);
-	}
+#define EMP_HIDE   0
+#define EMP_SHOW   1
+#define EMP_TOGGLE 2
 
-	return TRUE;
+//
+// CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
+//
+BOOL CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
+{
+    if (IsWindow(hWnd))
+    {
+        long lUserData = GetWindowLong(hWnd, GWL_USERDATA);
+
+        if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
+            (lParam == EMP_HIDE || lParam == EMP_TOGGLE))
+        {
+            SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
+            ShowWindow(hWnd, SW_HIDE);
+        }
+        else if ((lUserData == HIDEmagicDWord) &&
+            (lParam == EMP_SHOW || lParam == EMP_TOGGLE))
+        {
+            SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
+            ShowWindow(hWnd, SW_SHOW);
+        }
+    }
+
+    return TRUE;
 }
 
 
@@ -402,23 +418,7 @@ BOOL CALLBACK EnumHideWindowsProc(HWND hWnd, LPARAM /* lParam */)
 //
 void BangHideModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	EnumWindows(EnumHideWindowsProc, NULL);
-}
-
-
-//
-// CALLBACK EnumShowWindowsProc(HWND hWnd, LPARAM lParam)
-//
-BOOL CALLBACK EnumShowWindowsProc(HWND hWnd, LPARAM /* lParam */)
-{
-	if (IsWindow(hWnd) &&
-        (GetWindowLong(hWnd, GWL_USERDATA) == HIDEmagicDWord))
-	{
-		SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
-		ShowWindow(hWnd, SW_SHOW);
-	}
-
-	return TRUE;
+	EnumWindows(EnumModulesProc, EMP_HIDE);
 }
 
 
@@ -427,5 +427,14 @@ BOOL CALLBACK EnumShowWindowsProc(HWND hWnd, LPARAM /* lParam */)
 //
 void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	EnumWindows(EnumShowWindowsProc, NULL);
+	EnumWindows(EnumModulesProc, EMP_SHOW);
+}
+
+
+//
+// BangToggleModules(HWND hCaller, LPCSTR pszArgs)
+//
+void BangToggleModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
+{
+    EnumWindows(EnumModulesProc, EMP_TOGGLE);
 }

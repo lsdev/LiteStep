@@ -45,6 +45,7 @@ void BangTileWindowsV(HWND hCaller, LPCSTR pszArgs);
 void BangUnloadModule (HWND hCaller, LPCSTR pszArgs);
 void BangHideModules (HWND hCaller, LPCSTR pszArgs);
 void BangShowModules (HWND hCaller, LPCSTR pszArgs);
+void BangToggleModules (HWND hCaller, LPCSTR pszArgs);
 
 #endif // __BANGS_H
 
