@@ -24,13 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <math.h>
 #include "../utility/core.hpp"
 
-#ifdef __GNUC__
-  typedef void (__stdcall *STTWTYPE)(HWND, BOOL);
-
-  STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
-      GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
-#endif
-
 extern const char rcsRevision[];
 
 enum
@@ -226,6 +219,12 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 (GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
                 0, 0, SWP_NOSIZE);
 
+#ifdef __GNUC__
+            typedef void (__stdcall *STTWTYPE)(HWND, BOOL);
+            
+            static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
+                GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
+#endif
 			SwitchToThisWindow(hWnd, TRUE);
 
 			return FALSE;
