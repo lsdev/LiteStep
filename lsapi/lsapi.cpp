@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.9 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.9 2003/04/17 19:44:29 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.10 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.10 2003/05/02 13:54:09 ilmcuts Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -368,7 +368,8 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 				_splitpath(szCommand, szFullDir, szDir, NULL, NULL);
 				StringCchCat(szFullDir, _MAX_DIR + _MAX_DRIVE, szDir);
 
-				hResult = LSExecuteEx(hOwner, "open", szCommand, pszArgs, szFullDir, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
+				hResult = LSExecuteEx(hOwner, NULL, szCommand, pszArgs,
+                    szFullDir, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
 			}
 		}
 	}
