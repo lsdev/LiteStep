@@ -70,8 +70,8 @@ void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangAlert(HWND hCaller, LPCSTR pszArgs)
 {
-	char szMessage[MAX_PATH];
-	char szTitle[MAX_PATH];
+    char szMessage[MAX_LINE_LENGTH] = { 0 };
+    char szTitle[MAX_LINE_LENGTH] = { 0 };
 	LPSTR aszTokens[] = { szMessage, szTitle };
 
 	int nTokenCount = LCTokenize(pszArgs, aszTokens, 2, 0);
@@ -104,10 +104,10 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 {
 	if (IsValidStringPtr(pszArgs))
 	{
-		char szFirst[MAX_PATH];
-		char szSecond[MAX_PATH];
-		char szThird[MAX_PATH];
-		char szFourth[MAX_PATH];
+        char szFirst[MAX_LINE_LENGTH] = { 0 };
+		char szSecond[MAX_LINE_LENGTH] = { 0 };
+		char szThird[MAX_LINE_LENGTH] = { 0 };
+		char szFourth[MAX_LINE_LENGTH] = { 0 };
 		LPSTR aszTokens[] = { szFirst, szSecond, szThird, szFourth };
 
 		int nTokenCount = CommandTokenize(pszArgs, aszTokens, 4, 0);
@@ -116,7 +116,7 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 		{
 			if (nTokenCount == 3)
 			{
-				StringCchCopy(szFourth, MAX_PATH, "Litestep");
+				StringCchCopy(szFourth, MAX_LINE_LENGTH, "Litestep");
 			}
 
 			if (MessageBox(hCaller, szFirst, (nTokenCount == 3) ? szFourth : szSecond, MB_YESNO | MB_TOPMOST | MB_SETFOREGROUND) == IDYES)
@@ -270,7 +270,7 @@ void BangReloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 		if (hLiteStep)
 		{
 			LPCSTR pszNextToken = pszArgs;
-			char szModuleString[MAX_PATH];
+            char szModuleString[MAX_LINE_LENGTH] = { 0 };
 
 			while (GetToken(pszNextToken, szModuleString, &pszNextToken, TRUE))
 			{
@@ -366,7 +366,7 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 	if (hLiteStep)
 	{
 		LPCSTR pszNextToken = pszArgs;
-		char szPath[MAX_PATH];
+        char szPath[MAX_LINE_LENGTH] = { 0 };
 
 		while (GetToken(pszNextToken, szPath, &pszNextToken, TRUE))
 		{
