@@ -191,8 +191,8 @@ HANDLE LoadImagePassthru(
 //   .extract=file.exe[,3]
 HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 {
-	SAFE_CHAR(szImageBuf, MAX_PATH);
-	SAFE_CHAR(szImageFinal, MAX_PATH);
+	char szImageBuf[MAX_PATH];
+	char szImageFinal[MAX_PATH];
 	HINSTANCE hInstance;
 	HBITMAP hbmReturn = NULL;
 
@@ -222,8 +222,8 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 					int wdtFirst, hgtFirst;
 					int wdtSecond, hgtSecond;
 					int wdtResult, hgtResult;
-					SAFE_CHAR(szFirstImage, MAX_PATH);
-					SAFE_CHAR(szRestImageBuf, MAX_LINE_LENGTH);
+					char szFirstImage[MAX_PATH];
+					char szRestImageBuf[MAX_LINE_LENGTH];
 					LPSTR pipepos;
 
 					// get the position after the [|] character
@@ -322,7 +322,7 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 				}
 				else  // For now, we only support .BMP files
 				{
-					SAFE_CHAR(szFullPath, MAX_PATH);
+					char szFullPath[MAX_PATH];
 
 					LSGetImagePath(szFullPath, MAX_PATH);
 
@@ -407,8 +407,8 @@ HBITMAP BitmapFromIcon(HICON hIcon)
 
 HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 {
-	SAFE_CHAR(szIconPathBuf, MAX_PATH);
-	SAFE_CHAR(szIconPathFinal, MAX_PATH);
+	char szIconPathBuf[MAX_PATH];
+	char szIconPathFinal[MAX_PATH];
 	int nIcon = 0;
 	HINSTANCE hInstance = NULL;
 	HICON hIcon = NULL;
@@ -469,7 +469,7 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 					{
 						if (strlen(szTemp) == 1) // c:\path\ -> desktop.ini
 						{
-							SAFE_CHAR(szSetting, MAX_PATH);
+							char szSetting[MAX_PATH];
 							StringCchCat(szIconPathFinal, MAX_PATH, "desktop.ini");
 							GetPrivateProfileString(".ShellClassInfo", "IconIndex", "0", szSetting, MAX_PATH, szIconPathFinal);
 							nIcon = atoi(szSetting);

@@ -35,8 +35,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.4 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.4 2003/01/02 11:07:10 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.5 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.5 2003/01/03 04:59:05 message Exp $"; // The Full RCS ID.
 
 extern SettingsManager *gSettingsManager = NULL;
 
@@ -65,8 +65,8 @@ private:
 	DWORD m_dwMainThreadID;
 	BangManager* m_bmBangManager;
 
-	SAFE_CHAR_H(m_szLiteStepPath, MAX_PATH);
-	SAFE_CHAR_H(m_szLiteStepImagePath, MAX_PATH);
+	char m_szLiteStepPath[MAX_PATH];
+	char m_szLiteStepImagePath[MAX_PATH];
 
 	HWND m_hLiteStepWnd;
 
@@ -248,7 +248,7 @@ BOOL RemoveBangCommand(LPCSTR pszCommand)
 //
 BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 {
-	SAFE_CHAR(szExpandedArgs, MAX_LINE_LENGTH);
+	char szExpandedArgs[MAX_LINE_LENGTH];
 	BOOL bReturn = FALSE;
 
 	if (IsValidStringPtr(pszCommand))
@@ -270,8 +270,8 @@ BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 //
 void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs)
 {
-	SAFE_CHAR(szCommand, MAX_LINE_LENGTH)
-	SAFE_CHAR(szTempCommand, MAX_LINE_LENGTH)
+	char szCommand[MAX_LINE_LENGTH];
+	char szTempCommand[MAX_LINE_LENGTH];
 	LPCSTR pszTempArgs = NULL;
 
 	if (IsValidStringPtr(pszCommand))
@@ -342,8 +342,8 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 //
 HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 {
-	SAFE_CHAR(szCommand, MAX_LINE_LENGTH);
-	SAFE_CHAR(szExpandedCommand, MAX_LINE_LENGTH);
+	char szCommand[MAX_LINE_LENGTH];
+	char szExpandedCommand[MAX_LINE_LENGTH];
 	LPCSTR pszArgs;
 	HINSTANCE hResult = HINSTANCE(32);
 
@@ -364,8 +364,8 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 			}
 			else
 			{
-				SAFE_CHAR(szDir, _MAX_DIR);
-				SAFE_CHAR(szFullDir, _MAX_DIR + _MAX_DRIVE);
+				char szDir[_MAX_DIR];
+				char szFullDir[_MAX_DIR + _MAX_DRIVE];
 
 				_splitpath(szCommand, szFullDir, szDir, NULL, NULL);
 				StringCchCat(szFullDir, _MAX_DIR + _MAX_DRIVE, szDir);
@@ -419,7 +419,7 @@ void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText,
 //
 void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
 {
-	SAFE_CHAR(szFormat, MAX_LINE_LENGTH)
+	char szFormat[MAX_LINE_LENGTH];
 	va_list vargs;
 
 	if (IsValidStringPtr(pszText, cchText))
@@ -472,7 +472,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 
 int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets)
 {
-	SAFE_CHAR(szBuffer, MAX_LINE_LENGTH);
+	char szBuffer[MAX_LINE_LENGTH];
 	LPCSTR pszNextToken;
 	DWORD dwTokens = 0;
 
@@ -639,7 +639,7 @@ void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
 {
 	if (IsValidStringPtr(pszExpandedString) && IsValidStringPtr(pszTemplate))
 	{
-		SAFE_CHAR(szTempBuffer, MAX_LINE_LENGTH);
+		char szTempBuffer[MAX_LINE_LENGTH];
 
 		VarExpansionEx(szTempBuffer, pszTemplate, MAX_LINE_LENGTH);
 

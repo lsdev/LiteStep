@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "litestep.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-// const char rcsRevision[] = "$Revision: 1.4 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.4 2003/01/02 11:06:14 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.5 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.5 2003/01/03 04:59:05 message Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -300,7 +300,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	// Check for explorer
 	if (FindWindow("Shell_TrayWnd", NULL)) // Running under Exploder
 	{
-		if (!(GetRCBool("LSNoShellWarning", TRUE)))
+		if (GetRCBool("LSNoShellWarning", FALSE))
 		{
 			RESOURCE_STR(hInstance, IDS_LITESTEP_ERROR3,
 			             "You are currently running another shell, while Litestep b24 allows you\012to run under Explorer, we don't advise it for inexperienced users, and we\012will not support it, so do so at your own risk.\012\012If you continue, some of the advanced features of Litestep will be disabled\012such as the desktop. The wharf, hotkeys, and shortcuts will still work.\012\012To get rid of this message next time, put LSNoShellWarning in your step.rc\012\012Continue?")
@@ -711,7 +711,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		case LM_GETREVID:
 		{
-			SAFE_CHAR(szBuffer, 256);
+			char szBuffer[256];
 
 			if (wParam == 1)
 			{

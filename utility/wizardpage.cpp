@@ -108,8 +108,8 @@ HPROPSHEETPAGE CWizardPage::Create(UINT nIndex, HINSTANCE hInstance, CWizardMain
 
 void CWizardPage::SetStaticText(HWND hWnd, UINT nStaticTextID, UINT nResourceID, LPCSTR pszDefText, ...)
 {
-	SAFE_CHAR(szText, MAX_LINE_LENGTH);
-	SAFE_CHAR(szFormat, MAX_LINE_LENGTH);
+	char szText[MAX_LINE_LENGTH];
+	char szFormat[MAX_LINE_LENGTH];
 	va_list vargs;
 
 	GetResStr(m_hInstance, nResourceID, szFormat, MAX_LINE_LENGTH, pszDefText);

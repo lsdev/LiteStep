@@ -71,7 +71,7 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
 BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
-	SAFE_CHAR(wzKey, MAX_RCCOMMAND);
+	char wzKey[MAX_RCCOMMAND];
 
 	if (IsValidStringPtr(pszValue, cchValue) && IsValidStringPtr(pszConfig))
 	{

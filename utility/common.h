@@ -54,26 +54,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include "lsdebug.h"
 
-
-//
-// Including this for those rare occasions that we use these macros
-// in header files, but dont want to load safestr.h
-//
-#ifndef SAFE_CHAR
-#define SAFE_CHAR_W(name, length) WCHAR name[length+1]; name[0] = L'\0';
-#define SAFE_CHAR_H_W(name, length) WCHAR name[length+1];
-#define SAFE_CHAR_A(name, length) char name[length+1]; name[0] = '\0';
-#define SAFE_CHAR_H_A(name, length) char name[length+1];
-
-#ifdef _UNICODE
-#define SAFE_CHAR(name, length)		SAFE_CHAR_W(name, length)
-#define SAFE_CHAR_H(name, length)	SAFE_CHAR_H_W(name, length)
-#else // _UNICODE
-#define SAFE_CHAR(name, length)		SAFE_CHAR_A(name, length)
-#define SAFE_CHAR_H(name, length)	SAFE_CHAR_H_A(name, length)
-#endif // _UNICODE
-#endif // SAFE_CHAR
-
 #define INIT_STRUCT_CBSIZE(structure) memset(&structure, 0, sizeof(structure)); \
 								      structure.cbSize = sizeof(structure);
 

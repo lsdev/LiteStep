@@ -187,7 +187,7 @@ BOOL LSGetVariableEx(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
 BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
 {
 	BOOL bReturn = FALSE;
-	SAFE_CHAR(szTempValue, MAX_LINE_LENGTH);
+	char szTempValue[MAX_LINE_LENGTH];
 
 	pszValue[0] = '\0';
 	if (gSettingsManager)

@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/safestr.h" // Always include last in cpp file
 
-Module::Module(LPCSTR pszLoc, DWORD dwFlags)
+Module::Module(LPCTSTR ptzLoc, DWORD dwFlags)
 {
 	m_hThread = NULL;
 	m_pInitEx = NULL;
@@ -34,11 +34,11 @@ Module::Module(LPCSTR pszLoc, DWORD dwFlags)
 	m_pQuit = NULL;
 	m_dwFlags = dwFlags;
 
-	if (IsValidStringPtr(pszLoc))
+	if (IsValidStringPtr(ptzLoc))
 	{
-		m_szLocation = pszLoc;
+		m_tzLocation = ptzLoc;
 
-		m_hInstance = LoadLibrary(pszLoc);
+		m_hInstance = LoadLibrary(ptzLoc);
 
 		if (m_hInstance)
 		{
@@ -86,14 +86,14 @@ Module::~Module()
 	}
 }
 
-HANDLE Module::Init(HWND hMainWindow, LPCSTR pszAppPath)
+HANDLE Module::Init(HWND hMainWindow, LPCTSTR ptzAppPath)
 {
 	if (m_hInstance)
 	{
 		if (m_pInitEx)
 		{
 			m_hMainWindow = hMainWindow;
-			m_szAppPath = pszAppPath;
+			m_tzAppPath = ptzAppPath;
 
 			if (m_dwFlags & MODULE_THREADED)
 			{
@@ -122,7 +122,7 @@ ULONG Module::CallInit()
 
 	try
 	{
-		m_pInitEx(m_hMainWindow, m_hInstance, m_szAppPath.c_str());
+		m_pInitEx(m_hMainWindow, m_hInstance, m_tzAppPath.c_str());
 	}
 	catch (...)
 	{
@@ -156,7 +156,7 @@ HANDLE Module::Quit()
 				catch (...)
 				{
 					RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
-					                "Exception while quitting module.", m_szLocation.c_str())
+					                "Exception while quitting module.", m_tzLocation.c_str())
 				}
 			}
 		}
