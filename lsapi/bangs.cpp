@@ -64,14 +64,18 @@ ULONG WINAPI AboutBoxThread(void *);
 //
 void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	/*DWORD dwThread;
+/*DWORD dwThread;
 
-	HANDLE hThread = CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread);
-
-	if (hThread)
-	{
-		CloseHandle(hThread);
-	}*/
+  HANDLE hThread = CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread);
+  
+    if (hThread)
+    {
+    CloseHandle(hThread);
+}*/
+    MessageBox(NULL,
+        "LiteStep 0.24.7\nPrerelease test build.\n\nBuild Date: "__DATE__"\nWebsite TBA\n\nCopyright © 1997-2003\nThe LiteStep Development Team.",
+        "About LiteStep...",
+        MB_OK | MB_TOPMOST | MB_SETFOREGROUND | MB_ICONINFORMATION);
 }
 
 
