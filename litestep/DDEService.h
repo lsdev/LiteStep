@@ -43,7 +43,16 @@ public:
 private:
 	HRESULT _RegisterDDE();
 
-	static DDEWorker m_DDEWorker;
+    bool _DoStart();
+    void _DoStop();
+
+    static unsigned int __stdcall _DDEThreadProc(void* pvService);
+
+    static unsigned int m_uThreadId;
+    static HANDLE m_hThread;
+    static HANDLE m_hStartEvent;
+    
+    static DDEWorker m_DDEWorker;
 	static HSZ m_hszProgman;
 	static HSZ m_hszGroups;
 	static HSZ m_hszFolders;
