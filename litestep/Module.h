@@ -62,6 +62,8 @@ public:
 	Module(LPCTSTR ptzLoc, DWORD dwFlags);
 	virtual ~Module();
 
+	BOOL LoadDll();
+
 	HANDLE Init(HWND hMainWindow, LPCTSTR ptzAppPath);
 	HANDLE Quit();
 
