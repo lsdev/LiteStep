@@ -153,7 +153,7 @@ void BangExecute(HWND hCaller, LPCSTR pszArgs)
 		LPCSTR pszNextToken = pszArgs;
 		char szCommand[MAX_LINE_LENGTH];
 
-		while (GetToken(pszNextToken, szCommand, &pszNextToken, true))
+		while (GetToken(pszNextToken, szCommand, &pszNextToken, TRUE))
 		{
 			LSExecute(hCaller, szCommand, SW_SHOWDEFAULT);
 		}
@@ -184,7 +184,7 @@ void BangLogoff(HWND /* hCaller */, LPCSTR /* pszArgs */)
 
 	if (hLiteStep)
 	{
-		SendMessage(hLiteStep, LM_RECYCLE, LR_LOGOFF, 0);
+		PostMessage(hLiteStep, LM_RECYCLE, LR_LOGOFF, 0);
 	}
 }
 
@@ -227,7 +227,7 @@ void BangQuit(HWND /* hCaller */, LPCSTR /* pszArgs */)
 
 	if (hLiteStep)
 	{
-		SendMessage(hLiteStep, LM_RECYCLE, LR_QUIT, 0);
+		PostMessage(hLiteStep, LM_RECYCLE, LR_QUIT, 0);
 	}
 }
 
@@ -322,7 +322,7 @@ void BangShutdown(HWND /* hCaller */, LPCSTR /* pszArgs */)
 
 	if (hLiteStep)
 	{
-		SendMessage(hLiteStep, LM_RECYCLE, LR_MSSHUTDOWN, 0);
+		PostMessage(hLiteStep, LM_RECYCLE, LR_MSSHUTDOWN, 0);
 	}
 }
 
@@ -383,11 +383,11 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 //
 // CALLBACK EnumHideWindowsProc(HWND hWnd, LPARAM lParam)
 //
-BOOL CALLBACK EnumHideWindowsProc(HWND hWnd, LPARAM lParam)
+BOOL CALLBACK EnumHideWindowsProc(HWND hWnd, LPARAM /* lParam */)
 {
 	if (IsWindow(hWnd) &&
-	        IsWindowVisible(hWnd) &&
-	        (GetWindowLong(hWnd, GWL_USERDATA) == magicDWord))
+        (GetWindowLong(hWnd, GWL_USERDATA) == magicDWord) &&
+        IsWindowVisible(hWnd))
 	{
 		SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
 		ShowWindow(hWnd, SW_HIDE);
@@ -409,10 +409,10 @@ void BangHideModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 // CALLBACK EnumShowWindowsProc(HWND hWnd, LPARAM lParam)
 //
-BOOL CALLBACK EnumShowWindowsProc(HWND hWnd, LPARAM lParam)
+BOOL CALLBACK EnumShowWindowsProc(HWND hWnd, LPARAM /* lParam */)
 {
 	if (IsWindow(hWnd) &&
-	        (GetWindowLong(hWnd, GWL_USERDATA) == HIDEmagicDWord))
+        (GetWindowLong(hWnd, GWL_USERDATA) == HIDEmagicDWord))
 	{
 		SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
 		ShowWindow(hWnd, SW_SHOW);
