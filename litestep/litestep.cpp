@@ -29,15 +29,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
 
+// Services
+#include "DDEService.h"
+#include "TrayService.h"
+
 // Managers
 #include "HookManager.h"
+#include "MessageManager.h"
+#include "ModuleManager.h"
 
- // Always include last in cpp file
+// Misc Helpers
+#include "DataStore.h"
+
+// Always include last in cpp file
 #include "../utility/safestr.h"
 
 
-// const char rcsRevision[] = "$Revision: 1.10 $"; // Our Version
-const char rcsId[] = "$Id: litestep.cpp,v 1.10 2003/03/27 19:26:08 ilmcuts Exp $"; // The Full RCS ID.
+// const char rcsRevision[] = "$Revision: 1.11 $"; // Our Version
+const char rcsId[] = "$Id: litestep.cpp,v 1.11 2003/04/09 18:34:15 ilmcuts Exp $"; // The Full RCS ID.
 const char LSRev[] = "0.24.7 ";
 
 // Parse the command line
@@ -249,7 +258,7 @@ CLiteStep::CLiteStep()
 	m_szAppPath[0] = '\0';
 	m_szRcPath[0] = '\0';
 	m_hInstance = NULL;
-    m_bAutoHideModules = TRUE;
+    m_bAutoHideModules = FALSE;
     m_bAppIsFullScreen = FALSE;
 	m_hMainWindow = NULL;
 	WM_ShellHook = 0;
@@ -258,7 +267,6 @@ CLiteStep::CLiteStep()
 	m_pDataStoreManager = NULL;
 	m_pMessageManager = NULL;
 	bHookManagerStarted = FALSE;
-	hTrayManager = NULL;
 	m_cxServiceItems = 0;
 	m_pDDEService = NULL;
 	m_pTrayService = NULL;
@@ -312,7 +320,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 
 	bDoRunStartup = ((bRunStartup) ? GetRCBool("LSNoStartup", FALSE) : FALSE);
 
-	m_bAutoHideModules = GetRCBool("LSNoAutoHideModules", FALSE);
+	m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE);
 
 	// Check for explorer
 	if (FindWindow("Shell_TrayWnd", NULL)) // Running under Exploder
@@ -572,9 +580,9 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		case LM_SYSTRAYREADY:
 		{
-			if (hTrayManager)
+			if (m_pTrayService)
 			{
-				SendMessage(hTrayManager, uMsg, 0, 0);
+				m_pTrayService->SendSystemTray();
 				lReturn = TRUE;
 			}
 		}
@@ -903,11 +911,6 @@ HRESULT CLiteStep::_StartServices()
 			hr = (*m_ServiceItems[i].ppService)->Start();
 		}
 	}
-
-	if (m_pTrayService)
-    {
-        m_pTrayService->get_hWnd(&hTrayManager);
-    }
 
 	return hr;
 }

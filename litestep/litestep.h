@@ -23,18 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "../utility/ILiteStep.h"
 
-// Misc Helpers
-#include "DataStore.h"
 
-// Managers
-//#include "BangManager.h"
-#include "ModuleManager.h"
-#include "HookManager.h"
-#include "MessageManager.h"
-
-// Services
-#include "DDEService.h"
-#include "TrayService.h"
+// forward declarations
+class IService;
+class TrayService;
+class DDEService;
+class DataStore;
+class MessageManager;
+class ModuleManager;
 
 
 // RegisterShellHook flags
@@ -111,9 +107,8 @@ private:
 	// Manager Related
 	//
 	ModuleManager* m_pModuleManager; // = NULL;
-	//BangManager* gBangManager = NULL;
-	DataStore *m_pDataStoreManager; // = NULL;
-	MessageManager *m_pMessageManager; // = NULL;
+	DataStore* m_pDataStoreManager; // = NULL;
+	MessageManager* m_pMessageManager; // = NULL;
 
 	HRESULT _InitManagers();
 	HRESULT _StartManagers();
@@ -121,8 +116,6 @@ private:
 	void _CleanupManagers();
 
 	BOOL bHookManagerStarted; // = FALSE;
-
-	HWND hTrayManager; //= NULL;
 
 	//
 	// Service Related
