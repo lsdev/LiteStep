@@ -362,17 +362,30 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		// Set magic DWORD to prevent VWM from seeing main window
 		SetWindowLong (m_hMainWindow, GWL_USERDATA, magicDWord);
 
-        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = NULL;
-        RegisterShellHook = (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0xB5));
+        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) =
+            (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
+            GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0xB5));
 
         WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
 		
         if (RegisterShellHook)
-		{
-            #pragma COMPILE_TODO("Need to fix shellhook for Win9x")
+        {
             RegisterShellHook(NULL, RSH_REGISTER);
-			RegisterShellHook(m_hMainWindow, RSH_TASKMAN);
-		}
+
+            OSVERSIONINFO verInfo = { 0 };
+            verInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+            GetVersionEx(&verInfo);
+
+            if (verInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+            {
+                // c0atzin's fix for 9x
+                RegisterShellHook(m_hMainWindow, RSH_REGISTER);
+            }
+            else
+            {
+                RegisterShellHook(m_hMainWindow, RSH_TASKMAN);
+            }
+        }
 
 		// Set Shell Window
 		if (!bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
