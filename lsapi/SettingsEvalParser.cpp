@@ -212,22 +212,18 @@ bool EvalParser::relationalExpression(int &result)
 bool EvalParser::andExpression(int &result)
 {
 	if (!relationalExpression(result))
-		return false;
+    {
+        return false;
+    }
 
-	while (true)
+	while (matchToken(TT_AND))
 	{
-		if (matchToken(TT_AND))
-		{
-			int subresult;
-
-			if (!relationalExpression(subresult))
-				return false;
-
-			result = result && subresult;
-			continue;
-		}
-
-		break;
+        int subresult;
+        
+        if (!relationalExpression(subresult))
+            return false;
+        
+        result = result && subresult;
 	}
 
 	return true;
@@ -240,22 +236,18 @@ bool EvalParser::andExpression(int &result)
 bool EvalParser::orExpression(int &result)
 {
 	if (!andExpression(result))
-		return false;
+    {
+        return false;
+    }
 
-	while (true)
+	while (matchToken(TT_OR))
 	{
-		if (matchToken(TT_OR))
-		{
-			int subresult;
-
-			if (!andExpression(subresult))
-				return false;
-
-			result = result || subresult;
-			continue;
-		}
-
-		break;
+        int subresult;
+        
+        if (!andExpression(subresult))
+            return false;
+        
+        result = result || subresult;
 	}
 
 	return true;
