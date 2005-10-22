@@ -1,5 +1,6 @@
 #include "lsapi.h"
 #include "../utility/common.h"
+#include <strsafe.h>
 
 BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {
@@ -41,21 +42,27 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
     SetFilePointer(hLogFile, 0, NULL, FILE_END);
     
     // Get timestamp
-    SYSTEMTIME st;
+    SYSTEMTIME st = { 0 };
     GetLocalTime(&st);
     
     // Add timestamp and module name to message
     LPCSTR rszLevel[4] = { "Error", "Warning", "Notice", "Debug" };
-    TCHAR szLine[2048];
-    int nLen;
     
-    nLen = wsprintf(szLine, "%02d-%02d-%04d %02d:%02d:%02d - %s - %s: %s\r\n",
+    TCHAR szLine[MAX_LINE_LENGTH] = { 0 };
+    size_t cbLine = sizeof(szLine);
+    size_t cbRemaining = 0;
+    
+    if (SUCCEEDED(StringCbPrintfEx(szLine, cbLine, NULL, &cbRemaining,
+        STRSAFE_IGNORE_NULLS, "%02d-%02d-%04d %02d:%02d:%02d - %s - %s: %s\r\n",
         st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute, st.wSecond,
-        rszLevel[nLevel-1], pszModule, pszMessage);
-    
-    // Write it to the log file
-    DWORD dwCount;
-    WriteFile(hLogFile, szLine, nLen, &dwCount, NULL);
+        rszLevel[nLevel-1], pszModule, pszMessage)))
+    {
+        DWORD cbToWrite = cbLine - cbRemaining;
+
+        // Write it to the log file
+        DWORD dwCount = 0;
+        WriteFile(hLogFile, szLine, cbToWrite, &dwCount, NULL);
+    }
     
     // Close the log
     CloseHandle(hLogFile);
@@ -73,15 +80,21 @@ BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
         return FALSE;
     }
 
+    BOOL bReturn = FALSE;
     char szMessage[MAX_LINE_LENGTH];
+
     va_list argList;
-    
     va_start(argList, pszFormat);
-    wvsprintf(szMessage, pszFormat, argList);
+    
+    if (SUCCEEDED(StringCchVPrintf(szMessage, MAX_LINE_LENGTH,
+        pszFormat, argList)))
+    {
+        bReturn = LSLog(nLevel, pszModule, szMessage);
+    }
+
     va_end(argList);
     
-    return LSLog(nLevel, pszModule, szMessage);
-
+    return bReturn;
 #else
 
     return TRUE;
