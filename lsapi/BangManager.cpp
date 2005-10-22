@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ BangManager::~BangManager()
 // Add a bang command to the manager
 BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
 {
-	Lock lock (cs);
+	Lock lock(m_cs);
 
 	BangMap::iterator iter = bang_map.find(pszName);
 
@@ -52,7 +52,7 @@ BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
 // Remove a bang command from the manager
 BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 {
-	Lock lock (cs);
+	Lock lock(m_cs);
 	BOOL bReturn = FALSE;
 
 	BangMap::iterator iter = bang_map.find(pszName);
@@ -68,49 +68,41 @@ BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 	return bReturn;
 }
 
-// Retrieve a bang command from the manager
-Bang* BangManager::GetBangCommand(LPCSTR pszName)
-{
-	Lock lock (cs);
-
-	BangMap::const_iterator iter = bang_map.find(pszName);
-
-	if (iter != bang_map.end())
-	{
-		return iter->second;
-	}
-
-	return NULL;
-}
-
 // Execute a bang command with the specified name, passing params, getting result
 BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams)
 {
-    // Not locking the BangManager any more due to unresolved issues. For
-    // example calling a !bang which loads or unloads (threaded) modules
-    // (!recycle, !reloadmodule...) would result in a deadlock if the BangManger
-    // was locked here. !Bangs like !execute might also call !bangs in other
-    // threads which would again be a deadlock.
-    // It is not clear if this function even needs to be locked.
-//	Lock lock (cs);
-
 	BOOL bReturn = FALSE;
+    Bang* pToExec = NULL;
 
-	BangMap::const_iterator iter = bang_map.find(pszName);
+    // Acquiring lock manually to allow manual release below
+    m_cs.Acquire();
+
+    BangMap::const_iterator iter = bang_map.find(pszName);
 
 	if (iter != bang_map.end())
 	{
-		iter->second->Execute(hCaller, pszParams);
-
-		bReturn = TRUE;
+        pToExec = iter->second;
+        pToExec->AddRef();
 	}
+
+    // Release lock before executing the !bang since the BangProc might
+    // (recursively) enter this function again
+    m_cs.Release();
+
+    if (pToExec)
+    {
+        pToExec->Execute(hCaller, pszParams);
+        pToExec->Release();
+
+        bReturn = TRUE;
+    }
 
 	return bReturn;
 }
 
 void BangManager::ClearBangCommands()
 {
-	Lock lock (cs);
+	Lock lock(m_cs);
 
 	BangMap::iterator iter = bang_map.begin();
 
@@ -126,7 +118,7 @@ void BangManager::ClearBangCommands()
 
 HRESULT BangManager::EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const
 {
-    Lock lock(cs);
+    Lock lock(m_cs);
 
     HRESULT hr = S_OK;
 
