@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinesisch (Taiwan) resources
+// Chinese (Taiwan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
 #ifdef _WIN32
@@ -26,7 +26,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "±z¤w¸g¦b°õ¦æ LiteStep ¡A\n½T©w­nÄ~Äò¶Ü¡H"
     IDS_LITESTEP_ERROR2     "§ä¤£¨ìÀÉ®× ""%s""¡C\n½Ð½T»{ÀÉ®×¸ô®|¬O§_¥¿½T«á¦A¬O¤@¦¸¡C"
@@ -45,17 +45,17 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "Ãö³¬µøµ¡(&S)"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "²¾°£ LiteStep (&U)"
 END
 
-#endif    // Chinesisch (Taiwan) resources
+#endif    // Chinese (Taiwan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Deutsch (Deutschland) resources
+// German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 #ifdef _WIN32
@@ -68,7 +68,7 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen?"
     IDS_LITESTEP_ERROR2     "Konnte die Datei ""%s"" nicht finden.\nBitte stellen Sie sicher, daß der Pfad korrekt ist und die Datei existiert."
@@ -87,17 +87,17 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "Windows &Herunterfahren"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "Litestep &Deinstallieren"
 END
 
-#endif    // Deutsch (Deutschland) resources
+#endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Englisch (USA) resources
+// English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -112,7 +112,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
+IDI_LS                  ICON                    "litestep.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -120,18 +120,18 @@ IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE MOVEABLE PURE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE MOVEABLE PURE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE MOVEABLE PURE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -146,7 +146,7 @@ END
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 240, 185
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "About LiteStep..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -168,7 +168,6 @@ BEGIN
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -183,7 +182,7 @@ VS_VERSION_INFO VERSIONINFO
 #else
  FILEFLAGS 0x20L
 #endif
- FILEOS 0x40004L
+ FILEOS 0x4L
  FILETYPE 0x1L
  FILESUBTYPE 0x0L
 BEGIN
@@ -191,18 +190,16 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "http://www.lsdev.org\0"
-            VALUE "CompanyName", "Litestep Development Team\0"
-            VALUE "FileDescription", "LiteStep alternate shell for Microsoft Windows Operating Systems\0"
-            VALUE "FileVersion", "0, 24, 7, 0\0"
-            VALUE "InternalName", "LiteStep\0"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2003\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "litestep.exe\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "Litestep\0"
-            VALUE "ProductVersion", "0, 24, 7, 0\0"
-            VALUE "SpecialBuild", "Ticking over ahead of LiteStep 0.25\0"
+            VALUE "Comments", "http://www.lsdev.org/"
+            VALUE "CompanyName", "Litestep Development Team"
+            VALUE "FileDescription", "LiteStep alternate shell for Microsoft Windows Operating Systems"
+            VALUE "FileVersion", "0, 24, 7, 0"
+            VALUE "InternalName", "LiteStep"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2005"
+            VALUE "OriginalFilename", "litestep.exe"
+            VALUE "ProductName", "LiteStep"
+            VALUE "ProductVersion", "0, 24, 7, 0"
+            VALUE "SpecialBuild", "Ticking over ahead of LiteStep 0.25"
         END
     END
     BLOCK "VarFileInfo"
@@ -211,15 +208,13 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_LS                  BITMAP  MOVEABLE PURE   "litestep.bmp"
+IDB_LS                  BITMAP                  "litestep.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -227,7 +222,7 @@ IDB_LS                  BITMAP  MOVEABLE PURE   "litestep.bmp"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO MOVEABLE PURE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -243,7 +238,7 @@ END
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "A previous instance of LiteStep was detected.\nAre you sure you want to continue?"
     IDS_LITESTEP_ERROR2     "Unable to find the file ""%s"".\nPlease verify the location of the file."
@@ -262,7 +257,7 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "Sh&utdown Windows..."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "U&ninstall LiteStep"
     IDS_MODULEQUIT_ERROR    "Exception while quitting module."
@@ -282,12 +277,12 @@ BEGIN
     IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."
 END
 
-#endif    // Englisch (USA) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Französisch (Frankreich) resources
+// French (France) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
 #ifdef _WIN32
@@ -300,7 +295,7 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Une instance de LiteStep existe déjà.\nVoulez-vous vraiment continuer?"
     IDS_LITESTEP_ERROR2     "Impossible de trouver le fichier ""%s"".\nVeuillez vérifier\nl'emplacement du fichier."
@@ -319,17 +314,17 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Fermeture de Windows..."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "&Désinstaller LiteStep"
 END
 
-#endif    // Französisch (Frankreich) resources
+#endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Holländisch (Niederlande) resources
+// Dutch (Netherlands) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
 #ifdef _WIN32
@@ -342,7 +337,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Er is een andere instantie van LiteStep gedetecteerd.\nWeet u zeker dat u door wilt gaan?"
     IDS_LITESTEP_ERROR2     "Het bestand ""%s"".\nVerifieer de locatie van het bestand en probeer opnieuw."
@@ -361,17 +356,17 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Afsluiten Windows..."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "&De-installeren LiteStep"
 END
 
-#endif    // Holländisch (Niederlande) resources
+#endif    // Dutch (Netherlands) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Schwedisch resources
+// Swedish resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_SVE)
 #ifdef _WIN32
@@ -384,7 +379,7 @@ LANGUAGE LANG_SWEDISH, SUBLANG_DEFAULT
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "En tidigare instans av LiteStep upptäcktes.\nÄr du säker på att du vill fortsätta?"
     IDS_LITESTEP_ERROR2     "Kunde inte hitta filen ""%s"".\nKontrollera att filen existerar och försök igen."
@@ -403,17 +398,17 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Stäng av..."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "A&vinstallera LiteStep"
 END
 
-#endif    // Schwedisch resources
+#endif    // Swedish resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanisch (Mexikanisch) resources
+// Spanish (Mexican) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 #ifdef _WIN32
@@ -426,7 +421,7 @@ LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_ERROR1     "Fue detectada una instancia previa de LiteStep.\n¿Estas seguro de querer continuar?"
     IDS_LITESTEP_ERROR2     "No se pudo encontrar el archivo ""%s"".\nPor favor verifique donde se encuentra el archivo, e intente de nuevo."
@@ -445,12 +440,12 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Apagar Windows..."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_LITESTEP_UNINSTALLLS "&Desinstalar LiteStep"
 END
 
-#endif    // Spanisch (Mexikanisch) resources
+#endif    // Spanish (Mexican) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
