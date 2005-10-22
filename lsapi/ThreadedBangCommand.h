@@ -26,13 +26,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class ThreadedBangCommand : public CountedBase
 {
 public:
-    ThreadedBangCommand(HWND hCaller, LPCSTR pszParams, Bang* pBang) :
-      m_pBang(pBang), m_hCaller(hCaller)
+    ThreadedBangCommand(HWND hCaller, LPCSTR pszName, LPCSTR pszParams) :
+      m_hCaller(hCaller)
 	{
-		ASSERT_ISWRITEPTR(pBang);
+        ASSERT(pszName && !IsBadStringPtr(pszName, UINT_MAX));
         ASSERT((pszParams == NULL) || !IsBadStringPtr(pszParams, UINT_MAX));
 
-        m_pBang->AddRef();
+        // pszName is guaranteed to be non-NULL
+        StringCchCopy(m_szName, MAX_BANGCOMMAND, pszName);
 
         if (pszParams)
 		{
@@ -42,28 +43,18 @@ public:
         {
             m_szParams[0] = '\0';
         }
-	};
-
-	~ThreadedBangCommand()
-	{
-		if (m_pBang)
-		{
-			m_pBang->Release();
-			m_pBang = NULL;
-		}
 	}
 
 	void Execute()
 	{
-        if (m_pBang)
-		{
-			m_pBang->Execute(m_hCaller, m_szParams);
-		}
-	};
+        // Cannot use ParseBangCommand here because that would expand variables
+        // again - and some themes rely on the fact that they are expanded only
+        // once. Besides, it would create inconsistent behavior.
+        InternalExecuteBangCommand(m_hCaller, m_szName, m_szParams);
+	}
 
 private:
-	Bang* m_pBang;
-
+    char m_szName[MAX_BANGCOMMAND];
     char m_szParams[MAX_BANGARGS];
 	HWND m_hCaller;
 };

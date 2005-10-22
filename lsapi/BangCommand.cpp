@@ -48,7 +48,8 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
 
 	if (dwThreadID != m_dwThreadID)
 	{
-		ThreadedBangCommand * pInfo = new ThreadedBangCommand(hCaller, pszParams, this);
+		ThreadedBangCommand * pInfo =
+            new ThreadedBangCommand(hCaller, m_szCommand.c_str(), pszParams);
 
 		if (pInfo != NULL)
 		{

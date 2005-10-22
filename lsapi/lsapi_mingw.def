@@ -76,4 +76,5 @@ EXPORTS
     DeleteSettingsManager
     SetupBangs
     ClearBangs
+    InternalExecuteBangCommand
 
