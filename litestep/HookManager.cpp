@@ -32,7 +32,7 @@ HHOOK hCallWndHook;
 HANDLE hHookMgrThread;
 HWND hwndHookMgr;
 HINSTANCE hInst;
-bool processHooks;
+bool processHooks = false;
 HINSTANCE hmodHook;
 
 MSG msgd;
@@ -100,22 +100,24 @@ bool createHookThread()
 
 	if (!RegisterClass(&wc))
 	{
-		return FALSE;
+		return false;
 	}
 	//
 	// Now create another thread to handle the new queue
 	//
-	if (!(hHookMgrThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)HookMgrMain,
-	                                    0L, STANDARD_RIGHTS_REQUIRED, &Id)))
-	{
-		return FALSE;
-	}
-	return TRUE;
+    hHookMgrThread = CreateThread(NULL, 0, HookMgrMain, 0L,
+        STANDARD_RIGHTS_REQUIRED, &Id);
 
+	if (!hHookMgrThread)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 
-DWORD HookMgrMain(LPVOID lpv)
+DWORD WINAPI HookMgrMain(LPVOID /* lpv */)
 {
 	MSG msg;
 
@@ -311,7 +313,7 @@ LRESULT CALLBACK HookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 		case WM_NCDESTROY:
 		{
-			processHooks = FALSE;
+			processHooks = false;
 		}
 		break;
 		
