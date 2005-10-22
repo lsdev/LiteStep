@@ -54,8 +54,8 @@ using std::mem_fun;
 
 
 // Parse the command line
-static bool ParseCmdLine(LPCSTR pszCmdLine);
-static void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
+bool ParseCmdLine(LPCSTR pszCmdLine);
+HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
 
 CLiteStep gLiteStep;
 CHAR szAppPath[MAX_PATH];
@@ -74,46 +74,53 @@ int g_nStartupMode = STARTUP_DEFAULT;
 //
 // ExecuteCmdLineBang
 //
-static void ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
+HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
 {
-    if (IsValidStringPtr(pszCommand))
-	{
-		HWND hWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
-		
-        if (IsWindow(hWnd))
-		{
-            std::auto_ptr<LMBANGCOMMAND> pBangCommand(new LMBANGCOMMAND);
-			if (pBangCommand.get() != NULL)
-			{
-				pBangCommand->cbSize = sizeof(LMBANGCOMMAND);
-				pBangCommand->hWnd = NULL;
+    ASSERT(pszCommand);
+    HRESULT hr = E_FAIL;
 
-				StringCchCopy(pBangCommand->szCommand, MAX_BANGCOMMAND, pszCommand);
+    HWND hWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
 
-				pBangCommand->szArgs[0] = '\0';
-				if (IsValidStringPtr(pszArgs))
-				{
-					StringCchCopy(pBangCommand->szArgs, MAX_BANGARGS, pszArgs);
-				}
+    if (IsWindow(hWnd))
+    {
+        LMBANGCOMMAND bangCommand;
+        bangCommand.cbSize = sizeof(LMBANGCOMMAND);
+        bangCommand.hWnd = NULL;
 
-				COPYDATASTRUCT cds =
-                {
-                    LM_BANGCOMMAND,
-                    sizeof(LMBANGCOMMAND),
-                    (LPVOID)pBangCommand.get()
-                };
+        hr = StringCchCopy(bangCommand.szCommand, MAX_BANGCOMMAND, pszCommand);
 
-				SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds);
-			}
-		}
-	}
+        if (SUCCEEDED(hr))
+        {
+            if (pszArgs)
+            {
+                hr = StringCchCopy(bangCommand.szArgs, MAX_BANGARGS, pszArgs);
+            }
+            else
+            {
+                bangCommand.szArgs[0] = '\0';
+            }
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            COPYDATASTRUCT cds = { 0 };
+            cds.dwData = LM_BANGCOMMAND;
+            cds.cbData = sizeof(LMBANGCOMMAND);
+            cds.lpData = &bangCommand;
+
+            SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+            hr = S_OK;
+        }
+    }
+
+    return hr;
 }
 
 
 //
 // ParseCmdLine(LPCSTR pszCmdLine)
 //
-static bool ParseCmdLine(LPCSTR pszCmdLine)
+bool ParseCmdLine(LPCSTR pszCmdLine)
 {
 	if (IsValidStringPtr(pszCmdLine))
 	{
@@ -170,7 +177,7 @@ static bool ParseCmdLine(LPCSTR pszCmdLine)
 //
 //
 //
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
                    LPSTR lpCmdLine, int /* nCmdShow */)
 {
     HRESULT hr = S_OK;
@@ -671,7 +678,8 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 					MSWinShutdown = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3C));
 					if (MSWinShutdown)
 					{
-						MSWinShutdown(m_hMainWindow);
+						MSWinShutdown(m_hMainWindow); // shouldn't this be NULL?
+                        // Could also use the now-documented RestartDialog(Ex)
 					}
 				}
                 break;
