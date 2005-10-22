@@ -20,17 +20,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef  __LSAPI_H
 #define  __LSAPI_H
 
+/*
+ * IMPORTANT:
+ *   The exports and definitions included
+ *   with LSAPI_PRIVATE are for INTERNAL USE ONLY!
+ *
+ *   They MUST NOT be used by any module.
+ *   Their names and/or functionality may be changed at ANY time!
+ *
+ */
+
 #include <windows.h>
 #include <stdio.h>
 #include "lsapidefines.h"
 #include "lsmultimon.h"
 
 
-#ifdef LSAPI_INTERNAL
- #define LSAPI __declspec(dllexport)
-#else // LSAPI_INTERNAL
- #define LSAPI
-#endif	// LSAPI_INTERNAL
+#ifdef LSAPI_INTERNAL /* only defined when compiling lsapi */
+#  define LSAPI __declspec(dllexport)
+#else
+#  define LSAPI
+#endif	/* LSAPI_INTERNAL */
 
 
 #ifdef  __cplusplus
@@ -107,11 +117,12 @@ extern "C"
 
     LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
 
-    // for internal use only
+#ifdef LSAPI_PRIVATE
     LSAPI BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath);
     LSAPI void DeleteSettingsManager(void);
     LSAPI void SetupBangs(void);
     LSAPI void ClearBangs(void);
+#endif /* LSAPI_PRIVATE */
     
 #ifdef  __cplusplus
 };

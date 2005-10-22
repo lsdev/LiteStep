@@ -88,11 +88,12 @@
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				WarnAsError="FALSE"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4702"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool

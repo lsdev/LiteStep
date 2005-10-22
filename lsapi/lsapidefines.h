@@ -22,6 +22,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __LSAPIDEFINES_H
 #define __LSAPIDEFINES_H
 
+/*
+* IMPORTANT:
+*   The exports and definitions included
+*   with LSAPI_PRIVATE are for INTERNAL USE ONLY!
+*
+*   They MUST NOT be used by any module.
+*   Their names and/or functionality may be changed at ANY time!
+*
+*/
+
 #include <windows.h>
 
 //---------------------------------------------------------
@@ -87,9 +97,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LM_REFRESH					9305
 
 // Threaded Module Messages
+#ifdef LSAPI_PRIVATE
 #define LM_THREAD_BANGCOMMAND		9310
 #define LM_THREADREADY				9311
 #define LM_THREADFINISHED			9312
+#endif
 
 // VWM Messages
 #define LM_VWMUP					9350
@@ -106,13 +118,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LM_GETDESKTOPOF				9361
 
 // Core Messages
+#ifdef LSAPI_PRIVATE
 #define LM_GETLSOBJECT				9400 // Deprecated
 #define LM_WINDOWLIST				9401 // Deprecated
 #define LM_DATASTORE				9410 // Deprecated
 #define LM_MESSAGEMANAGER			9411 // Deprecated
 #define LM_BANGCOMMAND				9420
-#define LM_ENUMREVIDS               9430 // internal use only!
-#define LM_ENUMMODULES              9431 // internal use only!
+#define LM_ENUMREVIDS               9430
+#define LM_ENUMMODULES              9431
+#endif
 
 // shell hook messages
 #define LM_WINDOWCREATED			9501
@@ -144,7 +158,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define WHITESPACE WHITESPACEA
 #endif
 
+#ifdef LSAPI_PRIVATE
 #define HIDEmagicDWord 0x59474541
+#endif
 
 #ifndef magicDWord
 #define magicDWord 0x49474541
