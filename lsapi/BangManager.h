@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,13 +28,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string>
 
 
-typedef std::map<std::string, Bang*, stringicmp> BangMap;
-
 class BangManager
 {
 private:
-	BangMap bang_map;
-	mutable CriticalSection cs;
+    typedef std::map<std::string, Bang*, stringicmp> BangMap;
+
+    BangMap bang_map;
+	mutable CriticalSection m_cs;
 
 public:
 	BangManager();
@@ -42,7 +42,6 @@ public:
 
 	BOOL AddBangCommand(LPCSTR pszName, Bang *pbbBang);
 	BOOL RemoveBangCommand(LPCSTR pszName);
-	Bang* GetBangCommand(LPCSTR pszName);
 	void ClearBangCommands();
 	BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
     HRESULT EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const;
