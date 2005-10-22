@@ -324,7 +324,7 @@ void AboutDevTeam(HWND hListView)
 // Fill listview with module information
 //
 
-BOOL __stdcall ModulesCallback(LPCSTR pszPath, DWORD dwFlags, LPARAM lParam)
+BOOL __stdcall ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
 {
     CallbackInfo* pCi = (CallbackInfo*)lParam;
     

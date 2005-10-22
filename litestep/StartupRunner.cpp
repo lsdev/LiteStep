@@ -111,7 +111,7 @@ DWORD StartupRunner::Run(void* pvVoid)
 
 void StartupRunner::_RunRunOnceEx()
 {
-    char szArgs[MAX_PATH] = { 0 };
+    TCHAR szArgs[MAX_PATH] = { 0 };
     UINT uChars = GetSystemDirectory(szArgs, MAX_PATH);
     
     if (uChars > 0 && uChars < MAX_PATH)

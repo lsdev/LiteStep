@@ -40,7 +40,7 @@ HRESULT DDEStub::Start()
     {
         if (!m_hShDocVw)
         {
-            m_hShDocVw = LoadLibrary("SHDOCVW.DLL");
+            m_hShDocVw = LoadLibrary(_T("SHDOCVW.DLL"));
             //m_hShDocVw = GetModuleHandle("shell32.dll"); // win2k
         }
         
@@ -48,7 +48,7 @@ HRESULT DDEStub::Start()
         {
             m_pShellDDEInit = (void (__stdcall*)(BOOL))GetProcAddress(m_hShDocVw,
                 (LPSTR)118);
-                //(LPSTR)188); // system32.dll
+                //(LPSTR)188); // shell32.dll
         }
         
         if(m_pShellDDEInit)

@@ -42,7 +42,7 @@ rgMenuCommands[] =
 
 const int cMenuCommands = sizeof(rgMenuCommands) / sizeof(rgMenuCommands[0]);
 
-const char szRecoveryMenuWndClass[] = "RecoveryMenuWndClass";
+const TCHAR szRecoveryMenuWndClass[] = _T("RecoveryMenuWndClass");
 
 // this thread provides a recovery menu which can be accessed in
 // case errors render Litestep unusable
@@ -50,9 +50,7 @@ DWORD WINAPI RecoveryThreadProc(LPVOID pvData)
 {
 	HINSTANCE hInstance = static_cast<HINSTANCE>(pvData);
 
-    WNDCLASSEX wc;
-	ZeroMemory(&wc, sizeof(WNDCLASSEX));
-
+    WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.lpfnWndProc = RecoveryMenuWndProc;
 	wc.hInstance = hInstance;
@@ -161,8 +159,9 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 
 				case ID_RUN:
 				{
-					void (WINAPI * RunDlg)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT) = (void (WINAPI *)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT)) GetProcAddress(
-					            GetModuleHandle("SHELL32.DLL"), (LPCSTR) 61);
+					void (WINAPI * RunDlg)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT) =
+                        (void (WINAPI *)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT))GetProcAddress(
+					            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR) 61);
 
 					RunDlg(NULL, NULL, NULL, NULL, NULL, 0);
 				}
@@ -170,8 +169,9 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 
 				case ID_SHUTDOWN:
 				{
-					void (WINAPI * ShutdownDlg)(HWND) = (void (WINAPI *)(HWND)) GetProcAddress(
-					                                        GetModuleHandle("SHELL32.DLL"), (LPCSTR) 60);
+					void (WINAPI * ShutdownDlg)(HWND) =
+                        (void (WINAPI *)(HWND)) GetProcAddress(
+                            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR) 60);
 
 					ShutdownDlg(NULL);
 				}
