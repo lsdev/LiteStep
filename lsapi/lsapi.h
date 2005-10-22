@@ -122,6 +122,7 @@ extern "C"
     LSAPI void DeleteSettingsManager(void);
     LSAPI void SetupBangs(void);
     LSAPI void ClearBangs(void);
+    LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
 #endif /* LSAPI_PRIVATE */
     
 #ifdef  __cplusplus

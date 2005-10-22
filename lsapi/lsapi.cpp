@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.16 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.16 2004/05/01 13:49:25 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.17 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.17 2005/10/22 20:09:25 ilmcuts Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -242,6 +242,17 @@ BOOL RemoveBangCommand(LPCSTR pszCommand)
 
 
 //
+// InternalExecuteBangCommand
+// Just like ParseBangCommand but without the variable expansion
+//
+BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
+{
+    return LSAPIManager.GetBangManager()->
+        ExecuteBangCommand(pszCommand, hCaller, pszArgs);
+}
+
+
+//
 // ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 //
 BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
@@ -256,7 +267,8 @@ BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 			VarExpansionEx(szExpandedArgs, pszArgs, MAX_LINE_LENGTH);
 		}
 
-        bReturn = LSAPIManager.GetBangManager()->ExecuteBangCommand(pszCommand, hCaller, szExpandedArgs);
+        bReturn =
+            InternalExecuteBangCommand(hCaller, pszCommand, szExpandedArgs);
 	}
 
 	return bReturn;
@@ -312,9 +324,7 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 			}
 			else
 			{
-				SHELLEXECUTEINFO seiCommand;
-				memset(&seiCommand, 0, sizeof(seiCommand));
-
+                SHELLEXECUTEINFO seiCommand = { 0 };
 				seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
 				seiCommand.hwnd = hOwner;
 				seiCommand.lpVerb = pszOperation;
