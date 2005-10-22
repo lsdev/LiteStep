@@ -46,7 +46,18 @@ bool Module::_LoadDll()
 
 	if (!m_hInstance)
 	{
+        // Modules like popup2 like to call SetErrorMode. While that may not be
+        // good style, there is little we can do about it. However, LoadLibrary
+        // usually produces helpful error messages such as
+        // "msvcp70.dll not found" which are not displayed if a module has
+        // disabled them via SetErrorMode. We force their display here.
+        // First, make Windows display all errors
+        UINT uOldMode = SetErrorMode(0);
+
 		m_hInstance = LoadLibrary(m_tzLocation.c_str());
+
+        // Second, restore the old state
+        SetErrorMode(uOldMode);
 		
 		if (m_hInstance)
 		{
