@@ -22,20 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 
-#ifdef __GNUC__  // for mingw
-#  include <png.h>
-#else
-#  include <libpng/png.h>
-#endif
-
-typedef struct _PNGERROR
-{
-	HWND Wnd;
-	jmp_buf ErrorJump;
-}
-PNGERROR, *PPNGERROR;
-
-void PNGErrorHandler(png_structp PngStruct, png_const_charp Message);
 HBITMAP LoadFromPNG(LPCSTR pszFilename);
 
 #endif // __PNG_SUPPORT_H

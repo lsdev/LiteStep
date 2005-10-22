@@ -19,8 +19,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
+#ifdef __GNUC__  // for mingw
+#  include <png.h>
+#else
+#  include <libpng/png.h>
+#endif
+
 #include "png_support.h"
 #include "../utility/safeptr.h"
+
+
+typedef struct _PNGERROR
+{
+    HWND Wnd;
+    jmp_buf ErrorJump;
+}
+PNGERROR, *PPNGERROR;
 
 void PNGErrorHandler(png_structp PngStruct, png_const_charp Message)
 {
@@ -35,6 +49,32 @@ void PNGErrorHandler(png_structp PngStruct, png_const_charp Message)
 	}
 }
 
+
+png_voidp ls_png_malloc(png_structp /* png_ptr */, png_size_t size)
+{
+    return malloc(size);
+}
+
+void ls_png_free(png_structp /* png_ptr */, png_voidp ptr)
+{
+    free(ptr);
+}
+
+void ls_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+    FILE* file = (FILE*)png_get_io_ptr(png_ptr);
+    ASSERT(file); // if libpng calls this function, this mustn't be empty
+
+    fread(data, 1, length, file);
+}
+
+
+//
+// In order to avoid CRT mismatches, we override all CRT functions libpng uses
+// with our own. The alternative, using fopen and fread in our code and then
+// passing a FILE* into libpng, isn't reliable because it crashes if libpng was
+// compiled with a different CRT than lsapi.dll
+//
 HBITMAP LoadFromPNG(LPCSTR pszFilename)
 {
 	HBITMAP hDibSection = NULL;
@@ -44,24 +84,27 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 		FILE * hFile = fopen(pszFilename, "rb");
 		if (hFile)
 		{
-			const size_t num_sig_bytes = 8;
+            const size_t num_sig_bytes = 8;
 			unsigned char sig[num_sig_bytes];
 			fread(sig, 1, num_sig_bytes, hFile);
 
 			int is_png = png_check_sig(sig, num_sig_bytes);
 			if (is_png)
 			{
-				PNGERROR PngError = {GetForegroundWindow()};
+				PNGERROR PngError = { GetForegroundWindow() };
 
-				png_structp Read = png_create_read_struct(PNG_LIBPNG_VER_STRING, &PngError, PNGErrorHandler, NULL);
+				png_structp Read = png_create_read_struct_2(PNG_LIBPNG_VER_STRING,
+                    &PngError, PNGErrorHandler, NULL,
+                    NULL, ls_png_malloc, ls_png_free);
+
 				if (Read)
 				{
-					png_infop Info = png_create_info_struct(Read);
+                    png_infop Info = png_create_info_struct(Read);
 					if (Info)
 					{
 						if (!setjmp(PngError.ErrorJump))
 						{
-							png_init_io(Read, hFile);
+                            png_set_read_fn(Read, hFile, ls_png_read_data);
 							png_set_sig_bytes(Read, num_sig_bytes);
 							png_read_info(Read, Info);
 
