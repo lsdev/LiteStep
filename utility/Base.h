@@ -26,12 +26,9 @@ class Base
 {
 protected:
 	ULONG __BaseRefCount;
-	CRITICAL_SECTION __BaseCritSec;
 
 	virtual ~Base()
 	{
-		DeleteCriticalSection(&__BaseCritSec);
-		FillMemory(&__BaseCritSec, sizeof(__BaseCritSec), 0x00);
 	}
 
 	inline ULONG BaseAddRef()
@@ -45,22 +42,10 @@ protected:
 		return (ULONG)InterlockedDecrement((LONG *) & __BaseRefCount);
 	}
 
-	inline void Lock()
-	{
-		EnterCriticalSection(&__BaseCritSec);
-	}
-
-	inline void Unlock()
-	{
-		LeaveCriticalSection(&__BaseCritSec);
-	}
-
 public:
-
 	Base()
 	{
 		__BaseRefCount = 1;
-		InitializeCriticalSection(&__BaseCritSec);
 	}
 };
 
