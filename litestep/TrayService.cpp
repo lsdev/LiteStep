@@ -833,6 +833,8 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
                     {
                         _StringCopy(lnidTarget.szInfoTitle,
                             TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
+
+                        lnidTarget.dwInfoFlags = pnid->dwInfoFlags;                    
                     }
                     else
                     {
@@ -879,6 +881,8 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
                     {
                         _StringCopy(lnidTarget.szInfoTitle,
                             TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
+
+                        lnidTarget.dwInfoFlags = pnid->dwInfoFlags;
                     }
                     else
                     {
