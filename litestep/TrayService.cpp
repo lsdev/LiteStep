@@ -99,9 +99,9 @@ using std::min;
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
 #endif
 
-const char szTrayClass[]   = "Shell_TrayWnd";
-const char szTrayTitle[]   = "Litestep Tray Manager";
-const char szNotifyClass[] = "TrayNotifyWnd";
+const TCHAR szTrayClass[]   = _T("Shell_TrayWnd");
+const TCHAR szTrayTitle[]   = _T("Litestep Tray Manager");
+const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -159,7 +159,7 @@ HRESULT TrayService::Start()
             
             // tell apps to reregister their icons (see Note 6)
             PostMessage(HWND_BROADCAST,
-                RegisterWindowMessage("TaskbarCreated"), 0, 0);
+                RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
             
             if (m_bWin2000)
             {
@@ -338,14 +338,14 @@ void TrayService::_LoadShellServiceObjects()
     
     while (lErrorCode == ERROR_SUCCESS)
     {
-        char szValueName[32];
-        char szData[40];
-        DWORD cbValueName = 32;
-        DWORD cbData = 40;
+        TCHAR szValueName[32] = { 0 };
+        char szData[40] = { 0 };
+        DWORD cchValueName = sizeof(szValueName) / sizeof(szValueName[0]);
+        DWORD cbData = sizeof(szData);
         DWORD dwDataType;
         
         lErrorCode = RegEnumValue(hkeyServices, nCounter, szValueName,
-            &cbValueName, 0, &dwDataType, (LPBYTE) szData, &cbData);
+            &cchValueName, NULL, &dwDataType, (LPBYTE)szData, &cbData);
         
         if (lErrorCode == ERROR_SUCCESS)
         {

@@ -180,12 +180,12 @@ void DDEService::_DoStop()
 HDDEDATA CALLBACK DDEService::DdeCallback(
     UINT wType,
     UINT wFmt,
-    HCONV hConv,
+    HCONV /* hConv */,
     HSZ hszTopic,
     HSZ hszItem,
     HDDEDATA hData,
-    DWORD lData1,
-    DWORD lData2)
+    DWORD /* lData1 */,
+    DWORD /* lData2 */)
 {
 	HDDEDATA hReturn = (HDDEDATA)FALSE;
 
@@ -199,14 +199,16 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
 
 		case XTYP_WILDCONNECT:
 		{
-			HDDEDATA hData;
 			HSZPAIR FAR *phszp;
 			DWORD cb;
 
-			if ((!hszTopic || hszTopic == m_hszProgman) && (!hszItem || hszItem == m_hszProgman))
+			if ((!hszTopic || hszTopic == m_hszProgman) &&
+                (!hszItem || hszItem == m_hszProgman))
 			{
-				if ((hData = DdeCreateDataHandle(m_dwDDEInst, NULL,
-				                                 2 * sizeof(HSZPAIR), 0L, 0, 0, 0)))
+                HDDEDATA hData = DdeCreateDataHandle(m_dwDDEInst, NULL,
+                    2 * sizeof(HSZPAIR), 0L, 0, 0, 0);
+
+                if (hData)
 				{
 					phszp = (HSZPAIR FAR *)DdeAccessData(hData, &cb);
 					phszp[0].hszSvc = m_hszProgman;

@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 
-#define HOOKMGRWINDOWNAME  "HookMgrWindow"
-#define HOOKMGRWINDOWCLASS "HookMgrClass"
+#define HOOKMGRWINDOWNAME  _T("HookMgrWindow")
+#define HOOKMGRWINDOWCLASS _T("HookMgrClass")
 
 #ifdef HOOK_DLL
 	#define HOOK_EXPORT __declspec(dllexport)
