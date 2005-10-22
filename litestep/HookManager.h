@@ -35,7 +35,7 @@ void stopHookManager();
 UINT RegisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback);
 UINT UnregisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback);
 bool createHookThread();
-DWORD HookMgrMain(LPVOID lpv);
+DWORD WINAPI HookMgrMain(LPVOID lpv);
 bool InstallMsgFilter(bool install);
 LRESULT CALLBACK HookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
