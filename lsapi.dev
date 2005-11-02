@@ -8,7 +8,7 @@ CppCompiler=-D__GNUWIN32__ -DWIN32 -DNDEBUG -D_WINDOWS -DLSAPI_INTERNAL_@@_
 Includes=
 Linker=-lpng -lz -lshell32 -luuid -lversion -lkernel32 -luser32 -lshlwapi --image-base "0x13000000"_@@_output/Utility.a -lole32 -lgdi32_@@_--def lsapi/lsapi_mingw.def_@@_
 Libs=
-UnitCount=30
+UnitCount=29
 Folders=Headers,Source
 FileName=lsapi.dev
 ObjFiles=
@@ -230,16 +230,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit21]
-FileName=lsapi\match.h
-Folder=Headers
-Compile=1
-CompileCpp=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit22]
 FileName=lsapi\png_support.h
 Folder=Headers
 Compile=1
@@ -249,7 +239,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit23]
+[Unit22]
 FileName=lsapi\SettingsDefines.h
 Folder=Headers
 Compile=1
@@ -259,7 +249,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit24]
+[Unit23]
 FileName=lsapi\SettingsEvalParser.h
 Folder=Headers
 Compile=1
@@ -269,7 +259,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit25]
+[Unit24]
 FileName=lsapi\SettingsFileParser.h
 Folder=Headers
 Compile=1
@@ -279,7 +269,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit26]
+[Unit25]
 FileName=lsapi\SettingsIterator.h
 Folder=Headers
 Compile=1
@@ -289,7 +279,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit27]
+[Unit26]
 FileName=lsapi\SettingsManager.h
 Folder=Headers
 Compile=1
@@ -299,7 +289,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit28]
+[Unit27]
 FileName=lsapi\ThreadedBangCommand.h
 Folder=Headers
 Compile=1
@@ -309,7 +299,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit29]
+[Unit28]
 FileName=lsapi\aboutbox.cpp
 CompileCpp=1
 Folder=Source
@@ -337,7 +327,7 @@ ProductName=lsapi
 ProductVersion=0.1
 AutoIncBuildNr=0
 
-[Unit30]
+[Unit29]
 FileName=lsapi\lsapi_mingw.def
 Folder=lsapi
 Compile=0
