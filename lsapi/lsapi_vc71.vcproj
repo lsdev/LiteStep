@@ -221,9 +221,6 @@
 				RelativePath=".\lsmultimon.h">
 			</File>
 			<File
-				RelativePath=".\match.h">
-			</File>
-			<File
 				RelativePath=".\png_support.h">
 			</File>
 			<File

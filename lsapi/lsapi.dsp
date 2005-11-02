@@ -183,10 +183,6 @@ SOURCE=.\lsMultiMon.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\match.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\png_support.h
 # End Source File
 # Begin Source File
