@@ -39,8 +39,7 @@ EPSHeader
 #define PATTERN_EMPTY -4    /* [..] contstruct is empty */
 
 
-int matche_after_star (register _TCHAR *pattern, register _TCHAR *text);
-int fast_match_after_star (register _TCHAR *pattern, register _TCHAR *text);
+int matche_after_star (_TCHAR *pattern, _TCHAR *text);
 
 /*----------------------------------------------------------------------------
 *
@@ -157,7 +156,6 @@ BOOL is_valid_pattern (_TCHAR *p, int *error_type)
 					}
 					else
 					{
-
 						/* check for literal escape */
 						if (*p == '\\')
 							p++;
@@ -178,7 +176,7 @@ BOOL is_valid_pattern (_TCHAR *p, int *error_type)
 			case '*':
 			case '?':
 			default:
-			p++;                              /* _TEXT("normal") character */
+			p++;                              /* "normal" character */
 			break;
 		}
 	}
@@ -220,9 +218,9 @@ BOOL is_valid_pattern (_TCHAR *p, int *error_type)
 *
 ----------------------------------------------------------------------------*/
 
-int matche (register _TCHAR *p, register _TCHAR *t)
+int matche (_TCHAR *p, _TCHAR *t)
 {
-	register _TCHAR range_start, range_end;  /* start and end in range */
+	_TCHAR range_start, range_end;  /* start and end in range */
 
 	BOOL invert;             /* is this [..] or [!..] */
 	BOOL member_match;       /* have I matched the [..] construct? */
@@ -231,7 +229,7 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 	for (; *p; p++, t++)
 	{
 		/* if this is the end of the text
-		then this is the end of the match */
+		   then this is the end of the match */
 
 		if (!*t)
 		{
@@ -247,17 +245,15 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 			break;
 
 			case '*':                       /* multiple any character match */
-			return matche_after_star (p, t);
+			return matche_after_star(p, t);
 
 			/* [..] construct, single member/exclusion character match */
 			case '[':
 			{
 				/* move to beginning of range */
-
 				p++;
 
 				/* check if this is a member match or exclusion match */
-
 				invert = FALSE;
 				if (*p == '!' || *p == '^')
 				{
@@ -266,8 +262,7 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 				}
 
 				/* if closing bracket here or at range start then we have a
-				      malformed pattern */
-
+				   malformed pattern */
 				if (*p == ']')
 				{
 					return MATCH_PATTERN;
@@ -279,7 +274,6 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 				while (loop)
 				{
 					/* if end of construct then loop is done */
-
 					if (*p == ']')
 					{
 						loop = FALSE;
@@ -287,16 +281,16 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 					}
 
 					/* matching a '!', '^', '-', '\' or a ']' */
-
 					if (*p == '\\')
 					{
 						range_start = range_end = *++p;
 					}
 					else
+					{
 						range_start = range_end = *p;
+					}
 
 					/* if end of pattern then bad pattern (Missing ']') */
-
 					if (!*p)
 						return MATCH_PATTERN;
 
@@ -304,12 +298,10 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 					if (*++p == '-')
 					{
 						/* get the range end */
-
 						range_end = *++p;
 
 						/* if end of pattern or construct
 						   then bad pattern */
-
 						if (range_end == '\0' || range_end == ']')
 							return MATCH_PATTERN;
 
@@ -329,8 +321,8 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 					}
 
 					/* if the text character is in range then match found.
-					                     make sure the range letters have the proper
-					                     relationship to one another before comparison */
+					   make sure the range letters have the proper
+					   relationship to one another before comparison */
 
 					if (range_start < range_end)
 					{
@@ -352,12 +344,11 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 
 				/* if there was a match in an exclusion set then no match */
 				/* if there was no match in a member set then no match */
-
 				if ((invert && member_match) || !(invert || member_match))
 					return MATCH_RANGE;
 
 				/* if this is not an exclusion then skip the rest of
-				the [...] construct that already matched. */
+				   the [...] construct that already matched. */
 
 				if (member_match)
 				{
@@ -379,7 +370,7 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 								return MATCH_PATTERN;
 						}
 
-						/* move to next pattern _TCHAR */
+						/* move to next pattern char */
 
 						p++;
 					}
@@ -388,12 +379,10 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 			}
 			case '\\':    /* next character is quoted and must match exactly */
 
-			/* move pattern pointer to quoted _TCHAR and fall through */
-
+			/* move pattern pointer to quoted char and fall through */
 			p++;
 
 			/* if end of text then we have a bad pattern */
-
 			if (!*p)
 				return MATCH_PATTERN;
 
@@ -404,8 +393,8 @@ int matche (register _TCHAR *p, register _TCHAR *t)
 				return MATCH_LITERAL;
 		}
 	}
-	/* if end of text not reached then the pattern fails */
 
+	/* if end of text not reached then the pattern fails */
 	if (*t)
 		return MATCH_END;
 	else
@@ -425,11 +414,9 @@ int matche_after_star (_TCHAR *p, _TCHAR *t)
 	_TCHAR nextp;
 
 	/* pass over existing ? and * in pattern */
-
 	while (*p == '?' || *p == '*')
 	{
-		/* take one _TCHAR for each ? and + */
-
+		/* take one char for each ? and + */
 		if (*p == '?')
 		{
 			/* if end of text then no match */
@@ -437,8 +424,7 @@ int matche_after_star (_TCHAR *p, _TCHAR *t)
 				return MATCH_ABORT;
 		}
 
-		/* move to next _TCHAR in pattern */
-
+		/* move to next char in pattern */
 		p++;
 	}
 
@@ -448,14 +434,12 @@ int matche_after_star (_TCHAR *p, _TCHAR *t)
 		return MATCH_VALID;
 
 	/* get the next character to match which must be a literal or '[' */
-
 	nextp = *p;
 	if (nextp == '\\')
 	{
 		nextp = p[1];
 
 		/* if end of text then we have a bad pattern */
-
 		if (!nextp)
 			return MATCH_PATTERN;
 	}
@@ -466,17 +450,15 @@ int matche_after_star (_TCHAR *p, _TCHAR *t)
 	{
 		/* a precondition for matching is that the next character
 		   in the pattern match the next character in the text or that
-		   the next pattern _TCHAR is the beginning of a range.  Increment
+		   the next pattern char is the beginning of a range.  Increment
 		   text pointer as we go here */
 
 		if (_totlower(nextp) == _totlower(*t) || nextp == '[')
 			match = matche(p, t);
 
 		/* if the end of text is reached then no match */
-
 		if (!*t++)
 			match = MATCH_ABORT;
-
 	}
 	while (match != MATCH_VALID &&
 	        match != MATCH_ABORT &&
@@ -501,6 +483,3 @@ BOOL match(_TCHAR *p, _TCHAR *t)
 	error_type = matche(p, t);
 	return (error_type == MATCH_VALID) ? TRUE : FALSE;
 }
-
-
-
