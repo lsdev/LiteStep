@@ -90,10 +90,9 @@ LINK32=link.exe
 
 # Name "hook - Win32 Release"
 # Name "hook - Win32 Debug"
-# Begin Source File
+# Begin Group "Source Files"
 
-SOURCE=.\Hook.cpp
-# End Source File
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
 SOURCE=.\Hook.def
@@ -104,12 +103,21 @@ SOURCE=.\Hook.def
 
 !ELSEIF  "$(CFG)" == "hook - Win32 Debug"
 
-!ENDIF 
+!ENDIF
 
 # End Source File
 # Begin Source File
 
+SOURCE=.\Hook.cpp
+# End Source File
+# End Group
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
 SOURCE=.\Hook.h
 # End Source File
+# End Group
 # End Target
 # End Project
