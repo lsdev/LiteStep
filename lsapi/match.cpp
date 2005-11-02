@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2002,2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,12 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
+/*
+ EPSHeader
+
+   File: match.c
+   Author: J. Kercheval
+   Created: Sat, 01/05/1991  22:21:49
+*/
+/*
+ EPSRevision History
+
+   J. Kercheval  Wed, 02/20/1991  22:29:01  Released to Public Domain
+   J. Kercheval  Fri, 02/22/1991  15:29:01  fix '\' bugs (two :( of them)
+   J. Kercheval  Sun, 03/10/1991  19:31:29  add error return to matche()
+   J. Kercheval  Sun, 03/10/1991  20:11:11  add is_valid_pattern code
+   J. Kercheval  Sun, 03/10/1991  20:37:11  beef up main()
+   J. Kercheval  Tue, 03/12/1991  22:25:10  Released as V1.1 to Public Domain
+*/
 /****************************************************************************
 ****************************************************************************/
 #include "../utility/common.h"
 #include "lsapidefines.h"
 #include "lsapi.h"
-#include "match.h"
 
 /*----------------------------------------------------------------------------
 *
@@ -242,9 +258,13 @@ int matche (LPCSTR p, LPCSTR t)
 
 					/* matching a '!', '^', '-', '\' or a ']' */
 					if (*p == '\\')
+					{
 						range_start = range_end = *++p;
+					}
 					else
+					{
 						range_start = range_end = *p;
+					}
 
 					/* if end of pattern then bad pattern (Missing ']') */
 					if (!*p)
