@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -76,9 +76,9 @@ int g_nStartupMode = STARTUP_DEFAULT;
 //
 HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
 {
-    ASSERT(pszCommand);
-    HRESULT hr = E_FAIL;
+    ASSERT_ISNOTNULL(pszCommand);
 
+    HRESULT hr = E_FAIL;
     HWND hWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
 
     if (IsWindow(hWnd))
@@ -514,7 +514,7 @@ LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         pLiteStep = static_cast<CLiteStep*>(
             reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
 
-        ASSERT_ISWRITEPTR(pLiteStep);
+        ASSERT_ISNOTNULL(pLiteStep);
 	}
 
 	if (pLiteStep)

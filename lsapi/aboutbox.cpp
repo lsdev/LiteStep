@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -547,7 +547,7 @@ void AboutSysInfo(HWND hListView)
 
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
 {
-	ASSERT_ISSTRING(pszName); ASSERT(nSizeInPoints > 0);
+	ASSERT_ISNOTNULL(pszName); ASSERT(nSizeInPoints > 0);
 
     // convert size from points to pixels
 	HDC hDC = GetDC(NULL);
@@ -583,15 +583,11 @@ int GetClientWidth(HWND hWnd)
 //
 void TrimLeft(char* pszToTrim)
 {
-	ASSERT_ISSTRING(pszToTrim);
-    
     // skip past spaces
 	while (*pszToTrim && StrChr(WHITESPACE, *pszToTrim))
     {
         ++pszToTrim;
     }
-
-    ASSERT_ISSTRING(pszToTrim);
 }
 
 

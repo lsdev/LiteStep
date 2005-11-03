@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2003,2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
 	ASSERT(cchPath >= MAX_PATH);
-    ASSERT_ISWRITEDATA(ptzPath, cchPath);
+    ASSERT_ISVALIDBUF(ptzPath, cchPath);
 
 	IMalloc* pMalloc;
 	bool bReturn = false;
@@ -76,8 +76,8 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 //
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 {
-    ASSERT(cchPath > 0); ASSERT(cchPath <= STRSAFE_MAX_CCH);
-    ASSERT_ISWRITEDATA(ptzPath, cchPath);
+    ASSERT(cchPath <= STRSAFE_MAX_CCH);
+    ASSERT_ISVALIDBUF(ptzPath, cchPath);
 
     HRESULT hr = E_FAIL;
     size_t cchCurrentLength = 0;
@@ -137,7 +137,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 //
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 {
-    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
+    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
 
     return (0 != FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM |
@@ -157,7 +157,7 @@ bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 //
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 {
-    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
+    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
 
     LPOLESTR pOleString = NULL;
 

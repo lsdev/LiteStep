@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2003,2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -129,14 +129,14 @@ Module::~Module()
 
 HANDLE Module::Init(HWND hMainWindow, const std::string& sAppPath)
 {
-    ASSERT(m_hInstance == NULL);
+    ASSERT_ISNULL(m_hInstance);
     
     // delaying the LoadLibrary call until this point is necessary to make
     // grdtransparent work (it hooks LoadLibrary)
     if (_LoadDll())
 	{
-		ASSERT(m_pInitEx != NULL);
-        ASSERT(m_pQuit != NULL);
+        ASSERT_ISNOTNULL(m_pInitEx);
+        ASSERT_ISNOTNULL(m_pQuit);
 
         m_hMainWindow = hMainWindow;
         m_tzAppPath = sAppPath;
