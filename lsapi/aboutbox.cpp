@@ -74,8 +74,9 @@ struct
 }
 theDevTeam[] =
 {
-    "Message", "Bobby G. Vinyard",
-    "ilmcuts", "Simon"
+	"ilmcuts", "Simon"
+	,"jugg", "Chris Rempel"
+	,"Message", "Bobby G. Vinyard"
 };
 
 const unsigned int aboutOptionsCount = sizeof(aboutOptions) / sizeof(aboutOptions[0]);
@@ -583,11 +584,21 @@ int GetClientWidth(HWND hWnd)
 //
 void TrimLeft(char* pszToTrim)
 {
-    // skip past spaces
-	while (*pszToTrim && StrChr(WHITESPACE, *pszToTrim))
-    {
-        ++pszToTrim;
-    }
+	char * trimmed = pszToTrim;
+
+	// skip past spaces
+	while (*pszToTrim && isspace(*pszToTrim))
+		pszToTrim++;
+
+	if(pszToTrim != trimmed)
+	{
+		// copy the rest of the string over
+		while (*pszToTrim)
+			*trimmed++ = *pszToTrim++;
+	
+		// null-terminate it
+		*trimmed = 0;
+	}
 }
 
 
