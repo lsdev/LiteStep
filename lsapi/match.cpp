@@ -40,6 +40,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "lsapidefines.h"
 #include "lsapi.h"
 
+int matche_after_star (LPCSTR pattern, LPCSTR text);
+
 /*----------------------------------------------------------------------------
 *
 * Return TRUE if PATTERN has is a well formed regular expression according
