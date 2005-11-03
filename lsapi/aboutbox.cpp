@@ -28,11 +28,11 @@ extern const char rcsRevision[];
 
 enum
 {
-    ABOUT_BANGS = 0,
-    ABOUT_DEVTEAM = 1,
-    ABOUT_MODULES = 2,
-    ABOUT_REVIDS = 3,
-    ABOUT_SYSINFO = 4,
+	 ABOUT_BANGS = 0
+	,ABOUT_DEVTEAM = 1
+	,ABOUT_MODULES = 2
+	,ABOUT_REVIDS = 3
+	,ABOUT_SYSINFO = 4
 };
 
 typedef void (*AboutFunction)(HWND);
@@ -60,11 +60,11 @@ struct
 }
 aboutOptions[] =
 {
-    "Bang Commands", AboutBangs,
-    "Development Team", AboutDevTeam,
-    "Loaded Modules", AboutModules,
-    "Revision IDs", AboutRevIDs,
-    "System Information", AboutSysInfo
+	 "Bang Commands", AboutBangs
+	,"Development Team", AboutDevTeam
+	,"Loaded Modules", AboutModules
+	,"Revision IDs", AboutRevIDs
+	,"System Information", AboutSysInfo
 };
 
 struct
