@@ -182,7 +182,7 @@ HRESULT TrayService::Stop()
 {
 	HRESULT hr = S_OK;
 
-    if (m_bWin2000)
+    if (m_bWin2000 && m_hTrayWnd)
     {
         _UnloadShellServiceObjects();
     }
