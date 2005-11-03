@@ -26,8 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class ThreadedBangCommand : public CountedBase
 {
 public:
-    ThreadedBangCommand(HWND hCaller, LPCSTR pszName, LPCSTR pszParams) :
-      m_hCaller(hCaller)
+    ThreadedBangCommand(HWND hCaller, LPCSTR pszName, LPCSTR pszParams)
+    :m_hCaller(hCaller)
     {
         ASSERT_ISNOTNULL(pszName);
 

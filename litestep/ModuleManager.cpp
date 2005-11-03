@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -36,7 +36,7 @@ ModuleManager::~ModuleManager()
 
 HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
 {
-	ASSERT(m_pILiteStep == NULL);
+    ASSERT_ISNULL(m_pILiteStep);
 
     HRESULT hr = E_FAIL;
 
