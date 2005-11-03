@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -329,7 +329,7 @@ private:
 
     inline bool _IsValidIcon(const LSNOTIFYICONDATA* plnid) const
     {
-        ASSERT_ISREADPTR(plnid);
+        ASSERT_ISNOTNULL(plnid);
         return ((plnid->uFlags & NIF_ICON) && !_IsHidden(*plnid));
     }
 

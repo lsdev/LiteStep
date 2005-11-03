@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -129,7 +129,7 @@ TrayService::~TrayService()
 //
 HRESULT TrayService::Start()
 {
-    ASSERT(m_hTrayWnd == NULL);
+    ASSERT_ISNULL(m_hTrayWnd);
     HRESULT hr = E_FAIL;
     
     m_hLiteStep = GetLitestepWnd();
@@ -758,7 +758,7 @@ bool TrayService::_CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
 //
 bool TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid)
 {
-    ASSERT_ISREADPTR(plnid);
+    ASSERT_ISNOTNULL(plnid);
     return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)plnid);
 }
 
@@ -914,15 +914,14 @@ int TrayService::_ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
                                     const wchar_t* pwzInput, size_t cchInputMax)
                                     const
 {
-    ASSERT(!IsBadStringPtrW(pwzInput, cchInputMax));
-    ASSERT_ISWRITEDATA(pszOutput, cchOutput);
+    ASSERT_ISVALIDBUF(pwzInput, cchInputMax);
+    ASSERT_ISVALIDBUF(pszOutput, cchOutput);
     
     size_t cchRealInputMax = min((wcslen(pwzInput) + 1), cchInputMax);
     
     int nReturn = WideCharToMultiByte(CP_ACP, 0, pwzInput, cchRealInputMax,
         pszOutput, cchOutput, NULL, NULL);
     
-    ASSERT(!IsBadStringPtr(pszOutput, cchOutput + 1));
     return nReturn;
 }
 
@@ -933,8 +932,8 @@ int TrayService::_ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
 //
 bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCSTR pszSrc) const
 {
-    ASSERT_ISWRITEDATA(pszDest, cchDest);
-    ASSERT_ISSTRING(pszSrc);
+    ASSERT_ISVALIDBUF(pszDest, cchDest);
+    ASSERT_ISNOTNULL(pszSrc);
 
     return SUCCEEDED(StringCchCopyEx(pszDest, cchDest, pszSrc, NULL, NULL,
         STRSAFE_NULL_ON_FAILURE));
@@ -942,8 +941,8 @@ bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCSTR pszSrc) cons
 
 bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCWSTR pwzSrc) const
 {
-    ASSERT_ISWRITEDATA(pszDest, cchDest);
-    ASSERT(!IsBadStringPtrW(pwzSrc, -1));
+    ASSERT_ISVALIDBUF(pszDest, cchDest);
+    ASSERT_ISNOTNULL(pwzSrc);
 
     bool bReturn = (_ConvertWideToAnsi(pszDest, cchDest, pwzSrc, cchDest) != 0);
     

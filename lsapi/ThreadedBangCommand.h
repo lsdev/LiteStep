@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,35 +28,34 @@ class ThreadedBangCommand : public CountedBase
 public:
     ThreadedBangCommand(HWND hCaller, LPCSTR pszName, LPCSTR pszParams) :
       m_hCaller(hCaller)
-	{
-        ASSERT(pszName && !IsBadStringPtr(pszName, UINT_MAX));
-        ASSERT((pszParams == NULL) || !IsBadStringPtr(pszParams, UINT_MAX));
+    {
+        ASSERT_ISNOTNULL(pszName);
 
         // pszName is guaranteed to be non-NULL
         StringCchCopy(m_szName, MAX_BANGCOMMAND, pszName);
 
         if (pszParams)
-		{
-			StringCchCopy(m_szParams, MAX_BANGARGS, pszParams);
-		}
+        {
+            StringCchCopy(m_szParams, MAX_BANGARGS, pszParams);
+        }
         else
         {
             m_szParams[0] = '\0';
         }
-	}
+    }
 
-	void Execute()
-	{
+    void Execute()
+    {
         // Cannot use ParseBangCommand here because that would expand variables
         // again - and some themes rely on the fact that they are expanded only
         // once. Besides, it would create inconsistent behavior.
         InternalExecuteBangCommand(m_hCaller, m_szName, m_szParams);
-	}
+    }
 
 private:
     char m_szName[MAX_BANGCOMMAND];
     char m_szParams[MAX_BANGARGS];
-	HWND m_hCaller;
+    HWND m_hCaller;
 };
 
 #endif // __THREADEDBANGCOMMAND_H

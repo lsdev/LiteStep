@@ -1,7 +1,7 @@
 //
 //  This is a part of the LiteStep Shell source code.
 //
-//  Copyright (C) 1997-2003 The LiteStep Development Team.
+//  Copyright (C) 2003,2005 The LiteStep Development Team.
 //
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -65,11 +65,9 @@
 //
 #define ASSERT assert
 
-#define ASSERT_ISSTRING(psz)     ASSERT(!IsBadStringPtr(psz, UINT_MAX))
-#define ASSERT_ISREADPTR(p)      ASSERT(!IsBadReadPtr(p, sizeof(*p)))
-#define ASSERT_ISWRITEPTR(p)     ASSERT(!IsBadWritePtr(p, sizeof(*p)))
-#define ASSERT_ISWRITEDATA(a, l) ASSERT(!IsBadWritePtr(a, l))
-#define ASSERT_ISREADDATA(a, l)  ASSERT(!IsBadReadPtr(a, l))
+#define ASSERT_ISVALIDBUF(p,c)   ASSERT((NULL != (p) && 0 != (c)))
+#define ASSERT_ISNOTNULL(p)      ASSERT((NULL != (p)))
+#define ASSERT_ISNULL(p)         ASSERT((NULL == (p)))
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -81,7 +79,7 @@ namespace debug
 {
     template <class Tracer> inline void Trace(const char* pszFormat, ...)
     {
-        ASSERT_ISSTRING(pszFormat);
+        ASSERT_ISNOTNULL(pszFormat);
         
         va_list args;
         va_start(args, pszFormat);
@@ -106,7 +104,7 @@ namespace debug
           
         void operator()(const char* pszFormat, ...)
         {
-            ASSERT_ISSTRING(pszFormat);
+            ASSERT_ISNOTNULL(pszFormat);
             char szFormatBuffer[512] = { 0 };
             
             StringCchPrintfExA(szFormatBuffer, 512, NULL, NULL,
@@ -178,7 +176,7 @@ namespace debug
 {
     inline void TraceLastError(const char* pszDescription)
     {
-        ASSERT_ISSTRING(pszDescription);
+        ASSERT_ISNOTNULL(pszDescription);
         void* pvBuffer;
         
         FormatMessage(

@@ -2,7 +2,7 @@
 
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-98 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.17 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.17 2005/10/22 20:09:25 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.18 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.18 2005/11/03 19:18:44 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -711,7 +711,7 @@ HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
 {
     HRESULT hr = E_INVALIDARG;
 
-    if (!IsBadCodePtr(pfnCallback))
+	if (NULL != pfnCallback)
     {
         switch (uInfo)
         {   

@@ -1,7 +1,7 @@
 //
 //  This is a part of the LiteStep Shell source code.
 //
-//  Copyright (C) 1997-2003 The LiteStep Development Team.
+//  Copyright (C) 1997-2003,2005 The LiteStep Development Team.
 //
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 FileParser::FileParser(SettingsMap* pSettingsMap)
 : m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_pEvalParser(NULL)
 {
-    ASSERT_ISWRITEPTR(m_pSettingsMap);
+    ASSERT_ISNOTNULL(m_pSettingsMap);
 }
 
 
@@ -49,8 +49,8 @@ FileParser::~FileParser()
 //
 void FileParser::ParseFile(LPCTSTR ptzFileName)
 {
-    ASSERT_ISSTRING(ptzFileName);
-    ASSERT(m_phFile == NULL);
+    ASSERT_ISNOTNULL(ptzFileName);
+    ASSERT_ISNULL(m_phFile);
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
     TCHAR tzFullPath[MAX_PATH_LENGTH];
@@ -99,9 +99,9 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 //
 bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 {
-    ASSERT_ISWRITEDATA(ptzName, MAX_RCCOMMAND);
-    ASSERT((ptzValue == NULL) || !IsBadWritePtr(ptzValue, MAX_LINE_LENGTH));
-    ASSERT_ISREADPTR(m_phFile);
+    ASSERT_ISNOTNULL(m_phFile);
+    ASSERT_ISVALIDBUF(ptzName, MAX_RCCOMMAND);
+    ASSERT_ISVALIDBUF(ptzValue, MAX_LINE_LENGTH);
     
     TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
     bool bReturn = false;
@@ -154,7 +154,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 //
 void FileParser::_StripString(LPTSTR ptzString)
 {
-    ASSERT_ISWRITEPTR(ptzString);
+    ASSERT_ISNOTNULL(ptzString);
     
     LPTSTR ptzCurrent = ptzString;
     LPTSTR ptzStart = NULL;
@@ -242,7 +242,7 @@ void FileParser::_StripString(LPTSTR ptzString)
 //
 void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
-    ASSERT_ISSTRING(ptzName); ASSERT_ISSTRING(ptzValue);
+    ASSERT_ISNOTNULL(ptzName); ASSERT_ISNOTNULL(ptzValue);
 
     if (lstrcmpi(ptzName, _T("if")) == 0)
 	{
@@ -270,7 +270,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 //
 void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
-	ASSERT_ISSTRING(ptzExpression);
+    ASSERT_ISNOTNULL(ptzExpression);
 
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
 	TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };

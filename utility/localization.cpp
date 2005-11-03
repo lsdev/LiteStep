@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -243,8 +243,8 @@ int Localization::MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType)
 static void GetString(UINT uId, TCHAR* ptzBuffer, size_t cchBuffer,
                       const TCHAR* ptzDefault)
 {
-    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer);
-    ASSERT_ISSTRING(ptzDefault);
+    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
+    ASSERT_ISNOTNULL(ptzDefault);
     
     if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, cchBuffer) == 0)
     {
@@ -265,8 +265,8 @@ static void GetString(UINT uId, TCHAR* ptzBuffer, size_t cchBuffer,
 static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
                           const TCHAR* ptzFormat, const va_list& vargs)
 {
-    ASSERT(cchBuffer > 0);
-    ASSERT_ISWRITEDATA(ptzBuffer, cchBuffer); ASSERT_ISSTRING(ptzFormat);
+    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
+    ASSERT_ISNOTNULL(ptzFormat);
     
     HRESULT hr = E_FAIL;
     
@@ -294,14 +294,12 @@ static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
 //
 static int DoError(const TCHAR* ptzText, const TCHAR* ptzCaption = NULL)
 {
-    ASSERT_ISSTRING(ptzText);
+    ASSERT_ISNOTNULL(ptzText);
 
     TCHAR tzCaption[MAX_LINE_LENGTH] = { _T("LiteStep :: Error") };
     
     if (ptzCaption != NULL)
     {
-        ASSERT_ISSTRING(ptzCaption);
-
         StringCchPrintfEx(tzCaption, MAX_LINE_LENGTH,
             NULL, NULL, STRSAFE_NULL_ON_FAILURE,
             _T("LiteStep :: %s :: Error"), ptzCaption);
@@ -318,7 +316,8 @@ static int DoError(const TCHAR* ptzText, const TCHAR* ptzCaption = NULL)
 //
 void Error(UINT uMessageId, LPCTSTR ptzDefault, ...)
 {
-    ASSERT_ISSTRING(ptzDefault);
+    ASSERT_ISNOTNULL(ptzDefault);
+
     TCHAR tzMessage[MAX_LINE_LENGTH] = { 0 };
     TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
     
@@ -341,8 +340,8 @@ void Error(UINT uMessageId, LPCTSTR ptzDefault, ...)
 //
 void ErrorEx(LPCTSTR ptzCaption, UINT uMessageId, LPCTSTR ptzDefault, ...)
 {
-    ASSERT_ISSTRING(ptzDefault);
-    ASSERT_ISSTRING(ptzCaption);
+    ASSERT_ISNOTNULL(ptzDefault);
+    ASSERT_ISNOTNULL(ptzCaption);
     
     TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
     TCHAR tzMessage[MAX_LINE_LENGTH] = { 0 };
