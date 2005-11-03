@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.18 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.18 2005/11/03 19:18:44 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.19 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.19 2005/11/03 19:37:24 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -267,7 +267,7 @@ BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 			VarExpansionEx(szExpandedArgs, pszArgs, MAX_LINE_LENGTH);
 		}
 
-        bReturn =
+		bReturn = \
             InternalExecuteBangCommand(hCaller, pszCommand, szExpandedArgs);
 	}
 
