@@ -329,7 +329,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	// Register Window Class
     WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.cbWndExtra = sizeof(CLiteStep*);
 	wc.lpfnWndProc = CLiteStep::InternalWndProc;
 	wc.hInstance = m_hInstance;
 	wc.lpszClassName = szMainWindowClass;
