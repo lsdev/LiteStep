@@ -131,9 +131,6 @@
 			<File
 				RelativePath=".\shellhlp.cpp">
 			</File>
-			<File
-				RelativePath=".\versioning.cpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -186,9 +183,6 @@
 			</File>
 			<File
 				RelativePath=".\stringutility.h">
-			</File>
-			<File
-				RelativePath=".\versioning.h">
 			</File>
 			<File
 				RelativePath=".\wharfdata.h">
