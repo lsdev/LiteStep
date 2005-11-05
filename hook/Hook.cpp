@@ -116,11 +116,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		                 KEY_READ,
 		                 &hKey) == ERROR_SUCCESS)
 		{
-			char szExeName[MAX_PATH];
+            char szExeName[MAX_PATH+1] = { 0 };
 			char *szFileName = szExeName;
 			char *tcp;
 
-			GetModuleFileName(0, szExeName, sizeof(szExeName));
+			GetModuleFileName(0, szExeName, sizeof(szExeName)-1);
 
 			for (tcp = szExeName; *tcp; tcp++)
 			{
@@ -311,7 +311,7 @@ BOOL IsCurProcDebugger()
 
 	// In Visual C++, declare these three variables after the
 	// following if-block to speed things up.
-	char szPathName[PATHSIZE];
+    char szPathName[PATHSIZE+1] = { 0 };
 	char *szFileName = szPathName;
 	char *tcp;
 

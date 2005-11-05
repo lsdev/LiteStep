@@ -154,6 +154,7 @@ bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 
 //
 // CLSIDToString
+// Mostly for debugging purposes (TRACE et al)
 //
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 {
@@ -233,4 +234,35 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
     CoTaskMemFree(pOleString);
 
     return hr;
+}
+
+
+//
+// LSGetModuleFileName
+//
+// Wrapper around GetModuleFileName that takes care of truncated buffers. If
+// people are interested in the number of bytes written we could add another
+// parameter (DWORD* pcchWritten)
+//
+bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
+{
+    bool bSuccess = false;
+
+    DWORD cchCopied = GetModuleFileName(hInst, pszBuffer, cchBuffer);
+
+    if (cchCopied == cchBuffer)
+    {
+        ASSERT(GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+        // GetModuleFileName doesn't null-terminate the buffer if it is too
+        // small. Make sure that even in this error case the buffer is properly
+        // terminated - some people don't check return values.
+        pszBuffer[cchBuffer-1] = '\0';
+    }
+    else if (cchCopied > 0 && cchCopied < cchBuffer)
+    {
+        bSuccess = true;
+    }
+
+    return bSuccess;
 }
