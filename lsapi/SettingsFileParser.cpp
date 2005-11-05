@@ -101,7 +101,6 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 {
     ASSERT_ISNOTNULL(m_phFile);
     ASSERT_ISVALIDBUF(ptzName, MAX_RCCOMMAND);
-    ASSERT_ISVALIDBUF(ptzValue, MAX_LINE_LENGTH);
     
     TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
     bool bReturn = false;
