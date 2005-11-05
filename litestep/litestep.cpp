@@ -183,7 +183,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     HRESULT hr = S_OK;
     
     // Determine our application's path
-	if (GetModuleFileName (hInstance, szAppPath, sizeof (szAppPath)) > 0)
+	if (LSGetModuleFileName(hInstance, szAppPath, sizeof(szAppPath)))
 	{
 		PathRemoveFileSpec(szAppPath);
 		PathAddBackslashEx(szAppPath, MAX_PATH);

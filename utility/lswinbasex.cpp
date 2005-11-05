@@ -60,7 +60,7 @@ void WindowX::onSysCommand(Message & message)
 void WindowX::onGetRevId(Message & message)
 {
 	LPSTR buf = (LPSTR)(message.lParam);
-	char path[MAX_PATH + 1];
+    char path[MAX_PATH + 1] = { 0 };
 
 	GetModuleFileName(hInstance, path, MAX_PATH);
 	sprintf(buf, "%s: %s", strrchr(path, '\\') + 1, Revision());
