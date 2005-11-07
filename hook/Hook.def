@@ -1,0 +1,17 @@
+LIBRARY hook
+
+
+
+EXETYPE WINDOWS
+
+
+
+EXPORTS
+	GetMsgProc
+	CallWndProc
+
+
+
+
+SECTIONS
+	SHAREDATA Shared
