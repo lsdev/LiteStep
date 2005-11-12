@@ -104,10 +104,6 @@ SOURCE=.\safeptr.cpp
 
 SOURCE=.\shellhlp.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\versioning.cpp
-# End Source File
 # End Group
 # Begin Group "Headers"
 
@@ -175,10 +171,6 @@ SOURCE=.\shellhlp.h
 # Begin Source File
 
 SOURCE=.\stringutility.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\versioning.h
 # End Source File
 # Begin Source File
 
