@@ -626,7 +626,11 @@ bool TrayService::_AddIcon(const NOTIFYICONDATA& nid)
             plnid->uFlags = nid.uFlags;
             plnid->uID = nid.uID;
             plnid->hWnd  = nid.hWnd;
-            plnid->uCallbackMessage  = nid.uCallbackMessage;
+
+            if (nid.uFlags & NIF_MESSAGE)
+            {
+                plnid->uCallbackMessage  = nid.uCallbackMessage;
+            }
 
             _CopyIconHandle(*plnid, nid);
             _CopyVersionSpecifics(*plnid, nid);
@@ -667,7 +671,7 @@ bool TrayService::_ModifyIcon(LSNOTIFYICONDATA* plnid,
         {
             plnid->uCallbackMessage = nid.uCallbackMessage;
         }
-        
+
         bReturn = _CopyIconHandle(*plnid, nid);
         _CopyVersionSpecifics(*plnid, nid);
 
@@ -679,10 +683,8 @@ bool TrayService::_ModifyIcon(LSNOTIFYICONDATA* plnid,
         {
             _Notify(NIM_DELETE, plnid);
         }
-        else
-        {
-            bReturn = false;
-        }
+        // At this point, the only reason we will return false is
+        // if above our call to _CopyIconHandle failed.
     }
     else
     {
@@ -814,7 +816,10 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
             default:
             case NID_6W_SIZE:
             {
-                lnidTarget.guidItem = pnid->guidItem;
+                if (nidSource.uFlags & NIF_GUID)
+                {
+                    lnidTarget.guidItem = pnid->guidItem;
+                }
             }
             case NID_5W_SIZE:
             {
@@ -865,7 +870,10 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
             default:
             case NID_6A_SIZE:
             {
-                lnidTarget.guidItem = pnid->guidItem;
+                if (nidSource.uFlags & NIF_GUID)
+                {
+                    lnidTarget.guidItem = pnid->guidItem;
+                }
             }
             case NID_5A_SIZE:
             {
