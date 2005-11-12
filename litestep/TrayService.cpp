@@ -871,7 +871,10 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
             {
                 if (nidSource.uFlags & NIF_STATE)
                 {
-                    lnidTarget.dwState |= pnid->dwState;
+                    DWORD dwState = (lnidTarget.dwState & ~pnid->dwStateMask) \
+                                    | (pnid->dwState & pnid->dwStateMask);
+
+                    lnidTarget.dwState = dwState;
                     lnidTarget.dwStateMask |= pnid->dwStateMask;
                 }
 
