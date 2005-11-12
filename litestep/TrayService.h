@@ -255,7 +255,7 @@ public:
     BOOL HandleNotification(SHELLTRAYDATA* pstd);
     
     // resend all icon data
-    HWND SendSystemTray();
+    HWND SendSystemTray() const;
     
     // Message Handler
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
@@ -280,7 +280,7 @@ private:
     
     bool _CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
         const NOTIFYICONDATA& nidSource) const;
-    bool _Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid);
+    bool _Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid) const;
     
     //
     // methods handling version specifics

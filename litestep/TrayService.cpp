@@ -148,11 +148,7 @@ HRESULT TrayService::Start()
             m_bWin2000 = true;
         }
 
-        _CreateWindows();
-        
-        // Our main window is enough to start up, we can do without the
-        // TrayNotifyWnd if necessary.
-        if (m_hTrayWnd)
+        if (_CreateWindows())
         {
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG)this);
@@ -222,7 +218,7 @@ bool TrayService::_CreateWindows()
     wc.hInstance = m_hInstance;
     wc.lpszClassName = szTrayClass;
     wc.style = CS_DBLCLKS;
-    
+
     if (RegisterClassEx(&wc))
     {
         //
@@ -239,6 +235,10 @@ bool TrayService::_CreateWindows()
 
         if (m_hTrayWnd)
         {
+            // Our main window is enough to start up, we can do without the
+            // TrayNotifyWnd if necessary.
+            bReturn = true;
+
             //
             // Register "TrayNotifyWnd" class and create window (see Note 8)
             //
@@ -248,7 +248,7 @@ bool TrayService::_CreateWindows()
             wc.hInstance = m_hInstance;
             wc.lpszClassName = szNotifyClass;
             wc.style = CS_DBLCLKS;
-            
+
             if (RegisterClassEx(&wc))
             {
                 m_hNotifyWnd = CreateWindowEx(
@@ -260,23 +260,21 @@ bool TrayService::_CreateWindows()
                     m_hInstance,
                     NULL);
 
-                if (m_hNotifyWnd)
-                {
-                    bReturn = true;
-                }
-                else
+                if (!m_hNotifyWnd)
                 {
                     UnregisterClass(szNotifyClass, m_hInstance);
-                    
-                    RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
-                        "Unable to create window.", szNotifyClass);
+
+/* Quietly eat non-critical errors */
+//                    RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
+//                        "Unable to create window.", szNotifyClass);
                 }
             }
-            else
-            {
-                RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
-                    "Error registering window class.", szNotifyClass);
-            }
+/* Quietly eat non-critical errors */
+//            else
+//            {
+//                RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
+//                    "Error registering window class.", szNotifyClass);
+//            }
         }
         else
         {
@@ -577,9 +575,9 @@ BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
 // Resend all icon data; systray modules will request this via LM_SYSTRAYREADY
 // during their startup.
 //
-HWND TrayService::SendSystemTray()
+HWND TrayService::SendSystemTray() const
 {
-    for (IconVector::iterator iter = m_siVector.begin();
+    for (IconVector::const_iterator iter = m_siVector.begin();
          iter != m_siVector.end(); ++iter)
     {
         if (_IsValidIcon(*iter))
@@ -587,7 +585,7 @@ HWND TrayService::SendSystemTray()
             _Notify(NIM_ADD, *iter);
         }
     }
-    
+
     return m_hNotifyWnd;
 }
 
@@ -756,7 +754,7 @@ bool TrayService::_CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
 //
 // Notify all listeners of a systray event
 //
-bool TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid)
+bool TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid) const
 {
     ASSERT_ISNOTNULL(plnid);
     return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)plnid);
@@ -822,7 +820,10 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
             {
                 if (nidSource.uFlags & NIF_STATE)
                 {
-                    lnidTarget.dwState |= pnid->dwState;
+                    DWORD dwState = (lnidTarget.dwState & ~pnid->dwStateMask) \
+                                    | (pnid->dwState & pnid->dwStateMask);
+
+                    lnidTarget.dwState = dwState;
                     lnidTarget.dwStateMask |= pnid->dwStateMask;
                 }
 
@@ -834,7 +835,7 @@ void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
                         _StringCopy(lnidTarget.szInfoTitle,
                             TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
 
-                        lnidTarget.dwInfoFlags = pnid->dwInfoFlags;                    
+                        lnidTarget.dwInfoFlags = pnid->dwInfoFlags;
                     }
                     else
                     {
