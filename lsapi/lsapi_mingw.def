@@ -41,7 +41,7 @@ EXPORTS
 
     GetLitestepWnd
     _LSGetLitestepPath@8   = LSGetLitestepPath@8
-    _LSGetImagePath        = LSGetImagePath@8
+    _LSGetImagePath@8      = LSGetImagePath@8
 
     VarExpansion
     VarExpansionEx
