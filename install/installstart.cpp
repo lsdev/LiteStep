@@ -34,7 +34,7 @@ void CInstallStartPage::onInitDialog(Message& message)
 {
 	CWizardPage::onInitDialog(message);
 
-	SetStaticText(message.hWnd, IDC_TITLE, IDS_INSTALL_INTRO_TITLE,
+	SetStaticText(message.hWnd, IDC_INSTALL_TITLE, IDS_INSTALL_INTRO_TITLE,
 	              "LiteStep 0.24.7 Installation");
 
 	SetStaticText(message.hWnd, IDC_INSTALL_INTRO_TEXT, IDS_INSTALL_INTRO_TEXT,
