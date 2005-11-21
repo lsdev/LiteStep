@@ -20,7 +20,7 @@
 #define IDD_INSTALL_NT_USERS            105
 #define IDD_INSTALL_CONFIRM_CHANGES     106
 #define IDD_INSTALL_FINISH              107
-#define IDC_TITLE                       1000
+#define IDC_INSTALL_TITLE               1000
 #define IDC_INSTALL_INTRO_TEXT          1001
 #define IDC_INSTALL_NT_ALL_USERS        1002
 #define IDC_INSTALL_NT_CURRENT_USER     1003

@@ -57,7 +57,7 @@ STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Alternative Shell Installation"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    LTEXT           "",IDC_TITLE,115,9,189,31,NOT WS_GROUP,WS_EX_TRANSPARENT
+    LTEXT           "",IDC_INSTALL_TITLE,115,9,189,31,NOT WS_GROUP,WS_EX_TRANSPARENT
     LTEXT           "",IDC_INSTALL_INTRO_TEXT,115,40,189,146,0,
                     WS_EX_TRANSPARENT
 END
@@ -92,7 +92,7 @@ STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Completion Page"
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Completing Wiz97",IDC_TITLE,115,8,195,37
+    LTEXT           "Completing Wiz97",IDC_INSTALL_TITLE,115,8,195,37
     LTEXT           "Some Explanatory Text",IDC_STATIC,115,58,195,128
 END
 
