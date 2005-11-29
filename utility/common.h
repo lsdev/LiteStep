@@ -30,6 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #  pragma warning(disable: 4503) // STL naming warnings
 #endif
 
+#if !defined(_WIN32_IE)
+#define _WIN32_IE 0x600
+#endif
+
 // _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
 #if !defined (_WINDOWS_) && !defined(_WINDOWS_H)
 #  define WIN32_LEAN_AND_MEAN
