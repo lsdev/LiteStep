@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 ..\lsapi\release\lsapi.lib advapi32.lib comctl32.lib user32.lib kernel32.lib gdi32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /dll /pdb:none /map /machine:I386 /nodefaultlib /def:".\exports.def" /out:"../LiteStep/Release/install.dll" /opt:NOWIN98
+# ADD LINK32 ..\lsapi\release\lsapi.lib advapi32.lib comctl32.lib user32.lib kernel32.lib gdi32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /dll /pdb:none /map /machine:I386 /nodefaultlib /def:".\exports.def" /out:"..\litestep\Release\install.dll" /opt:NOWIN98
 
 !ELSEIF  "$(CFG)" == "install - Win32 Debug"
 
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\lsapi\debug\lsapi.lib comctl32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /dll /profile /debug /machine:I386 /nodefaultlib /out:"../LiteStep/Debug/install.dll"
+# ADD LINK32 ..\lsapi\debug\lsapi.lib comctl32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /dll /profile /debug /machine:I386 /nodefaultlib /out:"..\litestep\Debug\install.dll"
 
 !ENDIF 
 
