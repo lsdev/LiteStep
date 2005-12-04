@@ -164,6 +164,14 @@ SOURCE=.\resource.h
 
 SOURCE=.\stdafx.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\wizardmain.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\wizardpage.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
