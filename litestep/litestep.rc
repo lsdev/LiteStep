@@ -13,48 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Taiwan) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
-#ifdef _WIN32
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
-#pragma code_page(950)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_ERROR1     "±z¤w¸g¦b°õ¦æ LiteStep ¡A\n½T©w­nÄ~Äò¶Ü¡H"
-    IDS_LITESTEP_ERROR2     "§ä¤£¨ìÀÉ®× ""%s""¡C\n½Ð½T»{ÀÉ®×¸ô®|¬O§_¥¿½T«á¦A¬O¤@¦¸¡C"
-    IDS_LITESTEP_ERROR3     "±z²{¦b¥¿¦b¨Ï¥Î¥t¤@­Ó Shell¡CLiteStep b24 ÁöµM¥i¥H¸ò Exploere ¤@°_°õ¦æ¡A\n¦ý¬O§Ú­Ì¨Ã¤£«ØÄ³·s¨Ï¥ÎªÌ¨Ï¥Î³o¼Ëªº³]©w¡A¦Ó¥B§Ú­Ì¤]¤£¤ä´©³o¼Ëªº³]©w¡A\n©Ò¥H§Ú­Ì¤]¤£­t³d¥ô¦ó«áªG¡C\n¦pªG§A¨Ï¥Î³o¼Ëªº³]©wªº¸Ü, ¦³¨Ç LiteStep ªº¥\¯à¨Ò¦p Desktop ´N·|³QÃö±¼¡C\n\n¦ý¬O wharf, hotkeys, ÁÙ¦³ shortcuts ÁÙ¬O¥i¥H¨Ï¥Î¡C\n\n¦pªG§A¤U¦¸¤£·Q¬Ý¨ì³o­ÓÄµ§i°T®§,\n½Ð¦b§Aªº step.rc ÀÉ¥[¤J LSNoShellWarning ªº³]©w¡C Ä~Äò¡H\n"
-    IDS_LITESTEP_TITLE_WARNING "Äµ§i¡C"
-    IDS_LITESTEP_ERROR4     "µn°O LiteStep µøµ¡®Éµo¥Í¿ù»~¡C\n"
-    IDS_LITESTEP_TITLE_ERROR "¿ù»~¡C"
-    IDS_LITESTEP_ERROR5     "¶}±Ò LiteStep ¥Dµøµ¡®Éµo¥Í¿ù»~¡C"
-    IDS_LITESTEP_ERROR6     "­«·s¸ü¤J LiteStep ªº°Ê§@¤w¸g¼È°±¤F¡A½Ð«ö [½T©w] Ä~Äò¡C"
-    IDS_LITESTEP_ERROR7     "µLªk¸ü¤J %s¡C"
-    IDS_LITESTEP_TITLE_FATAL_ERROR "ÄY­«¿ù»~¡C"
-    IDS_LITESTEP_RECYCLELS  "­«·s¸ü¤J(&R)"
-    IDS_LITESTEP_QUITLS     "µ²§ô LiteStep (&Q)"
-    IDS_LITESTEP_TERMINATELS "¼É¤O²×µ² LiteStep (&T)"
-    IDS_LITESTEP_RUN        "°õ¦æ(&R)"
-    IDS_LITESTEP_SHUTDOWNWIN "Ãö³¬µøµ¡(&S)"
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_UNINSTALLLS "²¾°£ LiteStep (&U)"
-END
-
-#endif    // Chinese (Taiwan) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
@@ -178,9 +136,9 @@ VS_VERSION_INFO VERSIONINFO
  PRODUCTVERSION 0,24,7,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x21L
+ FILEFLAGS 0x1L
 #else
- FILEFLAGS 0x20L
+ FILEFLAGS 0x0L
 #endif
  FILEOS 0x4L
  FILETYPE 0x1L
@@ -192,14 +150,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://www.lsdev.org/"
             VALUE "CompanyName", "Litestep Development Team"
-            VALUE "FileDescription", "LiteStep alternate shell for Microsoft Windows Operating Systems"
+            VALUE "FileDescription", "An alternate shell for Microsoft Windows 32bit Operating Systems"
             VALUE "FileVersion", "0, 24, 7, 0"
-            VALUE "InternalName", "LiteStep"
+            VALUE "InternalName", "Litestep"
             VALUE "LegalCopyright", "Copyright © 1997 - 2005"
             VALUE "OriginalFilename", "litestep.exe"
-            VALUE "ProductName", "LiteStep"
+            VALUE "ProductName", "Litestep"
             VALUE "ProductVersion", "0, 24, 7, 0"
-            VALUE "SpecialBuild", "Ticking over ahead of LiteStep 0.25"
         END
     END
     BLOCK "VarFileInfo"
@@ -404,48 +361,6 @@ BEGIN
 END
 
 #endif    // Swedish resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Spanish (Mexican) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
-#ifdef _WIN32
-LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_ERROR1     "Fue detectada una instancia previa de LiteStep.\n¿Estas seguro de querer continuar?"
-    IDS_LITESTEP_ERROR2     "No se pudo encontrar el archivo ""%s"".\nPor favor verifique donde se encuentra el archivo, e intente de nuevo."
-    IDS_LITESTEP_ERROR3     "Actualmente estas corriendo otra shell, mientras que Litestep b24 te\npermite\n\ncorrer bajo Explorer, no lo recomendamos para usuarios sin experiencia, y\nnosotros\nno ofreceremos soporte, asi que usalo a tu propio riesgo.\n\nSi\ncontinuas,\nalgunas de las caracteristicas avanzadas de LiteStep seran\ndesactivadas,\ncomo es el caso de el escritorio. La wharf, hotkeys, y shortcuts funcionaran.\n\nPara que este mensaje no aparezca la proxima vez, coloca LSNoShellWarning en tu step.rc\n\n¿Continuar?"
-    IDS_LITESTEP_TITLE_WARNING "Advertencia"
-    IDS_LITESTEP_ERROR4     "Error registrando la clase principal de la ventana de LiteStep."
-    IDS_LITESTEP_TITLE_ERROR "Error"
-    IDS_LITESTEP_ERROR5     "Error creando la ventana principal de la aplicacion LiteStep."
-    IDS_LITESTEP_ERROR6     "El Reciclaje ha sido pausado, haz click en OK para continuar."
-    IDS_LITESTEP_ERROR7     "No se pudo cargar %s."
-    IDS_LITESTEP_TITLE_FATAL_ERROR "Error Fatal"
-    IDS_LITESTEP_RECYCLELS  "&Reciclar LiteStep"
-    IDS_LITESTEP_QUITLS     "&Quitar LiteStep"
-    IDS_LITESTEP_TERMINATELS "&Terminar LiteStep a la fuerza"
-    IDS_LITESTEP_RUN        "&Ejecutar..."
-    IDS_LITESTEP_SHUTDOWNWIN "&Apagar Windows..."
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_UNINSTALLLS "&Desinstalar LiteStep"
-END
-
-#endif    // Spanish (Mexican) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
