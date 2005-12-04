@@ -119,7 +119,7 @@ SOURCE=.\lsapi.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\lsMultiMon.cpp
+SOURCE=.\lsmultimon.cpp
 # End Source File
 # Begin Source File
 
@@ -147,7 +147,7 @@ SOURCE=.\SettingsIterator.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SettingsManager.cpp
+SOURCE=.\settingsmanager.cpp
 # End Source File
 # Begin Source File
 
@@ -187,6 +187,10 @@ SOURCE=.\png_support.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\resource.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SettingsDefines.h
 # End Source File
 # Begin Source File
@@ -208,6 +212,14 @@ SOURCE=.\SettingsManager.h
 # Begin Source File
 
 SOURCE=.\ThreadedBangCommand.h
+# End Source File
+# End Group
+# Begin Group "Resources"
+
+# PROP Default_Filter "*.rc;*.bmp;*.ico;*.h"
+# Begin Source File
+
+SOURCE=.\lsapi.rc
 # End Source File
 # End Group
 # End Target
