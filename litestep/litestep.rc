@@ -28,26 +28,20 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 
 STRINGTABLE 
 BEGIN
+    IDS_LITESTEP_TITLE_WARNING "Warnung"
+    IDS_LITESTEP_TITLE_ERROR "Fehler"
     IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen?"
     IDS_LITESTEP_ERROR2     "Konnte die Datei ""%s"" nicht finden.\nBitte stellen Sie sicher, daß der Pfad korrekt ist und die Datei existiert."
     IDS_LITESTEP_ERROR3     "Sie verwenden zur Zeit eine andere Shell. Obwohl die\nLitestep-Shell als normale Applikation laufen kann, raten\nwir unerfahrenen Benutzern davon ab.\n\nFalls Sie fortfahren, werden einige Features Litesteps\nnicht ordnungsgemäß funktionieren, wie z.B. der System-Tray,\nder Desktop und einige Task-Manager.\n\nUm diesen Hinweis abzuschalten, fügen Sie 'LSNoShellWarning'\nin Ihre step.rc ein.\n\nWollen Sie Litestep weiter als Applikation laufen lassen?"
-    IDS_LITESTEP_TITLE_WARNING "Warnung"
     IDS_LITESTEP_ERROR4     "Fehler beim registrieren der Litestep Hauptfensterklasse."
-    IDS_LITESTEP_TITLE_ERROR "Fehler"
     IDS_LITESTEP_ERROR5     "Fehler beim erzeugen des Litestep Hauptfensters"
     IDS_LITESTEP_ERROR6     "Recycle wurde pausiert. Drücken Sie OK um weiterzumachen."
     IDS_LITESTEP_ERROR7     "Konnte %s nicht laden."
-    IDS_LITESTEP_TITLE_FATAL_ERROR "Fataler Fehler."
     IDS_LITESTEP_RECYCLELS  "Litestep &recyclen"
     IDS_LITESTEP_QUITLS     "Litestep Be&enden"
     IDS_LITESTEP_TERMINATELS "Litestep ab&brechen"
     IDS_LITESTEP_RUN        "&Starte..."
     IDS_LITESTEP_SHUTDOWNWIN "Windows &Herunterfahren"
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_UNINSTALLLS "Litestep &Deinstallieren"
 END
 
 #endif    // German (Germany) resources
@@ -197,27 +191,25 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDS_LITESTEP_TITLE_WARNING "Warning"
+    IDS_LITESTEP_TITLE_ERROR "Error"
     IDS_LITESTEP_ERROR1     "A previous instance of LiteStep was detected.\nAre you sure you want to continue?"
     IDS_LITESTEP_ERROR2     "Unable to find the file ""%s"".\nPlease verify the location of the file."
     IDS_LITESTEP_ERROR3     "Litestep is not able to load as the system shell.\nAnother shell is already active.\n\nContinuing to load Litestep will disable specific system\nshell functions of Litestep and some features will not\nfunction properly such as icon notifications (systray),\nthe desktop and some task managers.\n\nTo disable this message, place 'LSNoShellWarning' in\nyour step.rc.\n\nContinue to load Litestep?"
-    IDS_LITESTEP_TITLE_WARNING "Warning"
     IDS_LITESTEP_ERROR4     "Error registering main Litestep window class."
-    IDS_LITESTEP_TITLE_ERROR "Error"
     IDS_LITESTEP_ERROR5     "Error creating Litestep main application window."
     IDS_LITESTEP_ERROR6     "Recycle has been paused, click OK to continue."
     IDS_LITESTEP_ERROR7     "Unable to load %s."
-    IDS_LITESTEP_TITLE_FATAL_ERROR "Fatal Error"
     IDS_LITESTEP_RECYCLELS  "Re&cycle LiteStep"
     IDS_LITESTEP_QUITLS     "&Quit LiteStep"
     IDS_LITESTEP_TERMINATELS "Forcibly &Terminate LiteStep"
     IDS_LITESTEP_RUN        "&Run..."
     IDS_LITESTEP_SHUTDOWNWIN "Sh&utdown Windows..."
+    IDS_MODULEQUIT_ERROR    "Exception while quitting module."
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_LITESTEP_UNINSTALLLS "U&ninstall LiteStep"
-    IDS_MODULEQUIT_ERROR    "Exception while quitting module."
     IDS_MODULENOTFOUND_ERROR 
                             "Error: Could not locate module.\nPlease check your configuration."
     IDS_INITMODULEEXNOTFOUND_ERROR 
@@ -254,26 +246,20 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 
 STRINGTABLE 
 BEGIN
+    IDS_LITESTEP_TITLE_WARNING "Avertissement"
+    IDS_LITESTEP_TITLE_ERROR "Erreur"
     IDS_LITESTEP_ERROR1     "Une instance de LiteStep existe déjà.\nVoulez-vous vraiment continuer?"
     IDS_LITESTEP_ERROR2     "Impossible de trouver le fichier ""%s"".\nVeuillez vérifier\nl'emplacement du fichier."
     IDS_LITESTEP_ERROR3     "Vous utilisez présentement un autre Shell que Litestep.\nBien que le Shell Litestep ait la capacité de fonctionner\nen mode ""application standard"", nous ne conseillons pas\nce mode pour les utilisateurs inexpérimentés.\n\nSi vous continuez, quelques fonctionnalités de Litestep,\ndont la zone d'icônes de notification, le bureau et la\nbarre des tâches, ne pourront pas fonctionner normalement.\n\nPour désactiver ce message, ajoutez \\'LSNoShellWarning\\'\ndans votre fichier step.rc.\n\nVoulez-vous continuer en mode application?"
-    IDS_LITESTEP_TITLE_WARNING "Avertissement"
     IDS_LITESTEP_ERROR4     "Erreur d'enregistrement de la window class principale de Litestep."
-    IDS_LITESTEP_TITLE_ERROR "Erreur"
     IDS_LITESTEP_ERROR5     "Erreur de création de la fenêtre principale d'application de LiteStep"
     IDS_LITESTEP_ERROR6     "Recycler est en pause, cliquez OK pour poursuivre."
     IDS_LITESTEP_ERROR7     "%s n'a pu être chargé(e)."
-    IDS_LITESTEP_TITLE_FATAL_ERROR "Erreur fatale"
     IDS_LITESTEP_RECYCLELS  "&Recycler LiteStep"
     IDS_LITESTEP_QUITLS     "&Quitter LiteStep"
     IDS_LITESTEP_TERMINATELS "&Forcer l'arrêt de LiteStep"
     IDS_LITESTEP_RUN        "&Exécuter..."
     IDS_LITESTEP_SHUTDOWNWIN "&Fermeture de Windows..."
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_UNINSTALLLS "&Désinstaller LiteStep"
 END
 
 #endif    // French (France) resources
@@ -296,26 +282,20 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 
 STRINGTABLE 
 BEGIN
+    IDS_LITESTEP_TITLE_WARNING "Waarschuwing."
+    IDS_LITESTEP_TITLE_ERROR "Fout"
     IDS_LITESTEP_ERROR1     "Er is een andere instantie van LiteStep gedetecteerd.\nWeet u zeker dat u door wilt gaan?"
     IDS_LITESTEP_ERROR2     "Het bestand ""%s"".\nVerifieer de locatie van het bestand en probeer opnieuw."
     IDS_LITESTEP_ERROR3     "Op dit moment gebruikt u een andere grafische interface (gui).\nHoewel Litestep bovenop de huidige GUI kan draaien, adviseren\nwe dat niet voor onervaren gebruikers.\n\nAls u doorgaat, zullen sommige van Litestep's functies\nniet naar behoren werken zoals de taakbalk, het bureaublad\nen andere functies\n\nOm dit bericht voortaan niet meer te laten zien, plaatst\nu 'LSNoShellWarning' in uw step.rc.\n\nLitestep toch starten?"
-    IDS_LITESTEP_TITLE_WARNING "Waarschuwing."
     IDS_LITESTEP_ERROR4     "Fout bij het registreren van de main LiteStep Window Class."
-    IDS_LITESTEP_TITLE_ERROR "Fout"
     IDS_LITESTEP_ERROR5     "Error creating Litestep main application window."
     IDS_LITESTEP_ERROR6     "Recycle is gepauzeerd, klik op OK om door te gaan."
     IDS_LITESTEP_ERROR7     "Unable to load %s."
-    IDS_LITESTEP_TITLE_FATAL_ERROR "Fatal Error"
     IDS_LITESTEP_RECYCLELS  "&Hernieuw LiteStep"
     IDS_LITESTEP_QUITLS     "&Stop LiteStep"
     IDS_LITESTEP_TERMINATELS "Forcibly &Terminate LiteStep"
     IDS_LITESTEP_RUN        "&Run..."
     IDS_LITESTEP_SHUTDOWNWIN "&Afsluiten Windows..."
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_UNINSTALLLS "&De-installeren LiteStep"
 END
 
 #endif    // Dutch (Netherlands) resources
@@ -338,26 +318,20 @@ LANGUAGE LANG_SWEDISH, SUBLANG_DEFAULT
 
 STRINGTABLE 
 BEGIN
+    IDS_LITESTEP_TITLE_WARNING "Varning"
+    IDS_LITESTEP_TITLE_ERROR "Fel"
     IDS_LITESTEP_ERROR1     "En tidigare instans av LiteStep upptäcktes.\nÄr du säker på att du vill fortsätta?"
     IDS_LITESTEP_ERROR2     "Kunde inte hitta filen ""%s"".\nKontrollera att filen existerar och försök igen."
     IDS_LITESTEP_ERROR3     "Litestep kan inte starta som systemets skal.\nEtt annat skal körs redan.\n\nOm du väljer att fortsätta kommer vissa funktioner\ni Litestep inte att fungera som det är tänkt, till\nexempel meddelandefältet, skrivbordet och vissa\naktivitetshanterare.\n\nFör att inaktivera detta meddelande, skriv\n'LSNoShellWarning' i din step.rc\n\nVill du fortfarande starta Litestep?"
-    IDS_LITESTEP_TITLE_WARNING "Varning"
     IDS_LITESTEP_ERROR4     "Ett fel uppstod när klassen för huvudfönstret skulle registreras.Error registering main Litestep window class."
-    IDS_LITESTEP_TITLE_ERROR "Fel"
     IDS_LITESTEP_ERROR5     "Kunde inte skapa huvudfönstret."
     IDS_LITESTEP_ERROR6     "Återvinning av inställningarna har pausats. Tryck på OK för att fortsätta."
     IDS_LITESTEP_ERROR7     "Kunde inte ladda %s."
-    IDS_LITESTEP_TITLE_FATAL_ERROR "Oåterkalleligt fel"
     IDS_LITESTEP_RECYCLELS  "&Återvinn inställningar"
     IDS_LITESTEP_QUITLS     "&Avsluta"
     IDS_LITESTEP_TERMINATELS "Avsluta med &våld."
     IDS_LITESTEP_RUN        "&Kör..."
     IDS_LITESTEP_SHUTDOWNWIN "&Stäng av..."
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_LITESTEP_UNINSTALLLS "A&vinstallera LiteStep"
 END
 
 #endif    // Swedish resources
