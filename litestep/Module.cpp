@@ -194,7 +194,7 @@ void Module::CallQuit()
         catch (...)
         {
             RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
-                "Exception while quitting module.", m_tzLocation.c_str())
+                "Exception while quitting module.", m_tzLocation.c_str());
         }
     }
 }
