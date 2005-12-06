@@ -10,7 +10,7 @@ Contents:
 -)SYSTEM REQUIREMENTS
 -)INSTALL
 -)USAGE (HELP)
--)DEVELOPEMENT
+-)DEVELOPMENT
 -)CREDITS
 -)HISTORY
 
@@ -74,7 +74,7 @@ Contents:
 
  NOTE:
  -----
- You are about to install a replacment shell for Windows.  A shell is not a
+ You are about to install a replacement shell for Windows.  A shell is not a
  normal application, and runs as a special system process.  Replacing the shell
  is not a supported procedure by Microsoft, and as such, it is possible  that if
  you do something wrong, you may end up with a non functional desktop or your
@@ -114,7 +114,7 @@ Contents:
 
 -- USAGE (HELP) ----------------------------------------------------------------
 
--- DEVELOPEMENT ----------------------------------------------------------------
+-- DEVELOPMENT ----------------------------------------------------------------
 
 -- CREDITS ---------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ Contents:
    demigod
 
  And thanks to all of those who have contributed to Litestep and its community
- over the last 8 years!  It is much appriciated by everyone.
+ over the last 8 years!  It is much appreciated by everyone.
 
 -- HISTORY ---------------------------------------------------------------------
 
@@ -228,7 +228,7 @@ development over to Brandon Williams (Floach) and what became the Litestep
 Development Team.
 
 And while the source was released under the GPL, it came with the following text
-stipulating his desires to see LiteSTEP development continue unfragmented:
+stipulating his desires to see LiteSTEP development continue fork free:
 
    Please, do not distribute modified versions on your own or we will end up
    with a big mess.
@@ -268,16 +268,16 @@ and found many new features and improvements for themers.  Over the following
 year until early 2001, the team released many intermediate builds on their goal
 for a stable 0.24.6 release.  Unfortunately because of a decision to proceed
 with a major rewrite of the shell's internals, a formal version 0.24.6 was never
-released, although development continued on the 0.24.6 branch until 2002-02-16.
-As the rewrite (with a goal of being version 0.25.0) continued, the community
-stagnated from the lack of releases formal releases.
+released, even though development continued on the 0.24.6 branch until
+2002-02-16.  As the rewrite (with a goal of being version 0.25.0) continued, the
+community stagnated from the lack of formal releases.
 
-In answer to this situation, a group of independant developers formed what they
-named "IndieStep" to continue the 0.24.6 code base while they waited for the
-formal 0.25.0 development to finalize.  Again unfortuenatly the development of
-0.25.0 was abandoned due to varying circumstances and the majority of the then
-current development team quit, leaving Litestep dead in the water accept for
-the continuing IndieStep development.
+In response to this situation, a group of independant developers formed what
+they named "IndieStep" to continue the 0.24.6 code base while they waited for
+the formal 0.25.0 development to finalize.  Again unfortunately the development
+of 0.25.0 was abandoned due to varying circumstances, and the majority of the
+then current development team quit, leaving Litestep dead in the water accept
+for the continuing IndieStep development.
 
 At this point, Message stepped up to the plate and took lead of the Litestep
 Development Team, and announced work on Litestep 0.24.7 which would return
@@ -286,15 +286,15 @@ again over the following year as Message cleaned up the source code and fixed
 numerous issues, IndieStep continued development waiting for a 0.24.7 release.
 
 However, Message was deployed to Iraq, and was unable to continue his work on
-0.24.7.  Ilmcuts from the IndieStep effort was able to take over, and was able
-to release the first beta build of 0.24.7 on March 13, 2003.  By May 21, 2004,
-he had release candidate 3 of 0.24.7 ready.
+0.24.7.  Ilmcuts from the IndieStep effort was able to take over, and released
+the first beta build of 0.24.7 on March 13, 2003.  By May 21, 2004, he had the
+third release candidate of 0.24.7 ready.
 
 Since then, nothing has happened until _now_.
 
 Now the Litestep Development Team proudly presents "Litestep 0.24.7" on the 8th
-aniversry of this shell that will forever change the way you interact with your
-Windows desktop.
+anniversary of this shell that will forever change the way you interact with
+your Windows desktop.
 
 http://www.lsdev.org/changelog.php
 
