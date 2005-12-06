@@ -316,8 +316,8 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		if (GetRCBool("LSNoShellWarning", FALSE))
 		{
 			RESOURCE_STR(hInstance, IDS_LITESTEP_ERROR3,
-			             "You are currently running another shell, while Litestep b24 allows you\012to run under Explorer, we don't advise it for inexperienced users, and we\012will not support it, so do so at your own risk.\012\012If you continue, some of the advanced features of Litestep will be disabled\012such as the desktop. The wharf, hotkeys, and shortcuts will still work.\012\012To get rid of this message next time, put LSNoShellWarning in your step.rc\012\012Continue?")
-			RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning")
+			             "You are currently running another shell, while Litestep b24 allows you\012to run under Explorer, we don't advise it for inexperienced users, and we\012will not support it, so do so at your own risk.\012\012If you continue, some of the advanced features of Litestep will be disabled\012such as the desktop. The wharf, hotkeys, and shortcuts will still work.\012\012To get rid of this message next time, put LSNoShellWarning in your step.rc\012\012Continue?");
+			RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
 			if (MessageBox(0, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
 			{
 				return E_ABORT;
@@ -337,7 +337,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	{
 		RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR4,
 		                  "Error registering main Litestep window class.",
-		                  IDS_LITESTEP_TITLE_ERROR, "Error")
+		                  IDS_LITESTEP_TITLE_ERROR, "Error");
 
 		return E_FAIL;
 	}
@@ -475,7 +475,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	{
 		RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR5,
 		                  "Error creating Litestep main application window.",
-		                  IDS_LITESTEP_TITLE_ERROR, "Error")
+		                  IDS_LITESTEP_TITLE_ERROR, "Error");
 	}
 
 	// Unreg class
@@ -1073,7 +1073,7 @@ void CLiteStep::_Recycle()
 	if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
 	{
 		RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_ERROR6,
-		                "Recycle has been paused, click OK to continue.", "LiteStep")
+		                "Recycle has been paused, click OK to continue.", "LiteStep");
 	}
 
 	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());

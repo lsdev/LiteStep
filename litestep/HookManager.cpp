@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -52,7 +52,7 @@ BOOL startHookManager(HINSTANCE dllInst)
 		if (!createHookThread())
 		{
 			RESOURCE_MSGBOX(hInst, IDS_HOOKMGR_CREATETHREAD_ERROR,
-			                "Could not create Hook Manager Thread", HOOKMGRWINDOWNAME)
+			                "Could not create Hook Manager Thread", HOOKMGRWINDOWNAME);
 
 			processHooks = false;
 		}
@@ -60,7 +60,7 @@ BOOL startHookManager(HINSTANCE dllInst)
 	else
 	{
 		RESOURCE_MSGBOX(hInst, IDS_HOOKMGR_LOADHOOK_ERROR,
-		                "Could not load hook.dll", HOOKMGRWINDOWNAME)
+		                "Could not load hook.dll", HOOKMGRWINDOWNAME);
 
 		processHooks = false;
 	}
@@ -131,7 +131,7 @@ DWORD WINAPI HookMgrMain(LPVOID /* lpv */)
 	{
 
 		RESOURCE_MSGBOX(hInst, IDS_LITESTEP_CREATEWINDOW_ERROR,
-		                "Unable to create window.", HOOKMGRWINDOWNAME)
+		                "Unable to create window.", HOOKMGRWINDOWNAME);
 
 		ExitThread(0);
 	}
