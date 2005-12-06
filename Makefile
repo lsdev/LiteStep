@@ -1,4 +1,16 @@
 #-----------------------------------------------------------------------------
+# Makefile for MinGW
+#
+# To make a release build:     make
+# To make a debug build:       make DEBUG=1
+# To clean up a release build: make clean
+# To clean up a debug build:   make clean DEBUG=1
+#
+# The output directory (Release or Debug by default) must exist before you
+# run make. For 'make clean' to work you need rm.exe.
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 # Tools and Flags
 #-----------------------------------------------------------------------------
 
@@ -7,9 +19,9 @@ CXX = g++
 
 # C++ compiler flags
 ifdef DEBUG
-CXXFLAGS = -g -Wall -DLSAPI_PRIVATE
+CXXFLAGS = -Wall -DLSAPI_PRIVATE -D_DEBUG -g
 else
-CXXFLAGS = -Wall -DLSAPI_PRIVATE
+CXXFLAGS = -Wall -DLSAPI_PRIVATE -DNDEBUG
 endif
 
 # Linker flags
@@ -89,6 +101,7 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/graphics.o \
 	$(OUTPUT)/localization.o \
 	$(OUTPUT)/lsapi.o \
+	$(OUTPUT)/lsapi.res \
 	$(OUTPUT)/lsmultimon.o \
 	$(OUTPUT)/match.o \
 	$(OUTPUT)/png_support.o \
@@ -152,13 +165,17 @@ clean:
 	-$(RM) $(OUTPUT)/*.o
 	-$(RM) $(OUTPUT)/*.res
 
+# Resources for litestep.exe
+$(OUTPUT)/litestep.res: litestep/litestep.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico
+	$(RC) -Ilitestep $(RCFLAGS) -o $@ $<
+
+# Resources for lsapi.dll
+$(OUTPUT)/lsapi.res: lsapi/lsapi.rc lsapi/resource.h
+	$(RC) -Ilsapi $(RCFLAGS) -o $@ $<
+
 # Pattern rule to compile cpp files
 $(OUTPUT)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-# Resources
-$(OUTPUT)/litestep.res: litestep/litestep_mingw.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico
-	$(RC) -Ilitestep $(RCFLAGS) -o $@ $<
 
 #-----------------------------------------------------------------------------
 # Dependencies

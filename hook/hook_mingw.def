@@ -1,0 +1,5 @@
+EXPORTS
+    getCallWndHook
+    setCallWndHook
+    getMsgHook
+    setMsgHook
