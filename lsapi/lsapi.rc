@@ -41,7 +41,7 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"
+        BLOCK "04090000"
         BEGIN
             VALUE "Comments", "http://www.lsdev.org/"
             VALUE "CompanyName", "Litestep Development Team"
@@ -56,7 +56,7 @@ BEGIN
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x409, 0
     END
 END
 
