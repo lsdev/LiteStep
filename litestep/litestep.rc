@@ -30,7 +30,7 @@ STRINGTABLE
 BEGIN
     IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen?"
     IDS_LITESTEP_ERROR2     "Konnte die Datei ""%s"" nicht finden.\nBitte stellen Sie sicher, daß der Pfad korrekt ist und die Datei existiert."
-    IDS_LITESTEP_ERROR3     "Es läuft gerade eine andere Benutzeroberfläche. Auch wenn Litestep b24\nes ihnen erlaubt, parallel zum Windows Explorer zu laufen, empfehlen wir es nicht für unerfahrene Benutzer\n und werden es nicht unterstützen. Sie tun es also auf eigene Gefahr.\n\nWenn Sie fortfahren, werden einige der fortgeschrittenen Funktionen von Litestep,\nwie z.B. der Desktop abgeschaltet. Das Dock, Tastenkombinationen, und Verknüpfungen werden funktionieren.\n\nUm diese Warnung für das nächste Mal abzuschalten, ergänzen Sie Ihre step.rc um die Zeile ""LSNoShellWarning"".\n\nWeitermachen?"
+    IDS_LITESTEP_ERROR3     "Sie verwenden zur Zeit eine andere Shell. Obwohl die\nLitestep-Shell als normale Applikation laufen kann, raten\nwir unerfahrenen Benutzern davon ab.\n\nFalls Sie fortfahren, werden einige Features Litesteps\nnicht ordnungsgemäß funktionieren, wie z.B. der System-Tray,\nder Desktop und einige Task-Manager.\n\nUm diesen Hinweis abzuschalten, fügen Sie 'LSNoShellWarning'\nin Ihre step.rc ein.\n\nWollen Sie Litestep weiter als Applikation laufen lassen?"
     IDS_LITESTEP_TITLE_WARNING "Warnung"
     IDS_LITESTEP_ERROR4     "Fehler beim registrieren der Litestep Hauptfensterklasse."
     IDS_LITESTEP_TITLE_ERROR "Fehler"
@@ -199,7 +199,7 @@ STRINGTABLE
 BEGIN
     IDS_LITESTEP_ERROR1     "A previous instance of LiteStep was detected.\nAre you sure you want to continue?"
     IDS_LITESTEP_ERROR2     "Unable to find the file ""%s"".\nPlease verify the location of the file."
-    IDS_LITESTEP_ERROR3     "You are currently running another shell, while Litestep b24 allows you\nto run under Explorer, we don't advise it for inexperienced users, and we\nwill not support it, so do so at your own risk.\n\nIf you continue, some of the advanced features of Litestep will be disabled\nsuch as the desktop. The wharf, hotkeys, and shortcuts will still work.\n\nTo get rid of this message next time, put LSNoShellWarning in your step.rc\n\nContinue?"
+    IDS_LITESTEP_ERROR3     "Litestep is not able to load as the system shell.\nAnother shell is already active.\n\nContinuing to load Litestep will disable specific system\nshell functions of Litestep and some features will not\nfunction properly such as icon notifications (systray),\nthe desktop and some task managers.\n\nTo disable this message, place 'LSNoShellWarning' in\nyour step.rc.\n\nContinue to load Litestep?"
     IDS_LITESTEP_TITLE_WARNING "Warning"
     IDS_LITESTEP_ERROR4     "Error registering main Litestep window class."
     IDS_LITESTEP_TITLE_ERROR "Error"
@@ -256,7 +256,7 @@ STRINGTABLE
 BEGIN
     IDS_LITESTEP_ERROR1     "Une instance de LiteStep existe déjà.\nVoulez-vous vraiment continuer?"
     IDS_LITESTEP_ERROR2     "Impossible de trouver le fichier ""%s"".\nVeuillez vérifier\nl'emplacement du fichier."
-    IDS_LITESTEP_ERROR3     "Vous exécutez actuellement un autre shell. Bien que Litestep b24 puisse fonctionner\nsous Explorer, ceci n'est pas conseillé aux utilisateurs inexpérimentés, et n'est \npas supporté, c'est donc à vos risques et périls.\n\nSi vous continuez, certaines des fonctionnalités avancées de Litestep seront désactivées,\nle bureau par exemple. Les Wharf, Hotkeys et les raccourcis fonctioneront toujours.\n\nPour vous\ndébarasser de ce message, ajoutez LSNoShellWarning à votre step.rc\n\nContinuer?  "
+    IDS_LITESTEP_ERROR3     "Vous utilisez présentement un autre Shell que Litestep.\nBien que le Shell Litestep ait la capacité de fonctionner\nen mode ""application standard"", nous ne conseillons pas\nce mode pour les utilisateurs inexpérimentés.\n\nSi vous continuez, quelques fonctionnalités de Litestep,\ndont la zone d'icônes de notification, le bureau et la\nbarre des tâches, ne pourront pas fonctionner normalement.\n\nPour désactiver ce message, ajoutez \\'LSNoShellWarning\\'\ndans votre fichier step.rc.\n\nVoulez-vous continuer en mode application?"
     IDS_LITESTEP_TITLE_WARNING "Avertissement"
     IDS_LITESTEP_ERROR4     "Erreur d'enregistrement de la window class principale de Litestep."
     IDS_LITESTEP_TITLE_ERROR "Erreur"
@@ -298,7 +298,7 @@ STRINGTABLE
 BEGIN
     IDS_LITESTEP_ERROR1     "Er is een andere instantie van LiteStep gedetecteerd.\nWeet u zeker dat u door wilt gaan?"
     IDS_LITESTEP_ERROR2     "Het bestand ""%s"".\nVerifieer de locatie van het bestand en probeer opnieuw."
-    IDS_LITESTEP_ERROR3     "You are currently running another shell, while Litestep b24 allows you\nto run under Explorer, we don't advise it for inexperienced users, and we\nwill not support it, so do so at your own risk.\n\nIf you continue, some of the advanced features of Litestep will be disabled\nsuch as the desktop. The wharf, hotkeys, and shortcuts will still work.\n\nTo get rid of this message next time, put LSNoShellWarning in your step.rc\n\nContinue?"
+    IDS_LITESTEP_ERROR3     "Op dit moment gebruikt u een andere grafische interface (gui).\nHoewel Litestep bovenop de huidige GUI kan draaien, adviseren\nwe dat niet voor onervaren gebruikers.\n\nAls u doorgaat, zullen sommige van Litestep's functies\nniet naar behoren werken zoals de taakbalk, het bureaublad\nen andere functies\n\nOm dit bericht voortaan niet meer te laten zien, plaatst\nu 'LSNoShellWarning' in uw step.rc.\n\nLitestep toch starten?"
     IDS_LITESTEP_TITLE_WARNING "Waarschuwing."
     IDS_LITESTEP_ERROR4     "Fout bij het registreren van de main LiteStep Window Class."
     IDS_LITESTEP_TITLE_ERROR "Fout"
@@ -340,7 +340,7 @@ STRINGTABLE
 BEGIN
     IDS_LITESTEP_ERROR1     "En tidigare instans av LiteStep upptäcktes.\nÄr du säker på att du vill fortsätta?"
     IDS_LITESTEP_ERROR2     "Kunde inte hitta filen ""%s"".\nKontrollera att filen existerar och försök igen."
-    IDS_LITESTEP_ERROR3     "LiteStep har upptäckt att du kör ett annat skal.\n\nÄven om LiteStep kan köras under Explorer, så\nrekommenderar vi inte ovana användare att försöka, och erbjuder\ningen hjälp om problem skulle uppstå.\n\nOm du fortsätter kommer många av LiteSteps funktioner att vara otillgängliga.\n\nFör att stänga av den här varningen kan du sätta LSNoShellWarning till true i din step.rc fil.\n\nVill du verkligen fortsätta?"
+    IDS_LITESTEP_ERROR3     "Litestep kan inte starta som systemets skal.\nEtt annat skal körs redan.\n\nOm du väljer att fortsätta kommer vissa funktioner\ni Litestep inte att fungera som det är tänkt, till\nexempel meddelandefältet, skrivbordet och vissa\naktivitetshanterare.\n\nFör att inaktivera detta meddelande, skriv\n'LSNoShellWarning' i din step.rc\n\nVill du fortfarande starta Litestep?"
     IDS_LITESTEP_TITLE_WARNING "Varning"
     IDS_LITESTEP_ERROR4     "Ett fel uppstod när klassen för huvudfönstret skulle registreras.Error registering main Litestep window class."
     IDS_LITESTEP_TITLE_ERROR "Fel"
