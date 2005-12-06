@@ -150,7 +150,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://www.lsdev.org/"
             VALUE "CompanyName", "Litestep Development Team"
-            VALUE "FileDescription", "An alternate shell for Microsoft Windows 32bit Operating Systems"
+            VALUE "FileDescription", "An Alternative Win32 Shell"
             VALUE "FileVersion", "0, 24, 7, 0"
             VALUE "InternalName", "Litestep"
             VALUE "LegalCopyright", "Copyright © 1997 - 2005"
