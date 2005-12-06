@@ -316,7 +316,18 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		if (GetRCBool("LSNoShellWarning", FALSE))
 		{
 			RESOURCE_STR(hInstance, IDS_LITESTEP_ERROR3,
-			             "You are currently running another shell, while Litestep b24 allows you\012to run under Explorer, we don't advise it for inexperienced users, and we\012will not support it, so do so at your own risk.\012\012If you continue, some of the advanced features of Litestep will be disabled\012such as the desktop. The wharf, hotkeys, and shortcuts will still work.\012\012To get rid of this message next time, put LSNoShellWarning in your step.rc\012\012Continue?");
+				"Litestep is not able to load as the system shell.\n"
+				"Another shell is already active.\n"
+				"\n"
+				"Continuing to load Litestep will disable specific system\n"
+				"shell functions of Litestep and some features will not\n"
+				"function properly such as icon notifications (systray),\n"
+				"the desktop and some task managers.\n"
+				"\n"
+				"To disable this message, place 'LSNoShellWarning' in\n"
+				"your step.rc.\n"
+				"\n"
+				"Continue to load Litestep?\n");
 			RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
 			if (MessageBox(0, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
 			{
