@@ -32,7 +32,7 @@ BEGIN
     IDS_LITESTEP_TITLE_ERROR "Fehler"
     IDS_LITESTEP_ERROR1     "Eine vorherige Instanz von Litestep gefunden.\nSind Sie sicher daß Sie weitermachen wollen?"
     IDS_LITESTEP_ERROR2     "Konnte die Datei ""%s"" nicht finden.\nBitte stellen Sie sicher, daß der Pfad korrekt ist und die Datei existiert."
-    IDS_LITESTEP_ERROR3     "Sie verwenden zur Zeit eine andere Shell. Obwohl die\nLitestep-Shell als normale Applikation laufen kann, raten\nwir unerfahrenen Benutzern davon ab.\n\nFalls Sie fortfahren, werden einige Features Litesteps\nnicht ordnungsgemäß funktionieren, wie z.B. der System-Tray,\nder Desktop und einige Task-Manager.\n\nUm diesen Hinweis abzuschalten, fügen Sie 'LSNoShellWarning'\nin Ihre step.rc ein.\n\nWollen Sie Litestep weiter als Applikation laufen lassen?"
+    IDS_LITESTEP_ERROR3     "Litestep kann nicht als die System-Shell geladen werden,\nda bereits eine andere Shell aktiv ist.\n\nFalls Sie mit dem Laden Litesteps fortfahren, werden einige\nFunktionen deaktiviert, und einige Features werden nicht\nordnungsgemäß funktionieren, wie z.B. der System-Tray, der\nDesktop und einige Task-Manager.\n\nUm diesen Hinweis abzuschalten, fügen Sie 'LSNoShellWarning'\nin Ihre step.rc ein.\n\nSoll mit dem Laden Litesteps fortgefahren werden?"
     IDS_LITESTEP_ERROR4     "Fehler beim registrieren der Litestep Hauptfensterklasse."
     IDS_LITESTEP_ERROR5     "Fehler beim erzeugen des Litestep Hauptfensters"
     IDS_LITESTEP_ERROR6     "Recycle wurde pausiert. Drücken Sie OK um weiterzumachen."
