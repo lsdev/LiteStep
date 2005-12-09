@@ -205,29 +205,28 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
             {
                 if (_FindModule((*iter)->GetLocation()) == m_ModuleQueue.end())
                 {
-                    HANDLE hEvent = (*iter)->Init(m_hLiteStep, m_sAppPath);
-                    
-                    if (hEvent)
+                    if ((*iter)->Init(m_hLiteStep, m_sAppPath))
                     {
-                        vecInitEvents.push_back(hEvent);
-                    }
-                    
-                    m_ModuleQueue.push_back(*iter);
-                    ++uReturn;
-                }
-                else
-                {
-                    // module already loaded
-                    ModuleQueue::iterator iterOld = iter++;
-                    
-                    delete *iterOld;
-                    mqModules.erase(iterOld);
+                        if ((*iter)->GetInitEvent())
+                        {
+                            vecInitEvents.push_back((*iter)->GetInitEvent());
+                        }
 
-                    continue;
+                        m_ModuleQueue.push_back(*iter);
+                        uReturn++;
+
+                        iter++;
+                        continue;
+                    }
                 }
             }
+
+            /* If we got here, then this is an invalid
+             * entry, and needs erased. */
+            ModuleQueue::iterator iterOld = iter++;
             
-            ++iter;
+            delete *iterOld;
+            mqModules.erase(iterOld);
         }
         
         // Wait for all modules to signal that they have started
@@ -246,7 +245,10 @@ void ModuleManager::_QuitModules()
     {
         if (*iter)
         {
-            HANDLE hEvent = (*iter)->Quit();
+            (*iter)->Quit();
+
+            HANDLE hEvent = (*iter)->GetQuitEvent();
+
             if (hEvent)
             {
                 vecQuitEvents.push_back(hEvent);
@@ -276,7 +278,9 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
     
     if (iter != m_ModuleQueue.end() && *iter)
     {
-        HANDLE hQuitEvent = (*iter)->Quit();
+        (*iter)->Quit();
+
+        HANDLE hQuitEvent = (*iter)->GetQuitEvent();
         
         if (hQuitEvent)
         {
