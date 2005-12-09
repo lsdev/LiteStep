@@ -171,7 +171,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 (WPARAM)hTitleFont, FALSE);
 
 			// set title with LS version
-			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.7 RC 3");
+			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.7 RC 4");
 
 			// set Theme info
             char themeAuthor[16] = { 0 };
