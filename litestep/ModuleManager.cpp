@@ -356,7 +356,10 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
         {
             MSG message;
             // if we use NULL instead of hLiteStep here.. it locks us up...
-            if (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
+            // TODO: could the above coment be because PeekMessage used to be
+            // called in an if statement instead of a while statement?
+            // We will have to test and see for 0.24.8 release.
+            while (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
             {
                 TranslateMessage(&message);
                 DispatchMessage (&message);
