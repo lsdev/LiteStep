@@ -1,32 +1,46 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    LiteStep 0.24.7 Release Candidate 3
+    LiteStep 0.24.7 Release Candidate 4
     Readme/Release Notes
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
 -- PREFACE ------------------------------------------------------------
 
- Hot on the heels of the State of the Step, your friendly devteam
- announces Release Candidate 3 of LiteStep 0.24.7. Changes since
- Release Candidate 2 are listed below as usual. Refer to changes.txt
- for a a list of changes since 0.24.6.
+ Your friendly devteam is proud to announce Release Candidate 4 of
+ LiteStep 0.24.7. Changes since Release Candidate 3 are listed below as
+ usual. Refer to changes.txt for a a list of changes since 0.24.6.
 
- This will hopefully be the last Release Candidate. Please let us know
+ This will hopefully be the last Release Candidate before the Final
+ 0.24.7 release planned late next week. Please let us know right away
  if you find any showstoppers.
+
  Installation instructions are not included. Use at your own risk.
 
 
--- CHANGES SINCE RELEASE CANDIDATE 2 ----------------------------------
+-- CHANGES SINCE RELEASE CANDIDATE 3 ----------------------------------
 
- - Fixed XP logon delay (many, many thanks to Nicolas Escuder)
+ - Fixed libpng/lsapi CRT dependency mismatch
 
- - Fixed Logitech QuickSwitch closing LiteStep on middleclick
+ - Fixed potential log buffer overflow (Thanks Hollow)
 
- - TrayService now preserves NIM_SETVERSION and NIM_SETFOCUS return
-   values
+ - Fixed missing/ invalid Win32 error messages during module load
 
- - STLport no longer necessary to compile or use Litestep
+ - Fixed several issues with the TrayService
 
+ - Fixed thread race condition in BangManager (Thanks luthe)
+
+ - Fixed various buffer and pointer access issues
+
+ - Fixed ModuleManager reporting a module loaded, that doesn't exist
+
+ - Updated string table translations (many thanks to LSML members)
+
+ - Updated libpng13.dll to version 1.2.8 and zlib.dll to version 1.2.3
+
+ - Added Makefile for MinGW
+
+ - Added VersionInfo resource to lsapi.dll
+ 
  - Various minor fixes
 
 
@@ -38,8 +52,9 @@
 
  Please send any suggestions or bug reports to the LS Mailing List or
  use the lsdev.org forums. You can also send a private email to ilmcuts
- at gmx dot net.
- 
+ at gmx dot net and please CC jugg at litestep dot net.
+
  Happy LiteStepping,
 
- - The LiteStep Development Team
+ - The Litestep Development Team  (www.lsdev.org)
+

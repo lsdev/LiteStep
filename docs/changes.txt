@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Release Candidate 3
+    LiteStep 0.24.7 Release Candidate 4
     Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -19,21 +19,17 @@
  - Cleaned up the code... this includes numerous fixes, formatting, and source 
    beautifications.
 
- - Switched to STLport (http://www.stlport.com) due to threading issues and
-   other general issues with the version of STL included with the VC 6.0 package.
-
- - Massive improvements in StartupRunner and TrayService.
-
- - On NT systems, LiteStep detects if startup items have been run before or not.
-   This is the same method that Explorer uses to detect if it should rerun
-   startup items in the event that the shell crashes. Thus the -nostartup switch
-   is obsolete on NT systems.
+ - Massive improvements in StartupRunner and TrayService.  Visible items are:
+   * On NT systems, LiteStep detects if startup items have been run before or
+     not. This is the same method that Explorer uses to detect if it should
+     rerun startup items in the event that the shell crashes. Thus the
+     -nostartup switch is obsolete on NT systems.
+   * Added command line switch -startup to force running of the startup items.
+   * StartupRunner now has RunOnceEx support.
+   * TrayService rewrite enables support for the language indicator icon
+    (but not on WinXP) and fixes many other problematic icons.
 
  - Fixed XP logon delay
-
- - Miscellaneous StartupRunner fixes and additions. Now has RunOnceEx support.
-
- - Added -startup to force running of the startup items.
 
  - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core. It is now
    called DDEService and loaded by default. Liteman.dll should no longer be
@@ -41,8 +37,7 @@
 
  - Added "LSUseSystemDDE". This loads Windows' DDE server instead of the
    DDEService. May result in slightly larger memory usage but "proper" DDE
-   support.
-   LSUseSystemDDE takes effect on startup only, not on !recycle.
+   support. LSUseSystemDDE takes effect on startup only, not on !recycle.
    Requires shdocvw.dll from IE.
 
  - Added !HideModules and !ShowModules to hide or show all module windows.
@@ -79,9 +74,6 @@
  - Improved handling of exceptions during !bang execution.
 
  - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
-
- - Rewrote the TrayService. Among other things this enables support for the
-   language indicator icon (but not on WinXP).
 
  - Added new step.rc setting "LSTrayService". "LSTrayService FALSE" disables
    the core's system tray support. Defaults to TRUE.
