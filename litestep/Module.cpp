@@ -127,7 +127,7 @@ Module::~Module()
 	}
 }
 
-HANDLE Module::Init(HWND hMainWindow, const std::string& sAppPath)
+bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
 {
     ASSERT_ISNULL(m_hInstance);
     
@@ -159,9 +159,11 @@ HANDLE Module::Init(HWND hMainWindow, const std::string& sAppPath)
         {
             CallInit();
         }
+
+        return true;
 	}
 
-	return m_hInitEvent;
+	return false;
 }
 
 int Module::CallInit()
@@ -200,7 +202,7 @@ void Module::CallQuit()
 }
 
 
-HANDLE Module::Quit()
+void Module::Quit()
 {
 	if (m_hInstance)
 	{
@@ -214,8 +216,6 @@ HANDLE Module::Quit()
             CallQuit();
 		}
 	}
-
-	return m_hQuitEvent;
 }
 
 

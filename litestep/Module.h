@@ -53,8 +53,8 @@ public:
 	Module(const std::string& sLocation, DWORD dwFlags);
 	virtual ~Module();
 
-    HANDLE Init(HWND hMainWindow, const std::string& sAppPath);
-	HANDLE Quit();
+    bool Init(HWND hMainWindow, const std::string& sAppPath);
+	void Quit();
 
 	static UINT __stdcall ThreadProc(void* dllModPtr);
 
