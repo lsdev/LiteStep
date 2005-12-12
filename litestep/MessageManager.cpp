@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,28 +19,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
+
 #include "MessageManager.h"
 
 
 void MessageManager::AddMessage(HWND window, UINT message)
 {
-	Lock lock(m_cs);
+    Lock lock(m_cs);
     m_MessageMap[message].insert(window);
 }
+
 
 void MessageManager::AddMessages(HWND window, UINT *pMessages)
 {
     Lock lock(m_cs);
-
+    
     if (pMessages != NULL)
-	{
-		while (*pMessages != 0)
-		{
-			AddMessage(window, *pMessages);
-			++pMessages;
-		}
-	}
+    {
+        while (*pMessages != 0)
+        {
+            AddMessage(window, *pMessages);
+            pMessages++;
+        }
+    }
 }
+
 
 void MessageManager::RemoveMessage(HWND window, UINT message)
 {
@@ -50,95 +53,104 @@ void MessageManager::RemoveMessage(HWND window, UINT message)
     // SendMessage for example.
     //
     Lock lock(m_cs);
-
-	messageMapT::iterator it = m_MessageMap.find(message);
-
-	if (it != m_MessageMap.end())
-	{
-		it->second.erase(window);
-		if (it->second.empty())
-		{
-			m_MessageMap.erase(it);
-		}
-	}
+    
+    messageMapT::iterator it = m_MessageMap.find(message);
+    
+    if (it != m_MessageMap.end())
+    {
+        it->second.erase(window);
+        
+        if (it->second.empty())
+        {
+            m_MessageMap.erase(it);
+        }
+    }
 }
+
 
 void MessageManager::RemoveMessages(HWND window, UINT *pMessages)
 {
     Lock lock(m_cs);
-
-	if (pMessages != NULL)
-	{
-		while (*pMessages != 0)
-		{
-			RemoveMessage(window, *pMessages);
-			++pMessages;
-		}
-	}
-
+    
+    if (pMessages != NULL)
+    {
+        while (*pMessages != 0)
+        {
+            RemoveMessage(window, *pMessages);
+            pMessages++;
+        }
+    }
 }
+
 
 void MessageManager::ClearMessages(void)
 {
     Lock lock(m_cs);
-	m_MessageMap.clear();
+    m_MessageMap.clear();
 }
+
 
 LRESULT MessageManager::SendMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
     Lock lock(m_cs);
-	LRESULT lResult = 0;
-
-	messageMapT::iterator it = m_MessageMap.find(message);
-	if (it != m_MessageMap.end())
-	{
-		windowSetT::iterator winIt;
-		for (winIt = it->second.begin(); winIt != it->second.end(); ++winIt)
-		{
-			lResult |= ::SendMessage(*winIt, message, wParam, lParam);
-		}
-	}
-
-	return lResult;
+    LRESULT lResult = 0;
+    
+    messageMapT::iterator it = m_MessageMap.find(message);
+    
+    if (it != m_MessageMap.end())
+    {
+        windowSetT::iterator winIt;
+        
+        for (winIt = it->second.begin(); winIt != it->second.end(); winIt++)
+        {
+            lResult |= ::SendMessage(*winIt, message, wParam, lParam);
+        }
+    }
+    
+    return lResult;
 }
+
 
 BOOL MessageManager::PostMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
     Lock lock(m_cs);
-	BOOL bResult = TRUE;
-
-	messageMapT::iterator it = m_MessageMap.find(message);
-	if (it != m_MessageMap.end())
-	{
-		windowSetT::iterator winIt;
-		for (winIt = it->second.begin(); (winIt != it->second.end() && bResult); ++winIt)
-		{
-			bResult = ::PostMessage(*winIt, message, wParam, lParam);
-		}
-	}
-
-	return bResult;
+    BOOL bResult = TRUE;
+    
+    messageMapT::iterator it = m_MessageMap.find(message);
+    
+    if (it != m_MessageMap.end())
+    {
+        windowSetT::iterator winIt;
+        
+        for (winIt = it->second.begin(); (winIt != it->second.end() && bResult); winIt++)
+        {
+            bResult = ::PostMessage(*winIt, message, wParam, lParam);
+        }
+    }
+    
+    return bResult;
 }
+
 
 BOOL MessageManager::HandlerExists(UINT message)
 {
     Lock lock(m_cs);
-	return (m_MessageMap.find(message) != m_MessageMap.end()) ? TRUE : FALSE;
+    return (m_MessageMap.find(message) != m_MessageMap.end()) ? TRUE : FALSE;
 }
+
 
 bool MessageManager::GetWindowsForMessage(UINT uMsg, windowSetT& setWindows) const
 {
-	Lock lock(m_cs);
-
+    Lock lock(m_cs);
     bool bResult = false;
     
     messageMapT::const_iterator iter = m_MessageMap.find(uMsg);
-
+    
     if (iter != m_MessageMap.end())
-	{
+    {
         setWindows = iter->second;
         bResult = true;
-	}
-
+    }
+    
     return bResult;
 }

@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
+
 #ifndef __DATASTORE_H
 #define __DATASTORE_H
 
@@ -24,34 +25,116 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <map>
 
 
+/**
+ * Item in the data store.
+ */
 class DataHolder
 {
 private:
-	WORD m_wLength;
-	BYTE* m_pvData;
-public:
-	DataHolder();
-	DataHolder(void *pvData, WORD wLength);
-	virtual ~DataHolder();
 
-	int GetData(void *pvData, WORD wLength);
-	int SetData(void *pvData, WORD wLength);
+    /** Size of data in bytes */
+    WORD m_wLength;
+    
+    /** Pointer to data */
+    BYTE* m_pvData;
+    
+public:
+
+    /**
+     * Constructs an empty DataHolder.
+     */
+    DataHolder();
+    
+    /**
+     * Constructs a DataHolder containing a copy of the specified data.
+     *
+     * @param  pvData   pointer to data
+     * @param  wLength  size of data in bytes
+     */
+    DataHolder(void *pvData, WORD wLength);
+    
+    /**
+     * Destructor.
+     */
+    virtual ~DataHolder();
+    
+    /**
+     * Copies the data into the supplied buffer.
+     *
+     * @param   pvData   buffer to receive data
+     * @param   wLength  maximum number of bytes to copy
+     * @return  number of bytes copied
+     */
+    int GetData(void *pvData, WORD wLength);
+    
+    /**
+     * Replaces the current data with a copy of the specified data.
+     *
+     * @param   pvData   pointer to data
+     * @param   wLength  size of data in bytes
+     * @return  number of bytes copied
+     */
+    int SetData(void *pvData, WORD wLength);
 };
 
+
+/**
+ * Manages module data that needs to be preserved across recycles.
+ */
 class DataStore
 {
+    /** Maps data identifiers to DataHolders */
     typedef std::map<WORD, DataHolder*> DataHolderMap;
-
-	DataHolderMap m_dhmData;
-
+    
+    /** List of data item index by identifier */
+    DataHolderMap m_dhmData;
+    
 public:
-	DataStore();
-	virtual ~DataStore();
 
-	size_t Count();
-	void Clear();
-	BOOL ReleaseData(WORD wIdent, void *pvData, WORD wLength);
-	BOOL StoreData(WORD wIdent, void *pvData, WORD wLength);
+    /**
+     * Constructor.
+     */
+    DataStore();
+    
+    /**
+     * Destructor.
+     */
+    virtual ~DataStore();
+    
+    /**
+     * Returns the number of items in the data store.
+     */
+    size_t Count();
+        
+    /**
+     * Removes all data from the data store.
+     */
+    void Clear();
+    
+    /**
+     * Retrieves a stored data item and removes it from the data store.
+     *
+     * @param   wIdent   data identifier
+     * @param   pvData   buffer to receive data
+     * @param   wLength  maximum number of bytes to copy
+     * @return  <code>TRUE</code> if the operation succeeds or
+     *          <code>FALSE</code> if no data item with the given
+     *          identifier exists
+     */
+    BOOL ReleaseData(WORD wIdent, void *pvData, WORD wLength);
+    
+    /**
+     * Adds a data item to the data store.
+     *
+     * @param   wIdent   data identifier
+     * @param   pvData   pointer to data
+     * @param   wLength  size of data in bytes
+     * @return  <code>TRUE</code> if the operation succeeds or
+     *          <code>FALSE</code> if another data item with the same
+     *          identifier already exists
+     */
+    BOOL StoreData(WORD wIdent, void *pvData, WORD wLength);
 };
+
 
 #endif // __DATASTORE_H

@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2005 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
+
 #ifndef __BANGMANAGER_H
 #define __BANGMANAGER_H
 
@@ -27,23 +28,72 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <map>
 #include <string>
 
-
+/**
+ * Maintains a list of bang commands.
+ */
 class BangManager
 {
 private:
-    typedef std::map<std::string, Bang*, stringicmp> BangMap;
 
+    /** Maps bang command names to Bang objects. */
+    typedef std::map<std::string, Bang*, stringicmp> BangMap;
+    
+    /** List of bang commands indexed by name */
     BangMap bang_map;
-	mutable CriticalSection m_cs;
+    
+    /** Critical section for serializing access to data members */
+    mutable CriticalSection m_cs;
 
 public:
-	BangManager();
-	virtual ~BangManager();
 
-	BOOL AddBangCommand(LPCSTR pszName, Bang *pbbBang);
-	BOOL RemoveBangCommand(LPCSTR pszName);
-	void ClearBangCommands();
-	BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
+    /** Constructor */
+    BangManager();
+    
+    /** Destructor */
+    virtual ~BangManager();
+    
+    /**
+     * Adds a bang command to the list.
+     *
+     * @param  pszName  bang command name
+     * @param  pbbBang  Bang object that implements the bang command
+     * @return <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     */
+    BOOL AddBangCommand(LPCSTR pszName, Bang *pbbBang);
+    
+    /**
+     * Removes a bang command from the list.
+     *
+     * @param   pszName  bang command name
+     * @return  <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     */
+    BOOL RemoveBangCommand(LPCSTR pszName);
+    
+    /**
+     * Removes all bang commands from the list.
+     */
+    void ClearBangCommands();
+    
+    /**
+     * Executes a bang command with the specified parameters.
+     *
+     * @param  pszName     bang command name
+     * @param  hCaller     handle to owner window
+     * @param  pszParams   command-line arguments
+     * @return <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     */
+    BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
+    
+    /**
+     * Calls a callback function once for each bang command in the list.
+     * Continues so long as the callback function returns <code>TRUE</code>.
+     *
+     * @param   pfnCallback  callback function
+     * @param   lParam       parameter passed to callback function
+     * @return  <code>S_OK</code> if all bang commands were enumerated,
+     *          <code>S_FALSE</code> if the callback function returned <code>FALSE</code>,
+     *          or an error code
+     */
     HRESULT EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const;
 };
 
