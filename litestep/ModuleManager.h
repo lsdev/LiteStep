@@ -66,7 +66,7 @@ public:
 	 * @param  pILiteStep  interface to Litestep's core
 	 * @return <code>S_OK</code> if successful or an error code
 	 */
-    HRESULT Start(ILiteStep *ILiteStep);
+    HRESULT Start(ILiteStep *pILiteStep);
     
 	/**
 	 * Unloads all modules and stops the module manager.
