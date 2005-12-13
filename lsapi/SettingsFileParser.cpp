@@ -1,7 +1,7 @@
 //
 //  This is a part of the LiteStep Shell source code.
 //
-//  Copyright (C) 1997-2003,2005 The LiteStep Development Team.
+//  Copyright (C) 1997-2006 The LiteStep Development Team.
 //
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
+
 #include "SettingsFileParser.h"
 #include "../utility/core.hpp"
 
@@ -26,8 +27,8 @@
 //
 // FileParser constructor
 //
-FileParser::FileParser(SettingsMap* pSettingsMap)
-: m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_pEvalParser(NULL)
+FileParser::FileParser(SettingsMap* pSettingsMap) :
+    m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_pEvalParser(NULL)
 {
     ASSERT_ISNOTNULL(m_pSettingsMap);
 }
@@ -56,12 +57,12 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     TCHAR tzFullPath[MAX_PATH_LENGTH];
     
     VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
-
+    
     PathUnquoteSpaces(tzExpandedPath);
     GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, tzFullPath, NULL);
     
     TRACE("Parsing \"%s\"", tzFullPath);
-
+    
     m_phFile = _tfopen(tzFullPath, _T("r"));
     
     if (m_phFile)
@@ -70,7 +71,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
         
         TCHAR tzKey[MAX_RCCOMMAND] = { 0 };
         TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
-
+        
         while (_ReadLineFromFile(tzKey, tzValue))
         {
             _ProcessLine(tzKey, tzValue);
@@ -114,7 +115,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         
         LPTSTR ptzCurrent = tzBuffer;
         ptzCurrent += StrSpn(ptzCurrent, WHITESPACE);
-
+        
         if (ptzCurrent[0] && ptzCurrent[0] != _T(';'))
         {
             size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE);
@@ -135,14 +136,13 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     
                     StringCchCopyEx(ptzValue, MAX_LINE_LENGTH, ptzValueStart,
                         NULL, NULL, STRSAFE_NULL_ON_FAILURE);
-
                 }
-
+                
                 bReturn = true;
             }
         }
     }
-
+    
     return bReturn;
 }
 
@@ -180,12 +180,12 @@ void FileParser::_StripString(LPTSTR ptzString)
         if (ptzStart != NULL)
         {
             if (*ptzCurrent == '[')
-			{
-				++stQuoteLevel;
-			}
-			else if (*ptzCurrent == ']')
-			{
-				if (stQuoteLevel > 0)
+            {
+                ++stQuoteLevel;
+            }
+            else if (*ptzCurrent == ']')
+            {
+                if (stQuoteLevel > 0)
                 {
                     --stQuoteLevel;
                 }
@@ -223,7 +223,7 @@ void FileParser::_StripString(LPTSTR ptzString)
         {
             --ptzLast;
         }
-
+        
         *ptzLast = '\0';
     }
     
@@ -242,24 +242,24 @@ void FileParser::_StripString(LPTSTR ptzString)
 void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
     ASSERT_ISNOTNULL(ptzName); ASSERT_ISNOTNULL(ptzValue);
-
+    
     if (lstrcmpi(ptzName, _T("if")) == 0)
-	{
-		_ProcessIf(ptzValue);
-	}
-	else if (lstrcmpi(ptzName, _T("include")) == 0)
-	{
+    {
+        _ProcessIf(ptzValue);
+    }
+    else if (lstrcmpi(ptzName, _T("include")) == 0)
+    {
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
-
-		GetToken(ptzValue, tzPath, NULL, FALSE);
-		
-		FileParser fpParser(m_pSettingsMap);
+        
+        GetToken(ptzValue, tzPath, NULL, FALSE);
+        
+        FileParser fpParser(m_pSettingsMap);
         fpParser.ParseFile(tzPath);
     }
     else
-	{
-		m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
-	}
+    {
+        m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
+    }
 }
 
 
@@ -270,101 +270,101 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
     ASSERT_ISNOTNULL(ptzExpression);
-
+    
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
-	TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
-
-	if (!m_pEvalParser)
-	{
-		m_pEvalParser = new EvalParser();
-	}
-
-	if (m_pEvalParser)
-	{
+    TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
+    
+    if (!m_pEvalParser)
+    {
+        m_pEvalParser = new EvalParser();
+    }
+    
+    if (m_pEvalParser)
+    {
         BOOL bResult;
-
+        
         if (!m_pEvalParser->evaluate(ptzExpression, &bResult))
-		{
+        {
             Error(LOCALIZE_THIS,
                 _T("Syntax error in IF expression:\n%s"), ptzExpression);
-		}
-		else
-		{
-			if (bResult)
-			{
-				// when the If condition evaluates true we read and process
-				// all lines until we reach ElseIf, Else, or EndIf
-				while (_ReadLineFromFile(tzName, tzValue))
-				{
+        }
+        else
+        {
+            if (bResult)
+            {
+                // when the If condition evaluates true we read and process
+                // all lines until we reach ElseIf, Else, or EndIf
+                while (_ReadLineFromFile(tzName, tzValue))
+                {
                     if ((lstrcmpi(tzName, _T("else")) == 0) ||
                         (lstrcmpi(tzName, _T("elseif")) == 0))
-					{
-						// if we find an ElseIf or Else then we read and ignore
-						// all lines until we find EndIf
-						_SkipIf();
-						break;
-					}
-					else if (lstrcmpi(tzName, _T("endif")) == 0)
-					{
-						// we're done
-						break;
-					}
-					else
-					{
-						// just a normal line, process it
-						_ProcessLine(tzName, tzValue);
-					}
-				}
-			}
-			else
-			{
-				// when the If expression evaluates false we read and ignore
-				// all lines until we find an ElseIf, Else, or EndIf
-				while (_ReadLineFromFile(tzName, tzValue))
-				{
-					if (lstrcmpi(tzName, _T("if")) == 0)
-					{
-						// nested Ifs are a special case
-						_SkipIf();
-					}
-					else if (lstrcmpi(tzName, _T("elseif")) == 0)
-					{
-						// we handle ElseIfs by recursively calling ProcessIf
-						_ProcessIf(tzValue);
-						break;
-					}
-					else if (lstrcmpi(tzName, _T("else")) == 0)
-					{
-						// since the If expression was false, when we see Else
-						// we start process lines until EndIf
-						while (_ReadLineFromFile(tzName, tzValue))
-						{
-							// we should probably check that there are no
-							// ElseIfs after the Else, but for now we silently
-							// ignore such an error
-
-							// break on EndIf
-							if (lstrcmpi(tzName, _T("endif")) == 0)
+                    {
+                        // if we find an ElseIf or Else then we read and ignore
+                        // all lines until we find EndIf
+                        _SkipIf();
+                        break;
+                    }
+                    else if (lstrcmpi(tzName, _T("endif")) == 0)
+                    {
+                        // we're done
+                        break;
+                    }
+                    else
+                    {
+                        // just a normal line, process it
+                        _ProcessLine(tzName, tzValue);
+                    }
+                }
+            }
+            else
+            {
+                // when the If expression evaluates false we read and ignore
+                // all lines until we find an ElseIf, Else, or EndIf
+                while (_ReadLineFromFile(tzName, tzValue))
+                {
+                    if (lstrcmpi(tzName, _T("if")) == 0)
+                    {
+                        // nested Ifs are a special case
+                        _SkipIf();
+                    }
+                    else if (lstrcmpi(tzName, _T("elseif")) == 0)
+                    {
+                        // we handle ElseIfs by recursively calling ProcessIf
+                        _ProcessIf(tzValue);
+                        break;
+                    }
+                    else if (lstrcmpi(tzName, _T("else")) == 0)
+                    {
+                        // since the If expression was false, when we see Else
+                        // we start process lines until EndIf
+                        while (_ReadLineFromFile(tzName, tzValue))
+                        {
+                            // we should probably check that there are no
+                            // ElseIfs after the Else, but for now we silently
+                            // ignore such an error
+                            
+                            // break on EndIf
+                            if (lstrcmpi(tzName, _T("endif")) == 0)
                             {
                                 break;
                             }
-
-							// otherwise process the line
-							_ProcessLine(tzName, tzValue);
-						}
-
-						// we're done
-						break;
-					}
-					else if (lstrcmpi(tzName, _T("endif")) == 0)
-					{
-						// we're done
-						break;
-					}
-				}
-			}
-		}
-	}
+                            
+                            // otherwise process the line
+                            _ProcessLine(tzName, tzValue);
+                        }
+                        
+                        // we're done
+                        break;
+                    }
+                    else if (lstrcmpi(tzName, _T("endif")) == 0)
+                    {
+                        // we're done
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -375,16 +375,16 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 void FileParser::_SkipIf()
 {
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
-
-	while (_ReadLineFromFile(tzName, NULL))
-	{
-		if (lstrcmpi(tzName, _T("if")) == 0)
-		{
-			_SkipIf();
-		}
-		else if (lstrcmpi(tzName, _T("endif")) == 0)
-		{
-			break;
-		}
-	}
+    
+    while (_ReadLineFromFile(tzName, NULL))
+    {
+        if (lstrcmpi(tzName, _T("if")) == 0)
+        {
+            _SkipIf();
+        }
+        else if (lstrcmpi(tzName, _T("endif")) == 0)
+        {
+            break;
+        }
+    }
 }
