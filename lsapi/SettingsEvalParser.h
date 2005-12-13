@@ -108,7 +108,7 @@ private:
 private:
 
     /**
-     * Parse and evaluate a basic expression.
+     * Parses and evaluates a basic expression.
      *
      * @param   result  an integer that receives the evaluation result
      * @return  <code>true</code> if the operation succeeded
@@ -116,7 +116,7 @@ private:
     bool basicExpression(int &result);
     
     /**
-     * Parse and evaluate a unary expression.
+     * Parses and evaluates a unary expression.
      *
      * @param   result  an integer that receives the evaluation result
      * @return  <code>true</code> if the operation succeeded
@@ -124,7 +124,7 @@ private:
     bool unaryExpression(int &result);
     
     /**
-     * Parse and evaluate a relational expression.
+     * Parses and evaluates a relational expression.
      *
      * @param   result  an integer that receives the evaluation result
      * @return  <code>true</code> if the operation succeeded
@@ -132,7 +132,7 @@ private:
     bool relationalExpression(int &result);
     
     /**
-     * Parse and evaluate a logical AND expression.
+     * Parses and evaluates a logical AND expression.
      *
      * @param   result  an integer that receives the evaluation result
      * @return  <code>true</code> if the operation succeeded
@@ -140,7 +140,7 @@ private:
     bool andExpression(int &result);
     
     /**
-     * Parse and evaluate a logical OR expression.
+     * Parses and evaluates a logical OR expression.
      *
      * @param   result  an integer that receives the evaluation result
      * @return  <code>true</code> if the operation succeeded
@@ -148,7 +148,7 @@ private:
     bool orExpression(int &result);
     
     /**
-     * Parse and evaluate an expression.
+     * Parses and evaluates an expression.
      *
      * @param   result  an integer that receives the evaluation result
      * @return  <code>true</code> if the operation succeeded

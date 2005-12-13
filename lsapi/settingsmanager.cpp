@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2005 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
+
 #include "SettingsManager.h"
 #include "SettingsFileParser.h"
 #include "../utility/shellhlp.h"
@@ -29,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #  define CSIDL_COMMON_ADMINTOOLS 0x002F
 #  define CSIDL_ADMINTOOLS 0x0030
 #endif
+
 
 SettingsManager::SettingsManager(LPCSTR pszLiteStepPath)
 {
@@ -44,7 +46,7 @@ SettingsManager::~SettingsManager()
     {
         delete *itSet;
     }
-
+    
     for (FileMap::iterator itFiles = m_FileMap.begin();
          itFiles != m_FileMap.end(); ++itFiles)
     {
@@ -64,7 +66,7 @@ SettingsManager::~SettingsManager()
 bool SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
     char szPath[MAX_PATH] = { 0 };
-
+    
     bool bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
     
     if (bReturn)
@@ -72,33 +74,33 @@ bool SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
         PathQuoteSpaces(szPath);
         SetVariable(pszVariable, szPath);
     }
-
+    
     return bReturn;    
 }
 
 
 void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 {
-	char szTemp[MAX_PATH];
-	DWORD dwLength = MAX_PATH;
-	OSVERSIONINFO OsVersionInfo;
-
-	StringCchCopy(szTemp, MAX_PATH, pszLiteStepPath);
+    char szTemp[MAX_PATH];
+    DWORD dwLength = MAX_PATH;
+    OSVERSIONINFO OsVersionInfo;
+    
+    StringCchCopy(szTemp, MAX_PATH, pszLiteStepPath);
     PathQuoteSpaces(szTemp);
     SetVariable("litestepdir", szTemp);
-	
+    
     if (GetWindowsDirectory(szTemp, MAX_PATH))
     {
         PathAddBackslashEx(szTemp, MAX_PATH);
         SetVariable("windir", szTemp);
     }
-
-	if (GetUserName(szTemp, &dwLength))
+    
+    if (GetUserName(szTemp, &dwLength))
     {
         PathQuoteSpaces(szTemp);
         SetVariable("username", szTemp);
     }
-
+    
     if (GetShellFolderPath(CSIDL_APPDATA, szTemp, MAX_PATH))
     {
         StringCchCat(szTemp, MAX_PATH,
@@ -107,18 +109,18 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
         PathQuoteSpaces(szTemp);
         SetVariable("quicklaunch", szTemp);
     }
-
+    
     SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
-	SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
-	SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
-	SetVariable("network", "::{208D2C60-3AEA-1069-A2D7-08002B30309D}");
-	SetVariable("controls", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
-	SetVariable("dialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{992CFFA0-F557-101A-88EC-00DD010CCC48}");
-	SetVariable("networkanddialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
-	SetVariable("printers", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{2227A280-3AEA-1069-A2DE-08002B30309D}");
-	SetVariable("scheduled", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
-	SetVariable("admintools", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
-
+    SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
+    SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
+    SetVariable("network", "::{208D2C60-3AEA-1069-A2D7-08002B30309D}");
+    SetVariable("controls", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+    SetVariable("dialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{992CFFA0-F557-101A-88EC-00DD010CCC48}");
+    SetVariable("networkanddialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+    SetVariable("printers", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{2227A280-3AEA-1069-A2DE-08002B30309D}");
+    SetVariable("scheduled", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
+    SetVariable("admintools", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
+    
     _SetShellFolderVariable("commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
     _SetShellFolderVariable("commonfavorites", CSIDL_COMMON_FAVORITES);
     _SetShellFolderVariable("commonprograms", CSIDL_COMMON_PROGRAMS);
@@ -143,33 +145,33 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
     _SetShellFolderVariable("templates", CSIDL_TEMPLATES);
     _SetShellFolderVariable("commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
     _SetShellFolderVariable("admintoolsdir", CSIDL_ADMINTOOLS);
-
-	OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
-	GetVersionEx(&OsVersionInfo);
-
-	if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-	{
+    
+    OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
+    GetVersionEx(&OsVersionInfo);
+    
+    if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    {
         // Any Win9x-series OS
         SetVariable("Win9x", "true");
-
+        
         if (OsVersionInfo.dwMinorVersion >= 90) // Windows ME (4.90)
         {
             SetVariable("WinME", "true");
         }
-		else if (OsVersionInfo.dwMinorVersion >= 10) // Windows 98 (4.10)
+        else if (OsVersionInfo.dwMinorVersion >= 10) // Windows 98 (4.10)
         {
             SetVariable("Win98", "true");
         }
-		else // Windows 95 (4.00)
+        else // Windows 95 (4.00)
         {
             SetVariable("Win95", "true");
         }
-	}
-	else if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-	{
+    }
+    else if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    {
         // Any WinNT-series OS
         SetVariable("WinNT", "true");
-
+        
         if (OsVersionInfo.dwMajorVersion == 5)
         {
             if (OsVersionInfo.dwMinorVersion >= 1)
@@ -181,51 +183,53 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
                 SetVariable("Win2000", "true");     // Windows 2000 (5.0)
             }
         }
-		else if (OsVersionInfo.dwMajorVersion >= 4) // Windows NT 4.0
+        else if (OsVersionInfo.dwMajorVersion >= 4) // Windows NT 4.0
         {
             SetVariable("WinNT4", "true");
         }
-	}
-
-	// screen resolution
-	StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
-	SetVariable("ResolutionX", szTemp);
-
-	StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
-	SetVariable("ResolutionY", szTemp);
-
+    }
+    
+    // screen resolution
+    StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
+    SetVariable("ResolutionX", szTemp);
+    
+    StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
+    SetVariable("ResolutionY", szTemp);
+    
     StringCchPrintf(szTemp, MAX_PATH, "\"%s\"", __DATE__);
     SetVariable("CompileDate", szTemp);
 }
 
+
 void SettingsManager::ParseFile(LPCSTR pszFileName)
 {
-	FileParser fpParser(&m_SettingsMap);
-	fpParser.ParseFile(pszFileName);
+    FileParser fpParser(&m_SettingsMap);
+    fpParser.ParseFile(pszFileName);
 }
+
 
 BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
 {
     ASSERT_ISNOTNULL(pszName);
     BOOL bReturn = FALSE;
-	
+    	
     // first appearance of a setting takes effect
     it = m_SettingsMap.lower_bound(pszName);
     
     if (it != m_SettingsMap.end() && lstrcmpi(pszName, it->first.c_str()) == 0)
-	{
-		bReturn = TRUE;
-	}
-
-	return bReturn;
+    {
+        bReturn = TRUE;
+    }
+    
+    return bReturn;
 }
 
 
 BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszDefStr, int nMaxLen)
 {
-	SettingsMap::iterator it;
-	BOOL bReturn = FALSE;
-
+    SettingsMap::iterator it;
+    BOOL bReturn = FALSE;
+    
     if (pszValue)
     {
         pszValue[0] = '\0';
@@ -236,7 +240,7 @@ BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszD
         if (_FindLine(pszKeyName, it))
         {
             bReturn = TRUE;
-
+            
             if (pszValue)
             {
                 char szToken[MAX_LINE_LENGTH] = { 0 };
@@ -254,27 +258,27 @@ BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszD
             //bReturn = TRUE;
         }
     }
-
-	return bReturn;
+    
+    return bReturn;
 }
 
 
 BOOL SettingsManager::GetRCLine(LPCSTR pszKeyName, LPSTR pszValue, int nMaxLen, LPCSTR pszDefStr)
 {
-	SettingsMap::iterator it;
-	BOOL bReturn = FALSE;
-
-	if (pszValue)
+    SettingsMap::iterator it;
+    BOOL bReturn = FALSE;
+    
+    if (pszValue)
     {
         pszValue[0] = '\0';
     }
-
+    
     if (pszKeyName)
     {
         if (_FindLine(pszKeyName, it))
         {
             bReturn = TRUE;
-
+            
             if (pszValue)
             {
                 // for compatibility reasons GetRCLine expands $evars$
@@ -290,133 +294,134 @@ BOOL SettingsManager::GetRCLine(LPCSTR pszKeyName, LPSTR pszValue, int nMaxLen, 
             //bReturn = TRUE;
         }
     }
-
+    
     return bReturn;
 }
 
 
 BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
 {
-	SettingsMap::iterator it;
-	
-	if (pszKeyName && _FindLine(pszKeyName, it))
-	{
+    SettingsMap::iterator it;
+    
+    if (pszKeyName && _FindLine(pszKeyName, it))
+    {
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
         char szToken[MAX_LINE_LENGTH] = { 0 };
-
-		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-
-		if (GetToken(szExpanded, szToken, NULL, FALSE))
-		{
-			if (lstrcmpi(szToken, "off") &&
+        
+        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        
+        if (GetToken(szExpanded, szToken, NULL, FALSE))
+        {
+            if (lstrcmpi(szToken, "off") &&
                 lstrcmpi(szToken, "false") &&
                 lstrcmpi(szToken, "no")) 
-			{
-				return bIfFound;
-			}
-		}
-		else
-		{
-			return bIfFound;
-		}
-	}
-
-	return !bIfFound;
+            {
+                return bIfFound;
+            }
+        }
+        else
+        {
+            return bIfFound;
+        }
+    }
+    
+    return !bIfFound;
 }
 
 
 BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
 {
-	SettingsMap::iterator it;
-
-	if (pszKeyName && _FindLine(pszKeyName, it))
-	{
+    SettingsMap::iterator it;
+    
+    if (pszKeyName && _FindLine(pszKeyName, it))
+    {
         char szToken[MAX_LINE_LENGTH] = { 0 };
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
-
+        
         VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-		
+        		
         if (GetToken(szExpanded, szToken, NULL, FALSE))
-		{
-			if ((lstrcmpi(szToken, "off") == 0) ||
+        {
+            if ((lstrcmpi(szToken, "off") == 0) ||
                 (lstrcmpi(szToken, "false") == 0) ||
                 (lstrcmpi(szToken, "no") == 0))
-			{
-				return FALSE;
-			}
-		}
-
-		return TRUE;
-	}
-
-	return bDefault;
+            {
+                return FALSE;
+            }
+        }
+        
+        return TRUE;
+    }
+    
+    return bDefault;
 }
 
 
 int SettingsManager::GetRCInt(LPCSTR pszKeyName, int nDefault)
 {
-	SettingsMap::iterator it;
-	int nValue = nDefault;
-
-	if (pszKeyName && _FindLine(pszKeyName, it))
-	{
+    SettingsMap::iterator it;
+    int nValue = nDefault;
+    
+    if (pszKeyName && _FindLine(pszKeyName, it))
+    {
         char szToken[MAX_LINE_LENGTH] = { 0 };
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
-
+        
         VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-
-		if (GetToken(szExpanded, szToken, NULL, FALSE))
-		{
-			nValue = strtol(szToken, NULL, 0);
-		}
-	}
-
-	return nValue;
+        
+        if (GetToken(szExpanded, szToken, NULL, FALSE))
+        {
+            nValue = strtol(szToken, NULL, 0);
+        }
+    }
+    
+    return nValue;
 }
 
 
 COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 {
-	COLORREF crReturn = crDefault;
-	SettingsMap::iterator it;
-
-	if (pszKeyName && _FindLine(pszKeyName, it))
-	{
-		char szBuffer[MAX_LINE_LENGTH];
+    COLORREF crReturn = crDefault;
+    SettingsMap::iterator it;
+    
+    if (pszKeyName && _FindLine(pszKeyName, it))
+    {
+        char szBuffer[MAX_LINE_LENGTH];
         char szFirst[MAX_LINE_LENGTH];
-		char szSecond[MAX_LINE_LENGTH];
-		char szThird[MAX_LINE_LENGTH];
-
-		LPSTR lpszTokens[3] = { szFirst, szSecond, szThird	};
-
+        char szSecond[MAX_LINE_LENGTH];
+        char szThird[MAX_LINE_LENGTH];
+        
+        LPSTR lpszTokens[3] = { szFirst, szSecond, szThird};
+        
         VarExpansionEx(szBuffer, it->second.c_str(), MAX_LINE_LENGTH);
         int nCount = LCTokenize(szBuffer, lpszTokens, 3, NULL);
-
-		if (nCount >= 3)
-		{
-			int nRed, nGreen, nBlue;
-
-			nRed = strtol(szFirst, NULL, 10);
-			nGreen = strtol(szSecond, NULL, 10);
-			nBlue = strtol(szThird, NULL, 10);
-
-			crReturn = RGB(nRed, nGreen, nBlue);
-		}
-		else if (nCount >= 1)
-		{
-			crReturn = strtol(szFirst, NULL, 16);
+        
+        if (nCount >= 3)
+        {
+            int nRed, nGreen, nBlue;
+            
+            nRed = strtol(szFirst, NULL, 10);
+            nGreen = strtol(szSecond, NULL, 10);
+            nBlue = strtol(szThird, NULL, 10);
+            
+            crReturn = RGB(nRed, nGreen, nBlue);
+        }
+        else if (nCount >= 1)
+        {
+            crReturn = strtol(szFirst, NULL, 16);
             // convert from BGR to RGB
             crReturn = RGB(GetBValue(crReturn), GetGValue(crReturn),
                            GetRValue(crReturn));
-		}
-	}
-
-	return crReturn;
+        }
+    }
+    
+    return crReturn;
 }
+
 
 BOOL SettingsManager::GetVariable(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
 {
-	// using GetRCString instead of GetRCLine here, again for compatibility reasons.
+    // using GetRCString instead of GetRCLine here, again for compatibility reasons.
     // as a side effect this strips any "" quotes around the variable's value.
     return GetRCString(pszKeyName, pszValue, NULL, dwLength);
 }
@@ -444,27 +449,27 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 {
     LPCSTR pszOriginalTemplate = pszTemplate;
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
-	LPSTR pszTempExpandedString = szTempExpandedString;
-	size_t stWorkLength = stLength;
-
-	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stWorkLength > 0))
-	{
-		//szTempExpandedString[0] = '\0';
-
-		while ((*pszTemplate != '\0') && (stWorkLength > 0))
-		{
-			if (*pszTemplate != '$')
-			{
-				*pszTempExpandedString = *pszTemplate;
-				++pszTemplate;
-				++pszTempExpandedString;
-				--stWorkLength;
-			}
-			else
-			{
-				//
-				// This is a variable so we need to find the end of it:
-				//
+    LPSTR pszTempExpandedString = szTempExpandedString;
+    size_t stWorkLength = stLength;
+    
+    if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stWorkLength > 0))
+    {
+        //szTempExpandedString[0] = '\0';
+        
+        while ((*pszTemplate != '\0') && (stWorkLength > 0))
+        {
+            if (*pszTemplate != '$')
+            {
+                *pszTempExpandedString = *pszTemplate;
+                ++pszTemplate;
+                ++pszTempExpandedString;
+                --stWorkLength;
+            }
+            else
+            {
+                //
+                // This is a variable so we need to find the end of it:
+                //
                 ++pszTemplate;
                 
                 LPCSTR pszVariable = pszTemplate;
@@ -473,29 +478,29 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                 {
                     ++pszTemplate;
                 }
-
-				bool bSucceeded = false;
-
-				if (*pszTemplate == '\0')
-				{
-					bSucceeded = SUCCEEDED(
+                
+                bool bSucceeded = false;
+                
+                if (*pszTemplate == '\0')
+                {
+                    bSucceeded = SUCCEEDED(
                         StringCchCopyNEx(pszTempExpandedString,
                         MAX_LINE_LENGTH - (pszTempExpandedString - szTempExpandedString),
                         pszVariable, pszTemplate - pszVariable, NULL, NULL,
                         STRSAFE_NULL_ON_FAILURE));
-				}
-				else
-				{
-					//
-					// We've found the end of the variable so copy it
-					// someplace usefull:
-					//
+                }
+                else
+                {
+                    //
+                    // We've found the end of the variable so copy it
+                    // someplace usefull:
+                    //
                     char szVariable[MAX_LINE_LENGTH];
-
+                    
                     StringCchCopyNEx(szVariable, MAX_LINE_LENGTH, pszVariable,
                         pszTemplate - pszVariable, NULL, NULL,
                         STRSAFE_NULL_ON_FAILURE);
-
+                    
                     if (szVariable[0] != '\0')
                     {
                         //
@@ -508,8 +513,8 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             bSucceeded = true;
                         }
                         else if (GetEnvironmentVariable(szVariable,
-							pszTempExpandedString,
-							static_cast<DWORD>(stLength)))
+                            pszTempExpandedString,
+                            static_cast<DWORD>(stLength)))
                         {
                             bSucceeded = true;
                         }
@@ -520,7 +525,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             {
                                 int nValue =
                                     static_cast<int>(_MathEvaluate(szVariable));
-
+                                
                                 StringCchPrintf(pszTempExpandedString, stLength,
                                     "%d", nValue);
                                 
@@ -539,38 +544,40 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             pszTempExpandedString[0] = '\0';
 #endif // LS_COMPAT_MATH
                         }
-					}
-				}
-				//
-				// If we succeeded, adjust our output buffers
-				// accordingly:
-				//
-				if (bSucceeded)
-				{
-					stWorkLength -= strlen(pszTempExpandedString);
-					pszTempExpandedString += strlen(pszTempExpandedString);
-				}
-
-				//
-				// Move to the next character if we didn't run out of space:
-				//
-				if (*pszTemplate != '\0')
-				{
-					++pszTemplate;
-				}
-			}
-		}
-		*pszTempExpandedString = '\0';
-
-		if (strchr(szTempExpandedString, '$'))
-		{
-			VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
-		}
-		else
-		{
-			StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
-		}
-	}
+                    }
+                }
+                
+                //
+                // If we succeeded, adjust our output buffers
+                // accordingly:
+                //
+                if (bSucceeded)
+                {
+                    stWorkLength -= strlen(pszTempExpandedString);
+                    pszTempExpandedString += strlen(pszTempExpandedString);
+                }
+                
+                //
+                // Move to the next character if we didn't run out of space:
+                //
+                if (*pszTemplate != '\0')
+                {
+                    ++pszTemplate;
+                }
+            }
+        }
+        
+        *pszTempExpandedString = '\0';
+        
+        if (strchr(szTempExpandedString, '$'))
+        {
+            VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
+        }
+        else
+        {
+            StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
+        }
+    }
 }
 
 
@@ -579,51 +586,51 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 //
 FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 {
-	FILE* pFile = NULL;
-
-	if (pszPath == NULL)
-	{
-		SettingsIterator* psiNew = new SettingsIterator(&m_SettingsMap, "\0");
-		
+    FILE* pFile = NULL;
+    
+    if (pszPath == NULL)
+    {
+        SettingsIterator* psiNew = new SettingsIterator(&m_SettingsMap, "\0");
+        
         if (psiNew)
-		{
-			m_Iterators.insert(psiNew);
-			pFile = (FILE*)psiNew;
-		}
-	}
-	else
-	{
+        {
+            m_Iterators.insert(psiNew);
+            pFile = (FILE*)psiNew;
+        }
+    }
+    else
+    {
         char szPath[MAX_PATH] = { 0 };
-		VarExpansionEx(szPath, pszPath, MAX_PATH);
-		
+        VarExpansionEx(szPath, pszPath, MAX_PATH);
+        
         Lock lock(m_CritSection);
-
+        
         FileMap::iterator it = m_FileMap.find(szPath);
-
-		if (it == m_FileMap.end() && PathFileExists(szPath))
-		{
-			FileInfo* pFileInfo = new FileInfo;
-			
+        
+        if (it == m_FileMap.end() && PathFileExists(szPath))
+        {
+            FileInfo* pFileInfo = new FileInfo;
+            
             if (pFileInfo)
-			{
+            {
                 pFileInfo->m_pSettingsMap = new SettingsMap;
-				pFileInfo->m_Count = 1;
-
+                pFileInfo->m_Count = 1;
+                
                 FileParser fpParser(pFileInfo->m_pSettingsMap);
-				fpParser.ParseFile(szPath);
-
-				m_FileMap.insert(FileMap::value_type(szPath, pFileInfo));
-				
+                fpParser.ParseFile(szPath);
+                
+                m_FileMap.insert(FileMap::value_type(szPath, pFileInfo));
+                
                 it = m_FileMap.find(szPath);
                 ASSERT(it != m_FileMap.end());
-			}
-		}
+            }
+        }
         
         if (it != m_FileMap.end())
         {
             SettingsIterator * psiNew =
                 new SettingsIterator(it->second->m_pSettingsMap, szPath);
-
+            
             if (psiNew)
             {
                 it->second->m_Count++;
@@ -631,9 +638,9 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
                 pFile = (FILE*)psiNew;
             }
         }
-	}
-
-	return pFile;
+    }
+    
+    return pFile;
 }
 
 
@@ -642,42 +649,41 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
 //
 BOOL SettingsManager::LCClose(FILE* pFile)
 {
-	BOOL bReturn = FALSE;
-
-	if (pFile != NULL)
-	{
+    BOOL bReturn = FALSE;
+    
+    if (pFile != NULL)
+    {
         Lock lock(m_CritSection);
         
-		IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
-		
+        IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
+        
         if (it != m_Iterators.end())
-		{
+        {
             FileMap::iterator fmIt = m_FileMap.find((*it)->get_Path());
-
-			if (fmIt != m_FileMap.end())
-			{
-				if (fmIt->second->m_Count == 1)
-				{
+            
+            if (fmIt != m_FileMap.end())
+            {
+                if (fmIt->second->m_Count == 1)
+                {
                     delete fmIt->second->m_pSettingsMap;
-					delete fmIt->second;
-
+                    delete fmIt->second;
+                    
                     m_FileMap.erase(fmIt);
-				}
-				else
-				{
-					fmIt->second->m_Count--;
-				}
-			}
-
+                }
+                else
+                {
+                    fmIt->second->m_Count--;
+                }
+            }
+            
             delete (*it);
-
             m_Iterators.erase(it);
-		}
-
-		bReturn = TRUE;
-	}
-
-	return bReturn;
+        }
+        
+        bReturn = TRUE;
+    }
+    
+    return bReturn;
 }
 
 
@@ -711,24 +717,27 @@ BOOL SettingsManager::LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszV
 //
 BOOL SettingsManager::LCReadNextLineOrCommand(FILE *pFile, LPSTR pszValue, size_t cchValue)
 {
-	BOOL bReturn = FALSE;
-	char szTempValue[MAX_LINE_LENGTH];
-
-	if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
-	{
-		IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
-		if (it != m_Iterators.end())
-		{
-			bReturn = (*it)->ReadNextLine(szTempValue, MAX_LINE_LENGTH);
-			if (bReturn)
-			{
-				VarExpansionEx(pszValue, szTempValue, cchValue);
-			}
-		}
-	}
-
-	return bReturn;
+    BOOL bReturn = FALSE;
+    char szTempValue[MAX_LINE_LENGTH];
+    
+    if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
+    {
+        IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
+        
+        if (it != m_Iterators.end())
+        {
+            bReturn = (*it)->ReadNextLine(szTempValue, MAX_LINE_LENGTH);
+            
+            if (bReturn)
+            {
+                VarExpansionEx(pszValue, szTempValue, cchValue);
+            }
+        }
+    }
+    
+    return bReturn;
 }
+
 
 #ifdef LS_COMPAT_MATH
 //
@@ -811,10 +820,10 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
             {
                 throw std::invalid_argument(ptzInput);
             }
-
+            
             ++ptzIter;
         }
-
+        
         return _tcstod(ptzInput, NULL);
     }
 }
