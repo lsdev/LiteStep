@@ -172,7 +172,7 @@ private:
     /**
      * Extracts the next token from the input.
      *
-     * @return <code>true</code if successful or
+     * @return <code>true</code> if successful or
      *         <code>false</code> if there was a lexical error
      */
     bool nextToken();
