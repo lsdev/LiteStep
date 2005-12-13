@@ -44,19 +44,19 @@ public:
     /**
      * Retrieve the next value.
      *
-     * @param   pszBuffer     buffer to receive value
-     * @param   cchBufferLen  size of buffer
+     * @param   pszValue  buffer to receive value
+     * @param   cchValue  size of buffer
      * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code> if there are
      *          no more values to retrieve
      */
-    BOOL ReadNextLine(LPSTR pszBuffer, size_t cchBufferLen);
+    BOOL ReadNextLine(LPSTR pszValue, size_t cchValue);
     
     /**
      * Retrieve the next value with the specified setting name.
      *
-     * @param   pszConfig     setting name
-     * @param   pszBuffer     buffer to receive value
-     * @param   cchBufferLen  size of buffer
+     * @param   pszConfig  setting name
+     * @param   pszValue   buffer to receive value
+     * @param   cchValue   size of buffer
      * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code> if there are
      *          no more values to retrieve
      */

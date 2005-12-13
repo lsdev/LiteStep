@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2002 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,41 +19,47 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
+
 #include "BangCommand.h"
 #include "ThreadedBangCommand.h"
 #include "../utility/core.hpp"
 
-Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
-:m_szCommand(pszCommand)
+
+Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand) :
+    m_szCommand(pszCommand)
 {
     m_bEX = false;
-	m_bBang = pfnBang;
-	m_dwThreadID = dwThread;
+    m_bBang = pfnBang;
+    m_dwThreadID = dwThread;
 }
 
-Bang::Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand)
-:m_szCommand(pszCommand)
+
+Bang::Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand) :
+    m_szCommand(pszCommand)
 {
-	m_bEX = true;
-	m_bBangEX = pfnBang;
-	m_dwThreadID = dwThread;
+    m_bEX = true;
+    m_bBangEX = pfnBang;
+    m_dwThreadID = dwThread;
 }
+
 
 Bang::~Bang()
-{}
+{
+}
+
 
 void Bang::Execute(HWND hCaller, LPCSTR pszParams)
 {
-	DWORD dwThreadID = GetCurrentThreadId();
-
-	if (dwThreadID != m_dwThreadID)
-	{
-		ThreadedBangCommand * pInfo =
-            new ThreadedBangCommand(hCaller, m_szCommand.c_str(), pszParams);
-
-		if (pInfo != NULL)
-		{
-			// target thread releases pInfo
+    DWORD dwThreadID = GetCurrentThreadId();
+    
+    if (dwThreadID != m_dwThreadID)
+    {
+        ThreadedBangCommand * pInfo = new ThreadedBangCommand(hCaller,
+            m_szCommand.c_str(), pszParams);
+        
+        if (pInfo != NULL)
+        {
+            // target thread releases pInfo
             PostThreadMessage(m_dwThreadID, LM_THREAD_BANGCOMMAND, (WPARAM)pInfo, 0);
         }
     }
@@ -77,5 +83,5 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
                 _T("Please contact the module author.\n\nBang parameters: %s"),
                 pszParams != NULL ? pszParams : _T("(null)"));
         }
-	}
+    }
 }
