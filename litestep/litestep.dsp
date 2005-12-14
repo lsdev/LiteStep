@@ -71,7 +71,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /FAs /FR /FD /c
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /FR /FD /c
+# SUBTRACT CPP /FA<none>
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "_DEBUG" /o /win32 "NUL"
 # SUBTRACT MTL /mktyplib203
@@ -82,7 +83,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\lsapi\debug\lsapi.lib ..\hook\debug\hook.lib ole32.lib oleaut32.lib uuid.lib delayimp.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /profile /debug /machine:I386 /nodefaultlib /delayload:"hook.dll"
+# ADD LINK32 ..\lsapi\debug\lsapi.lib ..\hook\debug\hook.lib ole32.lib oleaut32.lib uuid.lib delayimp.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib /delayload:"hook.dll"
+# SUBTRACT LINK32 /profile
 
 !ENDIF 
 
@@ -93,10 +95,6 @@ LINK32=link.exe
 # Begin Group "Source"
 
 # PROP Default_Filter "*.cpp;*.c"
-# Begin Source File
-
-SOURCE=..\lsapi\BangCommand.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\DataStore.cpp
