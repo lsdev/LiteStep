@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2006 The LiteStep Development Team
+Copyright (C) 1997-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,171 +19,157 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-
 #include "ModuleManager.h"
 #include "../utility/macros.h"
 #include <algorithm>
 #include <vector>
 #include "../utility/core.hpp"
 
-
 ModuleManager::ModuleManager() : 
-    m_pILiteStep(NULL), m_hLiteStep(NULL)
+m_pILiteStep(NULL), m_hLiteStep(NULL)
 {
 }
-
 
 ModuleManager::~ModuleManager()
 {
 }
 
-
 HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
 {
     ASSERT_ISNULL(m_pILiteStep);
-    
+
     HRESULT hr = E_FAIL;
-    
-    if (pILiteStep != NULL)
-    {
-        m_pILiteStep = pILiteStep;
-        m_pILiteStep->AddRef();
-        
+
+	if (pILiteStep != NULL)
+	{
+		m_pILiteStep = pILiteStep;
+		m_pILiteStep->AddRef();
+
         char szAppPath[MAX_PATH] = { 0 };
-        
+
         if (SUCCEEDED(m_pILiteStep->get_Window((LONG*)&m_hLiteStep)) &&
             SUCCEEDED(m_pILiteStep->get_AppPath(szAppPath, MAX_PATH)))
         {
             m_sAppPath = szAppPath;
-            
+
             _LoadModules();
             
             hr = S_OK;
         }
-    }
-    else
-    {
-        hr = E_INVALIDARG;
-    }
-    
-    return hr;
-}
+	}
+	else
+	{
+		hr = E_INVALIDARG;
+	}
 
+	return hr;
+}
 
 HRESULT ModuleManager::Stop()
 {
-    HRESULT hr = S_OK;
-    
-    _QuitModules();
-    
-    if (m_pILiteStep)
-    {
-        m_pILiteStep->Release();
-        m_pILiteStep = NULL;
-    }
-    
-    return hr;
-}
+	HRESULT hr = S_OK;
 
+	_QuitModules();
+
+	if (m_pILiteStep)
+	{
+		m_pILiteStep->Release();
+        m_pILiteStep = NULL;
+	}
+
+	return hr;
+}
 
 HRESULT ModuleManager::rStart()
 {
-    HRESULT hr = S_OK;
-    
-    _LoadModules();
-    
-    return hr;
-}
+	HRESULT hr = S_OK;
 
+	_LoadModules();
+
+	return hr;
+}
 
 HRESULT ModuleManager::rStop()
 {
-    HRESULT hr = S_OK;
-    
-    _QuitModules();
-    
-    return hr;
+	HRESULT hr = S_OK;
+
+	_QuitModules();
+
+	return hr;
 }
 
 
 UINT ModuleManager::_LoadModules()
 {
-    ASSERT(m_ModuleQueue.empty());
-    
+	ASSERT(m_ModuleQueue.empty());
+
     UINT uReturn = 0;
-    char szLine[MAX_LINE_LENGTH];
-    
+	char szLine[MAX_LINE_LENGTH];
+	
     FILE* f = LCOpen(NULL);
-    
-    if (f)
-    {
-        // need to use a separate queue as modules may load other modules (e.g.
+
+	if (f)
+	{
+		// need to use a separate queue as modules may load other modules (e.g.
         // mzscript via LoadModule) during the startup process
         ModuleQueue mqModules;
-        
+
         while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
-        {
+		{
             char szToken1[MAX_LINE_LENGTH] = { 0 };
             char szToken2[MAX_LINE_LENGTH] = { 0 };
-            char szToken3[MAX_LINE_LENGTH] = { 0 };
-            
+			char szToken3[MAX_LINE_LENGTH] = { 0 };
+
             // first buffer takes the "LoadModule" token
             LPSTR lpszBuffers[] = { NULL, szToken1, szToken2, szToken3 };
             
-            if (LCTokenize(szLine, lpszBuffers, 4, NULL) >= 2)
-            {
-                DWORD dwFlags = 0;
-                
-                if ((stricmp(szToken2, "threaded") == 0) ||
+			if (LCTokenize(szLine, lpszBuffers, 4, NULL) >= 2)
+			{
+				DWORD dwFlags = 0;
+
+				if ((stricmp(szToken2, "threaded") == 0) ||
                     (stricmp(szToken3, "threaded") == 0))
-                {
-                    dwFlags |= LS_MODULE_THREADED;
-                }
-                
-                if ((stricmp(szToken2, "nopump") == 0) ||
-                    (stricmp(szToken3, "nopump") == 0))
-                {
-                    dwFlags |= LS_MODULE_NOTPUMPED;
-                }
-                
-                Module* pModule = _MakeModule(szToken1, dwFlags);
-                
+				{
+					dwFlags |= LS_MODULE_THREADED;
+				}
+				
+				Module* pModule = _MakeModule(szToken1, dwFlags);
+				
                 if (pModule)
-                {
-                    mqModules.push_back(pModule);
-                }
-            }
-        }
-        
-        LCClose (f);
-        
+				{
+					mqModules.push_back(pModule);
+				}
+			}
+		}
+		LCClose (f);
+
         uReturn = _StartModules(mqModules);
-    }
-    
-    return uReturn;
+	}
+
+	return uReturn;
 }
 
 
 BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 {
-    BOOL bReturn = FALSE;
-    
-    Module* pModule = _MakeModule(pszLocation, dwFlags);
-    
-    if (pModule)
-    {
-        ModuleQueue mqModule(1, pModule);
+	BOOL bReturn = FALSE;
+	
+	Module* pModule = _MakeModule(pszLocation, dwFlags);
+	
+	if (pModule)
+	{
+		ModuleQueue	mqModule(1, pModule);
         bReturn = (_StartModules(mqModule) == 1);
-    }
-    
-    return bReturn;
+	}
+
+	return bReturn;
 }
 
 
 Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 {
-    Module* pModule = NULL;
-    
+	Module* pModule = NULL;
+
     try
     {
         pModule = new Module(pszLocation, dwFlags);
@@ -193,18 +179,18 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
         delete pModule;
         pModule = NULL;
     }
-    
-    return pModule;
+
+	return pModule;
 }
 
 
 UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 {
-    UINT uReturn = 0;
-    
-    if (mqModules.size() > 0)
-    {
-        std::vector<HANDLE> vecInitEvents;;
+	UINT uReturn = 0;
+
+	if (mqModules.size() > 0)
+	{
+        std::vector<HANDLE> vecInitEvents;
         ModuleQueue::iterator iter = mqModules.begin();
         
         while (iter != mqModules.end())
@@ -217,18 +203,20 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
                     {
                         if ((*iter)->GetInitEvent())
                         {
-                            vecInitEvents.push_back((*iter)->GetInitEvent());
+                            /* Note: We are taking ownership of the Event handle
+                             * here.  We call CloseHandle() below. */
+                            vecInitEvents.push_back((*iter)->TakeInitEvent());
                         }
-                        
+
                         m_ModuleQueue.push_back(*iter);
                         uReturn++;
-                        
+
                         iter++;
                         continue;
                     }
                 }
             }
-            
+
             /* If we got here, then this is an invalid
              * entry, and needs erased. */
             ModuleQueue::iterator iterOld = iter++;
@@ -237,47 +225,60 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
             mqModules.erase(iterOld);
         }
         
-        // Wait for all modules to signal that they have started
+        // Wait for all modules to signal that they have started.
         _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
+
+        // Close the handles we have taken ownership of.
+        std::for_each(vecInitEvents.begin(), vecInitEvents.end(), CloseHandle);
     }
-    
+
 	return uReturn;
 }
 
-
 void ModuleManager::_QuitModules()
 {
-    std::vector<HANDLE> vecQuitEvents;;
+    std::vector<HANDLE> vecQuitObjects;
     ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
-    
+    ModuleQueue TempQueue;
+
+    /* Note:
+     * Store each module in a temporary queue, so that the module
+     * may not be accessed via our main queue while it is being
+     * unloaded.  This does -not- protect us from threads, however
+     * it does hopefully add some security through obscurity from
+     * recursion. */
+
     while (iter != m_ModuleQueue.rend())
     {
+        TempQueue.push_back(*iter);
+
         if (*iter)
         {
             (*iter)->Quit();
-            
-            HANDLE hEvent = (*iter)->GetQuitEvent();
-            
-            if (hEvent)
+
+            if ((*iter)->GetThread())
             {
-                vecQuitEvents.push_back(hEvent);
+                vecQuitObjects.push_back((*iter)->TakeThread());
             }
         }
         
         ++iter;
     }
     
-    _WaitForModules(&vecQuitEvents[0], vecQuitEvents.size());
-    
+    m_ModuleQueue.clear();
+
+    _WaitForModules(&vecQuitObjects[0], vecQuitObjects.size());
+
+    // Close the handles we have taken ownership of.
+    std::for_each(vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle);
+
     // Clean it all up
-    iter = m_ModuleQueue.rbegin();
-    while (iter != m_ModuleQueue.rend())
+    iter = TempQueue.rbegin();
+    while (iter != TempQueue.rend())
     {
         delete *iter;
         ++iter;
     }
-    
-    m_ModuleQueue.clear();
 }
 
 
@@ -288,33 +289,35 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
     if (iter != m_ModuleQueue.end() && *iter)
     {
         (*iter)->Quit();
-        
-        HANDLE hQuitEvent = (*iter)->GetQuitEvent();
-        
-        if (hQuitEvent)
+
+        if ((*iter)->GetThread())
         {
-            _WaitForModules(&hQuitEvent, 1);
+            HANDLE hThread = (*iter)->TakeThread();
+
+            _WaitForModules(&hThread, 1);
+
+            CloseHandle(hThread);
         }
         
         delete *iter;
         m_ModuleQueue.erase(iter);
     }
-    
-    return TRUE;
+	
+	return TRUE;
 }
 
 
 BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 {
     BOOL bReturn = FALSE;
-    
+
     ModuleQueue::iterator iter = _FindModule(pszLocation);
     
     if (iter != m_ModuleQueue.end() && *iter)
     {
         bReturn = QuitModule((*iter)->GetInstance());
     }
-    
+
     return bReturn;
 }
 
@@ -322,18 +325,18 @@ BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
 BOOL ModuleManager::ReloadModule(HINSTANCE hModule)
 {
     BOOL bReturn = FALSE;
-    
+
     ModuleQueue::iterator iter = _FindModule(hModule);
     
     if (iter != m_ModuleQueue.end())
     {
         std::string sLocation = (*iter)->GetLocation();
         DWORD dwFlags = (*iter)->GetFlags();
-        
+
         QuitModule(hModule);
         bReturn = LoadModule(sLocation.c_str(), dwFlags);
     }
-    
+
     return bReturn;
 }
 
@@ -354,30 +357,37 @@ ModuleQueue::iterator ModuleManager::_FindModule(HINSTANCE hModule)
 
 void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
 {
-    DWORD dwRest = dwCount;
-    
-    while (dwRest)
+    std::vector<HANDLE> vWait(pHandles, pHandles+dwCount);
+
+    /* Loop for as long as we have an object whose state is not signaled. */
+    while (vWait.size())
     {
-        DWORD dwWaitStatus = MsgWaitForMultipleObjects(dwCount, pHandles,
+        MSG message;
+
+        /* Handle all window messages for current thread */
+        while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+        {
+            m_pILiteStep->MessageHandler(message);
+        }
+
+        /* Handle all messages posted to the current thread */
+        while (PeekMessage(&message, (HWND)INVALID_HANDLE_VALUE, 0, 0, PM_REMOVE))
+        {
+            m_pILiteStep->MessageHandler(message);
+        }
+
+        /* Wait for a new message to come in, or for one of our objects
+         * to become signaled. */
+        DWORD dwWaitStatus = MsgWaitForMultipleObjects(vWait.size(), &vWait[0],
             FALSE, INFINITE, QS_ALLINPUT);
         
-        if (dwWaitStatus == (WAIT_OBJECT_0 + dwCount))
+        /* Recreate the pObject list, in case any of the objects do not auto
+         * reset their signaled state.  Otherwise, we would drop through our
+         * outer loop immediately without waiting for all of our objects. */
+        if ((dwWaitStatus >= WAIT_OBJECT_0) &&
+            (dwWaitStatus < (WAIT_OBJECT_0 + vWait.size())))
         {
-            MSG message;
-            // if we use NULL instead of hLiteStep here.. it locks us up...
-            // TODO: could the above coment be because PeekMessage used to be
-            // called in an if statement instead of a while statement?
-            // We will have to test and see for 0.24.8 release.
-            while (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
-            {
-                TranslateMessage(&message);
-                DispatchMessage (&message);
-            }
-        }
-        else if ((dwWaitStatus >= WAIT_OBJECT_0) &&
-            (dwWaitStatus <= (WAIT_OBJECT_0 + dwCount - 1)))
-        {
-            --dwRest;
+            vWait.erase(vWait.begin() + (dwWaitStatus - WAIT_OBJECT_0));
         }
     }
 }

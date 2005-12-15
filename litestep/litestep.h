@@ -59,8 +59,9 @@ public:
 	LRESULT ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	// ILiteStep
-	STDMETHOD(get_Window)(/*[out, retval]*/ long* phWnd);
-	STDMETHOD(get_AppPath)(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath);
+	HRESULT get_Window(/*[out, retval]*/ long* phWnd) const;
+	HRESULT get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const;
+	int MessageHandler(MSG &message);
 
 private:
 
@@ -84,6 +85,9 @@ private:
 	// Shell hooks
 	UINT WM_ShellHook; // = 0;
 
+	// Function blocks
+	UINT m_BlockRecycle; // = 0
+
 	//
 	// Manager Related
 	//
@@ -97,6 +101,7 @@ private:
 	void _CleanupManagers();
 
 	bool m_bHookManagerStarted; // = false
+	bool m_bSignalExit; // = false
 
 	//
 	// Service Related
