@@ -71,5 +71,24 @@ private:
     Lock& operator=(const Lock& rhs);
 };
 
+class Block
+{
+public:
+	Block(UINT& cnt) : m_Count(cnt)
+	{
+		m_Count++;
+	}
+	~Block()
+	{
+		m_Count--;
+	}
+	bool IsBlocked()
+	{
+		return m_Count > 1;
+	}
+private:
+	UINT& m_Count;
+};
+
 
 #endif // __CRITICALSECTION_H
