@@ -1110,6 +1110,17 @@ void CLiteStep::_CleanupManagers()
 //
 void CLiteStep::_Recycle()
 {
+	Block block(m_BlockRecycle);
+
+	/* Do not allow recursive recycles.  This may happen if some
+	 * one is heavy fingered on their recycle hotkey, and multiple
+	 * LM_RECYCLE messages are posted to the queue. */
+	if(block.IsBlocked())
+	{
+		OutputDebugString("LiteStep: _Recycle Reentrant\r\n");
+		return;
+	}
+
 	_StopManagers();
 
 	DeleteSettingsManager();
