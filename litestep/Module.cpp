@@ -191,9 +191,12 @@ int Module::CallInit()
 {
 	int nReturn = 0;
 
+#if !defined(LS_NO_EXCEPTION)
 	try
 	{
+#endif /* LS_NO_EXCEPTION */
 		nReturn = m_pInitEx(m_hMainWindow, m_hInstance, m_tzAppPath.c_str());
+#if !defined(LS_NO_EXCEPTION)
 	}
     catch (...)
     {
@@ -201,6 +204,7 @@ int Module::CallInit()
             "Error: Exception during module initialization.\n\nPlease contact the module writer.",
             m_tzLocation.c_str());
     }
+#endif /* LS_NO_EXCEPTION */
 
     return nReturn;
 }
@@ -210,15 +214,19 @@ void Module::CallQuit()
 {
     if (m_pQuit)
     {
+#if !defined(LS_NO_EXCEPTION)
         try
         {
+#endif /* LS_NO_EXCEPTION */
             m_pQuit(m_hInstance);
+#if !defined(LS_NO_EXCEPTION)
         }
         catch (...)
         {
             RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
                 "Exception while quitting module.", m_tzLocation.c_str());
         }
+#endif /* LS_NO_EXCEPTION */
     }
 }
 
@@ -254,8 +262,10 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
     
     while (GetMessage(&msg, 0, 0, 0))
     {
+#if !defined(LS_NO_EXCEPTION)
         try
         {
+#endif /* LS_NO_EXCEPTION */
             if (msg.hwnd == NULL)
             {
                 // Thread message
@@ -267,12 +277,14 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
+#if !defined(LS_NO_EXCEPTION)
         }
         catch (...)
         {
             // Quietly ignore exceptions?
             // #pragma COMPILE_WARN(Note: Need stronger exception-handling code here...restart the module or something)
         }
+#endif /* LS_NO_EXCEPTION */
     }
 
     return 0;

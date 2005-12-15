@@ -498,8 +498,10 @@ int CLiteStep::MessageHandler(MSG &message)
 		return 0;
 	}
 
+#if !defined(LS_NO_EXCEPTION)
 	try
 	{
+#endif /* LS_NO_EXCEPTION */
 		if (NULL == message.hwnd)
 		{
 			// Thread message
@@ -527,11 +529,13 @@ int CLiteStep::MessageHandler(MSG &message)
 			TranslateMessage(&message);
 			DispatchMessage (&message);
 		}
+#if !defined(LS_NO_EXCEPTION)
 	}
 	catch(...)
 	{
 		MessageBox(m_hMainWindow, "exception", "oops", MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION);
 	}
+#endif /* LS_NO_EXCEPTION */
 
 	return 0;
 }
@@ -1150,8 +1154,10 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
     {
         hr = S_OK;
         
+#if !defined(LS_NO_EXCEPTION)
         try
         {
+#endif /* LS_NO_EXCEPTION */
             for (MessageManager::windowSetT::iterator iter = setWindows.begin();
                  iter != setWindows.end(); ++iter)
             {
@@ -1168,11 +1174,13 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
                     }
                 }
             }
+#if !defined(LS_NO_EXCEPTION)
         }
         catch (...)
         {
             hr = E_UNEXPECTED;
         }
+#endif /* LS_NO_EXCEPTION */
     }
 
     return hr;

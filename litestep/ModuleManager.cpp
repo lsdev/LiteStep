@@ -170,15 +170,19 @@ Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
 {
 	Module* pModule = NULL;
 
+#if !defined(LS_NO_EXCEPTION)
     try
     {
+#endif /* LS_NO_EXCEPTION */
         pModule = new Module(pszLocation, dwFlags);
+#if !defined(LS_NO_EXCEPTION)
     }
     catch (...)
     {
         delete pModule;
         pModule = NULL;
     }
+#endif /* LS_NO_EXCEPTION */
 
 	return pModule;
 }
@@ -397,8 +401,10 @@ HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam)
 {
     HRESULT hr = S_OK;
     
+#if !defined(LS_NO_EXCEPTION)
     try
     {
+#endif /* LS_NO_EXCEPTION */
         for (ModuleQueue::const_iterator iter = m_ModuleQueue.begin(); iter != m_ModuleQueue.end(); ++iter)
         {
             if (!pfnCallback((*iter)->GetLocation(), (*iter)->GetFlags(),
@@ -408,11 +414,13 @@ HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam)
                 break;
             }
         }
+#if !defined(LS_NO_EXCEPTION)
     }
     catch (...)
     {
         hr = E_UNEXPECTED;
     }
+#endif /* LS_NO_EXCEPTION */
     
     return hr;
 }
