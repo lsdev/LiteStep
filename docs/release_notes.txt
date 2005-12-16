@@ -338,7 +338,6 @@ Contents:
   LSTrayService
   LSImageFolder
 
-  LitestepDir (Deprecated in 0.24.7)
   LSLogLevel  (Deprecated in 0.24.7)
   LSLogFile   (Deprecated in 0.24.7)
 
@@ -350,7 +349,62 @@ Contents:
   ElseIf
   Endif
 
- e) !Bang Commands
+ E) Step.rc Variables
+ --------------------
+
+  LitestepDir
+  WinDir
+  UserName
+  QuickLaunch
+  BitBucket
+  Documents
+  Drives
+  Network
+  Controls
+  Dialup
+  NetworkAndDialup
+  Printers
+  Scheduled
+  AdminTools
+  Win9X
+  WinME
+  Win98
+  Win95
+  WinNT
+  WinXP
+  Win2000
+  WinNT4
+  ResolutionX
+  ResolutionY
+  CompileDate
+
+  CommonDesktopDir
+  CommonFavorites
+  CommonPrograms
+  CommonStartMenu
+  CommonStartup
+  Cookies
+  Desktop
+  DesktopDir
+  Favorites
+  Fonts
+  History
+  Internet
+  InternetCache
+  Nethood
+  DocumentsDir
+  Printhood
+  Programs
+  Recent
+  Sendto
+  Startmenu
+  Startup
+  Templates
+  Commonadmintoolsdir
+  Admintoolsdir
+
+
+ F) !Bang Commands
  -----------------
 
   !About
