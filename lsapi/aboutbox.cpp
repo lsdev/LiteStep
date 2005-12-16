@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2005 The LiteStep Development Team
+Copyright (C) 2001-2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -26,19 +26,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern const char rcsRevision[];
 
-enum
-{
-	 ABOUT_BANGS = 0
-	,ABOUT_DEVTEAM = 1
-	,ABOUT_MODULES = 2
-	,ABOUT_REVIDS = 3
-	,ABOUT_SYSINFO = 4
-};
-
 typedef void (*AboutFunction)(HWND);
 
 void AboutBangs(HWND hListView);
 void AboutDevTeam(HWND hListView);
+void AboutLicense(HWND hEdit);
 void AboutModules(HWND hListView);
 void AboutRevIDs(HWND hListView);
 void AboutSysInfo(HWND hListView);
@@ -53,6 +45,17 @@ int GetClientWidth(HWND hWnd);
 void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
 
+/* Keep this enum synch'd with aboutOptions */
+enum
+{
+	 ABOUT_BANGS = 0
+	,ABOUT_DEVTEAM
+	,ABOUT_LICENSE
+	,ABOUT_MODULES
+	,ABOUT_REVIDS
+	,ABOUT_SYSINFO
+};
+
 struct
 {
 	const char *option;
@@ -60,10 +63,11 @@ struct
 }
 aboutOptions[] =
 {
-	 "Bang Commands", AboutBangs
-	,"Development Team", AboutDevTeam
-	,"Loaded Modules", AboutModules
-	,"Revision IDs", AboutRevIDs
+	 "Bang Commands",      AboutBangs
+	,"Development Team",   AboutDevTeam
+	,"License",            AboutLicense
+	,"Loaded Modules",     AboutModules
+	,"Revision IDs",       AboutRevIDs
 	,"System Information", AboutSysInfo
 };
 
@@ -74,8 +78,8 @@ struct
 }
 theDevTeam[] =
 {
-	"ilmcuts", "Simon"
-	,"jugg", "Chris Rempel"
+	 "ilmcuts", "Simon"
+	,"jugg",    "Chris Rempel"
 	,"Message", "Bobby G. Vinyard"
 };
 
@@ -88,6 +92,27 @@ struct CallbackInfo
     int nItem;
 };
 
+/* LiteStep license notice */
+const char * lsLicense = \
+ "LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
+ "\r\n"
+ "Copyright (C) 1997-1998  Francis Gastellu\r\n"
+ "Copyright (C) 1998-2005  Litestep Development Team\r\n"
+ "\r\n"
+ "This program is free software; you can redistribute it and/or modify it under "
+ "the terms of the GNU General Public License as published by the Free Software "
+ "Foundation; either version 2 of the License, or (at your option) any later "
+ "version.\r\n"
+ "\r\n"
+ "This program is distributed in the hope that it will be useful, but WITHOUT ANY "
+ "WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A "
+ "PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\n"
+ "\r\n"
+ "You should have received a copy of the GNU General Public License along with "
+ "this program; if not, write to the Free Software Foundation, Inc., 51 Franklin "
+ "Street, Fifth Floor, Boston, MA  02110-1301, USA.\r\n"
+ "\r\n"
+ "http://www.lsdev.org/";
 
 //
 // AboutBox Dialog Procedure
@@ -117,8 +142,31 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 				// get new selection
 				i = (int)SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_GETCURSEL, 0, 0);
 
-				// fill the listview
-				aboutOptions[i].function(GetDlgItem(hWnd, IDC_LISTVIEW));
+				switch(i)
+				{
+				default:
+					// default to revision IDs
+					i = ABOUT_REVIDS;
+					SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_SETCURSEL, ABOUT_REVIDS, 0);
+					/* FALL THROUGH */
+				case ABOUT_REVIDS:
+				case ABOUT_BANGS:
+				case ABOUT_DEVTEAM:
+				case ABOUT_MODULES:
+				case ABOUT_SYSINFO:
+					// set the current display to the list view
+					aboutOptions[i].function(GetDlgItem(hWnd, IDC_LISTVIEW));
+					ShowWindow(GetDlgItem(hWnd, IDC_LISTVIEW), SW_SHOWNA);
+					ShowWindow(GetDlgItem(hWnd, IDC_EDIT), SW_HIDE);
+					break;
+
+				case ABOUT_LICENSE:
+					// set the current display to the edit box
+					aboutOptions[i].function(GetDlgItem(hWnd, IDC_EDIT));
+					ShowWindow(GetDlgItem(hWnd, IDC_EDIT), SW_SHOWNA);
+					ShowWindow(GetDlgItem(hWnd, IDC_LISTVIEW), SW_HIDE);
+					break;
+				}
 			}
 			else if (LOWORD(wParam) == IDOK || LOWORD(wParam == IDCANCEL))
 			{
@@ -133,6 +181,18 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
                 return TRUE;
 			}
+			/* This isn't necessary as we have the edit control set to read only.
+			 * It just ensures our text doesn't get changed somehow */
+			else if (LOWORD(wParam) == IDC_EDIT && HIWORD(wParam) == EN_UPDATE)
+			{
+				DWORD dwStart;
+
+				SendDlgItemMessage(hWnd, IDC_EDIT, EM_GETSEL, (WPARAM)&dwStart, 0);
+
+				SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
+
+				SendDlgItemMessage(hWnd, IDC_EDIT, EM_SETSEL, dwStart-1, dwStart-1);
+			}
             
 			return FALSE;
 		}
@@ -146,7 +206,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
             // the header and title need a white (COLOR_WINDOW) background
 			int id = GetDlgCtrlID((HWND)lParam);
 
-			if (id == IDC_TITLE || id == IDC_THEME_INFO)
+			if (id == IDC_TITLE || id == IDC_THEME_INFO || id == IDC_EDIT)
 			{
 				HDC hDC = (HDC)wParam;
 
@@ -171,7 +231,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 (WPARAM)hTitleFont, FALSE);
 
 			// set title with LS version
-			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.7 RC 4");
+			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.7");
 
 			// set Theme info
             char themeAuthor[16] = { 0 };
@@ -200,6 +260,9 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
 
+			// set the License Notice text
+			SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
+
 			// add options to combo box
 			for (unsigned int i = 0; i < aboutOptionsCount; ++i)
             {
@@ -207,9 +270,11 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                     0, (LPARAM)aboutOptions[i].option);
             }
 
-			// default to revision IDs
-			SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_SETCURSEL, ABOUT_REVIDS, 0);
-			AboutRevIDs(GetDlgItem(hWnd, IDC_LISTVIEW));
+			// default to License Notice
+			SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_SETCURSEL, ABOUT_LICENSE, 0);
+			// CB_SETCURSEL doesn't notify us via WM_COMMAND, so force it */
+			WPARAM wp = MAKEWPARAM(IDC_COMBOBOX, CBN_SELCHANGE);
+			SendMessage(hWnd, WM_COMMAND, wp, (LPARAM)GetDlgItem(hWnd, IDC_COMBOBOX));
 
 			// center dialog on screen
 			RECT rc;
@@ -227,6 +292,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
 #endif
 			SwitchToThisWindow(hWnd, TRUE);
+			SetFocus(GetDlgItem(hWnd, IDC_COMBOBOX));
 
 			return FALSE;
 		}
@@ -319,6 +385,14 @@ void AboutDevTeam(HWND hListView)
 		ListView_InsertItem(hListView, &itemInfo);
 		ListView_SetItemText(hListView, i, 1, (char *) theDevTeam[i].realName);
 	}
+}
+
+
+// Show License Notice... Nothing to do
+//
+
+void AboutLicense(HWND hEdit)
+{
 }
 
 
