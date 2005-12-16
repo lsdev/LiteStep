@@ -502,13 +502,16 @@ void AboutSysInfo(HWND hListView)
 
 	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	columnInfo.fmt = LVCFMT_LEFT;
-	columnInfo.cx = width / 2;
+	columnInfo.cx = width / 3 + width / 8;
 	columnInfo.pszText = "Name";
 	columnInfo.iSubItem = 0;
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
 
-	columnInfo.cx = width / 2;
+	/* Using this odd size, keeps the columns aligned with
+	 * the other list views, and also gives the text a little
+	 * more room to keep from being truncated. */
+	columnInfo.cx = (2 * width) / 3 - width / 8;
 	columnInfo.pszText = "Value";
 	columnInfo.iSubItem = 1;
 
