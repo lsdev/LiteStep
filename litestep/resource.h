@@ -36,6 +36,7 @@
 #define IDC_COMBOBOX                    1005
 #define IDC_LISTVIEW                    1006
 #define IDC_THEME_INFO                  1007
+#define IDC_EDIT                        1008
 
 // Next default values for new objects
 // 
@@ -44,7 +45,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        104
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
