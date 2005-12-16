@@ -493,7 +493,6 @@ int CLiteStep::MessageHandler(MSG &message)
 {
 	if(WM_QUIT == message.message)
 	{
-		OutputDebugString("LiteStep: WM_QUIT\r\n");
 		m_bSignalExit = true;
 		return 0;
 	}
@@ -1121,7 +1120,6 @@ void CLiteStep::_Recycle()
 	 * LM_RECYCLE messages are posted to the queue. */
 	if(block.IsBlocked())
 	{
-		OutputDebugString("LiteStep: _Recycle Reentrant\r\n");
 		return;
 	}
 
