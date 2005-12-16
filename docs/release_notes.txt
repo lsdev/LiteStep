@@ -13,10 +13,11 @@ Contents:
 -)DEVELOPMENT
 -)CREDITS
 -)HISTORY
+-)LEGAL
 
 -- ABOUT -----------------------------------------------------------------------
 
- LiteStep is a replacement shell for the standard Windows(tm) Explorer shell.
+ LiteStep is a replacement shell for the standard Windows® Explorer shell.
 
  The Explorer shell provides the familiar desktop environment, start menu, and
  task bar.  The developers of LiteStep (and thousands of users) have found the
@@ -51,18 +52,23 @@ Contents:
  http://wiki.litestep.com/
  -------------------------
  - A LiteStep wiki with content based largely around the community driven
-   Open Theme Standard, facilitating a common framework for themers to create
-   environments easily accessible to many users.
+   Open Theme Standard. The OTS facilitates a common framework for themers to
+   create desktop environments easily accessible to many users.
    (See also: http://o-t-s.sourceforge.net/)
+
+ http://loose-screws.com/modules.php
+ http://www.shellfront.org/modules-list.php
+ ------------------------------------------
+ - Module downloads.
 
 -- SYSTEM REQUIREMENTS ---------------------------------------------------------
  
  LiteStep requires only that you are running a 32bit version of Windows:
- Win95, Win98(se), WinME, Win2K, WinXP
+ Windows 95, Windows 98(se), Windows ME, Windows 2000, Windows XP
 
- LiteStep is designed to consume less resources than the Explorer shell it
- replaces, so there are no system requirements above and beyond that which is
- needed for a normal Windows system.
+ LiteStep is designed to consume less resources than the Explorer shell which it
+ replaces; so there are no system requirements above and beyond that which is
+ needed for a normal Windows-based system.
 
  However, depending on what modules (add-ons) are loaded, any given desktop
  environment will have its own system requirements.  This may range from being
@@ -76,7 +82,7 @@ Contents:
  -----
  You are about to install a replacement shell for Windows.  A shell is not a
  normal application; it runs as a special system process.  Replacing the shell
- is not a supported procedure by Microsoft, and as such, it is possible  that if
+ is not a supported procedure by Microsoft®, and as such, it is possible  that if
  you do something wrong, you may end up with a non functional desktop and/ or
  your system may display an error message asking you to re-install Windows.  Do
  NOT panic, a very simple solution will put you back to where you need to be, so
@@ -127,11 +133,11 @@ Contents:
  file.  Do NOT set LiteStep as your shell until you have configured it,
  otherwise you will be left with a disfunctional (yet recoverable) system.
  
- To install LiteStep as your shell, follow these instructions:
+ To set LiteStep as your shell, follow these instructions:
  
   1. Win9x/ME
 
-    - Using a text editor (i.e. Notepad) open the Windows System file named
+    - Using a text editor (e.g. Notepad) open the Windows System file named
       "system.ini". This file's location is normally "C:\Windows\system.ini"
 
     - Locate the line that begins with "shell=".  This line is located in the
@@ -152,9 +158,9 @@ Contents:
       "CANNOT FIND <shell file name> PLEASE REINSTALL WINDOWS"
 
       Do NOT reinstall windows!  Just simply follow the instructions below to
-      put your shell back to the default.
+      put your shell back to the default:
 
-    - Boot into DOS (press F8 before Windows starts, or use a DOS boot disk).
+      Boot into DOS (press F8 before Windows starts, or use a DOS boot disk).
       Issue the command "edit C:\Windows\system.ini" adjusting for the location
       of your system.ini file.  Delete the new line you created in the previous
       steps, and uncomment the line you previously disabled. Do this by deleting
@@ -166,8 +172,8 @@ Contents:
   
     - Note: Please see the LiteStep Wiki for a "Group Policy" installation.
 
-    - If you are NOT an administrator, you will most likely NOT be able to set
-      LiteStep as you shell.  The only exception to this is if your system
+    - Note: If you are NOT an administrator, you will most likely NOT be able to
+      set LiteStep as your shell.  The only exception to this is if your System
       Administrator has enabled "per user" shells.  This is highly unlikely.
 
       While it is "possible" to run LiteStep at the same time as the default
@@ -256,7 +262,123 @@ Contents:
 
 -- USAGE (HELP) ----------------------------------------------------------------
 
--- DEVELOPMENT ----------------------------------------------------------------
+ The following section lays out the structure of LiteStep, and the available
+ configuration options.
+
+ A) LiteStep Structure
+ ---------------------
+ 
+ LiteStep is designed around a modular plugin system.  The LiteStep "core" by
+ itself is rather useless to you until you configure and load a plugin.  These
+ plugins are called "Modules" and are available from several LiteStep community
+ websites (See the ABOUT section).
+
+ Modules
+
+ B) Command Line Parameters
+ --------------------------
+ 
+ Litestep has several command line switches to perform various actions.
+ 
+  -nostartup
+  ----------
+
+   Description:
+    Disables running Windows startup items when loading LiteStep.
+
+    This is useful on Windows 95, Windows 98(se) and Windows ME if you need to
+    restart LiteStep.
+
+    On Windows 2000 and Windows XP this switch is not needed as startup items
+    are ran only once per session.
+
+   Usage:
+    litestep.exe -nostartup
+
+  -startup
+  --------
+  
+   Description:
+    Force running Windows startup items when loading LiteStep.
+
+    On Windows 2000 and Windows XP, startup items are run only once per session.
+    Using this switch overrides that behavior and forces startup item execution.
+
+    This is not useful on Windows 95/98(se)/ME as startup items are always ran.
+    
+   Usage:
+    litestep.exe -startup
+    
+  !<bang command>
+  ---------------
+
+   Description:
+    Executes the specified !bang command.
+
+   Usage:
+    litestep.exe !recycle
+    
+    litestep.exe !ReloadModule "C:\LiteStep\Mmodules\popup.dll"
+
+ C) Step.rc Syntax
+ -----------------
+ 
+ Describe syntax here
+
+ D) Step.rc Directives
+ ---------------------
+
+  Include
+  LoadModule
+  LSNoStartup
+  LSAutoHideModules
+  LSNoShellWarning
+  LSSetAsShell
+  LSUseSystemDDE
+  LSTrayService
+  LSImageFolder
+
+  LitestepDir (Deprecated in 0.24.7)
+  LSLogLevel  (Deprecated in 0.24.7)
+  LSLogFile   (Deprecated in 0.24.7)
+
+  ThemeAuthor
+  ThemeName
+  
+  If
+  Else
+  ElseIf
+  Endif
+
+ e) !Bang Commands
+ -----------------
+
+  !About
+  !Alert
+  !CascadeWindows
+  !Confirm
+  !Execute
+  !Gather
+  !Logoff
+  !MinimizeWindows
+  !Quit
+  !Recycle
+  !Refresh
+  !Reload
+  !ReloadModule
+  !RestoreWindows
+  !Run
+  !Shutdown
+  !SwitchUser
+  !TileWindowsH
+  !TileWindowsV
+  !UnloadModule
+  !HideModules
+  !ShowModules
+  !ToggleModules
+
+
+-- DEVELOPMENT -----------------------------------------------------------------
 
 -- CREDITS ---------------------------------------------------------------------
 
@@ -445,5 +567,34 @@ anniversary of this shell that will forever change the way you interact with
 your Windows desktop.
 
 http://www.lsdev.org/changelog.php
+
+-- LEGAL -----------------------------------------------------------------------
+
+ LiteStep is a replacement shell for the standard Windows® Explorer shell.
+
+ Copyright (C) 1997-1998  Francis Gastellu
+ Copyright (C) 1997-2005  Litestep Development Team
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 51 Franklin
+ Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+ http://www.lsdev.org/
+
+
+
+ ------------------------------------------------------------------------------
+  Windows and Microsoft are registered trademarks of Microsoft Corporation in
+  the United States and other countries.
+ ------------------------------------------------------------------------------
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
