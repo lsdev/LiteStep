@@ -581,57 +581,68 @@ Contents:
 
  E) Step.rc Variables
  --------------------
+  Variables that are evaluated at runtime.
 
-  LitestepDir
-  WinDir
-  UserName
-  QuickLaunch
-  BitBucket
-  Documents
-  Drives
-  Network
-  Controls
-  Dialup
-  NetworkAndDialup
-  Printers
-  Scheduled
-  AdminTools
-  Win9X
-  WinME
-  Win98
-  Win95
-  WinNT
-  WinXP
-  Win2000
-  WinNT4
-  ResolutionX
-  ResolutionY
-  CompileDate
+  1. Folder Path Expansions
 
-  CommonDesktopDir
-  CommonFavorites
-  CommonPrograms
-  CommonStartMenu
-  CommonStartup
-  Cookies
-  Desktop
-  DesktopDir
-  Favorites
-  Fonts
-  History
-  Internet
-  InternetCache
-  Nethood
-  DocumentsDir
-  Printhood
-  Programs
-  Recent
-  Sendto
-  Startmenu
-  Startup
-  Templates
-  Commonadmintoolsdir
-  Admintoolsdir
+   AdminToolsDir
+   CommonAdminToolsDir
+   CommonDesktopDir
+   CommonFavorites
+   CommonPrograms
+   CommonStartMenu
+   CommonStartup
+   Cookies
+   Desktop
+   DesktopDir
+   DocumentsDir
+   Favorites
+   Fonts
+   History
+   Internet
+   InternetCache
+   LitestepDir
+   Nethood
+   Printhood
+   Programs
+   QuickLaunch
+   Recent
+   Sendto
+   Startmenu
+   Startup
+   Templates
+   WinDir
+
+  2. Conditional Expansions
+
+   Win2000
+   Win95
+   Win98
+   Win9X
+   WinME
+   WinNT
+   WinNT4
+   WinXP
+
+  3. Resource Expansions
+
+   CompileDate
+   ResolutionX
+   ResolutionY
+   UserName
+
+  4. GUID Folder Mappings
+
+   AdminTools
+   BitBucket
+   Controls
+   Dialup
+   Documents
+   Drives
+   Network
+   NetworkAndDialup
+   Printers
+   Scheduled
 
  F) !Bang Commands
  -----------------
@@ -916,20 +927,20 @@ Contents:
 
 -- HISTORY ---------------------------------------------------------------------
 
-In December of 1997 Francis Gastellu released the first private build (v1.0 ß1)
-of what was originally named SimpleStep, a shell replacement for Windows95.
-Over the next month several more builds were released, and the project was
-renamed to LiteSTEP, and described as LiteSTEP "will give your windows the
-AfterSTEP look&feel."
+ In December of 1997 Francis Gastellu released the first private build (v1.0 ß1)
+ of what was originally named SimpleStep, a shell replacement for Windows95.
+ Over the next month several more builds were released, and the project was
+ renamed to LiteSTEP, and described as LiteSTEP "will give your windows the
+ AfterSTEP look&feel."
 
-Between 12/14/97 and 05/06/98, Francis released >23 Beta builds of LiteSTEP v1.0
-with the final release of LiteSTEP 1.0 ß23d on 05/06/98.  He subsequently opened
-the Borland C Builder 1.0 source code under the GNU GPL (General Public License)
-and handed the development over to Brandon Williams (Floach) and what became the
-Litestep Development Team.
+ Between 12/14/97 and 05/06/98, Francis released >23 Beta builds of LiteSTEP
+ v1.0 with the final release of LiteSTEP 1.0 ß23d on 05/06/98.  He subsequently
+ opened the Borland C Builder 1.0 based source code under the GNU GPL (General
+ Public License) and handed the development over to Brandon Williams (Floach)
+ and what became the Litestep Development Team.
 
-And while the source was released under the GPL, it came with the following text
-stipulating his desires to see LiteSTEP development continue fork free:
+ And while the source was released under the GPL, it came with the following
+ text stipulating his desires to see LiteSTEP development continue fork free:
 
    Please, do not distribute modified versions on your own or we will end up
    with a big mess.
@@ -940,65 +951,65 @@ stipulating his desires to see LiteSTEP development continue fork free:
    You may also join the Litestep development team, we welcome everybody
    who is motivated.
 
-On 07/20/98 the new Litestep Development Team released their first build of
-LiteSTEP v1.0 ß23e with the help of Francis.
+ On 07/20/98 the new Litestep Development Team released their first build of
+ LiteSTEP v1.0 ß23e with the help of Francis.
 
-On 10/27/98 the Litestep Development Team released "LiteStep Version 0.24.0"
-based on their source tree re-written in plain C using Visual Studio 5 & 6. The
-new source supported modular add-ons allowing 3rd party developers to contribute
-to LiteStep's features.  The release included a complete installer with a
-packaged theme.  Fahim then joined the team and they released three "upgrade"
-builds:
+ On 10/27/98 the Litestep Development Team released "LiteStep Version 0.24.0"
+ based on their source tree re-written in plain C using Visual Studio 5 & 6. The
+ new source supported modular add-ons allowing 3rd party developers to
+ contribute to LiteStep's features.  The release included a complete installer
+ with a packaged theme.  Fahim then joined the team and they released three
+ "upgrade" builds:
 
-0.24.2 (10-30-98)
-0.24.3 (11-06-98)
-0.24.4 (11-28-98)
+ 0.24.2 (10-30-98)
+ 0.24.3 (11-06-98)
+ 0.24.4 (11-28-98)
 
-At this point it was decided the code needed to be cleaned up significantly
-and several new developers were brought on from the module developer community
-with the focus to clean up the supported modules and core.
+ At this point it was decided the code needed to be cleaned up significantly
+ and several new developers were brought on from the module developer community
+ with the focus to clean up the supported modules and core.
 
-On 08/29/99 the team released version 0.24.5 with a new installer and theme.
-Subsequently development continued for three months until Fahim quit and the
-Litestep Development Team lead was given to newcomer, Headius.  NeXTer and
-Message also joined the team at that time.  As development progressed and was
-taken in new directions, jugg, Ender and Visigoth decided to leave the team as
-well.  The last stable release built off of the 0.24.5 code base was dubbed the
-"1999-11-23" build.
+ On 08/29/99 the team released version 0.24.5 with a new installer and theme.
+ Subsequently development continued for three months until Fahim quit and the
+ Litestep Development Team lead was given to newcomer, Headius. NeXTer and
+ Message also joined the team at that time. As development progressed and was
+ taken in new directions, jugg, Ender and Visigoth decided to leave the team as
+ well. The last stable release built off of the 0.24.5 code base was dubbed the
+ "1999-11-23" build.
 
-Under the guide of Headius, LiteStep progressed as a C++/COM implementation
-and found many new features and improvements for themers.  Over the following
-year until early 2001, the team released many intermediate builds on their goal
-for a stable 0.24.6 release.  Unfortunately because of a decision to proceed
-with a major rewrite of the shell's internals, a formal version 0.24.6 was never
-released, even though development continued on the 0.24.6 branch until
-2002-02-16.  As the rewrite (with a goal of being version 0.25.0) continued, the
-community stagnated from the lack of formal releases.
+ Under the guide of Headius, LiteStep progressed as a C++/COM implementation
+ and found many new features and improvements for themers. Over the following
+ year until early 2001, the team released many intermediate builds on their goal
+ for a stable 0.24.6 release. Unfortunately because of a decision to proceed
+ with a major rewrite of the shell's internals, a formal version 0.24.6 was
+ never released, even though development continued on the 0.24.6 branch until
+ 2002-02-16. As the rewrite (with a goal of being version 0.25.0) continued,
+ the community stagnated from the lack of formal releases.
 
-In response to this situation, a group of independant developers formed what
-they named "IndieStep" to continue the 0.24.6 code base while they waited for
-the formal 0.25.0 development to finalize.  Again unfortunately the development
-of 0.25.0 was abandoned due to varying circumstances, and the majority of the
-then current development team quit, leaving LiteStep dead in the water accept
-for the continuing IndieStep development.
+ In response to this situation, a group of independant developers formed what
+ they named "IndieStep" to continue the 0.24.6 code base while they waited for
+ the formal 0.25.0 development to finalize. Again unfortunately the development
+ of 0.25.0 was abandoned due to varying circumstances, and the majority of the
+ then current development team quit, leaving LiteStep dead in the water accept
+ for the continuing IndieStep development.
 
-At this point the Litestep Development Team lead was given to Message, and he
-announced work on LiteStep 0.24.7 which would return the LiteStep code base back
-to stream-lined C++ implementation without COM.  So, again over the following
-year as Message cleaned up the source code and fixed numerous issues, IndieStep
-continued development waiting for a 0.24.7 release.
+ At this point the Litestep Development Team lead was given to Message, and he
+ announced work on LiteStep 0.24.7 which would return the LiteStep code base
+ back to stream-lined C++ implementation without COM. So, again over the
+ following year as Message cleaned up the source code and fixed numerous issues,
+ IndieStep continued development waiting for a 0.24.7 release.
 
-However, Message was deployed to Iraq, and was unable to continue his work on
-0.24.7.  So, The Litestep Development Team's lead once more changed, and Message
-gave it to Ilmcuts from the IndieStep effort.  Ilmcuts quickly progressed the
-code base and released the first beta build of 0.24.7 on March 13, 2003.  By
-May 21, 2004, he had the third release candidate of 0.24.7 ready.
+ However, Message was deployed to Iraq, and was unable to continue his work on
+ 0.24.7. So, The Litestep Development Team's lead once more changed, and
+ Message gave it to Ilmcuts from the IndieStep effort. Ilmcuts quickly
+ progressed the code base and released the first beta build of 0.24.7 on March
+ 13, 2003. By May 21, 2004, he had the third release candidate of 0.24.7 ready.
 
-Now the Litestep Development Team proudly presents "LiteStep 0.24.7" on the 8th
-anniversary of this shell that will forever change the way you interact with
-your Windows desktop.
+ Now the Litestep Development Team proudly presents "LiteStep 0.24.7" on the 8th
+ anniversary of this shell that will forever change the way you interact with
+ your Windows desktop.
 
-http://www.lsdev.org/changelog.php
+ http://www.lsdev.org/changelog.php
 
 -- LEGAL -----------------------------------------------------------------------
 
@@ -1035,7 +1046,6 @@ http://www.lsdev.org/changelog.php
  Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
  http://www.lsdev.org/
-
 
 
  ------------------------------------------------------------------------------
