@@ -329,29 +329,36 @@ Contents:
  C) Step.rc Syntax
  -----------------
 
- - The step.rc is formatted in a <command> [<value> [...]] directive syntax.
+ The step.rc is formatted in a <command> [<value> [...]] directive syntax.
 
- - There may be one directive per textual line.
+  - There may be one directive per textual line.
 
- - <command> must not be quoted, bracketed or in any other way use the reserved
-   characters of the step.rc parsers except in the special case of * character.
+  - <command> must not be quoted, bracketed or in any other way use the reserved
+    characters of the step.rc parsers except in the special case of * character.
 
- - <value> is depedent per <command> directive and is explained in the specific
-   directive's documentation.
+  - <value> is depedent per <command> directive and is explained in the specific
+    directive's documentation.  If it is a directive required by a Module,
+    please read the coresponding documentation provided with the Module.
 
- LiteStep employs three level's of parsing to the step.rc.
+ LiteStep employs three level's of load-time parsing to the step.rc plus
+ evaluating runtime variable expansion.
 
   1. Step.rc File Parser
 
     - The step.rc File Parser reserves "'[]; as special characters.
 
       ;  Used at the beggining of a textual line to deliniate a comment.
-         Comments are lines that are ignored by the Directive Parser.
+         Comments are lines that are ignored by the Directive Parser.  A comment
+         may also exist at the end of a <command> directive.  Everything after
+         (and including) the semicolon is ignored.
 
-    - The File Parser behaves similiarly to a pre-processor. The File processor
-      is the first to touch the step.rc.
+      See "Step.rc Directive Parser" for other operators.
 
-    - Recognizes:
+    - The File Parser behaves similiarly to a pre-processor. The File Parser is
+      the first to touch the step.rc.
+      
+    - The step.rc File Parser evaluates the following Directives:
+
       Include
       If
       ElseIf
@@ -360,10 +367,10 @@ Contents:
 
   2. Step.rc Directive Parser
 
-    - The step.rc Directive Parser reserves $"'[] as special characters.
+    - The step.rc Directive Parser reserves *$"'[] as special characters.
 
-      *  Used at the beggining of a <command> directive to deliniate the ability to
-         specify multiple <command>s of the same name (one per line).
+      *  Used at the beggining of a <command> directive to deliniate the ability
+         to specify multiple <command>s of the same name (one per line).
 
       $$ Used as a set around a <value> parameter to deliniate that a variable
          subsitution should occur for that parameter.
@@ -374,8 +381,8 @@ Contents:
       "" Used as a set around a <value> parameter to deliniate that any enclosed
          whitespace is part of the value (whitespace is TABs and SPACEs).
 
-      '' Used as a set within the <value> parameter to deliniate that the enclosed
-         contents are a sub value.
+      '' Used as a set within the <value> parameter to deliniate that the
+         enclosed contents are a sub value.
 
     - The step.rc Directive Parser recoginizes several <value> types.
 
@@ -387,17 +394,9 @@ Contents:
 
   3. Step.rc Evaluation Parser
 
-
-    - The step.rc Evaluation Parser reservers +-*/=<>() as special characters and
+    - The step.rc Evaluation Parser reservers =<>() as special characters and
       several key words.
  
-      Math
-      ----
-      +      Addition
-      -      Subtraction
-      *      Multiplication
-      /      Division
-   
       Relational
       ----------
       =      Equal
@@ -420,11 +419,28 @@ Contents:
       true   Not False
       false  Not True
 
+  4. Runtime Variable Expansion
+
+    - Variable expansion supports textual replacments and math expressions.
+
+      Math
+      ----
+      +      Addition
+      -      Subtraction
+      *      Multiplication
+      /      Division
+
+      Grouping
+      --------
+      (      Open Parenthesis
+      )      Close Parenthesis
+
+
  D) Step.rc Directives
  ---------------------
 
-  Include
-  -------
+  Include <file>
+  --------------
    Specifies an additional step.rc format file to include.
    
    Usage:
@@ -452,11 +468,11 @@ Contents:
    The expressions that If and ElseIf evaluate can use the following operators,
    listed in order from highest precedence to lowest:
 
-       Parentheses: ( )
-       Unary:       - not
-       Relational:  = < <= <> > >=
-       Logical AND: and
-       Logical OR:  or
+     Parentheses:  ( )
+           Unary:  not
+      Relational:  = < <= <> > >=
+     Logical AND:  and
+      Logical OR:  or
 
    Expressions may also contain Boolean and integer constants and references to
    Litestep variables (e-vars). Do not enclose variables references in dollar
@@ -473,8 +489,8 @@ Contents:
      <lines>
     EndIf
 
-  LoadModule
-  ----------
+  LoadModule <file>
+  -----------------
    Specifies a Module (plugin) to load.
    
    Usage:
@@ -482,58 +498,86 @@ Contents:
     
   LSNoStartup
   -----------
+   Disables running of system Startup items.
 
     Usage:
+     LSNoStartup TRUE
 
   LSAutoHideModules
   -----------------
+   Automatically hides all LiteStep modules from the display when an application
+   enters Full Screen mode. (e.g. A full screen game)
 
     Usage:
+     LSAutoHideModules TRUE
 
   LSNoShellWarning
   ----------------
+   Disables the warning issued when loading Litestep if another shell is already
+   running.  Do not use this setting unless you know what you are doing!
 
     Usage:
+     LSNoShellWarning TRUE
 
   LSSetAsShell
   ------------
+   Registers LiteStep as the system shell on load. This will enable automatic
+   respawning of LiteStep if it exits inadvertantly. However, this feature is
+   experimental and not recommended at this time.  If you experience problem
+   using Explorer as your file manager, try disabling this setting.
 
     Usage:
+     LSSetAsShell TRUE
 
   LSUseSystemDDE
   --------------
+   Enables Dynamic Data Exchange under LiteStep. This is required to enable
+   many features of the Explorer file manager and other system services. However
+   its functionality is not fully developed at this time and irregularities may
+   exist. If you experience resource usage troubles, try disabling this setting.
 
     Usage:
+     LSUseSystemDDE TRUE
 
   LSTrayService
   -------------
+   Allows disabling the Icon Notification (Systray) service.  This is useful if
+   you have to run ontop of another shell, or if you have another application
+   implementing the service.  By default this service is enabled.
 
     Usage:
+     LSTrayService FALSE
 
   LSImageFolder
   -------------
+   Sets the default folder that LiteStep looks in when loading images. This will
+   default to <install path>\images (e.g. C:\LiteStep\images).
 
     Usage:
+     C:\LiteStep\themes\mytheme\images
 
   ThemeAuthor
   -----------
+   Sets the name of the Author of the current Theme and is displayed in the
+   !About box dialog.
 
     Usage:
+     ThemeAuthor "Mr. ThemeWizard"
 
   ThemeName
   ---------
+   Sets the name of the current Theme and is displayed in the !About box dialog.
 
     Usage:
+     ThemeName "Elite-h/\x"
 
-  LSLogLevel  (Deprecated in 0.24.7)
+  LSLogLevel
   ----------
+   (Deprecated in 0.24.7)
 
-    Usage:
-
-  LSLogFile   (Deprecated in 0.24.7)
+  LSLogFile
   ---------
-
-    Usage:
+   (Deprecated in 0.24.7)
 
  E) Step.rc Variables
  --------------------
