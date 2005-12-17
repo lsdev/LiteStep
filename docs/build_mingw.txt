@@ -1,0 +1,91 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    LiteStep 0.24.7
+    Developer Information
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+
+-- NOTE ------------------------------------------------------------------------
+
+ It is assumed that the LiteStep sourcecode is in a directory called "ls-b247".
+ This is not crucial for compiling the LiteStep core but it saves you from
+ editing the path to lsapi if you want to compile a module developed with
+ 0.24.7.
+ 
+ MinGW build support is considered experimental at this time. Visual C++ 6.0 is
+ currently the only officially supported compiler.
+
+
+-- BUILD REQUIREMENTS ----------------------------------------------------------
+ 
+ - MinGW 4.1.0 (www.mingw.org)
+ - libpng 1.2.8 (www.devpaks.org)
+ - zlib 1.2.3 (www.devpaks.org)
+ 
+ This is the configuration used during 0.24.7 development, it is quite possible
+ that other versions of the above libraries can be used, but there's no
+ guarantee. If you can provide additional information about this please let us
+ know.
+ 
+ 
+-- BUILD SETUP -----------------------------------------------------------------
+
+ A. Install MinGW
+ ----------------
+ 
+  1. Download the MinGW installer (MinGW-4.1.0.exe) from www.mingw.org.
+  
+  2. Run the installer. At a minimum you need to install the runtime, w32api,
+     binutils, gcc-core, gcc-g++, and mingw32-make packages. These are all
+     included if you install with the default settings.
+     
+  3. Add the MinGW bin directory to your PATH.
+  
+ B. Install libpng and zlib
+ --------------------------
+ 
+  1. Download the libpng and zlib devpaks from www.devpaks.org.
+  
+  2. Rename the files to change the .DevPak extension to .tar.bz2.
+  
+  3. Extract both files into your MinGW directory, so that the binaries go in
+     \bin, headers go in \include, and libraries (.a) go in \lib.
+  
+
+-- BUILDING LITESTEP -----------------------------------------------------------
+
+ A. Extract source code
+ ----------------------
+ 
+  1. Create a build directory for the source code (ls-b247, for example).
+  
+  2. Extract the source code into the build directory. So that the build
+     directory has the following structure:
+     
+     \ls-b247
+         \hook
+         \litestep
+         \lsapi
+         \utility
+ 
+ B. Compile
+ ----------
+ 
+  1. Open a command prompt and change to the build directory.
+  
+  2. Create the output directory: mkdir Release
+  
+  3. Run: mingw32-make
+
+ 
+-- FILE DESCRIPTION ------------------------------------------------------------
+
+ - litestep.exe     Main executable. Loads modules, handles window messages
+                    communication. Runs startup apps, includes DDE and tray
+                    services.
+
+ - lsapi.dll        LiteStep API for modules to use. Loads and parses step.rc;
+                    handles $evars$ and all other configuration. Manages !bang
+                    commands, includes core !bangs.
+
+ - hook.dll
