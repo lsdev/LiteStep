@@ -525,6 +525,8 @@ Contents:
   ------------------
    Disables running of system Startup items.
 
+   Note: LiteStep must be restarted for this setting to take affect.
+
    Usage:
     LSNoStartup TRUE
 
@@ -541,6 +543,8 @@ Contents:
    Disables the warning issued when loading Litestep if another shell is already
    running.  Do not use this setting unless you know what you are doing!
 
+   Note: LiteStep must be restarted for this setting to take affect.
+
    Usage:
     LSNoShellWarning TRUE
 
@@ -550,6 +554,8 @@ Contents:
    re-spawn of LiteStep if LiteStep exits inadvertently. However, this feature
    is experimental and not recommended at this time.  If you experience problem
    using Explorer as your file manager, try disabling this setting.
+
+   Note: LiteStep must be restarted for this setting to take affect.
 
    Usage:
     LSSetAsShell TRUE
@@ -561,6 +567,8 @@ Contents:
    its functionality is not fully developed at this time and irregularities may
    exist. If you experience resource usage troubles, try disabling this setting.
 
+   Note: LiteStep must be restarted for this setting to take affect.
+
    Usage:
     LSUseSystemDDE TRUE
 
@@ -569,6 +577,8 @@ Contents:
    Disables the Icon Notification (Systray) service.  This is useful if you have
    to run LiteStep on top of another shell, or if you have another application
    implementing the service.
+
+   Note: LiteStep must be restarted for this setting to take affect.
 
    Usage:
     LSDisableTrayService TRUE
