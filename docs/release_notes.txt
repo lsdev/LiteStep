@@ -282,72 +282,258 @@ Contents:
  
   -nostartup
   ----------
+   Disables running Windows startup items when loading LiteStep.
 
-   Description:
-    Disables running Windows startup items when loading LiteStep.
+   This is useful on Windows 95, Windows 98(se) and Windows ME if you need to
+   restart LiteStep.
 
-    This is useful on Windows 95, Windows 98(se) and Windows ME if you need to
-    restart LiteStep.
-
-    On Windows 2000 and Windows XP this switch is not needed as startup items
-    are ran only once per session.
+   On Windows 2000 and Windows XP this switch is not needed as startup items are
+   ran only once per session.
 
    Usage:
     litestep.exe -nostartup
 
   -startup
   --------
-  
-   Description:
-    Force running Windows startup items when loading LiteStep.
+   Force running Windows startup items when loading LiteStep.
 
-    On Windows 2000 and Windows XP, startup items are run only once per session.
-    Using this switch overrides that behavior and forces startup item execution.
+   On Windows 2000 and Windows XP, startup items are run only once per session.
+   Using this switch overrides that behavior and forces startup item execution.
 
-    This is not useful on Windows 95/98(se)/ME as startup items are always ran.
+   This is not useful on Windows 95/98(se)/ME as startup items are always ran.
     
    Usage:
     litestep.exe -startup
     
   !<bang command>
   ---------------
-
-   Description:
-    Executes the specified !bang command.
+   Passes the specified !bang command and parameters to a currently running
+   instance of LiteStep. The previous instance of LiteStep receiving the !bang
+   command executes the specified !bang command.
+   
+   This is useful for external control of LiteStep, perhaps from a script.
 
    Usage:
     litestep.exe !recycle
-    
-    litestep.exe !ReloadModule "C:\LiteStep\Mmodules\popup.dll"
+    litestep.exe !ReloadModule "C:\LiteStep\modules\popup.dll"
+
+  <file>
+  ------
+   Specifies the absolute path of the "step.rc" configuration file LiteStep
+   should read its directives from.  This overrides the default of using the
+   step.rc file located in the same folder as litestep.exe.
+
+   Usage:
+    litestep.exe C:\LiteStep\step.rc
 
  C) Step.rc Syntax
  -----------------
+
+ - The step.rc is formatted in a <command> [<value> [...]] directive syntax.
+
+ - There may be one directive per textual line.
+
+ - <command> must not be quoted, bracketed or in any other way use the reserved
+   characters of the step.rc parsers except in the special case of * character.
+
+ - <value> is depedent per <command> directive and is explained in the specific
+   directive's documentation.
+
+ LiteStep employs three level's of parsing to the step.rc.
+
+  1. Step.rc File Parser
+
+    - The step.rc File Parser reserves "'[]; as special characters.
+
+      ;  Used at the beggining of a textual line to deliniate a comment.
+         Comments are lines that are ignored by the Directive Parser.
+
+    - The File Parser behaves similiarly to a pre-processor. The File processor
+      is the first to touch the step.rc.
+
+    - Recognizes:
+      Include
+      If
+      ElseIf
+      Else
+      Endif
+
+  2. Step.rc Directive Parser
+
+    - The step.rc Directive Parser reserves $"'[] as special characters.
+
+      *  Used at the beggining of a <command> directive to deliniate the ability to
+         specify multiple <command>s of the same name (one per line).
+
+      $$ Used as a set around a <value> parameter to deliniate that a variable
+         subsitution should occur for that parameter.
+
+      [] Used as a set around a <value> parameter to deliniate that the contents
+         are a single token value.
+
+      "" Used as a set around a <value> parameter to deliniate that any enclosed
+         whitespace is part of the value (whitespace is TABs and SPACEs).
+
+      '' Used as a set within the <value> parameter to deliniate that the enclosed
+         contents are a sub value.
+
+    - The step.rc Directive Parser recoginizes several <value> types.
+
+      Int
+      String
+      Bool
+      Line
+      Color
+
+  3. Step.rc Evaluation Parser
+
+
+    - The step.rc Evaluation Parser reservers +-*/=<>() as special characters and
+      several key words.
  
- Describe syntax here
+      Math
+      ----
+      +      Addition
+      -      Subtraction
+      *      Multiplication
+      /      Division
+   
+      Relational
+      ----------
+      =      Equal
+      <>     Not Equal
+      <      Less Than
+      <=     Less Than or Equal To
+      >      Greater Than
+      >=     Greater Than or Equal To
+   
+      Grouping
+      --------
+      (      Open Parenthesis
+      )      Close Parenthesis
+
+      Logical
+      -------
+      and    Both
+      or     Either
+      not    Negate
+      true   Not False
+      false  Not True
 
  D) Step.rc Directives
  ---------------------
 
   Include
-  LoadModule
-  LSNoStartup
-  LSAutoHideModules
-  LSNoShellWarning
-  LSSetAsShell
-  LSUseSystemDDE
-  LSTrayService
-  LSImageFolder
+  -------
+   Specifies an additional step.rc format file to include.
+   
+   Usage:
+    Include C:\LiteStep\config\theme.rc
+  
+  If, ElseIf, Else, and EndIf
+  ---------------------------
+   Conditionally parse a section of the step.rc.
 
-  LSLogLevel  (Deprecated in 0.24.7)
-  LSLogFile   (Deprecated in 0.24.7)
+   The If directive marks the start of a conditional section. The If directive
+   evalutes an expression to produce a true (nonzero) or false (zero) result. If
+   the result is true then the lines following up to the next ElseIf, Else, or
+   EndIf are parsed, otherwise they are ignored.
+
+   The ElseIf directive behaves like an If, but the expression is evaluated only
+   if all of the previous If and ElseIf expressions have evaluated to false.
+
+   The Else directive parses the lines that follow it only if all the previous
+   If and Elseif expressions have evaluated to false. There may be at most one
+   Else and it must follow any ElseIfs.
+
+   The EndIf directive marks the end of a conditional section. Each If directive
+   must have a corresponding EndIf. If-EndIf blocks may be nested to any depth.
+
+   The expressions that If and ElseIf evaluate can use the following operators,
+   listed in order from highest precedence to lowest:
+
+       Parentheses: ( )
+       Unary:       - not
+       Relational:  = < <= <> > >=
+       Logical AND: and
+       Logical OR:  or
+
+   Expressions may also contain Boolean and integer constants and references to
+   Litestep variables (e-vars). Do not enclose variables references in dollar
+   signs ($) when they occur in conditional expressions. Strings are not
+   supported in expressions (neither string constants nor string variables) in
+   0.24.7.
+
+   Usage:
+    If <expression>
+     <lines>
+    ElseIf <expression>
+     <lines>
+    Else
+     <lines>
+    EndIf
+
+  LoadModule
+  ----------
+   Specifies a Module (plugin) to load.
+   
+   Usage:
+    LoadModule C:\LiteStep\modules\popup.dll
+    
+  LSNoStartup
+  -----------
+
+    Usage:
+
+  LSAutoHideModules
+  -----------------
+
+    Usage:
+
+  LSNoShellWarning
+  ----------------
+
+    Usage:
+
+  LSSetAsShell
+  ------------
+
+    Usage:
+
+  LSUseSystemDDE
+  --------------
+
+    Usage:
+
+  LSTrayService
+  -------------
+
+    Usage:
+
+  LSImageFolder
+  -------------
+
+    Usage:
 
   ThemeAuthor
+  -----------
+
+    Usage:
+
   ThemeName
-  
-  If
-  Else
-  ElseIf
-  Endif
+  ---------
+
+    Usage:
+
+  LSLogLevel  (Deprecated in 0.24.7)
+  ----------
+
+    Usage:
+
+  LSLogFile   (Deprecated in 0.24.7)
+  ---------
+
+    Usage:
 
  E) Step.rc Variables
  --------------------
@@ -403,7 +589,6 @@ Contents:
   Commonadmintoolsdir
   Admintoolsdir
 
-
  F) !Bang Commands
  -----------------
 
@@ -430,7 +615,6 @@ Contents:
   !HideModules
   !ShowModules
   !ToggleModules
-
 
 -- DEVELOPMENT -----------------------------------------------------------------
 
@@ -623,6 +807,20 @@ your Windows desktop.
 http://www.lsdev.org/changelog.php
 
 -- LEGAL -----------------------------------------------------------------------
+
+ A) Documentation License Notice
+ -------------------------------
+
+ Copyright (c) 2005 Litestep Development Team
+
+ Permission is granted to copy, distribute and/or modify this document under the
+ terms of the GNU Free Documentation License, Version 1.2 or any later version
+ published by the Free Software Foundation; with no Invariant Sections, no
+ Front-Cover Texts, and no Back-Cover Texts.  A copy of the license is included
+ in the section entitled "GNU Free Documentation License".
+
+ B) LiteStep License Notice
+ --------------------------
 
  LiteStep is a replacement shell for the standard Windows® Explorer shell.
 
