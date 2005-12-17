@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7 Release Candidate 4
+    LiteStep 0.24.7
     Changelog
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -35,8 +35,8 @@
    called DDEService and loaded by default. Liteman.dll should no longer be
    loaded.
 
- - Added "LSUseSystemDDE". This loads Windows' DDE server instead of the
-   DDEService. May result in slightly larger memory usage but "proper" DDE
+ - Added "LSUseSystemDDE". This loads the Windows DDE server instead of the
+   DDEService. This may result in slightly larger memory usage but "proper" DDE
    support. LSUseSystemDDE takes effect on startup only, not on !recycle.
    Requires shdocvw.dll from IE.
 
@@ -44,8 +44,8 @@
    !ToggleModules is also available.
 
  - If "LSAutoHideModules" is specified LS tries to automatically hide all module
-   windows if a full-screen app is detected. Once the full-screen app exits
-   !ShowModules is called.
+   windows if a full-screen app is detected. Once the full-screen app exits the
+   modules are redisplayed.
 
  - LCOpen uses a separate SettingsMap for each file opened with LCOpen. This is
    the thread-safe approach but makes it impossible for modules to use the
@@ -62,7 +62,7 @@
  
  - Modules are loaded and unloaded asynchronously (at the same time) if
    threaded. This should lead to faster start and recycle times if threading is
-   used.
+   used. Specify a threaded module by:  LoadModule <file> threaded
 
  - All MessageBoxes (including !alert and !confirm) should now always have focus
    and appear ontop of the active window.
@@ -75,8 +75,8 @@
 
  - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
 
- - Added new step.rc setting "LSTrayService". "LSTrayService FALSE" disables
-   the core's system tray support. Defaults to TRUE.
+ - Added new step.rc setting "LSDisableTrayService". Setting this value disables
+   the core's system tray support.
 
  - LM_UN/RELOADMODULE can now un/reload modules by using the HINSTANCE of the
    module as the wParam. Set the lParam to LMM_HINSTANCE in that case.
