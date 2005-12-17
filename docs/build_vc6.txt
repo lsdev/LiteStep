@@ -1,0 +1,132 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    LiteStep 0.24.7
+    Visual C++ 6.0 Developer Information
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+-- BUILD REQUIREMENTS ----------------------------------------------------------
+
+ - Visual C++ 6.0 with Service Pack 6 (www.microsoft.com)
+ - Microsoft Platform SDK February 2003 Edition (www.microsoft.com)
+ - libpng 1.2.8 (www.libpng.org)
+ - zlib 1.2.3 (www.zlib.net)
+
+ This is the configuration used during 0.24.7 development, it is quite possible
+ that other versions of the above packages can be used, but there's no
+ guarantee.
+
+
+-- BUILD SETUP -----------------------------------------------------------------
+
+ It is assumed that Visual C++ 6 and Service Pack 6 are already installed. If
+ you don't have Service Pack 6 get it here:
+
+ http://msdn.microsoft.com/vstudio/downloads/updates/sp/vs6/sp6/default.aspx
+
+ A. Install The Platform SDK
+ ---------------------------
+
+  1. Unfortunately the last version of the Platform SDK that is compatible with
+     Visual C++ 6 is no longer available for download.  You may order a free
+     copy (plus shipping) from:
+
+     https://www.qdirect.net/qmsfp/Product5.aspx?Item=1748
+
+     We apologize for this.  We have started testing build files for both MinGW
+     (www.mingw.org) and Visual C++ 2003 which is compatible with current
+     Platform SDK versions.  However, neither build environment is currently
+     supported and all 0.24.x binary releases will be made with Visual C++ 6.
+
+     You may download the latest Platform SDK from:
+
+     http://www.microsoft.com/msdownload/platformsdk/sdkupdate/
+
+  2. Make sure MSVC is closed, then install the Platform SDK. The Platform SDK
+     will create an entry in your start menu. In there you'll find a sub-entry
+     named "Visual Studio Registration". Click on the "Register PSDK
+     Directories with Visual Studio" item.
+
+  3. Verify that the Platform SDK registered correctly with Visual C++.
+
+    - Open MSVC and go to the "Tools" menu and click "Options".
+
+    - Choose the "Directories" tab.
+
+    - Verify that the Platform SDK folders are present for "Executable files",
+      "Include files" and "Library files".
+
+    - Verify that the Platform SDK folders are the first one(s) listed in each
+      list.
+
+ B. Install libpng and zlib
+ --------------------------
+
+  Note: The following instructions explain how to build the libpng and zlib
+        libraries from source code.  However, all you need to build the LiteStep
+        source code are the files libpng13.lib, png.h, pngconf.h, zlib.h and
+        zconf.h placed in your LIB and INCLUDE paths respectively. LiteStep
+        links against libpng13.lib (for debug builds libpng13d.lib) and only
+        includes png.h.
+
+  1. Go to http://www.libpng.org/ and http://www.zlib.net/ and download the
+     respective source code (libpng-1.2.8-src.zip and zlib123.zip).
+
+  2. Extract the archives to two directories "libpng" and "zlib" in the same
+     parent directory the LiteStep source resides in (make sure you extract zlib
+     to "zlib" and not "zlib-1.2.3" or something else). For instance the
+     directory structure could look like this:
+
+      c:\dev\libpng
+      c:\dev\LiteStep
+      c:\dev\zlib
+
+  3. Open the \libpng\projects\visualc6\libpng.dsw workspace file in MSVC.
+
+  4. In the "Build" menu select "Set Active Configuration" and choose
+     "libpng - Win32 DLL".
+
+  5. Select "Rebuild All" in the "Build" menu to start compiling.
+
+  6. Repeat steps 4 and 5 for the "libpng - Win32 DLL Debug" configuration.
+
+  7. Update the Visual C++ build Directory listings.
+
+    - Add the <path-to-libpng> folder to the "Include files" Directory list.
+
+    - Add the <path-to-zlib> folder to the "Include files" Directory list.
+
+    - Add the <path-to-libpng>\projects\visualc6\Win32_DLL_Release path to the
+      "Library files" Directory list.
+
+    - Add the <path-to-libpng>\projects\visualc6\Win32_DLL_Debug path to the
+      "Library files" Directory list.
+
+
+-- BUILDING LITESTEP -----------------------------------------------------------
+
+ A. Extract source code
+ ----------------------
+
+  1. Create a build directory for the source code (LiteStep, for example).
+
+  2. Extract the source code into the build directory. So that the build
+     directory has the following structure:
+
+     \LiteStep
+         \hook
+         \litestep
+         \lsapi
+         \utility
+
+ B. Compile
+ ----------
+
+  1. Open the \litestep.dsw workspace file in MSVC.
+
+  2. In the "Build" menu select "Set Active Configuration" and choose the
+     desired build type of the litestep project.
+
+  3. Select "Rebuild All" in the "Build" menu to start compiling.
+
+  4. The output directory is a subdirectory of \LiteStep\litestep, depending on
+     your build choice (Debug or Release).
