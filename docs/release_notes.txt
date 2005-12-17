@@ -593,28 +593,178 @@ Contents:
  -----------------
 
   !About
+  ------
+   Displays LiteStep's about box.
+   
+   Usage:
+    !About
+  
   !Alert
+  ------
+   Displays a message box.
+   
+   Usage:
+    !Alert <message> [<title>]
+  
   !CascadeWindows
+  ---------------
+   Cascades all non-minimized application windows.
+   
+   Usage:
+    !CascadeWindows
+  
   !Confirm
+  --------
+   Displays a message box that allows the user to choose Yes or No. Executes a
+   different command based on the users choice.
+   
+   Usage:
+    !Confirm <message> [<title>] <yes-command> <no-command>
+  
   !Execute
+  --------
+   Executes a sequence of programs or bang commands.
+   
+   Usage:
+    !Execute <command1> [<command2> [...]]
+  
   !Gather
-  !Logoff
-  !MinimizeWindows
-  !Quit
-  !Recycle
-  !Refresh
-  !Reload
-  !ReloadModule
-  !RestoreWindows
-  !Run
-  !Shutdown
-  !SwitchUser
-  !TileWindowsH
-  !TileWindowsV
-  !UnloadModule
+  -------
+   Moves all application windows to the current virtual desktop.
+   
+   Usage:
+    !Gather
+  
   !HideModules
+  ------------
+   Hides all modules.
+   
+   Usage:
+    !HideModules
+  
+  !Logoff
+  -------
+   Logs off the current user. Does not display a prompt first.
+   
+   Usage:
+    !Logoff
+  
+  !MinimizeWindows
+  ----------------
+   Minimizes all application windows.
+   
+   Usage:
+    !MinimizeWindows
+  
+  !None
+  -----
+   Does nothing. Useful as a placeholder where a command is required.
+   
+   Usage:
+    !None
+  
+  !Quit
+  -----
+   Shuts down LiteStep, but does not shut down Windows. Be careful as there will
+   not be a shell running after this command is executed.
+   
+   Usage:
+    !Quit
+   
+  !Recycle
+  --------
+   Reloads configuration files and modules. You can pause a recycle operation by
+   holding down the shift key. This allows you to replace a module.
+   
+   Usage:
+    !Recycle
+  
+  !Refresh
+  --------
+   Reloads configuration files and notifies modules to update, however not all
+   modules support this.
+   
+   Usage:
+    !Refresh
+  
+  !Reload
+  -------
+   Reloads configuration files. Does not reload modules or notify them.
+   
+   Usage:
+    !Reload
+  
+  !ReloadModule
+  -------------
+   Reloads a specific module. Does not reload configuration files.
+   
+   Usage:
+    !ReloadModule <path>
+  
+  !RestoreWindows
+  ---------------
+   Restores all minimized application windows.
+   
+   Usage:
+    !RestoreWindows
+  
+  !Run
+  ----
+   Displays the Windows Run dialog box.
+   
+   Usage:
+    !Run
+  
   !ShowModules
+  ------------
+   Shows all modules.
+   
+   Usage:
+    !ShowModules
+  
+  !Shutdown
+  ---------
+   Displays the Windows Shutdown dialog box.
+   
+   Usage:
+    !Shutdown
+  
+  !SwitchUser
+  -----------
+   Switch to another user with logging off the current user. This command only
+   works on Windows XP or later.
+   
+   Usage:
+    !SwitchUser
+  
+  !TileWindowsH
+  -------------
+   Tiles all non-minimized application windows horizontally.
+   
+   Usage:
+    !TileWindowsH
+  
+  !TileWindowsV
+  -------------
+   Tiles all non-minimized application windows vertically.
+   
+   Usage:
+    !TileWindowsV
+  
   !ToggleModules
+  --------------
+   Toggles the visibility of all modules.
+   
+   Usage:
+    !ToggleModules
+  
+  !UnloadModule
+  -------------
+   Unloads a specific module.
+   
+   Usage:
+    !UnloadModule <path>
+  
 
 -- DEVELOPMENT -----------------------------------------------------------------
 
