@@ -954,7 +954,7 @@ HRESULT CLiteStep::_InitServices()
     //
     // Tray Service
     //
-    if (GetRCBoolDef("LSTrayService", TRUE))
+    if (GetRCBool("LSDisableTrayService", FALSE))
     {
         m_pTrayService = new TrayService();
         
@@ -1134,6 +1134,9 @@ void CLiteStep::_Recycle()
 	}
 
 	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
+
+	/* Read in our locally affected settings */
+	m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
 
 	_StartManagers();
 }
