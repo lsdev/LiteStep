@@ -532,7 +532,7 @@ int CLiteStep::MessageHandler(MSG &message)
 	}
 	catch(...)
 	{
-		MessageBox(m_hMainWindow, "exception", "oops", MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION);
+		// MessageBox(m_hMainWindow, "exception", "oops", MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION);
 	}
 #endif /* LS_NO_EXCEPTION */
 
