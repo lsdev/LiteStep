@@ -111,7 +111,7 @@ private:
     SettingsMap& mContext;
     
     /** Number of tokens of lookahead */
-    static const int LOOKAHEAD = 2;
+    enum { LOOKAHEAD = 2; }
     
     /** Token buffer */
     MathToken mLookahead[LOOKAHEAD];

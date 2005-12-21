@@ -143,7 +143,7 @@ bool MathValue::ToBoolean() const
 int MathValue::ToInteger() const
 {
     double number = ToNumber();
-    return finite(number) ? static_cast<int>(floor(number)) : 0;
+    return _finite(number) ? static_cast<int>(floor(number)) : 0;
 }
 
 
@@ -357,7 +357,7 @@ MathValue MathIntDivide(const MathValue& a, const MathValue& b)
 
 string MathNumberToString(double number)
 {
-    if (finite(number))
+    if (_finite(number))
     {
         // Number
         ostringstream stream;

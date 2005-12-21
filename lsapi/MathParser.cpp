@@ -691,7 +691,7 @@ MathValue Math_max(const MathValueList& argList)
     double a = argList[0].ToNumber();
     double b = argList[1].ToNumber();
     
-    if (isnan(a) || isnan(b))
+    if (_isnan(a) || _isnan(b))
     {
         return numeric_limits<double>::quiet_NaN();
     }
@@ -706,7 +706,7 @@ MathValue Math_min(const MathValueList& argList)
     double a = argList[0].ToNumber();
     double b = argList[1].ToNumber();
     
-    if (isnan(a) || isnan(b))
+    if (_isnan(a) || _isnan(b))
     {
         return numeric_limits<double>::quiet_NaN();
     }
@@ -733,7 +733,7 @@ MathValue Math_pow(const MathValueList& argList)
 MathValue Math_round(const MathValueList& argList)
 {
     double x = argList[0].ToNumber();
-    return copysign(floor(x + 0.5), x);
+    return _copysign(floor(x + 0.5), x);
 }
 
 
