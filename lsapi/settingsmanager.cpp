@@ -25,6 +25,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 #include <stdexcept>
 
+#include "MathEvaluate.h"
+#include <string>
+
+using std::string;
+
 #if !defined(CSIDL_COMMON_ADMINTOOLS)
 #  define CSIDL_COMMON_ADMINTOOLS 0x002F
 #  define CSIDL_ADMINTOOLS 0x0030
@@ -439,7 +444,7 @@ void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
     }
 }
 
-
+#if 0
 void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
 {
     LPCSTR pszOriginalTemplate = pszTemplate;
@@ -542,6 +547,125 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 #else /* LS_COMPAT_MATH */
                             pszTempExpandedString[0] = '\0';
 #endif // LS_COMPAT_MATH
+                        }
+					}
+				}
+				//
+				// If we succeeded, adjust our output buffers
+				// accordingly:
+				//
+				if (bSucceeded)
+				{
+					stWorkLength -= strlen(pszTempExpandedString);
+					pszTempExpandedString += strlen(pszTempExpandedString);
+				}
+
+				//
+				// Move to the next character if we didn't run out of space:
+				//
+				if (*pszTemplate != '\0')
+				{
+					++pszTemplate;
+				}
+			}
+		}
+		*pszTempExpandedString = '\0';
+
+		if (strchr(szTempExpandedString, '$'))
+		{
+			VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
+		}
+		else
+		{
+			StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
+		}
+	}
+}
+#endif
+
+void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
+{
+    LPCSTR pszOriginalTemplate = pszTemplate;
+    char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
+	LPSTR pszTempExpandedString = szTempExpandedString;
+	size_t stWorkLength = stLength;
+
+	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stWorkLength > 0))
+	{
+		//szTempExpandedString[0] = '\0';
+
+		while ((*pszTemplate != '\0') && (stWorkLength > 0))
+		{
+			if (*pszTemplate != '$')
+			{
+				*pszTempExpandedString = *pszTemplate;
+				++pszTemplate;
+				++pszTempExpandedString;
+				--stWorkLength;
+			}
+			else
+			{
+				//
+				// This is a variable so we need to find the end of it:
+				//
+                ++pszTemplate;
+                
+                LPCSTR pszVariable = pszTemplate;
+                
+                while ((*pszTemplate != '$') && (*pszTemplate != '\0'))
+                {
+                    ++pszTemplate;
+                }
+
+				bool bSucceeded = false;
+
+				if (*pszTemplate == '\0')
+				{
+					bSucceeded = SUCCEEDED(
+                        StringCchCopyNEx(pszTempExpandedString,
+                        MAX_LINE_LENGTH - (pszTempExpandedString - szTempExpandedString),
+                        pszVariable, pszTemplate - pszVariable, NULL, NULL,
+                        STRSAFE_NULL_ON_FAILURE));
+				}
+				else
+				{
+					//
+					// We've found the end of the variable so copy it
+					// someplace usefull:
+					//
+                    char szVariable[MAX_LINE_LENGTH];
+
+                    StringCchCopyNEx(szVariable, MAX_LINE_LENGTH, pszVariable,
+                        pszTemplate - pszVariable, NULL, NULL,
+                        STRSAFE_NULL_ON_FAILURE);
+
+                    if (szVariable[0] != '\0')
+                    {
+                        //
+                        // Get the value, if we can.
+                        //
+                        SettingsMap::iterator it;
+                        if (_FindLine(szVariable, it))
+                        {
+                            GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
+                            bSucceeded = true;
+                        }
+                        else if (GetEnvironmentVariable(szVariable,
+							pszTempExpandedString,
+							static_cast<DWORD>(stLength)))
+                        {
+                            bSucceeded = true;
+                        }
+                        else
+                        {
+                            string result;
+                            pszTempExpandedString[0] = '\0';
+                            
+                            if (MathEvaluateString(m_SettingsMap, szVariable, result, MATH_EXCEPTION_ON_UNDEFINED))
+                            {
+                                StringCchCopy(pszTempExpandedString, stLength, result.c_str());
+                                bSucceeded = true;
+                            }
                         }
 					}
 				}

@@ -104,6 +104,11 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/lsapi.res \
 	$(OUTPUT)/lsmultimon.o \
 	$(OUTPUT)/match.o \
+	$(OUTPUT)/MathEvaluate.o \
+	$(OUTPUT)/MathParser.o \
+	$(OUTPUT)/MathScanner.o \
+	$(OUTPUT)/MathToken.o \
+	$(OUTPUT)/MathValue.o \
 	$(OUTPUT)/png_support.o \
 	$(OUTPUT)/safeptr.o \
 	$(OUTPUT)/settings.o \
@@ -479,6 +484,35 @@ $(OUTPUT)/match.o: lsapi/match.cpp \
 	utility/common.h \
 	utility/debug.hpp
 
+$(OUTPUT)/MathParser.o: lsapi/MathParser.cpp \
+	litestep/buildoptions.h \
+	lsapi/lsapi.h \
+	lsapi/lsapidefines.h \
+	lsapi/lsmultimon.h \
+	lsapi/MathException.h \
+	lsapi/MathParser.h \
+	lsapi/MathScanner.h \
+	lsapi/MathToken.h \
+	lsapi/MathValue.h \
+	lsapi/SettingsDefines.h \
+	lsapi/SettingsIterator.h \
+	lsapi/SettingsManager.h \
+	utility/common.h \
+	utility/debug.hpp \
+	utility/CriticalSection.h \
+	utility/stringutility.h
+
+$(OUTPUT)/MathScanner.o: lsapi/MathScanner.cpp \
+	lsapi/MathException.h \
+	lsapi/MathScanner.h \
+	lsapi/MathToken.h
+
+$(OUTPUT)/MathToken.o: lsapi/MathToken.cpp \
+	lsapi/MathToken.h
+
+$(OUTPUT)/MathValue.o: lsapi/MathValue.cpp \
+	lsapi/MathValue.h
+
 $(OUTPUT)/png_support.o: lsapi/png_support.cpp \
 	litestep/buildoptions.h \
 	lsapi/lsapidefines.h \
@@ -520,6 +554,7 @@ $(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsmultimon.h \
+	lsapi/MathEvaluate.h \
 	lsapi/SettingsDefines.h \
 	lsapi/SettingsEvalParser.h \
 	lsapi/SettingsFileParser.h \
@@ -555,6 +590,7 @@ $(OUTPUT)/SettingsManager.o: lsapi/SettingsManager.cpp \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsmultimon.h \
+	lsapi/MathEvaluate.h \
 	lsapi/SettingsDefines.h \
 	lsapi/SettingsEvalParser.h \
 	lsapi/SettingsFileParser.h \
