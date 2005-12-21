@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 libpng13.lib ole32.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /base:"0x13000000" /subsystem:windows /dll /pdb:none /map:"../litestep/Release/lsapi.map" /machine:I386 /nodefaultlib /out:"..\litestep\Release\lsapi.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 delayimp.lib libpng13.lib ole32.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /base:"" /subsystem:windows /dll /pdb:none /map:"../litestep/Release/lsapi.map" /machine:I386 /nodefaultlib /out:"..\litestep\Release\lsapi.dll" /delayload:"libpng13.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "lsapi - Win32 Debug"
 
@@ -82,7 +82,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 delayimp.lib libpng13.lib winspool.lib ole32.lib oleaut32.lib uuid.lib version.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /dll /profile /debug /machine:I386 /nodefaultlib /out:"..\litestep\Debug\lsapi.dll" /delayload:"libpng13.dll"
+# ADD LINK32 delayimp.lib libpng13d.lib ole32.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /base:"" /subsystem:windows /dll /debug /machine:I386 /nodefaultlib /out:"..\litestep\Debug\lsapi.dll" /delayload:"libpng13d.dll"
+# SUBTRACT LINK32 /profile
 
 !ENDIF 
 
