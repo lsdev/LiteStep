@@ -59,7 +59,7 @@ private:
 private:
 
     /** Number of characters of lookahead */
-    enum { LOOKAHEAD = 2; }
+    enum { LOOKAHEAD = 2 };
     
     /** Character buffer */
     int mLookahead[LOOKAHEAD];

@@ -14,7 +14,7 @@
 #include "MathToken.h"
 #include "MathValue.h"
 #include "lsapi.h"
-#include "SettingsManager.h"
+#include "SettingsDefines.h"
 #include <strsafe.h>
 
 using namespace std;
