@@ -194,8 +194,13 @@ MathValue MathParser::GetVariable(const string& name) const
     
     if (stricmp(value, "false") == 0 || stricmp(value, "off") == 0 || stricmp(value, "no") == 0)
     {
-        // False is a special case since MathValue("false").ToBoolean() != false
+        // False
         return false;
+    }
+    else if (stricmp(value, "true") == 0 || stricmp(value, "on") == 0 || stricmp(value, "yes") == 0)
+    {
+        // True
+        return true;
     }
     else if (strlen(value) == 0)
     {
