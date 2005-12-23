@@ -136,6 +136,12 @@ const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
 MathParser::MathParser(SettingsMap& context, const string& expression, unsigned int flags) :
     mContext(context), mScanner(expression), mFlags(flags)
 {
+#ifdef _DEBUG
+    char debug[MAX_LINE_LENGTH];
+    StringCchPrintf(debug, MAX_LINE_LENGTH, "Expression: %s", expression.c_str());
+    OutputDebugString(debug);
+#endif
+    
     // Fill the token buffer
     Next(LOOKAHEAD);
 }
@@ -145,6 +151,18 @@ MathValue MathParser::Evaluate()
 {
     MathValue value = ParseExpression();
     Match(TT_END);
+    
+#ifdef _DEBUG
+    char debug[MAX_LINE_LENGTH];
+    StringCchPrintf(debug, MAX_LINE_LENGTH, "Boolean: %s", value.ToBoolean() ? "true" : "false");
+    OutputDebugString(debug);
+    StringCchPrintf(debug, MAX_LINE_LENGTH, "Integer: %d", value.ToInteger());
+    OutputDebugString(debug);
+    StringCchPrintf(debug, MAX_LINE_LENGTH, "Number: %f", value.ToNumber());
+    OutputDebugString(debug);
+    StringCchPrintf(debug, MAX_LINE_LENGTH, "String: %s", value.ToString().c_str());
+    OutputDebugString(debug);
+#endif
     
     return value;
 }
@@ -184,6 +202,11 @@ MathValue MathParser::GetVariable(const string& name) const
     
     if (it == mContext.end())
     {
+#ifdef _DEBUG
+        char debug[MAX_LINE_LENGTH];
+        StringCchPrintf(debug, MAX_LINE_LENGTH, "Undefined Variable %s", name.c_str());
+        OutputDebugString(debug);
+#endif
         // Variable is undefined
         return MathValue();
     }
@@ -191,6 +214,12 @@ MathValue MathParser::GetVariable(const string& name) const
     // Expand variable references
     char value[MAX_LINE_LENGTH];
     VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH);
+    
+#ifdef _DEBUG
+    char debug[MAX_LINE_LENGTH];
+    StringCchPrintf(debug, MAX_LINE_LENGTH, "Variable %s: %s", name.c_str(), value);
+    OutputDebugString(debug);
+#endif
     
     if (stricmp(value, "false") == 0 || stricmp(value, "off") == 0 || stricmp(value, "no") == 0)
     {

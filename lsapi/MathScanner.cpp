@@ -143,7 +143,7 @@ MathToken MathScanner::ScanIdentifier()
 {
     ostringstream value;
     
-    while (isalnum(mLookahead[0]))
+    while (isalnum(mLookahead[0]) || mLookahead[0] == '_')
     {
         value.put(mLookahead[0]);
         Next();
