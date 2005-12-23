@@ -459,6 +459,8 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                         _ProcessLine(tzName, tzValue);
                     }
                 }
+                // We're done
+                break;
             }
             else if (stricmp(tzName, "endif") == 0)
             {
