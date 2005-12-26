@@ -105,6 +105,10 @@ contains(string, string)
   Returns true if the second argument, converted to a string, is a subtring of
   the first argument, converted to a string.
 
+endsWith(string, string)
+  Returns true if the second argument, converted to a string, is a suffix of
+  the first argument, converted to a string.
+
 floor(number)
   Returns the floor (greatest lesser integer) of the argument, converted to a
   number.
@@ -136,6 +140,10 @@ pow(number, number)
 
 round(number)
   Returns the argument, converted to a number, rounded to the nearest integer.
+
+startsWith(string, string)
+  Returns true if the second argument, converted to a string, is a prefix of
+  the first argument, converted to a string.
 
 string(value)
   Returns the argument, converted to a string. For Booleans, true maps to

@@ -131,7 +131,7 @@ bool MathValue::ToBoolean() const
         return (mNumber != 0.0 && !_isnan(mNumber));
         
     case STRING:
-        return !mString.empty();
+        return (!mString.empty() && stricmp(mString.c_str(), "false") != 0);
     }
     
     // Should never happen
@@ -260,29 +260,41 @@ MathValue operator!(const MathValue& a)
 
 MathValue operator==(const MathValue& a, const MathValue& b)
 {
-    if (a.IsString() && b.IsString())
+    if (a.IsBoolean() || b.IsBoolean())
+    {
+        // If either operand is a Boolean, then do a Boolean comparison
+        return (a.ToBoolean() == b.ToBoolean());
+    }
+    else if (a.IsString() && b.IsString())
     {
         // If both operands are strings then do a string comparison
         return (a.ToString() == b.ToString());
     }
-    
-    // In all other cases do a numeric comparison. Note that this correctly
-    // handles comparison of Booleans.
-    return (a.ToNumber() == b.ToNumber());
+    else
+    {
+        // In all other cases do a numeric comparison.
+        return (a.ToNumber() == b.ToNumber());
+    }
 }
 
 
 MathValue operator!=(const MathValue& a, const MathValue& b)
 {
-    if (a.IsString() && b.IsString())
+    if (a.IsBoolean() || b.IsBoolean())
+    {
+        // If either operand is a Boolean, then do a Boolean comparison
+        return (a.ToBoolean() != b.ToBoolean());
+    }
+    else if (a.IsString() && b.IsString())
     {
         // If both operands are strings then do a string comparison
         return (a.ToString() != b.ToString());
     }
-    
-    // In all other cases do a numeric comparison. Note that this correctly
-    // handles comparison of Booleans.
-    return (a.ToNumber() != b.ToNumber());
+    else
+    {
+        // In all other cases do a numeric comparison.
+        return (a.ToNumber() != b.ToNumber());
+    }
 }
 
 
@@ -293,9 +305,11 @@ MathValue operator<(const MathValue& a, const MathValue& b)
         // If both operands are strings then do a string comparison
         return (a.ToString() < b.ToString());
     }
-    
-    // In all other cases do a numeric comparison
-    return (a.ToNumber() < b.ToNumber());
+    else
+    {
+        // In all other cases do a numeric comparison
+        return (a.ToNumber() < b.ToNumber());
+    }
 }
 
 
@@ -306,9 +320,11 @@ MathValue operator<=(const MathValue& a, const MathValue& b)
         // If both operands are strings then do a string comparison
         return (a.ToString() <= b.ToString());
     }
-    
-    // In all other cases do a numeric comparison
-    return (a.ToNumber() <= b.ToNumber());
+    else
+    {
+        // In all other cases do a numeric comparison
+        return (a.ToNumber() <= b.ToNumber());
+    }
 }
 
 
@@ -319,9 +335,11 @@ MathValue operator>(const MathValue& a, const MathValue& b)
         // If both operands are strings then do a string comparison
         return (a.ToString() > b.ToString());
     }
-    
-    // In all other cases do a numeric comparison
-    return (a.ToNumber() > b.ToNumber());
+    else
+    {
+        // In all other cases do a numeric comparison
+        return (a.ToNumber() > b.ToNumber());
+    }
 }
 
 
@@ -332,9 +350,11 @@ MathValue operator>=(const MathValue& a, const MathValue& b)
         // If both operands are strings then do a string comparison
         return (a.ToString() >= b.ToString());
     }
-    
-    // In all other cases do a numeric comparison
-    return (a.ToNumber() >= b.ToNumber());
+    else
+    {
+        // In all other cases do a numeric comparison
+        return (a.ToNumber() >= b.ToNumber());
+    }
 }
 
 

@@ -94,6 +94,7 @@ static MathValue Math_abs(const MathValueList& argList);
 static MathValue Math_boolean(const MathValueList& argList);
 static MathValue Math_ceil(const MathValueList& argList);
 static MathValue Math_contains(const MathValueList& argList);
+static MathValue Math_endsWith(const MathValueList& argList);
 static MathValue Math_floor(const MathValueList& argList);
 static MathValue Math_integer(const MathValueList& argList);
 static MathValue Math_length(const MathValueList& argList);
@@ -103,31 +104,32 @@ static MathValue Math_min(const MathValueList& argList);
 static MathValue Math_number(const MathValueList& argList);
 static MathValue Math_pow(const MathValueList& argList);
 static MathValue Math_round(const MathValueList& argList);
+static MathValue Math_startsWith(const MathValueList& argList);
 static MathValue Math_string(const MathValueList& argList);
 static MathValue Math_sqrt(const MathValueList& argList);
-static MathValue Math_type(const MathValueList& argList);
 static MathValue Math_upperCase(const MathValueList& argList);
 
 // Mapping of names to predefined functions
 struct { const char *name; MathFunction function; int numArgs; } gFunctions[] =
 {
-    { "abs",       Math_abs,       1 },
-    { "boolean",   Math_boolean,   1 },
-    { "ceil",      Math_ceil,      1 },
-    { "contains",  Math_contains,  2 },
-    { "floor",     Math_floor,     1 },
-    { "integer",   Math_integer,   1 },
-    { "length",    Math_length,    1 },
-    { "lowerCase", Math_lowerCase, 1 },
-    { "max",       Math_max,       2 },
-    { "min",       Math_min,       2 },
-    { "number",    Math_number,    1 },
-    { "pow",       Math_pow,       2 },
-    { "round",     Math_round,     1 },
-    { "string",    Math_string,    1 },
-    { "sqrt",      Math_sqrt,      1 },
-    { "type",      Math_type,      1 },
-    { "upperCase", Math_upperCase, 1 }
+    { "abs",        Math_abs,        1 },
+    { "boolean",    Math_boolean,    1 },
+    { "ceil",       Math_ceil,       1 },
+    { "contains",   Math_contains,   2 },
+    { "endsWith",   Math_endsWith,   2 },
+    { "floor",      Math_floor,      1 },
+    { "integer",    Math_integer,    1 },
+    { "length",     Math_length,     1 },
+    { "lowerCase",  Math_lowerCase,  1 },
+    { "max",        Math_max,        2 },
+    { "min",        Math_min,        2 },
+    { "number",     Math_number,     1 },
+    { "pow",        Math_pow,        2 },
+    { "round",      Math_round,      1 },
+    { "startsWith", Math_startsWith, 2 },
+    { "string",     Math_string,     1 },
+    { "sqrt",       Math_sqrt,       1 },
+    { "upperCase",  Math_upperCase,  1 }
 };
 
 const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
@@ -689,6 +691,22 @@ MathValue Math_contains(const MathValueList& argList)
 }
 
 
+// Ends with a substring
+MathValue Math_endsWith(const MathValueList& argList)
+{
+    string toSearch = argList[0].ToString();
+    string toFind = argList[1].ToString();
+    
+    if (toFind.empty())
+    {
+        // An empty string is a prefix of all strings
+        return true;
+    }
+    
+    return (toSearch.find(toFind) == toSearch.length() - toFind.length());
+}
+
+
 // Floor (round down)
 MathValue Math_floor(const MathValueList& argList)
 {
@@ -771,6 +789,22 @@ MathValue Math_round(const MathValueList& argList)
 }
 
 
+// Starts with a substring
+MathValue Math_startsWith(const MathValueList& argList)
+{
+    string toSearch = argList[0].ToString();
+    string toFind = argList[1].ToString();
+    
+    if (toFind.empty())
+    {
+        // An empty string is a prefix of all strings
+        return true;
+    }
+    
+    return (toSearch.find(toFind) == 0);
+}
+
+
 // Convert to string
 MathValue Math_string(const MathValueList& argList)
 {
@@ -782,13 +816,6 @@ MathValue Math_string(const MathValueList& argList)
 MathValue Math_sqrt(const MathValueList& argList)
 {
     return sqrt(argList[0].ToNumber());
-}
-
-
-// Returns a description of the argument's type
-MathValue Math_type(const MathValueList& argList)
-{
-    return argList[0].GetTypeName();
 }
 
 
