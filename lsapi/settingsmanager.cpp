@@ -247,7 +247,9 @@ BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszD
                 char szToken[MAX_LINE_LENGTH] = { 0 };
                 GetToken(it->second.c_str(), szToken, NULL, FALSE);
                 
-                VarExpansionEx(pszValue, szToken, nMaxLen);
+                StringSet recursiveVarSet;
+                recursiveVarSet.insert(pszKeyName);
+                VarExpansionEx(pszValue, szToken, nMaxLen, recursiveVarSet);
             }
         }
         else if (pszDefStr && pszValue)
@@ -283,7 +285,9 @@ BOOL SettingsManager::GetRCLine(LPCSTR pszKeyName, LPSTR pszValue, int nMaxLen, 
             if (pszValue)
             {
                 // for compatibility reasons GetRCLine expands $evars$
-                VarExpansionEx(pszValue, it->second.c_str(), nMaxLen);
+                StringSet recursiveVarSet;
+                recursiveVarSet.insert(pszKeyName);
+                VarExpansionEx(pszValue, it->second.c_str(), nMaxLen, recursiveVarSet);
             }
         }
         else if (pszDefStr && pszValue)
@@ -309,7 +313,9 @@ BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
         char szToken[MAX_LINE_LENGTH] = { 0 };
 
-		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
 
 		if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
@@ -339,7 +345,9 @@ BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
         char szToken[MAX_LINE_LENGTH] = { 0 };
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
 
-        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
 		
         if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
@@ -368,7 +376,9 @@ int SettingsManager::GetRCInt(LPCSTR pszKeyName, int nDefault)
         char szToken[MAX_LINE_LENGTH] = { 0 };
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
 
-        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+		VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
 
 		if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
@@ -394,7 +404,10 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
 
 		LPSTR lpszTokens[3] = { szFirst, szSecond, szThird	};
 
-        VarExpansionEx(szBuffer, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+		VarExpansionEx(szBuffer, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
+
         int nCount = LCTokenize(szBuffer, lpszTokens, 3, NULL);
 
 		if (nCount >= 3)
@@ -444,148 +457,16 @@ void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
     }
 }
 
-#if 0
+
 void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
 {
-    LPCSTR pszOriginalTemplate = pszTemplate;
-    char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
-	LPSTR pszTempExpandedString = szTempExpandedString;
-	size_t stWorkLength = stLength;
-
-	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stWorkLength > 0))
-	{
-		//szTempExpandedString[0] = '\0';
-
-		while ((*pszTemplate != '\0') && (stWorkLength > 0))
-		{
-			if (*pszTemplate != '$')
-			{
-				*pszTempExpandedString = *pszTemplate;
-				++pszTemplate;
-				++pszTempExpandedString;
-				--stWorkLength;
-			}
-			else
-			{
-				//
-				// This is a variable so we need to find the end of it:
-				//
-                ++pszTemplate;
-                
-                LPCSTR pszVariable = pszTemplate;
-                
-                while ((*pszTemplate != '$') && (*pszTemplate != '\0'))
-                {
-                    ++pszTemplate;
-                }
-
-				bool bSucceeded = false;
-
-				if (*pszTemplate == '\0')
-				{
-					bSucceeded = SUCCEEDED(
-                        StringCchCopyNEx(pszTempExpandedString,
-                        MAX_LINE_LENGTH - (pszTempExpandedString - szTempExpandedString),
-                        pszVariable, pszTemplate - pszVariable, NULL, NULL,
-                        STRSAFE_NULL_ON_FAILURE));
-				}
-				else
-				{
-					//
-					// We've found the end of the variable so copy it
-					// someplace usefull:
-					//
-                    char szVariable[MAX_LINE_LENGTH];
-
-                    StringCchCopyNEx(szVariable, MAX_LINE_LENGTH, pszVariable,
-                        pszTemplate - pszVariable, NULL, NULL,
-                        STRSAFE_NULL_ON_FAILURE);
-
-                    if (szVariable[0] != '\0')
-                    {
-                        //
-                        // Get the value, if we can.
-                        //
-                        SettingsMap::iterator it;
-                        if (_FindLine(szVariable, it))
-                        {
-                            GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
-                            bSucceeded = true;
-                        }
-                        else if (GetEnvironmentVariable(szVariable,
-							pszTempExpandedString,
-							static_cast<DWORD>(stLength)))
-                        {
-                            bSucceeded = true;
-                        }
-                        else
-                        {
-#ifdef LS_COMPAT_MATH
-#if !defined(LS_NO_EXCEPTION)
-                            try
-                            {
-#endif /* LS_NO_EXCEPTION */
-                                int nValue =
-                                    static_cast<int>(_MathEvaluate(szVariable));
-
-                                StringCchPrintf(pszTempExpandedString, stLength,
-                                    "%d", nValue);
-                                
-                                bSucceeded = true;
-#if !defined(LS_NO_EXCEPTION)
-                            }
-                            catch (std::invalid_argument& ia)
-                            {
-                                Error(LOCALIZE_THIS,
-                                    "Variable \"%s\" not defined.\n\n"
-                                    "Expression: %s",
-                                    ia.what(), pszOriginalTemplate);
-                                
-                                pszTempExpandedString[0] = '\0';
-                            }
-#endif /* LS_NO_EXCEPTION */
-#else /* LS_COMPAT_MATH */
-                            pszTempExpandedString[0] = '\0';
-#endif // LS_COMPAT_MATH
-                        }
-					}
-				}
-				//
-				// If we succeeded, adjust our output buffers
-				// accordingly:
-				//
-				if (bSucceeded)
-				{
-					stWorkLength -= strlen(pszTempExpandedString);
-					pszTempExpandedString += strlen(pszTempExpandedString);
-				}
-
-				//
-				// Move to the next character if we didn't run out of space:
-				//
-				if (*pszTemplate != '\0')
-				{
-					++pszTemplate;
-				}
-			}
-		}
-		*pszTempExpandedString = '\0';
-
-		if (strchr(szTempExpandedString, '$'))
-		{
-			VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
-		}
-		else
-		{
-			StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
-		}
-	}
+    StringSet recursiveVarSet;
+    VarExpansionEx(pszExpandedString, pszTemplate, stLength, recursiveVarSet);
 }
-#endif
 
-void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
+
+void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength, const StringSet& recursiveVarSet)
 {
-    LPCSTR pszOriginalTemplate = pszTemplate;
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
 	LPSTR pszTempExpandedString = szTempExpandedString;
 	size_t stWorkLength = stLength;
@@ -641,18 +522,36 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 
                     if (szVariable[0] != '\0')
                     {
+                        // Check for recursive variable definitions
+                        if (recursiveVarSet.count(szVariable) > 0)
+                        {
+                            // Output an error message (localize this)
+                            TCHAR szError[MAX_LINE_LENGTH];
+                            StringCchPrintf(szError, MAX_LINE_LENGTH, "Error: Variable \"%s\" is defined recursively.", szVariable);
+                            MessageBox(NULL, szError, "Litestep", MB_SETFOREGROUND);
+
+                            pszExpandedString[0] = '\0';
+                            return;
+                        }
+
                         //
                         // Get the value, if we can.
                         //
                         SettingsMap::iterator it;
                         if (_FindLine(szVariable, it))
                         {
-                            GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
+                            StringSet newRecursiveVarSet(recursiveVarSet);
+                            newRecursiveVarSet.insert(szVariable);
+
+                            TCHAR szTemp[MAX_LINE_LENGTH];
+                            GetToken(it->second.c_str(), szTemp, NULL, FALSE);
+                            VarExpansionEx(pszTempExpandedString, szTemp, stWorkLength, newRecursiveVarSet);
+
                             bSucceeded = true;
                         }
                         else if (GetEnvironmentVariable(szVariable,
 							pszTempExpandedString,
-							static_cast<DWORD>(stLength)))
+							static_cast<DWORD>(stWorkLength)))
                         {
                             bSucceeded = true;
                         }
@@ -663,7 +562,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             
                             if (MathEvaluateString(m_SettingsMap, szVariable, result, MATH_EXCEPTION_ON_UNDEFINED))
                             {
-                                StringCchCopy(pszTempExpandedString, stLength, result.c_str());
+                                StringCchCopy(pszTempExpandedString, stWorkLength, result.c_str());
                                 bSucceeded = true;
                             }
                         }
@@ -688,16 +587,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				}
 			}
 		}
-		*pszTempExpandedString = '\0';
 
-		if (strchr(szTempExpandedString, '$'))
-		{
-			VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
-		}
-		else
-		{
-			StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
-		}
+		*pszTempExpandedString = '\0';
+		StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
 	}
 }
 
