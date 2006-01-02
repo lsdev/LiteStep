@@ -23,7 +23,8 @@ public:
     /**
      * Constructor.
      */
-    MathParser(SettingsMap& context, const std::string& expression, unsigned int flags = 0);
+    MathParser(const SettingsMap& context, const std::string& expression,
+        const StringSet& recursiveVarSet, unsigned int flags = 0);
     
     /**
      * Parses and evaluates a math expression.
@@ -107,18 +108,21 @@ private:
     
 private:
     
-    /** Variable bindings */
-    SettingsMap& mContext;
-    
     /** Number of tokens of lookahead */
     enum { LOOKAHEAD = 2 };
     
     /** Token buffer */
     MathToken mLookahead[LOOKAHEAD];
     
+    /** Variable bindings */
+    const SettingsMap& mContext;
+    
     /** Lexical analyzer */
     MathScanner mScanner;
     
+    /** Set of variables to check for recursive definition */
+    const StringSet& mRecursiveVarSet;
+
     /** Flags */
     unsigned int mFlags;
 };

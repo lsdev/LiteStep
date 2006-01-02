@@ -540,13 +540,14 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                         SettingsMap::iterator it;
                         if (_FindLine(szVariable, it))
                         {
+                            // Add this variable to the set to check for recursion
                             StringSet newRecursiveVarSet(recursiveVarSet);
                             newRecursiveVarSet.insert(szVariable);
 
+                            // FIXME: Should we call GetToken here?!
                             TCHAR szTemp[MAX_LINE_LENGTH];
                             GetToken(it->second.c_str(), szTemp, NULL, FALSE);
                             VarExpansionEx(pszTempExpandedString, szTemp, stWorkLength, newRecursiveVarSet);
-
                             bSucceeded = true;
                         }
                         else if (GetEnvironmentVariable(szVariable,
@@ -560,7 +561,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             string result;
                             pszTempExpandedString[0] = '\0';
                             
-                            if (MathEvaluateString(m_SettingsMap, szVariable, result, MATH_EXCEPTION_ON_UNDEFINED))
+                            if (MathEvaluateString(m_SettingsMap, szVariable, result, recursiveVarSet, MATH_EXCEPTION_ON_UNDEFINED))
                             {
                                 StringCchCopy(pszTempExpandedString, stWorkLength, result.c_str());
                                 bSucceeded = true;

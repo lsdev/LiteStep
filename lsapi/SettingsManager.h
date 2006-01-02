@@ -37,9 +37,6 @@ struct FileInfo
 typedef std::set<SettingsIterator*> IteratorSet;
 typedef std::map<std::string, FileInfo*, stringicmp> FileMap;
 
-/** Set of strings with case-insensitive ordering. */
-typedef std::set<std::string, stringicmp> StringSet;
-
 
 class SettingsManager
 {

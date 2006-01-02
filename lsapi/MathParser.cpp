@@ -15,6 +15,7 @@
 #include "MathValue.h"
 #include "lsapi.h"
 #include "SettingsDefines.h"
+#include "SettingsManager.h"
 #include <strsafe.h>
 
 using namespace std;
@@ -85,6 +86,8 @@ using namespace std;
 //
 //----------------------------------------------------------------------------
 
+extern SettingsManager *gSettingsManager;
+
 
 // Function type
 typedef MathValue (*MathFunction)(const MathValueList&);
@@ -135,8 +138,8 @@ struct { const char *name; MathFunction function; int numArgs; } gFunctions[] =
 const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
 
 
-MathParser::MathParser(SettingsMap& context, const string& expression, unsigned int flags) :
-    mContext(context), mScanner(expression), mFlags(flags)
+MathParser::MathParser(const SettingsMap& context, const string& expression, const StringSet& recursiveVarSet, unsigned int flags) :
+    mContext(context), mScanner(expression), mRecursiveVarSet(recursiveVarSet), mFlags(flags)
 {
     // Fill the token buffer
     Next(LOOKAHEAD);
@@ -181,8 +184,17 @@ MathValue MathParser::CallFunction(const string& name, const MathValueList& argL
 
 MathValue MathParser::GetVariable(const string& name) const
 {
+    // Check for recursive variable definitions
+    if (mRecursiveVarSet.count(name) > 0)
+    {
+        // Output an error message (localize this)
+        char message[MAX_LINE_LENGTH];
+        StringCchPrintf(message, MAX_LINE_LENGTH, "Error: Variable \"%s\" is defined recursively.", name.c_str());
+        throw MathException(message);
+    }
+
     // Look up variable name
-    SettingsMap::iterator it = mContext.find(name);
+    SettingsMap::const_iterator it = mContext.find(name);
     
     if (it == mContext.end())
     {
@@ -190,9 +202,12 @@ MathValue MathParser::GetVariable(const string& name) const
         return MathValue();
     }
     
+    StringSet newRecursiveVarSet(mRecursiveVarSet);
+    newRecursiveVarSet.insert(name);
+
     // Expand variable references
     char value[MAX_LINE_LENGTH];
-    VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH);
+    gSettingsManager->VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
     
     if (stricmp(value, "false") == 0 || stricmp(value, "off") == 0 || stricmp(value, "no") == 0)
     {

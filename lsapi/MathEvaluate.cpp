@@ -10,12 +10,13 @@
 using namespace std;
 
 
-bool MathEvaluateBool(SettingsMap& context, const string& expression,
+bool MathEvaluateBool(const SettingsMap& context, const string& expression,
     bool& result, unsigned int flags)
 {
     try
     {
-        MathParser mathParser(context, expression, flags);
+        StringSet recursiveVarSet;
+        MathParser mathParser(context, expression, recursiveVarSet, flags);
         result = mathParser.Evaluate().ToBoolean();
     }
     catch (const MathException& e)
@@ -37,66 +38,12 @@ bool MathEvaluateBool(SettingsMap& context, const string& expression,
 }
 
 
-bool MathEvaluateFloat(SettingsMap& context, const string& expression,
-    double& result, unsigned int flags)
+bool MathEvaluateString(const SettingsMap& context, const string& expression,
+    string& result, const StringSet& recursiveVarSet, unsigned int flags)
 {
     try
     {
-        MathParser mathParser(context, expression, flags);
-        result = mathParser.Evaluate().ToNumber();
-    }
-    catch (const MathException& e)
-    {
-        // FIXME: Localize this
-        ostringstream message;
-        
-        message << "Error in Expression:\n"
-                << expression << "\n"
-                << "\n"
-                << "Description:\n"
-                << e.what();
-        
-        MessageBox(GetLitestepWnd(), message.str().c_str(), NULL, MB_SETFOREGROUND);
-        return false;
-    }
-    
-    return true;
-}
-
-
-bool MathEvaluateInt(SettingsMap& context, const string& expression,
-    int& result, unsigned int flags)
-{
-    try
-    {
-        MathParser mathParser(context, expression, flags);
-        result = mathParser.Evaluate().ToInteger();
-    }
-    catch (const MathException& e)
-    {
-        // FIXME: Localize this
-        ostringstream message;
-        
-        message << "Error in Expression:\n"
-                << expression << "\n"
-                << "\n"
-                << "Description:\n"
-                << e.what();
-        
-        MessageBox(GetLitestepWnd(), message.str().c_str(), NULL, MB_SETFOREGROUND);
-        return false;
-    }
-    
-    return true;
-}
-
-
-bool MathEvaluateString(SettingsMap& context, const string& expression,
-    string& result, unsigned int flags)
-{
-    try
-    {
-        MathParser mathParser(context, expression, flags);
+        MathParser mathParser(context, expression, recursiveVarSet, flags);
         result = mathParser.Evaluate().ToString();
     }
     catch (const MathException& e)

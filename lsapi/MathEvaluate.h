@@ -6,8 +6,7 @@
 
 
 /**
- * Flags for {@link MathEvaluateBool}, {@MathEvaluateFloat}, {@MathEvaluateInt},
- * and {@link MathEvaluateString}.
+ * Flags for {@link MathEvaluateBool} and {@link MathEvaluateString}.
  */
 enum
 {
@@ -26,54 +25,26 @@ enum
  * @return <code>true</code>  if successful or
  *         <code>false</code> if an error occured
  */
-bool MathEvaluateBool(SettingsMap& context,
+bool MathEvaluateBool(const SettingsMap& context,
     const std::string& expression,
     bool& result,
     unsigned int flags = 0);
 
 /**
- * Evaluates a math expression and converts the result to a floating-point number.
- *
- * @param  context    map with variable bindings
- * @param  expression string with expression to evaluate
- * @param  result     variable to hold expression result
- * @param  flags      flags that control parsing and evaluation
- * @return <code>true</code>  if successful or
- *         <code>false</code> if an error occured
- */
-bool MathEvaluateFloat(SettingsMap& context,
-    const std::string& expression,
-    double& result,
-    unsigned int flags = 0);
-
-/**
- * Evaluates a math expression and converts the result to an integer.
- *
- * @param  context    map with variable bindings
- * @param  expression string with expression to evaluate
- * @param  result     variable to hold expression result
- * @param  flags      flags that control parsing and evaluation
- * @return <code>true</code>  if successful or
- *         <code>false</code> if an error occured
- */
-bool MathEvaluateInt(SettingsMap& context,
-    const std::string& expression,
-    int& result,
-    unsigned int flags = 0);
-
-/**
  * Evaluates a math expression and converts the result to a string.
  *
- * @param  context    map with variable bindings
- * @param  expression string with expression to evaluate
- * @param  result     variable to hold expression result
- * @param  flags      flags that control parsing and evaluation
+ * @param  context         map with variable bindings
+ * @param  expression      string with expression to evaluate
+ * @param  result          variable to hold expression result
+ * @param  recursiveVarSet set of variables to check for recursive definitions
+ * @param  flags           flags that control parsing and evaluation
  * @return <code>true</code>  if successful or
  *         <code>false</code> if an error occured
  */
-bool MathEvaluateString(SettingsMap& context,
+bool MathEvaluateString(const SettingsMap& context,
     const std::string& expression,
     std::string& result,
+    const StringSet& recursiveVarSet,
     unsigned int flags = 0);
 
 
