@@ -1,3 +1,4 @@
+#include "../utility/common.h"
 #include <algorithm>
 #include <cctype>
 #include <cfloat>
