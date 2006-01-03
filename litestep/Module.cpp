@@ -200,6 +200,8 @@ int Module::CallInit()
 	}
     catch (...)
     {
+        TRACE("Exception in initModuleEx: %s", m_tzLocation.c_str());
+
         RESOURCE_MSGBOX(NULL, IDS_MODULEINITEXCEPTION_ERROR,
             "Error: Exception during module initialization.\n\nPlease contact the module writer.",
             m_tzLocation.c_str());
@@ -223,6 +225,8 @@ void Module::CallQuit()
         }
         catch (...)
         {
+            TRACE("Exception in quitModule: %s", m_tzLocation.c_str());
+
             RESOURCE_MSGBOX(NULL, IDS_MODULEQUIT_ERROR,
                 "Exception while quitting module.", m_tzLocation.c_str());
         }
@@ -281,6 +285,8 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
         }
         catch (...)
         {
+            TRACE("Exception in module's main thread: %s", dllMod->m_tzLocation.c_str());
+
             // Quietly ignore exceptions?
             // #pragma COMPILE_WARN(Note: Need stronger exception-handling code here...restart the module or something)
         }
