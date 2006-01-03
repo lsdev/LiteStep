@@ -112,7 +112,6 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/png_support.o \
 	$(OUTPUT)/safeptr.o \
 	$(OUTPUT)/settings.o \
-	$(OUTPUT)/SettingsEvalParser.o \
 	$(OUTPUT)/SettingsFileParser.o \
 	$(OUTPUT)/SettingsIterator.o \
 	$(OUTPUT)/SettingsManager.o \
@@ -539,15 +538,6 @@ $(OUTPUT)/settings.o: lsapi/settings.cpp \
 	utility/safestr.h \
 	utility/stringutility.h
 
-$(OUTPUT)/SettingsEvalParser.o: lsapi/SettingsEvalParser.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/SettingsEvalParser.h \
-	utility/common.h \
-	utility/debug.hpp \
-
 $(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
 	litestep/buildoptions.h \
 	litestep/resource.h \
@@ -556,7 +546,6 @@ $(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
 	lsapi/lsmultimon.h \
 	lsapi/MathEvaluate.h \
 	lsapi/SettingsDefines.h \
-	lsapi/SettingsEvalParser.h \
 	lsapi/SettingsFileParser.h \
 	utility/common.h \
 	utility/core.hpp \
@@ -592,7 +581,6 @@ $(OUTPUT)/SettingsManager.o: lsapi/SettingsManager.cpp \
 	lsapi/lsmultimon.h \
 	lsapi/MathEvaluate.h \
 	lsapi/SettingsDefines.h \
-	lsapi/SettingsEvalParser.h \
 	lsapi/SettingsFileParser.h \
 	lsapi/SettingsIterator.h \
 	lsapi/SettingsManager.h \

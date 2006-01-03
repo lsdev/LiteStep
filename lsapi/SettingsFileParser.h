@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __SETTINGSFILEPARSER_H
 
 #include "../utility/common.h"
-// #include "settingsevalparser.h"
 #include "settingsdefines.h"
 
 class FileParser //: boost::noncopyable
@@ -35,7 +34,6 @@ public:
 private:
 	SettingsMap* m_pSettingsMap;
 	FILE* m_phFile;
-    // EvalParser* m_pEvalParser;
     
 	bool _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
 	void _StripString(LPTSTR ptzString);

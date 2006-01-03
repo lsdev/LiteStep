@@ -156,10 +156,6 @@ SOURCE=.\settings.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SettingsEvalParser.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SettingsFileParser.cpp
 # End Source File
 # Begin Source File
@@ -237,10 +233,6 @@ SOURCE=.\resource.h
 # Begin Source File
 
 SOURCE=.\SettingsDefines.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\SettingsEvalParser.h
 # End Source File
 # Begin Source File
 
