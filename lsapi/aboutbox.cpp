@@ -80,6 +80,7 @@ theDevTeam[] =
 {
 	 "ilmcuts", "Simon"
 	,"jugg",    "Chris Rempel"
+    ,"Maduin",  "Kevin Schaffer"
 	,"Message", "Bobby G. Vinyard"
 };
 
