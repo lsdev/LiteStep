@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SH_TRAY_DATA      (1)
 #define SH_LOADPROC_DATA  (2)
 
-// data sent by shell via Shell_NotifyIcon -- Maduin
+// data sent by shell via Shell_NotifyIcon
 typedef struct _SHELLTRAYDATA
 {
     DWORD dwUnknown;
@@ -39,7 +39,7 @@ typedef struct _SHELLTRAYDATA
     NID_XX nid;
 } *PSHELLTRAYDATA;
 
-// Data sent with AppBar Message (from Maduin)
+// Data sent with AppBar Message
 typedef struct _SHELLAPPBARDATA
 {
     APPBARDATA abd;
@@ -72,7 +72,7 @@ public:
     virtual HRESULT Stop();
     
     // Handler for AppBar messages
-    BOOL HandleAppBarMessage(SHELLAPPBARDATA* pData);
+    BOOL HandleAppBarMessage(PSHELLAPPBARDATA pData);
 
     // Handler for system tray notifications
     BOOL HandleNotification(PSHELLTRAYDATA pstd);
