@@ -69,12 +69,12 @@ MathToken MathScanner::NextToken()
         // End of input
         return MathToken(TT_END);
     }
-    else if (isalpha(mLookahead[0]))
+    else if (IsFirstNameChar(mLookahead[0]))
     {
         // Identifier or reserved word
         return ScanIdentifier();
     }
-    else if (isdigit(mLookahead[0]))
+    else if (IsDigit(mLookahead[0]))
     {
         // Numeric literal
         return ScanNumber();
@@ -143,7 +143,7 @@ MathToken MathScanner::ScanIdentifier()
 {
     ostringstream value;
     
-    while (isalnum(mLookahead[0]) || mLookahead[0] == '_')
+    while (IsNameChar(mLookahead[0]))
     {
         value.put(mLookahead[0]);
         Next();
@@ -157,7 +157,7 @@ MathToken MathScanner::ScanNumber()
 {
     ostringstream value;
     
-    while (isdigit(mLookahead[0]))
+    while (IsDigit(mLookahead[0]))
     {
         value.put(mLookahead[0]);
         Next();
@@ -168,25 +168,7 @@ MathToken MathScanner::ScanNumber()
         value.put(mLookahead[0]);
         Next();
         
-        while (isdigit(mLookahead[0]))
-        {
-            value.put(mLookahead[0]);
-            Next();
-        }
-    }
-    
-    if (mLookahead[0] == 'E' || mLookahead[0] == 'e')
-    {
-        value.put(mLookahead[0]);
-        Next();
-        
-        if (mLookahead[0] == '+' || mLookahead[0] == '-')
-        {
-            value.put(mLookahead[0]);
-            Next();
-        }
-        
-        while (isdigit(mLookahead[0]))
+        while (IsDigit(mLookahead[0]))
         {
             value.put(mLookahead[0]);
             Next();
@@ -249,8 +231,63 @@ MathToken MathScanner::ScanString()
 
 void MathScanner::SkipSpace()
 {
-    while (isspace(mLookahead[0]))
+    while (IsSpace(mLookahead[0]))
     {
         Next();
     }
+}
+
+
+bool MathScanner::IsDigit(int ch)
+{
+    return (ch >= '0' && ch <= '9');
+}
+
+
+bool MathScanner::IsFirstNameChar(int ch)
+{
+    return !IsDigit(ch) && IsNameChar(ch);
+}
+
+
+bool MathScanner::IsNameChar(int ch)
+{
+    if (ch < 0 || IsSpace(ch))
+    {
+        return false;
+    }
+
+    switch (ch)
+    {
+        case '!':
+        // case '@':  Will be reserved in 0.25
+        // case '#':  Will be reserved in 0.25
+        case '$':
+        case '&':
+        case '*':
+        case '(':
+        case ')':
+        case '-':
+        case '+':
+        case '=':
+        case '[':
+        case ']':
+        // case '|':  Will be reserved in 0.25
+        case ';':
+        case '"':
+        case '\'':
+        case '<':
+        case '>':
+        case ',':
+        case '/':
+            return false;
+    }
+
+    return true;
+}
+
+
+bool MathScanner::IsSpace(int ch)
+{
+    return (ch == ' ' || ch == '\t'); // More than this?
 }

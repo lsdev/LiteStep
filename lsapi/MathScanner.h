@@ -50,11 +50,34 @@ private:
      * Scans a string literal.
      */
     MathToken ScanString();
+
+private:
     
     /**
      * Skips past white space in the input.
      */
     void SkipSpace();
+
+    /**
+     * Returns true if a character is a digit.
+     */
+    static bool IsDigit(int ch);
+    
+    /**
+     * Returns true if a character can appear as the first character in an
+     * identifier (name).
+     */
+    static bool IsFirstNameChar(int ch);
+    
+    /**
+     * Returns true if a character can appear in an identifier (name).
+     */
+    static bool IsNameChar(int ch);
+    
+    /**
+     * Returns true if a character is a space character.
+     */
+    static bool IsSpace(int ch);
     
 private:
 

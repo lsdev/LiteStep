@@ -2,9 +2,21 @@ Introduction
 ------------
 
 Starting with version 0.24.8, LiteStep now uses the same parser for both
-conditional expressions (If and ElseIf) and expression enclosed in dollar
+conditional expressions (If and ElseIf) and expressions enclosed in dollar
 signs ($). The new parser also adds new features not previously available,
 such as comparison and concatenation of strings and builtin functions.
+
+
+Variable Names
+--------------
+
+In order to work with the math parser, a variable name must not begin with a
+digit or contain any of the following reserved characters:
+
+  ! $ & * ( ) - + = [ ] ; " ' < > , /
+
+Furthermore, it is recommended that you do not use @, #, or | (vertical bar),
+because these characters may become reserved in the future.
 
 
 Data Types
@@ -21,6 +33,28 @@ types as necessary. In the event that an explicit type conversion is needed,
 use one of the conversion functions. Whether implicit or explicit, type
 conversions follow the same set of rules, which are described in the section
 on Functions, below.
+
+
+Undefined Variables
+-------------------
+
+For compatibility reasons, conditional expressions (If and ElseIf) can use
+undefined variables without generating an error. Any operator or function
+applied to an undefined value produces an undefined result. If the result of a
+conditional expression is undefined, then it is treated as if it were false.
+
+This behavior, while supported in 0.24.8, will be removed in the future. The
+correct way to detect undefined variables is to use the "defined" keyword:
+
+  If defined(SomeVariable)
+  If not defined(AnotherVariable)
+
+Defined behaves like a function that takes a variable name and returns true if
+that variable is defined or false if it is not. Defined is not, however, a
+real function because its argument must be a variable name.
+
+Using an undefined variable in an inline expression (one enclosed in $'s)
+generates an error, just as it always has.
 
 
 Operators

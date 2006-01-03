@@ -195,72 +195,128 @@ string MathValue::ToString() const
 
 MathValue operator+(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return (a.ToNumber() + b.ToNumber());
 }
 
 
 MathValue operator+(const MathValue& a)
 {
+    if (a.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return a.ToNumber();
 }
 
 
 MathValue operator-(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return (a.ToNumber() - b.ToNumber());
 }
 
 
 MathValue operator-(const MathValue& a)
 {
+    if (a.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return -a.ToNumber();
 }
 
 
 MathValue operator*(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return (a.ToNumber() * b.ToNumber());
 }
 
 
 MathValue operator/(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return (a.ToNumber() / b.ToNumber());
 }
 
 
 MathValue operator%(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     double divisor = b.ToNumber();
     
-    if (divisor != 0.0)
-        return fmod(a.ToNumber(), divisor);
+    if (divisor == 0.0)
+    {
+        // Modulus by zero generates a NaN
+        return numeric_limits<double>::quiet_NaN();
+    }
     
-    return numeric_limits<double>::quiet_NaN();
+    return fmod(a.ToNumber(), divisor);
 }
 
 
 MathValue operator&&(const MathValue& a, const MathValue& b)
 {
+    // For compatibility reasons, convert undefined values to false for
+    // Boolean operators.
     return (a.ToBoolean() && b.ToBoolean());
 }
 
 
 MathValue operator||(const MathValue& a, const MathValue& b)
 {
+    // For compatibility reasons, convert undefined values to false for
+    // Boolean operators.
     return (a.ToBoolean() || b.ToBoolean());
 }
 
 
 MathValue operator!(const MathValue& a)
 {
+    // For compatibility reasons, convert undefined values to false for
+    // Boolean operators.
     return !a.ToBoolean();
 }
 
 
 MathValue operator==(const MathValue& a, const MathValue& b)
 {
-    if (a.IsBoolean() || b.IsBoolean())
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+    else if (a.IsBoolean() || b.IsBoolean())
     {
         // If either operand is a Boolean, then do a Boolean comparison
         return (a.ToBoolean() == b.ToBoolean());
@@ -280,7 +336,12 @@ MathValue operator==(const MathValue& a, const MathValue& b)
 
 MathValue operator!=(const MathValue& a, const MathValue& b)
 {
-    if (a.IsBoolean() || b.IsBoolean())
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+    else if (a.IsBoolean() || b.IsBoolean())
     {
         // If either operand is a Boolean, then do a Boolean comparison
         return (a.ToBoolean() != b.ToBoolean());
@@ -300,7 +361,12 @@ MathValue operator!=(const MathValue& a, const MathValue& b)
 
 MathValue operator<(const MathValue& a, const MathValue& b)
 {
-    if (a.IsString() && b.IsString())
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+    else if (a.IsString() && b.IsString())
     {
         // If both operands are strings then do a string comparison
         return (a.ToString() < b.ToString());
@@ -315,7 +381,12 @@ MathValue operator<(const MathValue& a, const MathValue& b)
 
 MathValue operator<=(const MathValue& a, const MathValue& b)
 {
-    if (a.IsString() && b.IsString())
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+    else if (a.IsString() && b.IsString())
     {
         // If both operands are strings then do a string comparison
         return (a.ToString() <= b.ToString());
@@ -330,7 +401,12 @@ MathValue operator<=(const MathValue& a, const MathValue& b)
 
 MathValue operator>(const MathValue& a, const MathValue& b)
 {
-    if (a.IsString() && b.IsString())
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+    else if (a.IsString() && b.IsString())
     {
         // If both operands are strings then do a string comparison
         return (a.ToString() > b.ToString());
@@ -345,7 +421,12 @@ MathValue operator>(const MathValue& a, const MathValue& b)
 
 MathValue operator>=(const MathValue& a, const MathValue& b)
 {
-    if (a.IsString() && b.IsString())
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+    else if (a.IsString() && b.IsString())
     {
         // If both operands are strings then do a string comparison
         return (a.ToString() >= b.ToString());
@@ -360,18 +441,33 @@ MathValue operator>=(const MathValue& a, const MathValue& b)
 
 MathValue MathConcatenate(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     return (a.ToString() + b.ToString());
 }
 
 
 MathValue MathIntDivide(const MathValue& a, const MathValue& b)
 {
+    if (a.IsUndefined() || b.IsUndefined())
+    {
+        // Undefined operands always generate an undefined result
+        return MathValue();
+    }
+
     int divisor = b.ToInteger();
     
-    if (divisor != 0)
-        return (a.ToInteger() / divisor);
+    if (divisor == 0)
+    {
+        // Division by zero results in an Infinity of the appropriate sign
+        return _copysign(numeric_limits<double>::infinity(), a.ToNumber());
+    }
     
-    return numeric_limits<double>::infinity();
+    return (a.ToInteger() / divisor);
 }
 
 
