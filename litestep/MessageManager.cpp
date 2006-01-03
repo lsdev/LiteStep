@@ -96,7 +96,7 @@ LRESULT MessageManager::SendMessage(UINT message, WPARAM wParam, LPARAM lParam)
         // Make a copy since modules may unregister messages in their message handlers
         windowSetT windowSet(it->second);
         
-        for (windowSetT::const_iterator winIt = it->second.begin(); winIt != it->second.end(); ++winIt)
+        for (windowSetT::const_iterator winIt = windowSet.begin(); winIt != windowSet.end(); ++winIt)
         {
             lResult |= ::SendMessage(*winIt, message, wParam, lParam);
         }
