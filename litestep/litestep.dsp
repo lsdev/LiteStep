@@ -141,6 +141,10 @@ SOURCE=.\StartupRunner.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrayNotifyIcon.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrayService.cpp
 # End Source File
 # End Group
@@ -194,6 +198,10 @@ SOURCE=.\RecoveryMenu.h
 # Begin Source File
 
 SOURCE=.\StartupRunner.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrayNotifyIcon.h
 # End Source File
 # Begin Source File
 

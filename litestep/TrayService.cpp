@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2005 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,63 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/ 
-// NOTES // NOTES // NOTES // NOTES // NOTES // NOTES // NOTES // NOTES //
-/****************************************************************************
-Note 1:  The offline file sync is sent only with a valid uMessageCallback 
-         (NIF_MESSAGE) (W2K)
- 
-Note 2:  The DUN/Networking icons sent using the NIS_HIDDEN dwState flags use 
-         an invalid uID (usually 0xFFFFFFFF) (W2K/XP)
- 
-Note 3:  The window handling the DUN/Networking icons has a class and caption of
-         "Connections Tray" (FindWindowEx(NULL, NULL, "Connections Tray, NULL))
-		 (W2K/XP)
- 
-Note 4:  Tooltip (NIF_TIP) for the DUN/Networking icons isn't created until the
-         tray icon receives its first mouseover event (W2K/XP)
- 
-Note 5:  There are two different approaches to handle the DUN icon on XP. See
-         Note 5a (old way) and Note 5b (new way).
-
-Note 5a: The DUN/Networking Icons appear to use NIS_SHAREDICON with two
-         different uIDs. This will cause two icons to display with the same
-         functionality. One icon will not show a tooltip. Therefore as a
-         workaround, find the "Connections Tray" window, and everytime a
-         notification comes in matching that hWnd and without a NIF_TIP flag,
-         post a WM_MOUSEMOVE message with the uID and uCallbackMessage to the
-         "Connections Tray" window. This will cause a tooltip to be added to the
-         true icon next time it is sent. The other icon will remain with out a
-         tooltip and can be ignored. (XP)
- 
-Note 5b: The DUN icon sends three NIM_ADDs; none of them has a tooltip.
-         The first one has NIS_HIDDEN and a valid hIcon, but not NIF_MESSAGE.
-         The second one has a valid hIcon.
-         The third one has hIcon == NULL but nevertheless has NIF_ICON.
-         The second and the third both have NIS_SHAREDICON but different uIDs.
-         Since the second one on its own is complete we use it and discard the
-         first and the third. This means we show icons that don't have NIF_TIP.
-
-Note 6:  RegisterWindowMessage("TaskbarCreated") should be sent with
-         HWND_BROADCAST before the shell service objects are loaded (sending
-         afterwards would result in a Volume icon flicker or loss because the
-         shell service object would delete the icon) Also ensure the
-         "TaskbarCreated" message is sent only once. (W2K/XP)
-
-Note 7:  Volume/DUN/Networking icons are controlled by shell service objects
-         (SSO). They are COM servers implementing the IOleCommandTarget
-         interface. The CLSIDs are listed in 
-		 "Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad" 
-         They should be enumerated and created using IID_IOleCOmmandTarget. 
-		 Exec each SSO with a group id of CGID_ShellServiceObject and command id 
-		 of 2 to start. Exec each SSO with a group id of CGID_ShellServiceObject 
-		 and a command id of 3 to stop.
-
-Note 8:  The pre-XP language indicator, internat.exe, checks the existence of
-         a window with the window class TrayNotifyWnd on startup. If the window
-         doesn't exist internat.exe terminates. The window needs to be a child
-         of Shell_TrayWnd. Internat calculates the position of its context menu
-         from the position of TrayNotifyWnd.
-****************************************************************************/
 #include "TrayService.h"
 #include <regstr.h>
 #include <shlobj.h>
@@ -84,25 +27,13 @@ Note 8:  The pre-XP language indicator, internat.exe, checks the existence of
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
-#ifdef __GNUC__ // mingw workarounds
-#  include <initguid.h>
-#  include <docobj.h>
-
-#  if __MINGW32_MAJOR_VERSION < 3 // mingw 3.x headers already have this symbol
-     DEFINE_GUID(CGID_ShellServiceObject, 0x000214D2, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
-#  endif
-
-using std::min;
-#endif // defined(__GNUC__)
-
 #ifndef REGSTR_PATH_SHELLSERVICEOBJECTDELAYED
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
 #endif
 
-const TCHAR szTrayClass[]   = _T("Shell_TrayWnd");
-const TCHAR szTrayTitle[]   = _T("Litestep Tray Manager");
-const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
-
+static const TCHAR szTrayClass[]   = _T("Shell_TrayWnd");
+static const TCHAR szTrayTitle[]   = _T("Litestep Tray Manager");
+static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
@@ -148,7 +79,7 @@ HRESULT TrayService::Start()
             m_bWin2000 = true;
         }
 
-        if (_CreateWindows())
+        if (createWindows())
         {
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG)this);
@@ -159,14 +90,14 @@ HRESULT TrayService::Start()
             
             if (m_bWin2000)
             {
-                _LoadShellServiceObjects();
+                loadShellServiceObjects();
             }
             
             hr = S_OK;
         }
     }
 
-	return hr;
+    return hr;
 }
 
 
@@ -176,35 +107,30 @@ HRESULT TrayService::Start()
 //
 HRESULT TrayService::Stop()
 {
-	HRESULT hr = S_OK;
+    HRESULT hr = S_OK;
 
     if (m_bWin2000 && m_hTrayWnd)
     {
-        _UnloadShellServiceObjects();
+        unloadShellServiceObjects();
     }
 
-    _DestroyWindows();
+    destroyWindows();
 
     while (!m_siVector.empty())
     {
-        if (m_siVector.back()->hIcon)
-        {
-            DestroyIcon(m_siVector.back()->hIcon);
-        }
-
         delete m_siVector.back();
         m_siVector.pop_back();
     }
 
-	return hr;
+    return hr;
 }
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _CreateWindows
+// createWindows
 //
-bool TrayService::_CreateWindows()
+bool TrayService::createWindows()
 {
     bool bReturn = false;
 
@@ -219,7 +145,12 @@ bool TrayService::_CreateWindows()
     wc.lpszClassName = szTrayClass;
     wc.style = CS_DBLCLKS;
 
-    if (RegisterClassEx(&wc))
+    if(!RegisterClassEx(&wc))
+    {
+        RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
+            "Error registering window class.", szTrayClass);
+    }
+    else
     {
         //
         // Window which receives the tray messages
@@ -233,7 +164,14 @@ bool TrayService::_CreateWindows()
             m_hInstance,
             NULL);
 
-        if (m_hTrayWnd)
+        if(NULL == m_hTrayWnd)
+        {
+            UnregisterClass(szTrayClass, m_hInstance);
+
+            RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
+                "Unable to create window.", szTrayTitle);
+        }
+        else
         {
             // Our main window is enough to start up, we can do without the
             // TrayNotifyWnd if necessary.
@@ -263,31 +201,9 @@ bool TrayService::_CreateWindows()
                 if (!m_hNotifyWnd)
                 {
                     UnregisterClass(szNotifyClass, m_hInstance);
-
-/* Quietly eat non-critical errors */
-//                    RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
-//                        "Unable to create window.", szNotifyClass);
                 }
             }
-/* Quietly eat non-critical errors */
-//            else
-//            {
-//                RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
-//                    "Error registering window class.", szNotifyClass);
-//            }
         }
-        else
-        {
-            UnregisterClass(szTrayClass, m_hInstance);
-            
-            RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
-                "Unable to create window.", szTrayTitle);
-        }
-    }
-    else
-    {
-        RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
-            "Error registering window class.", szTrayClass);
     }
 
     return bReturn;
@@ -296,9 +212,9 @@ bool TrayService::_CreateWindows()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _DestroyWindows
+// destroyWindows
 //
-void TrayService::_DestroyWindows()
+void TrayService::destroyWindows()
 {
     if (m_hNotifyWnd)
     {
@@ -320,11 +236,11 @@ void TrayService::_DestroyWindows()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _LoadShellServiceObjects
+// loadShellServiceObjects
 //
 // Start the COM based shell services listed in the registry.
 //
-void TrayService::_LoadShellServiceObjects()
+void TrayService::loadShellServiceObjects()
 {
     HKEY hkeyServices;
     int nCounter = 0;
@@ -377,12 +293,12 @@ void TrayService::_LoadShellServiceObjects()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _UnloadShellServiceObjects
+// unloadShellServiceObjects
 //
 // Shut down the COM based shell services.
 //
 //
-void TrayService::_UnloadShellServiceObjects()
+void TrayService::unloadShellServiceObjects()
 {
     while (!m_ssoList.empty())
     {
@@ -402,20 +318,20 @@ void TrayService::_UnloadShellServiceObjects()
 // Redirects all messages to the appropriate handler
 //
 LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
-                                               WPARAM wParam, LPARAM lParam)
+                                         WPARAM wParam, LPARAM lParam)
 {
     static TrayService* pTrayService = NULL;
     
-	if (!pTrayService)
-	{
-		pTrayService = (TrayService*)GetWindowLongPtr(hWnd, 0);
-	}
+    if (!pTrayService)
+    {
+        pTrayService = (TrayService*)GetWindowLongPtr(hWnd, 0);
+    }
 
     if (pTrayService)
     {
         switch (uMsg)
         {
-            case WM_COPYDATA:
+        case WM_COPYDATA:
             {
                 //
                 // Undocumented: This is how we can make our own system tray
@@ -427,29 +343,30 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                 
                 switch(pcds->dwData)
                 {
-                    case 0:
+                case SH_APPBAR_DATA:
                     {
                         //
                         // Application Bar Message
                         //
-                        SHELLAPPBARDATA* pData = (SHELLAPPBARDATA*)pcds->lpData;
+                        PSHELLAPPBARDATA pData = (PSHELLAPPBARDATA)pcds->lpData;
                         
                         return pTrayService->HandleAppBarMessage(pData);
                     }
                     break;
                     
-                    case 1:
+                case SH_TRAY_DATA:
                     {
                         //
                         // System Tray Notification
                         //
-                        SHELLTRAYDATA* pstd = (SHELLTRAYDATA*)pcds->lpData;
+                        PSHELLTRAYDATA pstd = (PSHELLTRAYDATA)pcds->lpData;
                         
                         return pTrayService->HandleNotification(pstd);
                     }
                     break;
 
-                    default:
+                case SH_LOADPROC_DATA:
+                default:
                     {
                         TRACE("Unsupported tray message: %u", pcds->dwData);
                     }
@@ -458,7 +375,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
             }
             break;
             
-            default:
+        default:
             break;
         }
     }
@@ -473,7 +390,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
 //
 // Handler for all AppBar Messages
 //
-BOOL TrayService::HandleAppBarMessage(SHELLAPPBARDATA* pData)
+BOOL TrayService::HandleAppBarMessage(PSHELLAPPBARDATA pData)
 {
     TRACE("Received AppBar Message %u; DontKnow: %u; NoClue: %u",
         pData->dwMessage, pData->dwDontKnow, pData->dwNoClue);
@@ -483,22 +400,22 @@ BOOL TrayService::HandleAppBarMessage(SHELLAPPBARDATA* pData)
     //
     switch(pData->dwMessage)
     {
-        case ABM_NEW:
-        case ABM_REMOVE:
-        case ABM_QUERYPOS:
-        case ABM_SETPOS:
-        case ABM_ACTIVATE:
-        case ABM_WINDOWPOSCHANGED:
+    case ABM_NEW:
+    case ABM_REMOVE:
+    case ABM_QUERYPOS:
+    case ABM_SETPOS:
+    case ABM_ACTIVATE:
+    case ABM_WINDOWPOSCHANGED:
         {
             return TRUE;
         }
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     return FALSE;
-
 }
 
 
@@ -508,63 +425,62 @@ BOOL TrayService::HandleAppBarMessage(SHELLAPPBARDATA* pData)
 //
 // Handler for all system tray notifications
 //
-BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
+BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
 {
     bool bReturn = false;
 
-    IconVector::iterator itIcon = _FindIcon(pstd->nid);
-
     switch (pstd->dwMessage)
     {
-        case NIM_ADD:
+    case NIM_ADD:
         {
-            if (itIcon == m_siVector.end())
-            {
-                bReturn = _AddIcon(pstd->nid);
-            }
+            bReturn = addIcon(pstd->nid);
         }
         break;
 
-        case NIM_MODIFY:
+    case NIM_MODIFY:
         {
-            //
-            // Some apps (old versions of Daemon Tools) use NIM_MODIFY to
-            // reregister the icon in response to the TaskbarCreated message.
-            // But treating NIM_MODIFY as NIM_ADD creates problems esp. with the
-            // DUN and volume icons.
-            //
-            if (itIcon != m_siVector.end())
-            {
-                bReturn = _ModifyIcon(*itIcon, pstd->nid);
-            }
-        }
-        break;
-        
-        case NIM_DELETE:
-        {
-            if (itIcon != m_siVector.end())
-            {
-                bReturn = _RemoveIcon(itIcon);
-            }
+            bReturn = modifyIcon(pstd->nid);
         }
         break;
 
-        default:
+    case NIM_DELETE:
+        {
+            bReturn = deleteIcon(pstd->nid);
+        }
+        break;
+
+    case NIM_SETFOCUS:
+        {
+            bReturn = setFocusIcon(pstd->nid);
+        }
+        break;
+
+    case NIM_SETVERSION:
+        {
+            bReturn = setVersionIcon(pstd->nid);
+        }
+        break;
+
+    default:
         {
             TRACE("NIM unknown: %u", pstd->dwMessage);
-        }
-        case NIM_SETFOCUS:
-        case NIM_SETVERSION:
-        {
-            if (itIcon != m_siVector.end())
-            {
-                bReturn = _Notify(pstd->dwMessage, *itIcon);
-            }
         }
         break;
     }
 
     return bReturn ? TRUE : FALSE;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// notify
+//
+// Notify all listeners of a systray event
+//
+bool TrayService::notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const
+{
+    return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)pclsnid);
 }
 
 
@@ -577,12 +493,16 @@ BOOL TrayService::HandleNotification(SHELLTRAYDATA* pstd)
 //
 HWND TrayService::SendSystemTray() const
 {
-    for (IconVector::const_iterator iter = m_siVector.begin();
-         iter != m_siVector.end(); ++iter)
+    for (IconVector::const_iterator it = m_siVector.begin();
+         it != m_siVector.end(); ++it)
     {
-        if (_IsValidIcon(*iter))
+        if((*it)->IsValid())
         {
-            _Notify(NIM_ADD, *iter);
+            LSNOTIFYICONDATA lsnid = {0};
+
+            (*it)->CopyLSNID(&lsnid);
+
+            notify(NIM_ADD, &lsnid);
         }
     }
 
@@ -592,130 +512,101 @@ HWND TrayService::SendSystemTray() const
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _AddIcon
+// extendNIDCopy
 //
-bool TrayService::_AddIcon(const NOTIFYICONDATA& nid)
+// Copies all non-persistent data that is not stored in NotifyIcon.
+//
+bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) const
 {
-    bool bReturn = false;
-
-    //
-    // See Note 5b.
-    //
-    // Ignore adds if NIS_SHAREDICON is set and hIcon is NULL. This fixes the
-    // "ghost" DUN icon on XP. It sends three NIM_ADDs, one of them with
-    // NIS_HIDDEN and another one with hIcon == NULL. The former doesn't pass
-    // the _IsValidIcon test, the latter is filtered out here. The third one is
-    // displayed.
-    //
-    if (IsWindow(nid.hWnd) && !(_IsShared(nid) && (nid.hIcon == NULL)))
+    // Copy Info Tips
+    if(nid.uFlags & NIF_INFO)
     {
-        //
-        // Create a new item
-        //
-        LSNOTIFYICONDATA* plnid = new LSNOTIFYICONDATA;
-
-        if (plnid)
+        switch(nid.cbSize)
         {
-            //
-            // Return true in most cases; some apps crash if false is returned.
-            //
-            bReturn = true;
-
-            ZeroMemory(plnid, sizeof(LSNOTIFYICONDATA));
-            plnid->cbSize = sizeof(LSNOTIFYICONDATA);
-            plnid->uFlags = nid.uFlags;
-            plnid->uID = nid.uID;
-            plnid->hWnd  = nid.hWnd;
-
-            if (nid.uFlags & NIF_MESSAGE)
+        case NID_6W_SIZE:
+        case NID_5W_SIZE:
             {
-                plnid->uCallbackMessage  = nid.uCallbackMessage;
+                NID_5W* pnid = (NID_5W*)&nid;
+
+                int nReturn;
+
+                nReturn = WideCharToMultiByte(CP_ACP, 0, pnid->szInfo, 256,
+                    lsnid.szInfo, TRAY_MAX_INFO_LENGTH, NULL, NULL);
+
+                if(!nReturn)
+                {
+                    lsnid.szInfo[0] = 0;
+                }
+
+                nReturn = WideCharToMultiByte(CP_ACP, 0, pnid->szInfoTitle, 64,
+                    lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, NULL, NULL);
+
+                if(!nReturn)
+                {
+                    lsnid.szInfoTitle[0] = 0;
+                }
+
+                lsnid.dwInfoFlags = pnid->dwInfoFlags;
+                lsnid.uTimeout = pnid->uTimeout;
+                lsnid.uFlags |= NIF_INFO;
             }
-
-            _CopyIconHandle(*plnid, nid);
-            _CopyVersionSpecifics(*plnid, nid);
-
-            //
-            // This needs to be stored even if the icon doesn't pass the
-            // _IsValidIcon test. A subsequent NIM_MODIFY could make it valid.
-            //
-            m_siVector.push_back(plnid);
-
-            if (_IsValidIcon(plnid))
+            break;
+        case NID_6A_SIZE:
+        case NID_5A_SIZE:
             {
-                _Notify(NIM_ADD, plnid);
+                NID_5A* pnid = (NID_5A*)&nid;
+
+                HRESULT hr;
+
+                hr = StringCchCopy(lsnid.szInfo, TRAY_MAX_INFO_LENGTH, pnid->szInfo);
+
+                if(FAILED(hr))
+                {
+                    lsnid.szInfo[0] = 0;
+                }
+
+                hr = StringCchCopy(lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
+
+                if(FAILED(hr))
+                {
+                    lsnid.szInfoTitle[0] = 0;
+                }
+
+                lsnid.dwInfoFlags = pnid->dwInfoFlags;
+                lsnid.uTimeout = pnid->uTimeout;
+                lsnid.uFlags |= NIF_INFO;
             }
+            break;
+        default:
+            break;
         }
     }
-    
-    return bReturn;
-}
 
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _ModifyIcon
-//
-bool TrayService::_ModifyIcon(LSNOTIFYICONDATA* plnid,
-                              const NOTIFYICONDATA& nid)
-{
-    bool bReturn = true;
-
-    if (plnid)
+    // Copy GUID
+    if(nid.uFlags & NIF_GUID)
     {
-        bool bWasValid = _IsValidIcon(plnid);
-
-        plnid->uFlags |= nid.uFlags;
-
-        if (nid.uFlags & NIF_MESSAGE)
+        switch(nid.cbSize)
         {
-            plnid->uCallbackMessage = nid.uCallbackMessage;
-        }
+        case NID_6W_SIZE:
+            {
+                NID_6W* pnid = (NID_6W*)&nid;
 
-        bReturn = _CopyIconHandle(*plnid, nid);
-        _CopyVersionSpecifics(*plnid, nid);
+                lsnid.guidItem = pnid->guidItem;
+                lsnid.uFlags |= NIF_GUID;
+            }
+            break;
+        case NID_6A_SIZE:
+            {
+                NID_6A* pnid = (NID_6A*)&nid;
 
-        if (_IsValidIcon(plnid))
-        {
-            _Notify(bWasValid ? NIM_MODIFY : NIM_ADD, plnid);
+                lsnid.guidItem = pnid->guidItem;
+                lsnid.uFlags |= NIF_GUID;
+            }
+            break;
+        default:
+            break;
         }
-        else if (bWasValid)
-        {
-            _Notify(NIM_DELETE, plnid);
-        }
-        // At this point, the only reason we will return false is
-        // if above our call to _CopyIconHandle failed.
     }
-    else
-    {
-        bReturn = false;
-    }
-
-    return bReturn;
-}
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _RemoveIcon
-//
-// Remove an icon from the icon list
-//
-bool TrayService::_RemoveIcon(IconVector::iterator itIcon)
-{
-    if (*itIcon)
-    {
-        _Notify(NIM_DELETE, *itIcon);
-        
-        if ((*itIcon)->hIcon)
-        {
-            DestroyIcon((*itIcon)->hIcon);
-        }
-        
-        delete *itIcon;
-    }
-    
-    m_siVector.erase(itIcon);
 
     return true;
 }
@@ -723,26 +614,38 @@ bool TrayService::_RemoveIcon(IconVector::iterator itIcon)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _CopyIconHandle
+// addIcon
 //
-bool TrayService::_CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
-                                  const NOTIFYICONDATA& nidSource) const
+bool TrayService::addIcon(const NID_XX& nid)
 {
-    bool bReturn = true;
-    
-    if (nidSource.uFlags & NIF_ICON)
+    bool bReturn = false;
+
+    if(m_siVector.end() == findIcon(nid))
     {
-        if (lnidTarget.hIcon)
+        NotifyIcon * pni = new NotifyIcon(nid);
+
+        if (pni)
         {
-            DestroyIcon(lnidTarget.hIcon);
-        }
-        
-        lnidTarget.hIcon = CopyIcon(nidSource.hIcon);
-        
-        if (!lnidTarget.hIcon)
-        {
-            lnidTarget.uFlags &= ~NIF_ICON;
-            bReturn = false;
+            /* Fail shared icons, unless a valid hIcon exists */
+            if(IsWindow(pni->GetHwnd()) && (!pni->IsShared() || pni->HasIcon()))
+            {
+                m_siVector.push_back(pni);
+
+                if(pni->IsValid())
+                {
+                    LSNOTIFYICONDATA lsnid = {0};
+
+                    pni->CopyLSNID(&lsnid);
+                    extendNIDCopy(lsnid, nid);
+
+                    notify(NIM_ADD, &lsnid);
+                }
+                bReturn = true;
+            }
+            else
+            {
+                delete pni;
+            }
         }
     }
     
@@ -752,14 +655,166 @@ bool TrayService::_CopyIconHandle(LSNOTIFYICONDATA& lnidTarget,
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _Notify
+// modifyIcon
 //
-// Notify all listeners of a systray event
-//
-bool TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid) const
+bool TrayService::modifyIcon(const NID_XX& nid)
 {
-    ASSERT_ISNOTNULL(plnid);
-    return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)plnid);
+    bool bReturn = false;
+
+    IconVector::iterator it = findIcon(nid);
+
+    if(m_siVector.end() != it && *it)
+    {
+        NotifyIcon * pni = *it;
+
+        bool bWasValid = pni->IsValid();
+
+        // Update stored NotifyIcon
+        pni->Update(nid);
+
+        if(pni->IsValid())
+        {
+            LSNOTIFYICONDATA lsnid = {0};
+
+            if(!bWasValid)
+            {
+                // This is a "new" icon, send entire stored NotifyIcon
+                pni->CopyLSNID(&lsnid);
+                extendNIDCopy(lsnid, nid);
+
+                notify(NIM_ADD, &lsnid);
+            }
+            else
+            {
+                // This icon already exists, just send updated flags
+                pni->CopyLSNID(&lsnid, nid.uFlags);
+                extendNIDCopy(lsnid, nid);
+
+                notify(NIM_MODIFY, &lsnid);
+            }
+        }
+        else if(bWasValid)
+        {
+            LSNOTIFYICONDATA lsnid = {
+                 sizeof(LSNOTIFYICONDATA)
+                ,pni->GetHwnd()
+                ,pni->GetuID()
+                ,0
+            };
+
+            // This icon is no longer visible, remove
+            notify(NIM_DELETE, &lsnid);
+        }
+
+        bReturn = true;
+    }
+
+    return bReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// deleteIcon
+//
+// Remove an icon from the icon list
+//
+bool TrayService::deleteIcon(const NID_XX& nid)
+{
+    bool bReturn = false;
+
+    IconVector::iterator it = findIcon(nid);
+
+    if(m_siVector.end() != it)
+    {
+        LSNOTIFYICONDATA lsnid = {
+             sizeof(LSNOTIFYICONDATA)
+            ,(*it)->GetHwnd()
+            ,(*it)->GetuID()
+            ,0
+        };
+
+        notify(NIM_DELETE, &lsnid);
+
+        delete *it;
+        m_siVector.erase(it);
+
+        bReturn = true;
+    }
+
+    return bReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// setFocusIcon
+//
+// Sets selection focus to the specified icon
+//
+bool TrayService::setFocusIcon(const NID_XX& nid)
+{
+    bool bReturn = false;
+
+    IconVector::iterator it = findIcon(nid);
+
+    if(m_siVector.end() != it)
+    {
+        LSNOTIFYICONDATA lsnid = {
+             sizeof(LSNOTIFYICONDATA)
+            ,(*it)->GetHwnd()
+            ,(*it)->GetuID()
+            ,0
+        };
+
+        bReturn = notify(NIM_SETFOCUS, &lsnid);
+    }
+
+    return bReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// setVersionIcon
+//
+// Sets compatibility version for specified icon
+//
+bool TrayService::setVersionIcon(const NID_XX& nid)
+{
+    bool bReturn = false;
+
+    IconVector::iterator it = findIcon(nid);
+
+    if(m_siVector.end() != it)
+    {
+        LSNOTIFYICONDATA lsnid = {
+             sizeof(LSNOTIFYICONDATA)
+            ,(*it)->GetHwnd()
+            ,(*it)->GetuID()
+            ,0
+        };
+
+        switch(nid.cbSize)
+        {
+        case NID_6W_SIZE:
+        case NID_5W_SIZE:
+            lsnid.uVersion = ((NID_5W&)nid).uVersion;
+            break;
+
+        case NID_6A_SIZE:
+        case NID_5A_SIZE:
+            lsnid.uVersion = ((NID_5A&)nid).uVersion;
+            break;
+
+        default:
+            break;
+        }
+
+        bReturn = notify(NIM_SETVERSION, &lsnid);
+    }
+
+    return bReturn;
 }
 
 
@@ -767,18 +822,18 @@ bool TrayService::_Notify(DWORD dwMessage, LSNOTIFYICONDATA* plnid) const
 //
 // FindIconPredicate
 //
-// Predicate for std::find_if, used by _FindIcon
+// Predicate for std::find_if, used by findIcon
 // Needs to be at global scope because of mingw issues
 //
-struct FindIconPredicate
+const struct FindIconPredicate
 {
     FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID) {}
-    
-    bool operator() (const LSNOTIFYICONDATA* plnid) const
+
+    bool operator() (const NotifyIcon* pni) const
     {
-        return (plnid->hWnd == m_hWnd && plnid->uID == m_uID);
+        return (pni->GetHwnd() == m_hWnd && pni->GetuID() == m_uID);
     }
-    
+
 private:
     HWND m_hWnd;
     UINT m_uID;
@@ -787,181 +842,15 @@ private:
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// _FindIcon
+// findIcon
 //
 // Looks up an icon in the SystrayIconList
 //
-IconVector::iterator TrayService::_FindIcon(HWND hWnd, UINT uId)
+IconVector::iterator TrayService::findIcon(HWND hWnd, UINT uId) const
 {
-    return std::find_if(m_siVector.begin(), m_siVector.end(),
-        FindIconPredicate(hWnd, uId));
+    IconVector::const_iterator iter = std::find_if(m_siVector.begin(),
+        m_siVector.end(), FindIconPredicate(hWnd, uId));
+
+    return const_cast<class NotifyIcon **>(iter);
 }
 
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _CopyVersionSpecifics
-//
-// Setup version specific attributes
-//
-void TrayService::_CopyVersionSpecifics(LSNOTIFYICONDATA& lnidTarget,
-                                        const NOTIFYICONDATA& nidSource) const
-{
-    if (_IsUnicode(nidSource))
-    {
-        NID_6W* pnid = (NID_6W*)&nidSource;
-
-        switch (nidSource.cbSize)
-        {
-            default:
-            case NID_6W_SIZE:
-            {
-                if (nidSource.uFlags & NIF_GUID)
-                {
-                    lnidTarget.guidItem = pnid->guidItem;
-                }
-            }
-            case NID_5W_SIZE:
-            {
-                if (nidSource.uFlags & NIF_STATE)
-                {
-                    DWORD dwState = (lnidTarget.dwState & ~pnid->dwStateMask) \
-                                    | (pnid->dwState & pnid->dwStateMask);
-
-                    lnidTarget.dwState = dwState;
-                    lnidTarget.dwStateMask |= pnid->dwStateMask;
-                }
-
-                if (nidSource.uFlags & NIF_INFO)
-                {
-                    if (_StringCopy(lnidTarget.szInfo, TRAY_MAX_INFO_LENGTH,
-                        pnid->szInfo))
-                    {
-                        _StringCopy(lnidTarget.szInfoTitle,
-                            TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
-
-                        lnidTarget.dwInfoFlags = pnid->dwInfoFlags;
-                    }
-                    else
-                    {
-                        pnid->uFlags &= ~NIF_INFO;
-                    }
-                }
-            }
-            case NID_4W_SIZE:
-            {
-                if (nidSource.uFlags & NIF_TIP)
-                {
-                    if (!_StringCopy(lnidTarget.szTip, TRAY_MAX_TIP_LENGTH,
-                        pnid->szTip))
-                    {
-                        lnidTarget.uFlags &= ~NIF_TIP;
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        NID_6A* pnid = (NID_6A*)&nidSource;
-
-        switch (nidSource.cbSize)
-        {
-            default:
-            case NID_6A_SIZE:
-            {
-                if (nidSource.uFlags & NIF_GUID)
-                {
-                    lnidTarget.guidItem = pnid->guidItem;
-                }
-            }
-            case NID_5A_SIZE:
-            {
-                if (nidSource.uFlags & NIF_STATE)
-                {
-                    DWORD dwState = (lnidTarget.dwState & ~pnid->dwStateMask) \
-                                    | (pnid->dwState & pnid->dwStateMask);
-
-                    lnidTarget.dwState = dwState;
-                    lnidTarget.dwStateMask |= pnid->dwStateMask;
-                }
-
-                if (nidSource.uFlags & NIF_INFO)
-                {
-                    if (_StringCopy(lnidTarget.szInfo, TRAY_MAX_INFO_LENGTH,
-                        pnid->szInfo))
-                    {
-                        _StringCopy(lnidTarget.szInfoTitle,
-                            TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
-
-                        lnidTarget.dwInfoFlags = pnid->dwInfoFlags;
-                    }
-                    else
-                    {
-                        pnid->uFlags &= ~NIF_INFO;
-                    }
-                }
-            }
-            case NID_4A_SIZE:
-            {
-                if (nidSource.uFlags & NIF_TIP)
-                {
-                    if (!_StringCopy(lnidTarget.szTip, TRAY_MAX_TIP_LENGTH,
-                        pnid->szTip))
-                    {
-                        lnidTarget.uFlags &= ~NIF_TIP;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _ConvertWideToAnsi
-//
-int TrayService::_ConvertWideToAnsi(char* pszOutput, size_t cchOutput,
-                                    const wchar_t* pwzInput, size_t cchInputMax)
-                                    const
-{
-    ASSERT_ISVALIDBUF(pwzInput, cchInputMax);
-    ASSERT_ISVALIDBUF(pszOutput, cchOutput);
-    
-    size_t cchRealInputMax = min((wcslen(pwzInput) + 1), cchInputMax);
-    
-    int nReturn = WideCharToMultiByte(CP_ACP, 0, pwzInput, cchRealInputMax,
-        pszOutput, cchOutput, NULL, NULL);
-    
-    return nReturn;
-}
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// _StringCopy
-//
-bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCSTR pszSrc) const
-{
-    ASSERT_ISVALIDBUF(pszDest, cchDest);
-    ASSERT_ISNOTNULL(pszSrc);
-
-    return SUCCEEDED(StringCchCopyEx(pszDest, cchDest, pszSrc, NULL, NULL,
-        STRSAFE_NULL_ON_FAILURE));
-}
-
-bool TrayService::_StringCopy(LPSTR pszDest, size_t cchDest, LPCWSTR pwzSrc) const
-{
-    ASSERT_ISVALIDBUF(pszDest, cchDest);
-    ASSERT_ISNOTNULL(pwzSrc);
-
-    bool bReturn = (_ConvertWideToAnsi(pszDest, cchDest, pwzSrc, cchDest) != 0);
-    
-    if (!bReturn)
-    {
-        *pszDest = '\0';
-    }
-
-    return bReturn;
-}
