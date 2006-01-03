@@ -52,10 +52,6 @@ protected:
 
 	void _SetupVars(LPCSTR szLSPath);
 
-#ifdef LS_COMPAT_MATH
-    double _MathEvaluate(LPTSTR ptzInput);
-#endif //LS_COMPAT_MATH
-
     bool _SetShellFolderVariable(LPCSTR pszVariable, int nFolder);
     
 public:
