@@ -1,60 +1,47 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    LiteStep 0.24.7 Release Candidate 4
-    Readme/Release Notes
+    LiteStep 0.24.7
+    Readme
+    
+    Copyright (c) 2005 - Litestep Development Team
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
 -- PREFACE ------------------------------------------------------------
 
- Your friendly devteam is proud to announce Release Candidate 4 of
- LiteStep 0.24.7. Changes since Release Candidate 3 are listed below as
- usual. Refer to changes.txt for a a list of changes since 0.24.6.
-
- This will hopefully be the last Release Candidate before the Final
- 0.24.7 release planned late next week. Please let us know right away
- if you find any showstoppers.
-
- Installation instructions are not included. Use at your own risk.
+ Your friendly devteam is proud to announce the release of Litestep
+ 0.24.7 Final. Changes since Release Candidate 4 are listed below as
+ usual. Refer to changes.txt for a list of changes since 0.24.6. Refer
+ to release_notes.txt for complete documentation on this release.
 
 
--- CHANGES SINCE RELEASE CANDIDATE 3 ----------------------------------
+-- CHANGES SINCE RELEASE CANDIDATE 4 ----------------------------------
 
- - Fixed libpng/lsapi CRT dependency mismatch
+ - Fixed issues with module threading
 
- - Fixed potential log buffer overflow (Thanks Hollow)
+ - Fixed !Recycle/!ReloadModule/!UnloadModule lockups
 
- - Fixed missing/ invalid Win32 error messages during module load
+ - Removed the "nopump" modifier from LoadModule
 
- - Fixed several issues with the TrayService
+ - Changed setting "LSTrayService" introduced in RC 2 to
+   "LSDisableTrayService"
 
- - Fixed thread race condition in BangManager (Thanks luthe)
+ - Made "LSAutoHideModules" update on Recycle
 
- - Fixed various buffer and pointer access issues
+ - Updated release notes
 
- - Fixed ModuleManager reporting a module loaded, that doesn't exist
-
- - Updated string table translations (many thanks to LSML members)
-
- - Updated libpng13.dll to version 1.2.8 and zlib.dll to version 1.2.3
-
- - Added Makefile for MinGW
-
- - Added VersionInfo resource to lsapi.dll
- 
- - Various minor fixes
+ - Updated build instructions
 
 
 -- FINAL WORDS --------------------------------------------------------
 
  Thanks to the LiteStep Community for all the positive feedback and
  support; and for the endless patience. It has taken a long time, but
- we may yet see a Final Release.
+ LiteStep 0.24.7 has finally arrived.
 
  Please send any suggestions or bug reports to the LS Mailing List or
- use the lsdev.org forums. You can also send a private email to ilmcuts
- at gmx dot net and please CC jugg at litestep dot net.
+ use the lsdev.org forums.
 
  Happy LiteStepping,
 
- - The Litestep Development Team  (www.lsdev.org)
-
+ - The Litestep Development Team
+   http://www.lsdev.org/

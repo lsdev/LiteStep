@@ -4,191 +4,43 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
+-- LITESTEP CORE DEVELOPMENT ---------------------------------------------------
 
--- NOTE ------------------------------------------------------------------------
+ For build instructions, please review
 
+  - build_vc6.txt   (official supported method)
+  - build_mingw.txt
 
- It is assumed that the LiteStep sourcecode is in a directory called "ls-b247".
- This is not crucial for compiling the LiteStep core but it saves you from
- editing the path to lsapi if you want to compile a module developed with
- 0.24.7.
+ The LiteStep source is segmented into separate code modules.  The source folder
+ structure represents these code modules.
 
+  \LiteStep
+    - Contains build environment project files
 
+  \LiteStep\litestep
+    - Contains the "litestep.exe" source files
 
--- BUILD REQUIREMENTS ----------------------------------------------------------
- 
- - MS Visual Studio 6.0sp5
+  \LiteStep\lsapi
+    - Contains the "lsapi.dll" source files
 
+  \LiteStep\hook
+    - Contains the "hook.dll" source files
 
- - Platform SDK from August 2002 or later
+  \LiteStep\utility
+    - Contains common utility source files used across all code modules
 
 
- - STLport 4.5.3
-
-
- - libpng 1.2.4
-
-
- - zlib 1.1.4
-
-
- This is the configuration used during 0.24.7 development, it is quite possible
- that other versions of the above libraries can be used, but there's no
- guarantee. If you can provide additional information about this please let us
- know.
-
-
- 
--- BUILD SETUP -----------------------------------------------------------------
-
-
- It is assumed that Visual Studio 6 and Service Pack 5 are already installed. If
- you don't have Service Pack 5 get it here:
- http://msdn.microsoft.com/vstudio/downloads/updates/sp/vs6/sp5/default.asp
- It is important that you keep the following installation order:
-
-
- A. Installing the Platform SDK
- ------------------------------
-  
-  1. Go to http://www.microsoft.com/msdownload/platformsdk/sdkupdate/ and
-     download the Platform SDK. The minimum requirement is the build environment
-     of the Core SDK.
-
-
-  2. Make sure MSVC is closed. The Platform SDK will create a folder in your
-     start menu. In there you'll find a subfolder called "Visual Studio
-     Registration." Click on the entry "Register PSDK Directories with Visual
-     Studio".
-
-
-  3. *TODO* Check for correct registration in MSVC.
-
-
- 
- B. Installing STLPort
- ---------------------
- 
-  1. Download STLport 4.5.3 from http://www.stlport.org.
-
-
-  2. Extract the archive to a directory of your choice, for example "C:\Program
-     Files\Visual Studio\STLport". This path will be references as
-     "\your_path_to_stlport" from here on.
-
-
-  3. Open \your_path_to_stlport\stlport\stl_user_config.h and scroll down almost
-     to the bottom. Uncomment (ie. enable) _STLP_NEW_PLATFORM_SDK.
-
-
-  4. Open \your_path_to_stlport\stlport\stl\_site_config.h and uncomment
-     _STLP_USE_STATIC_LIB if it's not already enabled.
-
-
-  5. In the Platform SDK's start menu entry, go to "Open Build Environment
-     Window" and select a retail (non-64bit) build environment, e.g. "Set
-     Windows 2000 Build Environment (Retail)"
-
-
-  6. Type in "cd \your_path_to_stlport\src" (without the quotes) and hit return.
-
-
-  7. Run "copy vc6.mak makefile" and then "nmake clean all" (without quotes).
-     Nmake can take a while to complete. After it is done you should find
-     "stlport_vc6_static.lib" (among others) in the "\your_path_to_stlport\lib"
-     directory. If that is not the case STLport did not compile correctly and
-     you might have to start over.
-
-
-  8. Open Visual Studio. In the "Tools" menu select "Options", then switch to
-     the "Directories" tab. Add the "\your_path_to_stlport\stlport" directory at
-     the top of "include files" and the "\your_path_to_stlport\lib" directory to
-     "library files". For the debugger add "\your_path_to_stlport\src" at the
-     top of "source files."
-
-
-
- C. Installing libpng and zlib
- -----------------------------
-
-
-  1. Go to http://www.libpng.org and http://www.zlib.org and download the
-     respective sourcecode.
-
-
-  2. Extract the sourcecode to two directories "libpng" and "zlib" in the same
-     directory the LS source resides in (make sure it is "libpng" and not 
-     "lpng124" or something else). For instance the directory structure could
-     look like this:
-      c:\dev\ls-b247
-      c:\dev\libpng
-      c:\dev\zlib
-
-
-  3. Open the libpng\projects\msvc\libpng.dsw MS VC++ workspace.
-
-
-  4. In the "Build" menu select "Set Active Configuration" and choose
-     "libpng - Win32 DLL".
-
-
-  5. Hit compile.
-
-
-  6. Repeat steps 4 and 5 for the "libpng - Win32 DLL Debug" configuration.
-  
-
-
--- BUILDING LITESTEP -----------------------------------------------------------
-
-
- A. Compiler Flags/Build Options
- -------------------------------
-  *TODO*
-
-
-
- B. Compiling
- ------------
-
-
-  2. Open the litestep.dsw (not .dsp!) MS VC++ workspace.
-
-
-  3. In the "Build" menu select "Set Active Configuration" and choose the
-     desired build type of the litestep project.
-
-
-  4. Press F7 or select "Build litestep.exe" in the "Build" menu to start
-     compiling.
-
-
-  5. The output directory is a subdirectory of ls-b247\litestep, depending on
-     your build choice.
-
-
-
--- FILE DESCRIPTION ------------------------------------------------------------
-
+-- BINARY FILE DESCRIPTION -----------------------------------------------------
 
  - litestep.exe     Main executable. Loads modules, handles window messages
                     communication. Runs startup apps, includes DDE and tray
                     services.
 
-
  - lsapi.dll        LiteStep API for modules to use. Loads and parses step.rc;
                     handles $evars$ and all other configuration. Manages !bang
                     commands, includes core !bangs.
 
+ - hook.dll         The system shell hook used by some legacy LiteStep modules
+                    for receiving global system messages.
 
- - install.dll
- - hook.dll
-
-
- *TODO* make this a project description including the utility project?
-
-
-
--- MODULE DEVELOPMENT ----------------------------------------------------------
-
- *TODO* does this even belong here? if so then we might as well add the coding convention 
+-- LITESTEP MODULE DEVELOPMENT -------------------------------------------------
