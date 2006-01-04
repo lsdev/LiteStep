@@ -30,8 +30,8 @@ class ILiteStep: public CountedBase
 {
 public:
 
-	STDMETHOD(get_Window)(/*[out, retval]*/ long* phWnd) = 0;
-	STDMETHOD(get_AppPath)(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) = 0;
+	virtual HRESULT get_Window(/*[out, retval]*/ long* phWnd) const = 0;
+	virtual HRESULT get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const = 0;
 };
 
 #endif // __ILITESTEP_H

@@ -860,7 +860,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 
-STDMETHODIMP CLiteStep::get_Window(/*[out, retval]*/ long *phWnd)
+HRESULT CLiteStep::get_Window(/*[out, retval]*/ long *phWnd) const
 {
     HRESULT hr;
 
@@ -878,7 +878,7 @@ STDMETHODIMP CLiteStep::get_Window(/*[out, retval]*/ long *phWnd)
 }
 
 
-STDMETHODIMP CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath)
+HRESULT CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const
 {
     HRESULT hr;
 
