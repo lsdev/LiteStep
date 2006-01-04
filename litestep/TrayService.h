@@ -112,9 +112,9 @@ private:
     //
     // findIcon variants
     //
-    IconVector::iterator findIcon(HWND hWnd, UINT uId) const;
+    IconVector::iterator findIcon(HWND hWnd, UINT uId);
 
-    inline IconVector::iterator findIcon(const NID_XX& nid) const
+    inline IconVector::iterator findIcon(const NID_XX& nid)
     {
         return findIcon(nid.hWnd, nid.uID);
     }

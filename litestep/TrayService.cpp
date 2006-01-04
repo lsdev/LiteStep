@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
+#include <docobj.h>
 
 #ifndef REGSTR_PATH_SHELLSERVICEOBJECTDELAYED
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
@@ -40,8 +41,8 @@ static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 // TrayService
 //
 TrayService::TrayService() :
-m_hNotifyWnd(NULL), m_hTrayWnd(NULL), m_hLiteStep(NULL),
-m_hInstance(NULL), m_bWin2000(false)
+m_bWin2000(false), m_hNotifyWnd(NULL), m_hTrayWnd(NULL), m_hLiteStep(NULL),
+m_hInstance(NULL)
 {
 }
 
@@ -825,7 +826,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
 // Predicate for std::find_if, used by findIcon
 // Needs to be at global scope because of mingw issues
 //
-const struct FindIconPredicate
+struct FindIconPredicate
 {
     FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID) {}
 
@@ -846,11 +847,9 @@ private:
 //
 // Looks up an icon in the SystrayIconList
 //
-IconVector::iterator TrayService::findIcon(HWND hWnd, UINT uId) const
+IconVector::iterator TrayService::findIcon(HWND hWnd, UINT uId)
 {
-    IconVector::const_iterator iter = std::find_if(m_siVector.begin(),
+    return std::find_if(m_siVector.begin(),
         m_siVector.end(), FindIconPredicate(hWnd, uId));
-
-    return const_cast<class NotifyIcon **>(iter);
 }
 
