@@ -42,7 +42,7 @@ struct FileInfo
     /** Local settings map for this file */
     SettingsMap* m_pSettingsMap;
     
-	/** Reference count */
+    /** Reference count */
     UINT m_Count;
 };
 

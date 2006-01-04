@@ -204,7 +204,7 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
     
     if (mqModules.size() > 0)
     {
-        std::vector<HANDLE> vecInitEvents;;
+        std::vector<HANDLE> vecInitEvents;
         ModuleQueue::iterator iter = mqModules.begin();
         
         while (iter != mqModules.end())
@@ -241,13 +241,13 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
         _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
     }
     
-	return uReturn;
+    return uReturn;
 }
 
 
 void ModuleManager::_QuitModules()
 {
-    std::vector<HANDLE> vecQuitEvents;;
+    std::vector<HANDLE> vecQuitEvents;
     ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
     
     while (iter != m_ModuleQueue.rend())

@@ -60,80 +60,80 @@ public:
      */
     virtual ~ModuleManager();
     
-	/**
-	 * Starts the module manager and loads all the modules specified in <code>step.rc</code>.
-	 *
-	 * @param  pILiteStep  interface to Litestep's core
-	 * @return <code>S_OK</code> if successful or an error code
-	 */
+    /**
+     * Starts the module manager and loads all the modules specified in <code>step.rc</code>.
+     *
+     * @param  pILiteStep  interface to Litestep's core
+     * @return <code>S_OK</code> if successful or an error code
+     */
     HRESULT Start(ILiteStep *pILiteStep);
     
-	/**
-	 * Unloads all modules and stops the module manager.
-	 *
-	 * @return <code>S_OK</code> if successful or an error code
-	 */
+    /**
+     * Unloads all modules and stops the module manager.
+     *
+     * @return <code>S_OK</code> if successful or an error code
+     */
     HRESULT Stop();
     
-	/**
-	 * Loads all the modules specified in <code>step.rc</code>.
-	 *
-	 * @return <code>S_OK</code> if successful or an error code
-	 */
+    /**
+     * Loads all the modules specified in <code>step.rc</code>.
+     *
+     * @return <code>S_OK</code> if successful or an error code
+     */
     HRESULT rStart();
     
-	/**
-	 * Unloads all modules.
-	 *
-	 * @return <code>S_OK</code> if successful or an error code
-	 */
+    /**
+     * Unloads all modules.
+     *
+     * @return <code>S_OK</code> if successful or an error code
+     */
     HRESULT rStop();
     
-	/**
-	 * Loads a module.
-	 *
-	 * @param  pszLocation  path to the module's DLL
-	 * @param  dwFlags      set of flags that control how the module is loaded
-	 * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
-	 */
+    /**
+     * Loads a module.
+     *
+     * @param  pszLocation  path to the module's DLL
+     * @param  dwFlags      set of flags that control how the module is loaded
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     */
     BOOL LoadModule(LPCSTR pszLocation, DWORD dwFlags);
     
-	/**
-	 * Unloads a module given its instance handle.
-	 *
-	 * @param  hModule  handle to the module's DLL instance
-	 * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
-	 */
+    /**
+     * Unloads a module given its instance handle.
+     *
+     * @param  hModule  handle to the module's DLL instance
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     */
     BOOL QuitModule(HINSTANCE hModule);
     
-	/**
-	 * Unloads a module given the path to its DLL.
-	 *
-	 * @param  pszLocation  path to the module's DLL
-	 * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
-	 */
+    /**
+     * Unloads a module given the path to its DLL.
+     *
+     * @param  pszLocation  path to the module's DLL
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     */
     BOOL QuitModule(LPCSTR pszLocation);
     
-	/**
-	 * Reloads a module given its instance handle
-	 *
-	 * @param  hModule  handle to the module's DLL instance
-	 * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
-	 */
+    /**
+     * Reloads a module given its instance handle
+     *
+     * @param  hModule  handle to the module's DLL instance
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     */
     BOOL ReloadModule(HINSTANCE hModule);
     
-	/**
-	 * Enumerates loaded modules. Calls the callback function once for each loaded
-	 * module. Continues until all modules have been enumerated or the callback
-	 * function returns <code>FALSE</code>.
-	 *
-	 * @param  pfnCallback  pointer to callback function
-	 * @param  lParam       application-defined value passed to the callback function
-	 * @return <code>S_OK</code> if all modules were enumerated, <code>S_FALSE</code> if the
-	 *         callback function returned <code>FALSE</code>, or an error code
-	 */
+    /**
+     * Enumerates loaded modules. Calls the callback function once for each loaded
+     * module. Continues until all modules have been enumerated or the callback
+     * function returns <code>FALSE</code>.
+     *
+     * @param  pfnCallback  pointer to callback function
+     * @param  lParam       application-defined value passed to the callback function
+     * @return <code>S_OK</code> if all modules were enumerated, <code>S_FALSE</code> if the
+     *         callback function returned <code>FALSE</code>, or an error code
+     */
     HRESULT EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam) const;
-	
+
 private:
 
     /**
@@ -143,31 +143,31 @@ private:
      */
     UINT _LoadModules();
     
-	/**
-	 * Initializes the modules in the specified list.
-	 *
-	 * @param  mqModules  list of modules to initialize
-	 * @return number of modules initialized
-	 */
+    /**
+     * Initializes the modules in the specified list.
+     *
+     * @param  mqModules  list of modules to initialize
+     * @return number of modules initialized
+     */
     UINT _StartModules(ModuleQueue& mqModules);
     
-	/**
-	 * Unloads all loaded modules.
-	 */
+    /**
+     * Unloads all loaded modules.
+     */
     void _QuitModules();
     
-	/**
-	 * Finds a module in the loaded module list based on the path to its DLL.
-	 *
-	 * @return iterator that points to the module or the end of the list
-	 */
+    /**
+     * Finds a module in the loaded module list based on the path to its DLL.
+     *
+     * @return iterator that points to the module or the end of the list
+     */
     ModuleQueue::iterator _FindModule(LPCSTR pszLocation);
     
-	/**
-	 * Finds a module in the loaded module list based on its instance handle.
-	 *
-	 * @return iterator that points to the module or the end of the list
-	 */
+    /**
+     * Finds a module in the loaded module list based on its instance handle.
+     *
+     * @return iterator that points to the module or the end of the list
+     */
     ModuleQueue::iterator _FindModule(HINSTANCE hModule);
     
     /**

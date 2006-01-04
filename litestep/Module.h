@@ -62,10 +62,10 @@ private:
     /** Flags used to load module */
     DWORD m_dwFlags;
     
-	/** Event that is triggered when a threaded module completes initialization */
+    /** Event that is triggered when a threaded module completes initialization */
     HANDLE m_hInitEvent;
     
-	/** Event that is triggered to tell a threaded module to shut down */
+    /** Event that is triggered to tell a threaded module to shut down */
     HANDLE m_hQuitEvent;
 
 public:
@@ -78,9 +78,9 @@ public:
      */
     Module(const std::string& sLocation, DWORD dwFlags);
     
-	/**
-	 * Destructor.
-	 */
+    /**
+     * Destructor.
+     */
     virtual ~Module();
     
     /**
@@ -102,12 +102,12 @@ public:
      */
     void Quit();
     
-	/**
-	 * Entry point for the module's main thread.
-	 *
-	 * @param  dllModPtr  pointer to <code>this</code>
-	 * @return unused
-	 */
+    /**
+     * Entry point for the module's main thread.
+     *
+     * @param  dllModPtr  pointer to <code>this</code>
+     * @return unused
+     */
     static UINT __stdcall ThreadProc(void* dllModPtr);
     
     /**
@@ -117,51 +117,51 @@ public:
      */
     void HandleThreadMessage(MSG &msg);
     
-	/**
-	 * Returns this module's DLL instance handle.
-	 */
+    /**
+     * Returns this module's DLL instance handle.
+     */
     HINSTANCE GetInstance() const { return m_hInstance; }
-
-	/**
-	 * Returns this module's thread handle. Returns <code>NULL</code> if the
-	 * module was not loaded in its own thread.
-	 */
+    
+    /**
+     * Returns this module's thread handle. Returns <code>NULL</code> if the
+     * module was not loaded in its own thread.
+     */
     HANDLE GetThread() const { return m_hThread; }
     
-	/**
-	 * Returns an event that is set once this module has been initialized.
-	 */
+    /**
+     * Returns an event that is set once this module has been initialized.
+     */
     HANDLE GetInitEvent() const { return m_hInitEvent; }
     
-	/**
-	 * Returns an event that is set once this module has shut down.
-	 */
+    /**
+     * Returns an event that is set once this module has shut down.
+     */
     HANDLE GetQuitEvent() const { return m_hQuitEvent; }
     
-	/**
-	 * Returns the path to this module's DLL.
-	 */
+    /**
+     * Returns the path to this module's DLL.
+     */
     LPCTSTR GetLocation() const { return m_tzLocation.c_str(); }
     
-	/**
-	 * Returns the set of flags used to load this module.
-	 */
+    /**
+     * Returns the set of flags used to load this module.
+     */
     DWORD GetFlags() const { return m_dwFlags; }
     
-	/**
-	 * Returns <code>TRUE</code> if Litestep provides the message pump for this module's
-	 * main thread.
-	 */
+    /**
+     * Returns <code>TRUE</code> if Litestep provides the message pump for this module's
+     * main thread.
+     */
     BOOL HasMessagePump() const { return !(m_dwFlags & LS_MODULE_NOTPUMPED); }
     
-	/**
-	 * Returns a pointer to this module's <code>quitModule</code> function.
-	 */
+    /**
+     * Returns a pointer to this module's <code>quitModule</code> function.
+     */
     ModuleQuitFunc GetQuit() const { return m_pQuit; }
     
-	/**
-	 * Returns a pointer to this module's <code>initModuleEx</code> function.
-	 */
+    /**
+     * Returns a pointer to this module's <code>initModuleEx</code> function.
+     */
     ModuleInitExFunc GetInitEx() const { return m_pInitEx; }
 
 private:
