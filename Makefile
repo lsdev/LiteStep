@@ -79,6 +79,7 @@ EXEOBJS = $(OUTPUT)/BangCommand.o \
 	$(OUTPUT)/safeptr.o \
 	$(OUTPUT)/shellhlp.o \
 	$(OUTPUT)/StartupRunner.o \
+	$(OUTPUT)/TrayNotifyIcon.o \
 	$(OUTPUT)/TrayService.o
 
 # Path to lsapi.dll
@@ -365,6 +366,16 @@ $(OUTPUT)/StartupRunner.o: litestep/StartupRunner.cpp \
 	utility/safeptr.h \
 	utility/safestr.h \
 	utility/shellhlp.h
+
+$(OUTPUT)/TrayNotifyIcon.o: litestep/TrayNotifyIcon.cpp \
+	litestep/buildoptions.h \
+	litestep/TrayNotifyIcon.h \
+	lsapi/lsapidefines.h \
+	utility/Base.h \
+	utility/common.h \
+	utility/debug.hpp \
+	utility/IService.h \
+	utility/safestr.h
 
 $(OUTPUT)/TrayService.o: litestep/TrayService.cpp \
 	litestep/buildoptions.h \
