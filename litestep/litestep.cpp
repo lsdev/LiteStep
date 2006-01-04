@@ -256,6 +256,7 @@ CLiteStep::CLiteStep()
 	m_pDataStoreManager = NULL;
 	m_pMessageManager = NULL;
 	m_bHookManagerStarted = false;
+	m_bSignalExit = false;
 	m_pTrayService = NULL;
 	m_BlockRecycle = 0;
 }
@@ -432,40 +433,13 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         
         // Main message pump
         MSG message;
-        while (GetMessage(&message, 0, 0, 0) > 0)
+        /* Note: check m_bSignalExit first, so that if MessageHandler()
+         * was called externally from a response to PeekMessage() we
+         * know right away if there was a WM_QUIT in the queue, and
+         * subsequently do not incorrectly call GetMessage() again. */
+        while (!m_bSignalExit && GetMessage(&message, 0, 0, 0) > 0)
         {
-            try
-            {
-                if (message.hwnd == NULL)
-		        {
-				    // Thread message
-				    switch (message.message)
-				    {
-					    case LM_THREAD_BANGCOMMAND:
-					    {
-						    ThreadedBangCommand* pInfo =
-                                (ThreadedBangCommand*)message.wParam;
-
-						    if (pInfo != NULL)
-						    {
-							    pInfo->Execute();
-							    pInfo->Release(); // check BangCommand.cpp for the reason
-						    }
-					    }
-					    break;
-
-                        default:
-                        break;
-				    }
-			    }
-			    else
-			    {
-				    TranslateMessage(&message);
-				    DispatchMessage (&message);
-			    }
-			}
-			catch(...)
-			{}
+            MessageHandler(message);
 		}
 
 		if (RegisterShellHook)
@@ -512,6 +486,54 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	return S_OK;
 }
 
+//
+//
+//
+int CLiteStep::MessageHandler(MSG &message)
+{
+    if(WM_QUIT == message.message)
+    {
+        m_bSignalExit = true;
+        return 0;
+    }
+
+    try
+    {
+        if (NULL == message.hwnd)
+        {
+            // Thread message
+            switch (message.message)
+            {
+                case LM_THREAD_BANGCOMMAND:
+                {
+                    ThreadedBangCommand* pInfo = \
+                        (ThreadedBangCommand*)message.wParam;
+
+                    if (NULL != pInfo)
+                    {
+                        pInfo->Execute();
+                        pInfo->Release(); // check BangCommand.cpp for the reason
+                    }
+                }
+                break;
+
+                default:
+                break;
+            }
+        }
+        else
+        {
+            TranslateMessage(&message);
+            DispatchMessage (&message);
+        }
+    }
+    catch(...)
+    {
+        // MessageBox(m_hMainWindow, "exception", "oops", MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION);
+    }
+
+    return 0;
+}
 
 //
 //

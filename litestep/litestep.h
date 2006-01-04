@@ -61,6 +61,7 @@ public:
 	// ILiteStep
 	HRESULT get_Window(/*[out, retval]*/ long* phWnd) const;
 	HRESULT get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const;
+	int MessageHandler(MSG &message);
 
 private:
 
@@ -100,6 +101,7 @@ private:
 	void _CleanupManagers();
 
 	bool m_bHookManagerStarted; // = false
+	bool m_bSignalExit; // = false
 
 	//
 	// Service Related
