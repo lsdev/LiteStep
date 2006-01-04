@@ -257,6 +257,7 @@ CLiteStep::CLiteStep()
 	m_pMessageManager = NULL;
 	m_bHookManagerStarted = false;
 	m_pTrayService = NULL;
+	m_BlockRecycle = 0;
 }
 
 
@@ -1077,6 +1078,16 @@ void CLiteStep::_CleanupManagers()
 //
 void CLiteStep::_Recycle()
 {
+	Block block(m_BlockRecycle);
+
+	/* Do not allow recursive recycles.  This may happen if some
+	 * one is heavy fingered on their recycle hotkey, and multiple
+	 * LM_RECYCLE messages are posted to the queue. */
+	if(block.IsBlocked())
+	{
+		return;
+	}
+
 	_StopManagers();
 
 	DeleteSettingsManager();

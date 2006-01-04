@@ -84,6 +84,9 @@ private:
 	// Shell hooks
 	UINT WM_ShellHook; // = 0;
 
+	// Function blocks
+	UINT m_BlockRecycle; // = 0
+
 	//
 	// Manager Related
 	//
