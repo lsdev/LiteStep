@@ -928,7 +928,7 @@ HRESULT CLiteStep::_InitServices()
     //
     // Tray Service
     //
-    if (GetRCBoolDef("LSTrayService", TRUE))
+    if (GetRCBool("LSDisableTrayService", FALSE))
     {
         m_pTrayService = new TrayService();
         
@@ -986,13 +986,15 @@ HRESULT CLiteStep::_InitManagers()
 {
 	HRESULT hr = S_OK;
 
-	//gDataStore = new DataStore();
-
 	m_pMessageManager = new MessageManager();
 
 	m_pModuleManager = new ModuleManager();
 
-	//gBangManager = new BangManager();
+	// Note:
+	// - The DataStore manager is dynamically initialized/started.
+	// - The Bang manager is located in LSAPI, and
+	//   is instantiated via LSAPIInit.
+	// - The Hook mamanger is dynamically initialized/started.
 
 	return hr;
 }
@@ -1005,13 +1007,20 @@ HRESULT CLiteStep::_StartManagers()
 {
 	HRESULT hr = S_OK;
 
-	//SetBangManager(gBangManager);
-
 	// Setup bang commands in lsapi
 	SetupBangs();
 
 	// Load modules
 	m_pModuleManager->Start(this);
+
+	// Note:
+	// - The BangManger is continually running
+	//   however, we must add our internal bang commands
+	//   at startup.  We take responsibility for that
+	//   here as it also needs to happen on Recycle.
+	// - MessageManager has/needs no Start method.
+	// - The DataStore manager is dynamically initialized/started.
+	// - The Hook mamanger is dynamically initialized/started.
 
 	return hr;
 }
@@ -1031,11 +1040,14 @@ HRESULT CLiteStep::_StopManagers()
 	}
 
 	m_pModuleManager->Stop();
-	//gBangManager->ClearBangCommands();
-	m_pMessageManager->ClearMessages();
 
-	//ClearBangManager();
-    ClearBangs();
+	m_pMessageManager->ClearMessages();
+	ClearBangs();
+
+	// Note:
+	// - The DataStore manager is persistent.
+	// - The Message manager can not be "stopped", just cleared.
+	// - The Bang manager can not be "stopped", just cleraed.
 
 	return hr;
 }
@@ -1052,12 +1064,6 @@ void CLiteStep::_CleanupManagers()
 		m_pModuleManager = NULL;
 	}
 
-	/*if (gBangManager)
-	{
-		delete gBangManager;
-		gBangManager = NULL;
-	}*/
-
 	if (m_pMessageManager)
 	{
 		delete m_pMessageManager;
@@ -1070,6 +1076,10 @@ void CLiteStep::_CleanupManagers()
 		delete m_pDataStoreManager;
 		m_pDataStoreManager = NULL;
 	}
+
+	// Note:
+	// - The Hook manager is dynamically started/stopped.
+
 }
 
 
@@ -1099,6 +1109,9 @@ void CLiteStep::_Recycle()
 	}
 
 	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
+
+	/* Read in our locally affected settings */
+	m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
 
 	_StartManagers();
 }
