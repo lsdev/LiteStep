@@ -19,12 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#ifdef __GNUC__  // for mingw
-#  include <png.h>
-#else
-#  include <libpng/png.h>
-#endif
-
+#include <png.h>
 #include "png_support.h"
 #include "../utility/safeptr.h"
 
