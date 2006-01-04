@@ -141,7 +141,11 @@ struct DebugOutputTracer
     static void Output(const char* pszText)
     {
         OutputDebugStringA(pszText);
+
+    #if !defined(__GNUC__)
+        // This just outputs a blank line in gdb
         OutputDebugStringA("\n");
+    #endif
     }
 };
     
