@@ -63,12 +63,12 @@ struct
 }
 aboutOptions[] =
 {
-	 "Bang Commands",      AboutBangs
-	,"Development Team",   AboutDevTeam
-	,"License",            AboutLicense
-	,"Loaded Modules",     AboutModules
-	,"Revision IDs",       AboutRevIDs
-	,"System Information", AboutSysInfo
+	 {"Bang Commands",      AboutBangs}
+	,{"Development Team",   AboutDevTeam}
+	,{"License",            AboutLicense}
+	,{"Loaded Modules",     AboutModules}
+	,{"Revision IDs",       AboutRevIDs}
+	,{"System Information", AboutSysInfo}
 };
 
 struct
@@ -78,10 +78,10 @@ struct
 }
 theDevTeam[] =
 {
-	 "ilmcuts", "Simon"
-	,"jugg",    "Chris Rempel"
-    ,"Maduin",  "Kevin Schaffer"
-	,"Message", "Bobby G. Vinyard"
+	 {"ilmcuts", "Simon"}
+	,{"jugg",    "Chris Rempel"}
+	,{"Maduin",  "Kevin Schaffer"}
+	,{"Message", "Bobby G. Vinyard"}
 };
 
 const unsigned int aboutOptionsCount = sizeof(aboutOptions) / sizeof(aboutOptions[0]);

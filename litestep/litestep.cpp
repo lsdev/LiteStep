@@ -108,7 +108,7 @@ HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
             cds.cbData = sizeof(LMBANGCOMMAND);
             cds.lpData = &bangCommand;
 
-            SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+            SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds);
             hr = S_OK;
         }
     }

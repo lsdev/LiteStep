@@ -28,17 +28,15 @@ struct
 	int nStringID;
 	int nCommandID;
 	LPCSTR pszDefText;
-}
-rgMenuCommands[] =
-    {
-        IDS_LITESTEP_RECYCLELS, ID_RECYCLE, "Re&cycle LiteStep",
-        IDS_LITESTEP_QUITLS, ID_QUIT, "&Quit LiteStep",
-        IDS_LITESTEP_TERMINATELS, ID_TERMINATE, "Forcibly &Terminate LiteStep",
-        0, -1, "",
-        IDS_LITESTEP_RUN, ID_RUN, "&Run...",
-        0, -1, "",
-        IDS_LITESTEP_SHUTDOWNWIN, ID_SHUTDOWN, "Sh&utdown Windows..."
-    };
+} rgMenuCommands[] = {
+     {IDS_LITESTEP_RECYCLELS, ID_RECYCLE, "Re&cycle LiteStep"}
+    ,{IDS_LITESTEP_QUITLS, ID_QUIT, "&Quit LiteStep"}
+    ,{IDS_LITESTEP_TERMINATELS, ID_TERMINATE, "Forcibly &Terminate LiteStep"}
+    ,{0, -1, ""}
+    ,{IDS_LITESTEP_RUN, ID_RUN, "&Run..."}
+    ,{0, -1, ""}
+    ,{IDS_LITESTEP_SHUTDOWNWIN, ID_SHUTDOWN, "Sh&utdown Windows..."}
+};
 
 const int cMenuCommands = sizeof(rgMenuCommands) / sizeof(rgMenuCommands[0]);
 
