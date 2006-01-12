@@ -100,6 +100,7 @@ static MathValue Math_ceil(const MathValueList& argList);
 static MathValue Math_contains(const MathValueList& argList);
 static MathValue Math_endsWith(const MathValueList& argList);
 static MathValue Math_floor(const MathValueList& argList);
+static MathValue Math_if(const MathValueList& argList);
 static MathValue Math_integer(const MathValueList& argList);
 static MathValue Math_length(const MathValueList& argList);
 static MathValue Math_lowerCase(const MathValueList& argList);
@@ -122,6 +123,7 @@ struct { const char *name; MathFunction function; int numArgs; } gFunctions[] =
     { "contains",   Math_contains,   2 },
     { "endsWith",   Math_endsWith,   2 },
     { "floor",      Math_floor,      1 },
+    { "if",         Math_if,         3 },
     { "integer",    Math_integer,    1 },
     { "length",     Math_length,     1 },
     { "lowerCase",  Math_lowerCase,  1 },
@@ -698,6 +700,13 @@ MathValue Math_endsWith(const MathValueList& argList)
 MathValue Math_floor(const MathValueList& argList)
 {
     return floor(argList[0].ToNumber());
+}
+
+
+// Conditional
+MathValue Math_if(const MathValueList& argList)
+{
+    return argList[0].ToBoolean() ? argList[1] : argList[2];
 }
 
 

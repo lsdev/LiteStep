@@ -147,6 +147,11 @@ floor(number)
   Returns the floor (greatest lesser integer) of the argument, converted to a
   number.
 
+if(condition, then, else)
+  Converts its first argument to a Boolean. If its true, returns the second
+  argument (then). If its false, returns the third argument (else). This 
+  function lets you do simple conditionals in an inline expression.
+
 integer(value)
   Returns the argument, converted to an integer. Conversion to integer is the
   same as conversion to number, except that infinites and NaNs become zero.
