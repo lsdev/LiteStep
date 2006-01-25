@@ -40,6 +40,8 @@ EXPORTS
     LSExecuteEx
 
     GetLitestepWnd
+    LSGetLitestepPath@8
+    LSGetImagePath@8
     _LSGetLitestepPath@8   = LSGetLitestepPath@8
     _LSGetImagePath@8      = LSGetImagePath@8
 
@@ -72,9 +74,9 @@ EXPORTS
 
     EnumLSData
 
-    SetupSettingsManager
-    DeleteSettingsManager
-    SetupBangs
-    ClearBangs
     InternalExecuteBangCommand
-
+    LSAPIInitialize
+    LSAPIReloadBangs
+    LSAPIReloadSettings
+    LSAPISetLitestepWindow
+    

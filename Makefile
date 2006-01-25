@@ -103,6 +103,7 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/localization.o \
 	$(OUTPUT)/lsapi.o \
 	$(OUTPUT)/lsapi.res \
+    $(OUTPUT)/lsapiInit.o \
 	$(OUTPUT)/lsmultimon.o \
 	$(OUTPUT)/match.o \
 	$(OUTPUT)/MathEvaluate.o \
@@ -475,6 +476,30 @@ $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
 	utility/ILiteStep.h \
+	utility/localization.h \
+	utility/safeptr.h \
+	utility/safestr.h \
+	utility/shellhlp.h \
+	utility/stringutility.h
+
+$(OUTPUT)/lsapiInit.o: lsapi/lsapiInit.cpp \
+	litestep/BangManager.h \
+	litestep/buildoptions.h \
+	litestep/resource.h \
+	lsapi/BangCommand.h \
+	lsapi/bangs.h \
+	lsapi/lsapidefines.h \
+	lsapi/lsapi.h \
+	lsapi/lsapiInit.h \
+	lsapi/lsmultimon.h \
+	lsapi/SettingsDefines.h \
+	lsapi/SettingsIterator.h \
+	lsapi/SettingsManager.h \
+	utility/Base.h \
+	utility/common.h \
+	utility/core.hpp \
+	utility/CriticalSection.h \
+	utility/debug.hpp \
 	utility/localization.h \
 	utility/safeptr.h \
 	utility/safestr.h \
