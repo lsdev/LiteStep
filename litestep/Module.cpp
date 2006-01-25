@@ -19,11 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */ 
 /****************************************************************************
 ****************************************************************************/
-#include <process.h>
 #include "module.h"
-#include "../utility/macros.h"
 #include "../lsapi/ThreadedBangCommand.h"
+#include "../utility/macros.h"
 #include "../utility/core.hpp"
+
+#include <process.h>
 
 
 Module::Module(const std::string& sLocation, DWORD dwFlags)

@@ -21,11 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ****************************************************************************/
 #include "SettingsManager.h"
 #include "SettingsFileParser.h"
+#include "MathEvaluate.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
-#include <stdexcept>
 
-#include "MathEvaluate.h"
 #include <string>
 
 using std::string;

@@ -24,16 +24,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "lsapi.h"
 #include "../litestep/BangManager.h"
 #include "../litestep/litestep.h"
-#include "BangCommand.h"
 #include "SettingsManager.h"
-#include "bangs.h"
+#include "BangCommand.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.20 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.20 2005/11/05 01:07:10 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.20.2.1 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.1 2006/01/25 19:54:50 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 

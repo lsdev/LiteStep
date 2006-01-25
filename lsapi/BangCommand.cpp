@@ -20,8 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "BangCommand.h"
-#include "ThreadedBangCommand.h"
 #include "../utility/core.hpp"
+#include "ThreadedBangCommand.h"
 
 Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
 :m_szCommand(pszCommand)

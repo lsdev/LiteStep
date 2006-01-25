@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "TrayNotifyIcon.h"
 #include "../utility/common.h"
 #include "../utility/IService.h"
-#include "../utility/safestr.h"
 #include <shellapi.h>
 #include <vector>
 
