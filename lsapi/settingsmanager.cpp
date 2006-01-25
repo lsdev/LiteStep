@@ -41,6 +41,8 @@ SettingsManager::SettingsManager()
 
 SettingsManager::~SettingsManager()
 {
+    Lock lock(m_CritSection);
+
     // check if nasty modules forgot to call LCClose
     for (IteratorSet::iterator itSet = m_Iterators.begin();
          itSet != m_Iterators.end(); ++itSet)
