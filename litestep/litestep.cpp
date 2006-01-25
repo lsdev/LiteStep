@@ -371,7 +371,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 
         FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) =
             (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
-            GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0xB5));
+            GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x00B5));
 
         WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
 		
@@ -712,7 +712,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				default:  // wParam == LR_MSSHUTDOWN
 				{
 					FARPROC (__stdcall * MSWinShutdown)(HWND) = NULL;
-					MSWinShutdown = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3C));
+					MSWinShutdown = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003C));
 					if (MSWinShutdown)
 					{
 						MSWinShutdown(m_hMainWindow); // shouldn't this be NULL?

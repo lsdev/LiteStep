@@ -46,8 +46,7 @@ HRESULT DDEStub::Start()
         
         if(m_hShDocVw && !m_pShellDDEInit)
         {
-            m_pShellDDEInit = (void (__stdcall*)(BOOL))GetProcAddress(m_hShDocVw,
-                (LPSTR)118);
+            m_pShellDDEInit = (void (__stdcall*)(BOOL))GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
                 //(LPSTR)188); // shell32.dll
         }
         

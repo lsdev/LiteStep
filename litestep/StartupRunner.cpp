@@ -66,7 +66,7 @@ DWORD StartupRunner::Run(void* pvVoid)
         typedef DWORD (WINAPI* SHREST_PROC)(RESTRICTIONS);
 
         SHREST_PROC pSHRestricted = (SHREST_PROC)GetProcAddress(
-            GetModuleHandle(_T("shell32.dll")), (LPCSTR)100);
+            GetModuleHandle(_T("shell32.dll")), (LPCSTR)((long)0x0064));
 
         if (pSHRestricted)
         {

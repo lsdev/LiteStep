@@ -159,7 +159,7 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 				{
 					void (WINAPI * RunDlg)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT) =
                         (void (WINAPI *)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT))GetProcAddress(
-					            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR) 61);
+					            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x003D));
 
 					RunDlg(NULL, NULL, NULL, NULL, NULL, 0);
 				}
@@ -169,7 +169,7 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 				{
 					void (WINAPI * ShutdownDlg)(HWND) =
                         (void (WINAPI *)(HWND)) GetProcAddress(
-                            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR) 60);
+                            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x003C));
 
 					ShutdownDlg(NULL);
 				}

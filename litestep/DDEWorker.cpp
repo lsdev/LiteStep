@@ -37,7 +37,7 @@ DDEWorker::DDEWorker()
 		m_bIsUserAnAdmin = FALSE;
 	}
 
-	SHFindFiles = (BOOL (__stdcall *)(LPCITEMIDLIST, LPCITEMIDLIST))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x5A));
+	SHFindFiles = (BOOL (__stdcall *)(LPCITEMIDLIST, LPCITEMIDLIST))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x005A));
 }
 
 
