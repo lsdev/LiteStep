@@ -15,8 +15,7 @@
 #include "MathToken.h"
 #include "MathValue.h"
 #include "lsapi.h"
-#include "SettingsDefines.h"
-#include "SettingsManager.h"
+#include "lsapiInit.h"
 #include <strsafe.h>
 
 using namespace std;
@@ -86,9 +85,6 @@ using namespace std;
 //     Expression
 //
 //----------------------------------------------------------------------------
-
-extern SettingsManager *gSettingsManager;
-
 
 // Function type
 typedef MathValue (*MathFunction)(const MathValueList&);
@@ -210,7 +206,7 @@ MathValue MathParser::GetVariable(const string& name) const
 
     // Expand variable references
     char value[MAX_LINE_LENGTH];
-    gSettingsManager->VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
+    g_LSAPIManager.GetSettingsManager()->VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
     
     if (stricmp(value, "false") == 0 || stricmp(value, "off") == 0 || stricmp(value, "no") == 0)
     {

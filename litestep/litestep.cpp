@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Misc Helpers
 #include "RecoveryMenu.h"
 #include "StartupRunner.h"
+#include "../lsapi/lsapiInit.h"
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
@@ -188,6 +189,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 		PathRemoveFileSpec(szAppPath);
 		PathAddBackslashEx(szAppPath, MAX_PATH);
 	}
+	else
+	{
+		// something really crappy is going on.
+		return -1;
+	}
 	PathCombine(szRcPath, szAppPath, "step.rc");
 
 	// Parse command line, setting appropriate variables
@@ -215,6 +221,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 		               "Unable to find the file \"%s\".\nPlease verify the location of the file, and try again.", szRcPath);
 		MessageBox(NULL, resourceTextBuffer, "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
 		return 2;
+	}
+
+	// Initialize the LSAPI.  Note: The LSAPI controls the bang and settings managers
+	// so they will be started at this point.
+	if (!LSAPIInitialize(szAppPath, szRcPath))
+	{
+		//TODO: Localize this.
+		MessageBox(NULL, "Failed to initialize the LiteStep API.", "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
+		return 3;
 	}
 
 	// Check for previous instance
@@ -300,8 +315,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
 	}
 
-	SetupSettingsManager(pszAppPath, pszRcPath);
-
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
         (nStartupMode != STARTUP_FORCE_RUN && !GetRCBool("LSNoStartup", FALSE)))
     {
@@ -366,6 +379,9 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	{
 		// Set magic DWORD to prevent VWM from seeing main window
 		SetWindowLong (m_hMainWindow, GWL_USERDATA, magicDWord);
+
+        // Set our window in LSAPI
+        LSAPISetLitestepWindow(m_hMainWindow);
 
         FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) =
             (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
@@ -451,9 +467,10 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		_StopServices();
 		_CleanupServices();
 
-		// Destroy _main window
+		// Destroy main window
 		DestroyWindow(m_hMainWindow);
 		m_hMainWindow = NULL;
+		LSAPISetLitestepWindow(NULL);
 	}
 	else
 	{
@@ -464,9 +481,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 
 	// Unreg class
 	UnregisterClass(szMainWindowClass, m_hInstance);
-
-	// deinitialize stepsettings
-	DeleteSettingsManager();
 
 	// Uninitialize OLE/COM
 	OleUninitialize();
@@ -980,7 +994,7 @@ HRESULT CLiteStep::_InitManagers()
 
 	// Note:
 	// - The DataStore manager is dynamically initialized/started.
-	// - The Bang manager is located in LSAPI, and
+	// - The Bang and Settings managers are located in LSAPI, and
 	//   is instantiated via LSAPIInit.
 	// - The Hook mamanger is dynamically initialized/started.
 
@@ -995,17 +1009,10 @@ HRESULT CLiteStep::_StartManagers()
 {
 	HRESULT hr = S_OK;
 
-	// Setup bang commands in lsapi
-	SetupBangs();
-
 	// Load modules
 	m_pModuleManager->Start(this);
 
 	// Note:
-	// - The BangManger is continually running
-	//   however, we must add our internal bang commands
-	//   at startup.  We take responsibility for that
-	//   here as it also needs to happen on Recycle.
 	// - MessageManager has/needs no Start method.
 	// - The DataStore manager is dynamically initialized/started.
 	// - The Hook mamanger is dynamically initialized/started.
@@ -1021,21 +1028,21 @@ HRESULT CLiteStep::_StopManagers()
 {
 	HRESULT hr = S_OK;
 
+	m_pModuleManager->Stop();
+
+	// Clean up as modules might not have
+
+	m_pMessageManager->ClearMessages();
+
 	if (m_bHookManagerStarted)
 	{
 		stopHookManager();
 		m_bHookManagerStarted = false;
 	}
 
-	m_pModuleManager->Stop();
-
-	m_pMessageManager->ClearMessages();
-	ClearBangs();
-
 	// Note:
 	// - The DataStore manager is persistent.
 	// - The Message manager can not be "stopped", just cleared.
-	// - The Bang manager can not be "stopped", just cleraed.
 
 	return hr;
 }
@@ -1060,13 +1067,12 @@ void CLiteStep::_CleanupManagers()
 
 	if (m_pDataStoreManager)
 	{
-		m_pDataStoreManager->Clear();
 		delete m_pDataStoreManager;
 		m_pDataStoreManager = NULL;
 	}
 
 	// Note:
-	// - The Hook manager is dynamically started/stopped.
+	// - The Hook manager is dynamically created/deleted.
 
 }
 
@@ -1088,16 +1094,15 @@ void CLiteStep::_Recycle()
 
 	_StopManagers();
 
-	DeleteSettingsManager();
-
 	if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
 	{
 		RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_ERROR6,
 		                "Recycle has been paused, click OK to continue.", "LiteStep");
 	}
 
-	/* The previous values for appPath and rcPath are retained */
-	SetupSettingsManager(NULL, NULL);
+	// Re-initialize the bang and settings manager in LSAPI
+	LSAPIReloadBangs();
+	LSAPIReloadSettings();
 
 	/* Read in our locally affected settings */
 	m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;

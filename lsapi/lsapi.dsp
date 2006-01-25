@@ -120,6 +120,10 @@ SOURCE=.\lsapi.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\lsapiInit.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\lsmultimon.cpp
 # End Source File
 # Begin Source File
@@ -193,6 +197,10 @@ SOURCE=.\lsapi.h
 # Begin Source File
 
 SOURCE=.\lsapidefines.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\lsapiInit.h
 # End Source File
 # Begin Source File
 

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 
+void SetupBangs();
 
 void BangAbout(HWND hCaller, LPCSTR pszArgs);
 void BangAlert(HWND hCaller, LPCSTR pszArgs);

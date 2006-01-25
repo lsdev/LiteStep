@@ -238,8 +238,7 @@ void BangRefresh(HWND hCaller, LPCSTR pszArgs)
 
 void BangReload(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    DeleteSettingsManager();
-    SetupSettingsManager(NULL, NULL);
+    LSAPIReloadSettings();
 }
 
 

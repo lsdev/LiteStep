@@ -46,17 +46,11 @@ class SettingsManager
 
     CriticalSection m_CritSection;
 
-
 protected:
 	BOOL _FindLine(LPCSTR pszName, SettingsMap::iterator &it);
 
-	void _SetupVars(LPCSTR szLSPath);
-
-    bool _SetShellFolderVariable(LPCSTR pszVariable, int nFolder);
-    
 public:
-
-	SettingsManager(LPCSTR pszLiteStepPath);
+	SettingsManager();
 	~SettingsManager();
 
 	void ParseFile(LPCSTR pszFileName);

@@ -2,7 +2,7 @@
 
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2005 The LiteStep Development Team
+Copyright (C) 1997-2006 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -22,168 +22,59 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "lsapi.h"
-#include "../litestep/BangManager.h"
-#include "../litestep/litestep.h"
-#include "SettingsManager.h"
+#include "lsapiinit.h"
 #include "BangCommand.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
+static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.20.2.1 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.1 2006/01/25 19:54:50 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.20.2.2 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.2 2006/01/25 21:10:59 jugg Exp $"; // The Full RCS ID.
 
-SettingsManager* gSettingsManager = NULL;
 
-int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
-
-class LSAPIInit
+BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
 {
-public:
-	LSAPIInit();
-	~LSAPIInit();
-
-	DWORD GetMainThreadID() const
-	{
-		return m_dwMainThreadID;
-	}
-
-	BangManager* GetBangManager() const
-	{
-		return m_bmBangManager;
-	}
-
-	HWND GetLiteStepWnd();
-	BOOL GetLiteStepPath(LPSTR pszPath, size_t cchPath);
-
-private:
-	DWORD m_dwMainThreadID;
-	BangManager* m_bmBangManager;
-
-	char m_szLiteStepPath[MAX_PATH];
-	char m_szLiteStepImagePath[MAX_PATH];
-
-	HWND m_hLiteStepWnd;
-
-};
-
-LSAPIInit::LSAPIInit()
-{
-	m_dwMainThreadID = GetCurrentThreadId();
-	m_bmBangManager = new BangManager;
-
-	m_szLiteStepPath[0] = '\0';
-	m_szLiteStepImagePath[0] = '\0';
-
-	m_hLiteStepWnd = NULL;
-}
-
-LSAPIInit::~LSAPIInit()
-{
-	if (m_bmBangManager)
-	{
-		delete m_bmBangManager;
-	}
-}
-
-HWND LSAPIInit::GetLiteStepWnd()
-{
-	if (!m_hLiteStepWnd)
-	{
-		m_hLiteStepWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
-	}
-	return m_hLiteStepWnd;
-}
-
-BOOL LSAPIInit::GetLiteStepPath(LPSTR pszPath, size_t cchPath)
-{
-	BOOL bReturn = FALSE;
-
-	if (IsValidStringPtr(pszPath, cchPath))
-	{
-		if (!m_szLiteStepPath[0])
-		{
-			if (GetRCString("litestepdir", m_szLiteStepPath, NULL, MAX_PATH))
-			{
-				bReturn = TRUE;
-			}
-			else
-			{
-				HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(
-                    GetLitestepWnd(), GWLP_HINSTANCE);
-				
-                if (hInstance &&
-                    LSGetModuleFileName(hInstance, m_szLiteStepPath, MAX_PATH))
-                {
-                    PathRemoveFileSpec(m_szLiteStepPath);
-                    PathAddBackslashEx(m_szLiteStepPath, MAX_PATH);
-                    bReturn = TRUE;
-                }
-			}
-
-		}
-		else
-		{
-			bReturn = TRUE;
-		}
-		if (bReturn)
-		{
-			StringCchCopy(pszPath, cchPath, m_szLiteStepPath);
-		}
-
-	}
-
-	return bReturn;
-}
-
-static LSAPIInit LSAPIManager;
-
-
-BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath)
-{
-    BOOL bReturn = FALSE;
-
-    // Storing the paths here to make !reload work. It calls this function
-    // with NULL, NULL as parameters. In the future SettingsManager or LSAPIInit
-    // could store these paths and/or SettingsManager could provide a Reload().
-    static char szAppPath[MAX_PATH] = { 0 };
-    static char szRcPath[MAX_PATH] = { 0 };
-
-    if (pszLiteStepPath && pszRCPath)
+    try
     {
-        StringCchCopy(szAppPath, MAX_PATH, pszLiteStepPath);
-        StringCchCopy(szRcPath, MAX_PATH, pszRCPath);
+        g_LSAPIManager.Initialize(pszLitestepPath, pszRcPath);
     }
-
-	if (gSettingsManager == NULL)
-	{
-		gSettingsManager = new SettingsManager(szAppPath);
-
-		if (IsValidReadPtr(gSettingsManager))
-		{
-			gSettingsManager->ParseFile(szRcPath);
-			bReturn = TRUE;
-		}
-	}
-
-	return bReturn;
+    catch(LSAPIException& lse)
+    {
+        lse.Type();
+    }
+    
+    return g_LSAPIManager.IsInitialized() ? TRUE:FALSE;
 }
 
-
-void DeleteSettingsManager(void)
+void LSAPIReloadBangs(VOID)
 {
-	if (gSettingsManager)
-	{
-		delete gSettingsManager;
-		gSettingsManager = NULL;
-	}
+    try
+    {
+        g_LSAPIManager.ReloadBangs();
+    }
+    catch(LSAPIException& lse)
+    {
+        lse.Type();
+    }
 }
 
-
-void ClearBangs()
+void LSAPIReloadSettings(VOID)
 {
-    LSAPIManager.GetBangManager()->ClearBangCommands();
+    try
+    {
+        g_LSAPIManager.ReloadSettings();
+    }
+    catch(LSAPIException& lse)
+    {
+        lse.Type();
+    }
+}
+
+void LSAPISetLitestepWindow(HWND hLitestepWnd)
+{
+    g_LSAPIManager.SetLitestepWindow(hLitestepWnd);
 }
 
 
@@ -201,12 +92,12 @@ BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
         if (IsValidReadPtr(pBang))
         {
             //bBang->AddRef();
-            LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, pBang);
+            g_LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, pBang);
             pBang->Release();
             bReturn = TRUE;
         }
     }
-
+    
     return bReturn;
 }
 
@@ -234,7 +125,7 @@ BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
 //
 BOOL RemoveBangCommand(LPCSTR pszCommand)
 {
-	return LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+    return g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
 }
 
 
@@ -244,7 +135,7 @@ BOOL RemoveBangCommand(LPCSTR pszCommand)
 //
 BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 {
-    return LSAPIManager.GetBangManager()->
+    return g_LSAPIManager.GetBangManager()->
         ExecuteBangCommand(pszCommand, hCaller, pszArgs);
 }
 
@@ -401,7 +292,7 @@ void SetDesktopArea(int left, int top, int right, int bottom)
 //
 HWND GetLitestepWnd()
 {
-	return LSAPIManager.GetLiteStepWnd();
+    return g_LSAPIManager.GetLitestepWnd();
 }
 
 
@@ -444,7 +335,18 @@ void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchTex
 //
 BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
 {
-	return LSAPIManager.GetLiteStepPath(pszPath, cchPath);
+    BOOL bReturn = FALSE;
+    
+    if (IsValidStringPtr(pszPath, cchPath))
+    {
+        // Default to user defined variable
+        if (GetRCString("litestepdir", pszPath, NULL, cchPath))
+        {
+            bReturn = TRUE;
+        }
+    }
+    
+    return bReturn;
 }
 
 
@@ -463,7 +365,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 		}
 		else
 		{
-			if (LSAPIManager.GetLiteStepPath(pszPath, cchPath))
+			if (LSGetLitestepPath(pszPath, cchPath))
 			{
 				StringCchCat(pszPath, cchPath, "images\\");
 				bReturn = TRUE;
@@ -475,7 +377,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 }
 
 
-int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets)
+static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets)
 {
 	char szBuffer[MAX_LINE_LENGTH];
 	LPCSTR pszNextToken;
@@ -682,9 +584,9 @@ void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpan
 	if (IsValidStringPtr(pszExpandedString, cchExpandedString) &&
 	        IsValidStringPtr(pszTemplate))
 	{
-		if (gSettingsManager != NULL)
+		if(g_LSAPIManager.IsInitialized())
 		{
-			gSettingsManager->VarExpansionEx(pszExpandedString, pszTemplate, cchExpandedString);
+			g_LSAPIManager.GetSettingsManager()->VarExpansionEx(pszExpandedString, pszTemplate, cchExpandedString);
 		}
 		else
 		{
@@ -707,18 +609,18 @@ void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpan
 HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
 {
     HRESULT hr = E_INVALIDARG;
-
-	if (NULL != pfnCallback)
+    
+    if (NULL != pfnCallback)
     {
         switch (uInfo)
         {   
             case ELD_BANGS:
             {
-                hr = LSAPIManager.GetBangManager()->
+                hr = g_LSAPIManager.GetBangManager()->
                     EnumBangs((LSENUMBANGSPROC)pfnCallback, lParam);
             }
             break;
-
+            
             case ELD_REVIDS:
             {
                 hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMREVIDS,
@@ -732,7 +634,7 @@ HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
                     (WPARAM)pfnCallback, lParam);
             }
             break;
-
+            
             default:
             break;
         }
@@ -741,6 +643,6 @@ HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
     {
         hr = E_POINTER;
     }
-
+    
     return hr;
 }
