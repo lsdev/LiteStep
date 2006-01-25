@@ -718,13 +718,6 @@ Contents:
    Usage:
     !Execute <command1> [<command2> [...]]
 
-  !Gather
-  -------
-   Moves all application windows to the current virtual desktop.
-
-   Usage:
-    !Gather
-
   !HideModules
   ------------
    Hides all modules.
