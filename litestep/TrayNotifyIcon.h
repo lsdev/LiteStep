@@ -21,8 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TRAYNOTIFYICON_H
 
 #include "../utility/common.h"
-#include "../utility/IService.h"
-#include "../utility/safestr.h"
 #include <shellapi.h>
 
 #define TRAY_MAX_TIP_LENGTH       128
