@@ -29,9 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class ILiteStep: public CountedBase
 {
 public:
-
-	virtual HRESULT get_Window(/*[out, retval]*/ long* phWnd) const = 0;
-	virtual HRESULT get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const = 0;
 	virtual int MessageHandler(/*[in]*/ MSG &message) = 0;
 };
 

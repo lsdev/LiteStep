@@ -59,8 +59,6 @@ public:
 	LRESULT ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	// ILiteStep
-	HRESULT get_Window(/*[out, retval]*/ long* phWnd) const;
-	HRESULT get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const;
 	int MessageHandler(MSG &message);
 
 private:
@@ -69,9 +67,6 @@ private:
 
 	void _Recycle();
     HRESULT _EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const;
-
-    std::string m_sAppPath;
-    std::string m_sConfigFile;
 
 	// Application instance
 	HINSTANCE m_hInstance;

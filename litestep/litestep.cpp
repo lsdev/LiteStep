@@ -278,8 +278,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	HRESULT hr;
 	bool bUnderExplorer = false;
 
-	m_sAppPath.assign(pszAppPath);  // could throw length_error
-	m_sConfigFile.assign(pszRcPath);
 	m_hInstance = hInstance;
 
 	// Initialize OLE/COM
@@ -302,7 +300,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 		SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
 	}
 
-	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
+	SetupSettingsManager(pszAppPath, pszRcPath);
 
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
         (nStartupMode != STARTUP_FORCE_RUN && !GetRCBool("LSNoStartup", FALSE)))
@@ -886,41 +884,6 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 
-HRESULT CLiteStep::get_Window(/*[out, retval]*/ long *phWnd) const
-{
-    HRESULT hr;
-
-    if (phWnd != NULL)
-    {
-        *phWnd = (LONG)m_hMainWindow;
-        hr = S_OK;
-    }
-    else
-    {
-        hr = E_INVALIDARG;
-    }
-
-    return hr;
-}
-
-
-HRESULT CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const
-{
-    HRESULT hr;
-
-    if (IsValidStringPtr(pszPath, cchPath))
-    {
-        hr = StringCchCopy(pszPath, cchPath, m_sAppPath.c_str());
-    }
-    else
-    {
-        hr = E_INVALIDARG;
-    }
-
-    return hr;
-}
-
-
 //
 // _InitServies()
 //
@@ -1133,7 +1096,8 @@ void CLiteStep::_Recycle()
 		                "Recycle has been paused, click OK to continue.", "LiteStep");
 	}
 
-	SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
+	/* The previous values for appPath and rcPath are retained */
+	SetupSettingsManager(NULL, NULL);
 
 	/* Read in our locally affected settings */
 	m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
