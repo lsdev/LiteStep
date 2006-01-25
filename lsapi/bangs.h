@@ -28,7 +28,6 @@ void BangAlert(HWND hCaller, LPCSTR pszArgs);
 void BangCascadeWindows(HWND hCaller, LPCSTR pszArgs);
 void BangConfirm(HWND hCaller, LPCSTR pszArgs);
 void BangExecute(HWND hCaller, LPCSTR pszArgs);
-void BangGather(HWND hCaller, LPCSTR pszArgs);
 void BangLogoff(HWND hCaller, LPCSTR pszArgs);
 void BangMinimizeWindows(HWND hCaller, LPCSTR pszArgs);
 void BangQuit(HWND caller, LPCSTR param);

@@ -30,7 +30,6 @@ void SetupBangs()
 	AddBangCommand("!CascadeWindows", BangCascadeWindows);
 	AddBangCommand("!Confirm", BangConfirm);
 	AddBangCommand("!Execute", BangExecute);
-	AddBangCommand("!Gather", BangGather);
 	AddBangCommand("!Logoff", BangLogoff);
 	AddBangCommand("!MinimizeWindows", BangMinimizeWindows);
 	AddBangCommand("!Quit", BangQuit);
@@ -146,20 +145,6 @@ void BangExecute(HWND hCaller, LPCSTR pszArgs)
 		{
 			LSExecute(hCaller, szCommand, SW_SHOWDEFAULT);
 		}
-	}
-}
-
-
-//
-// BangGather(HWND hCaller, LPCSTR pszArgs)
-//
-void BangGather(HWND /* hCaller */, LPCSTR /* pszArgs */)
-{
-	HWND hLiteStep = GetLitestepWnd();
-
-	if (hLiteStep)
-	{
-		SendMessage(hLiteStep, LM_BRINGTOFRONT, 1, 0);
 	}
 }
 
