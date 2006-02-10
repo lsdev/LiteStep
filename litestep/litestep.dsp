@@ -201,6 +201,10 @@ SOURCE=.\StartupRunner.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrayAppBar.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrayNotifyIcon.h
 # End Source File
 # Begin Source File

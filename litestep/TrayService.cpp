@@ -28,6 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 #include <docobj.h>
 
+FUNC_PVOID__HANDLE_DWORD fpSHLockShared;
+FUNC_BOOL__PVOID fpSHUnlockShared;
+
 #ifndef REGSTR_PATH_SHELLSERVICEOBJECTDELAYED
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
 #endif
@@ -63,6 +66,15 @@ HRESULT TrayService::Start()
 {
     ASSERT_ISNULL(m_hTrayWnd);
     HRESULT hr = E_FAIL;
+    
+    fpSHLockShared = (FUNC_PVOID__HANDLE_DWORD)GetProcAddress(
+         GetModuleHandle(_T("SHELL32"))
+        ,(LPCSTR)((long)0x0209)
+    );
+    fpSHUnlockShared = (FUNC_BOOL__PVOID)GetProcAddress(
+         GetModuleHandle(_T("SHELL32"))
+        ,(LPCSTR)((long)0x020A)
+    );
     
     m_hLiteStep = GetLitestepWnd();
     m_hInstance = GetModuleHandle(NULL);
@@ -123,6 +135,15 @@ HRESULT TrayService::Stop()
         m_siVector.pop_back();
     }
 
+    while (!m_abVector.empty())
+    {
+        delete m_abVector.back();
+        m_abVector.pop_back();
+    }
+    
+    fpSHLockShared = NULL;
+    fpSHUnlockShared = NULL;
+    
     return hr;
 }
 
@@ -141,7 +162,7 @@ bool TrayService::createWindows()
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.cbWndExtra = 4;
-    wc.lpfnWndProc = TrayService::WindowProc;
+    wc.lpfnWndProc = TrayService::WindowTrayProc;
     wc.hInstance = m_hInstance;
     wc.lpszClassName = szTrayClass;
     wc.style = CS_DBLCLKS;
@@ -183,7 +204,7 @@ bool TrayService::createWindows()
             //
             ZeroMemory(&wc, sizeof(wc));
             wc.cbSize = sizeof(WNDCLASSEX);
-            wc.lpfnWndProc = TrayService::WindowProc;
+            wc.lpfnWndProc = TrayService::WindowNotifyProc;
             wc.hInstance = m_hInstance;
             wc.lpszClassName = szNotifyClass;
             wc.style = CS_DBLCLKS;
@@ -318,7 +339,7 @@ void TrayService::unloadShellServiceObjects()
 //
 // Redirects all messages to the appropriate handler
 //
-LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
+LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                                          WPARAM wParam, LPARAM lParam)
 {
     static TrayService* pTrayService = NULL;
@@ -330,15 +351,16 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
 
     if (pTrayService)
     {
+        LRESULT lResult = 0;
+        
         switch (uMsg)
         {
         case WM_COPYDATA:
             {
                 //
                 // Undocumented: This is how we can make our own system tray
-                // and eventually handle app bar windows. Once a window in
-                // the system has the "Shell_TrayWnd" class name, it receives
-                // this message!
+                // and handle app bar windows. Once a window in the system has
+                // the "Shell_TrayWnd" class name, it receives this message!
                 //
                 COPYDATASTRUCT* pcds = (COPYDATASTRUCT*)lParam;
                 
@@ -346,12 +368,59 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                 {
                 case SH_APPBAR_DATA:
                     {
+                        TRACE("SH_APPBAR_DATA: %u", pcds->cbData);
+                        
                         //
                         // Application Bar Message
                         //
-                        PSHELLAPPBARDATA pData = (PSHELLAPPBARDATA)pcds->lpData;
-                        
-                        return pTrayService->HandleAppBarMessage(pData);
+                        switch (pcds->cbData)
+                        {
+                        case sizeof(APPBARMSGDATAV2):
+                            {
+                                PAPPBARMSGDATAV2 pamd = (PAPPBARMSGDATAV2)pcds->lpData;
+                                
+                                TRACE("APPBARMSGDATAV2: %u", pamd->abd.cbSize);
+                                
+                                if(sizeof(APPBARDATAV2) != pamd->abd.cbSize)
+                                    break;
+                                
+                                SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
+                                sbd.dwMessage = pamd->dwMessage;
+                                sbd.hSharedMemory = pamd->hSharedMemory;
+                                sbd.dwSourceProcessId = pamd->dwSourceProcessId;
+                                
+                                TRACE("dwMessage: %u", pamd->dwMessage);
+                                
+                                lResult = pTrayService->HandleAppBarMessage(&sbd);
+                            }
+                            break;
+                            
+                        case sizeof(APPBARMSGDATAV1):
+                            {
+                                PAPPBARMSGDATAV1 pamd = (PAPPBARMSGDATAV1)pcds->lpData;
+                                
+                                TRACE("APPBARMSGDATAV1: %u", pamd->abd.cbSize);
+                                
+                                if(sizeof(APPBARDATAV1) != pamd->abd.cbSize)
+                                    break;
+                                
+                                TRACE("dwMessage: %u", pamd->dwMessage);
+                                
+                                SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
+                                sbd.dwMessage = pamd->dwMessage;
+                                sbd.hSharedMemory = pamd->hSharedMemory;
+                                sbd.dwSourceProcessId = pamd->dwSourceProcessId;
+                                
+                                lResult = pTrayService->HandleAppBarMessage(&sbd);
+                            }
+                            break;
+                            
+                        default:
+                            {
+                                TRACE("Unknown APPBARMSGDATA size: %u", pcds->cbData);
+                            }
+                            break;
+                        }
                     }
                     break;
                     
@@ -362,10 +431,10 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                         //
                         PSHELLTRAYDATA pstd = (PSHELLTRAYDATA)pcds->lpData;
                         
-                        return pTrayService->HandleNotification(pstd);
+                        lResult = (LRESULT)pTrayService->HandleNotification(pstd);
                     }
                     break;
-
+                    
                 case SH_LOADPROC_DATA:
                 default:
                     {
@@ -376,14 +445,87 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
             }
             break;
             
-        default:
+        case ABP_NOTIFYPOSCHANGED:
+            {
+                BarVector::reverse_iterator rit;
+                
+                HWND hSkip = (HWND)wParam;
+                AppBar* p = NULL;
+                
+                for(rit = pTrayService->m_abVector.rbegin(); rit != pTrayService->m_abVector.rend(); rit++)
+                {
+                    if(hSkip != (*rit)->hWnd())
+                    {
+                        if(!p || p->uEdge() != (*rit)->uEdge())
+                        {
+                            SendMessage(
+                                 (*rit)->hWnd()
+                                ,(*rit)->uMsg()
+                                ,ABN_POSCHANGED
+                                ,0
+                            );
+                        }
+                    }
+                    else
+                    {
+                        p = *rit;
+                    }
+                }
+            }
             break;
+            
+        case ABP_NOTIFYSTATECHANGE:
+            {
+                BarVector::reverse_iterator rit;
+                
+                for(rit = pTrayService->m_abVector.rbegin(); rit != pTrayService->m_abVector.rend(); rit++)
+                {
+                    if(!(*rit)->IsOverLap())
+                    {
+                        SendMessage(
+                             (*rit)->hWnd()
+                            ,(*rit)->uMsg()
+                            ,ABN_STATECHANGE
+                            ,0
+                        );
+                    }
+                }
+            }
+            break;
+            
+        case ABP_RAISEAUTOHIDEHWND:
+            {
+                HWND hRaise = (HWND)wParam;
+                //UINT uEdge = (UINT)lParam;
+                
+                SetWindowPos(
+                     hRaise, HWND_TOP
+                    ,0,0,0,0
+                    ,SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOSIZE|SWP_NOOWNERZORDER
+                );
+            }
+            break;
+            
+        default:
+            return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
+        
+        return lResult;
     }
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// WindowNotifyProc
+//
+// Redirects all messages to the appropriate handler
+//
+LRESULT CALLBACK TrayService::WindowNotifyProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
@@ -391,34 +533,812 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
 //
 // Handler for all AppBar Messages
 //
-BOOL TrayService::HandleAppBarMessage(PSHELLAPPBARDATA pData)
+LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
 {
-    TRACE("Received AppBar Message %u; DontKnow: %u; NoClue: %u",
-        pData->dwMessage, pData->dwDontKnow, pData->dwNoClue);
+    LRESULT lResult = 0;
     
-    //
-    // Hack that could let some AppBars work
-    //
-    switch(pData->dwMessage)
+    switch(psad->dwMessage)
     {
     case ABM_NEW:
-    case ABM_REMOVE:
-    case ABM_QUERYPOS:
-    case ABM_SETPOS:
-    case ABM_ACTIVATE:
-    case ABM_WINDOWPOSCHANGED:
-        {
-            return TRUE;
-        }
+        lResult = barCreate(psad->abd);
         break;
-
+        
+    case ABM_REMOVE:
+        lResult = barDestroy(psad->abd);
+        break;
+        
+    case ABM_QUERYPOS:
+        lResult = barQueryPos(psad);
+        break;
+        
+    case ABM_SETPOS:
+        lResult = barSetPos(psad);
+        break;
+        
+    case ABM_GETSTATE:
+        lResult = barGetTaskBarState();
+        break;
+        
+    case ABM_GETTASKBARPOS:
+        lResult = barGetTaskBarPos(psad);
+        break;
+        
+    case ABM_ACTIVATE:
+        lResult = barActivate(psad->abd);
+        break;
+        
+    case ABM_GETAUTOHIDEBAR:
+        lResult = barGetAutoHide(psad->abd.uEdge);
+        break;
+        
+    case ABM_SETAUTOHIDEBAR:
+        lResult = barSetAutoHide(psad->abd);
+        break;
+        
+    case ABM_WINDOWPOSCHANGED:
+        lResult = barPosChanged(psad->abd);
+        break;
+        
+    case ABM_SETSTATE:
+        lResult = barSetTaskBarState(psad->abd);
+        break;
+        
     default:
+        TRACE("ABM unknown: %u", psad->dwMessage);
         break;
     }
-
-    return FALSE;
+    
+    return lResult;
 }
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// NotifyRudeApp
+//
+// External interface to let us know a window has gone/left full screen mode
+//
+void TrayService::NotifyRudeApp(bool bIsFullScreen) const
+{
+    BarVector::const_reverse_iterator rit;
+    
+    for(rit = m_abVector.rbegin(); rit != m_abVector.rend(); rit++)
+    {
+        SendMessage(
+             (*rit)->hWnd()
+            ,(*rit)->uMsg()
+            ,ABN_FULLSCREENAPP
+            ,(LPARAM)(bIsFullScreen ? 1:0)
+        );
+    }
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barCreate
+//
+// Creates a new AppBar.
+//
+// ABM_NEW
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//
+LRESULT TrayService::barCreate(const APPBARDATAV1& abd)
+{
+    LRESULT lResult = 0;
+    
+    if(IsWindow(abd.hWnd) && !isBar(abd.hWnd))
+    {
+        m_abVector.push_back(new AppBar(abd.hWnd, abd.uCallbackMessage));
+        lResult = 1;
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barDestroy
+//
+// Removes the specified AppBar.
+//
+// ABM_REMOVE
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//
+LRESULT TrayService::barDestroy(const APPBARDATAV1& abd)
+{
+    BarVector::iterator itBar;
+    LRESULT lResult = 0;
+    
+    if(getBar(abd.hWnd, itBar))
+    {
+        lResult = 1;
+        
+        delete *itBar;
+        m_abVector.erase(itBar);
+        
+        PostMessage(
+             m_hTrayWnd
+            ,ABP_NOTIFYPOSCHANGED
+            ,(WPARAM)abd.hWnd
+            ,(LPARAM)MAKELONG(0, 0)
+        );
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barQueryPos
+//
+// Queries for an acceptable position for the specified appbar
+//
+// ABM_QUERYPOS
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//  uEdge
+//  rc
+//
+LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
+{
+    LRESULT lResult = 0;
+    PAPPBARDATAV1 pabd = ABLock(psad);
+    const APPBARDATAV1& abd = psad->abd;
+    
+    if(pabd)
+    {
+        AppBar* p;
+        
+        if(getBar(abd.hWnd, p))
+        {
+            lResult = 1;
+            
+            p->uEdge(abd.uEdge);
+            
+            modifyBar(pabd->rc, abd.rc, p->uEdge());
+            
+            if(ABS_OVERLAPAUTOHIDE == (p->lParam() & ABS_OVERLAPAUTOHIDE))
+            {
+                modifyOverlapBar(pabd->rc, abd.rc, p->uEdge());
+            }
+            else
+            {
+                modifyNormalBar(pabd->rc, abd);
+            }
+        }
+        
+        ABUnLock(pabd);
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barSetPos
+//
+// Sets the position of the specified appbar
+//
+// ABM_SETPOS
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//  uEdge
+//  rc
+//
+LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
+{
+    LRESULT lResult = 0;
+    PAPPBARDATAV1 pabd = ABLock(psad);
+    const APPBARDATAV1& abd = psad->abd;
+    
+    if(pabd)
+    {
+        AppBar* p;
+        
+        if(getBar(abd.hWnd, p))
+        {
+            lResult = 1;
+            
+            p->uEdge(abd.uEdge);
+            
+            modifyBar(pabd->rc, abd.rc, p->uEdge());
+            
+            if(ABS_OVERLAPAUTOHIDE == (p->lParam() & ABS_OVERLAPAUTOHIDE))
+            {
+                modifyOverlapBar(pabd->rc, abd.rc, p->uEdge());
+            }
+            else
+            {
+                modifyNormalBar(pabd->rc, abd);
+                
+                if((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
+                   || !EqualRect(&(p->GetRectRef()), &(pabd->rc)))
+                {
+                    // Set Work Area
+                    // TODO: Integrate work area management, and have
+                    // desktop modules interact with us.
+                    
+                    // Notify other bars
+                    PostMessage(
+                         m_hTrayWnd
+                        ,ABP_NOTIFYPOSCHANGED
+                        ,(WPARAM)abd.hWnd
+                        ,(LPARAM)MAKELONG(1, abd.uEdge) //0x00010001
+                    );
+                }
+            }
+            
+            CopyRect(&(p->GetRectRef()), &(pabd->rc));
+            p->lParam(p->lParam() | ABS_CLEANRECT);
+        }
+        
+        ABUnLock(pabd);
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barGetTaskBarState
+//
+// Returns the current TaskBar state (autohide, alwaysontop)
+//
+// ABM_GETSTATE
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//
+LRESULT TrayService::barGetTaskBarState()
+{
+    return 0;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barGetTaskBarPos
+//
+// Gets the current TaskBar position
+//
+// ABM_GETTASKBARPOS
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//
+LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
+{
+    LRESULT lResult = 0;
+    PAPPBARDATAV1 pabd = ABLock(psad);
+    
+    if(pabd)
+    {
+        if(GetWindowRect(m_hNotifyWnd, &(pabd->rc)))
+        {
+            lResult = 1;
+        }
+        
+        ABUnLock(pabd);
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barActivate
+//
+// Ensures that any autohide appbar has the topmost zOrder when any appbar is
+// activated.
+//
+// ABM_ACTIVATE
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//
+LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
+{
+    LRESULT lResult = 0;
+    AppBar* p;
+    
+    if(getBar(abd.hWnd, p))
+    {
+        BarVector::iterator itBar = findBar(p->uEdge(), ABS_AUTOHIDE);
+        
+        if(itBar != m_abVector.end())
+        {
+            PostMessage(
+                 m_hTrayWnd
+                ,ABP_RAISEAUTOHIDEHWND
+                ,(WPARAM)(*itBar)->hWnd()
+                ,(LPARAM)(*itBar)->uEdge()
+            );
+        }
+        
+        lResult = 1;
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barGetAutoHide
+//
+// Returns the HWND of the autohide appbar on the specified screen edge
+//
+// ABM_GETAUTOHIDEBAR
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//  uEdge
+//
+LRESULT TrayService::barGetAutoHide(UINT uEdge)
+{
+    LRESULT lResult = 0;
+    BarVector::iterator itBar = findBar(uEdge, ABS_AUTOHIDE);
+    
+    if(itBar != m_abVector.end())
+    {
+        lResult = (LRESULT)(*itBar)->hWnd();
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barSetAutoHide
+//
+// Sets the specified AppBar to autohide if it already exists, otherwise
+// if the specified AppBar does not exist, it creates it and sets it to as
+// an overlap autohide AppBar.
+//
+// ABM_SETAUTOHIDEBAR
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//  uEdge
+//  lParam
+//
+LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
+{
+    LRESULT lResult = 0;
+    
+    BarVector::iterator itBar = findBar(abd.hWnd);
+    BarVector::iterator itAutoHideBar = findBar(abd.uEdge, ABS_AUTOHIDE);
+    
+    if(abd.lParam) // Set Auto Hide
+    {
+        lResult = 1;
+        
+        // Does an autohide bar already exist on this edge?
+        if(itAutoHideBar != m_abVector.end())
+        {
+            // Return true if this appbar is the autohide bar.
+            return (itBar == itAutoHideBar);
+        }
+        
+        // if bar doesn't exist, create it and set it as an overlap bar
+        if(itBar == m_abVector.end())
+        {
+            if(!barCreate(abd))
+            {
+                return 0;
+            }
+            
+            itBar = m_abVector.end()-1;
+            (*itBar)->lParam((*itBar)->lParam() | ABS_OVERLAPAUTOHIDE);
+        }
+        
+        // set edge bar is assigned to, and set that it an autohide bar
+        (*itBar)->uEdge(abd.uEdge);
+        (*itBar)->lParam((*itBar)->lParam() | ABS_AUTOHIDE);
+    }
+    else // Clear Auto Hide
+    {
+        // if the bar was the auto hide bar proceed
+        if(itBar != m_abVector.end() && itBar == itAutoHideBar)
+        {
+            lResult = 1;
+            
+            // if bar was overlap, destroy it
+            if((*itBar)->lParam() & ABS_OVERLAPAUTOHIDE)
+            {
+                barDestroy(abd);
+            }
+            else
+            {
+                // otherwise clear its autohide status.
+                (*itBar)->lParam((*itBar)->lParam() & ~ABS_AUTOHIDE);
+            }
+        }
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barPosChanged
+//
+// Ensures that any autohide appbar has the topmost zOrder when any non autohide
+// appbar's position has changed.
+//
+// ABM_WINDOWPOSCHANGED
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//
+LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
+{
+    LRESULT lResult = 0;
+    AppBar* p;
+    
+    if(getBar(abd.hWnd, p) && !p->IsAutoHide())
+    {
+        BarVector::iterator itBar = findBar(p->uEdge(), ABS_AUTOHIDE);
+        
+        if(itBar != m_abVector.end())
+        {
+            PostMessage(
+                 m_hTrayWnd
+                ,ABP_RAISEAUTOHIDEHWND
+                ,(WPARAM)(*itBar)->hWnd()
+                ,(LPARAM)(*itBar)->uEdge()
+            );
+        }
+        
+        lResult = 1;
+    }
+    
+    return lResult;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// barSetTaskBarState
+//
+// Sets the current TaskBar state (autohide, alwaysontop)
+//
+// ABM_SETSTATE
+//
+// Valid APPBARDATA members:
+//
+//  cbSize
+//  hWnd
+//  lParam
+//
+LRESULT TrayService::barSetTaskBarState(const APPBARDATAV1& abd)
+{
+    return 0;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// modifyOverlapBar
+//
+// Helper function to barSetPos and barQueryPos
+//
+void TrayService::modifyOverlapBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge)
+{
+    switch(uEdge)
+    {
+    case ABE_LEFT:
+        rcDst.right = rcDst.left + (rcSrc.right - rcSrc.left);
+        break;
+    case ABE_TOP:
+        rcDst.bottom = rcDst.top + (rcSrc.bottom - rcSrc.top);
+        break;
+    case ABE_RIGHT:
+        rcDst.left = rcDst.right - (rcSrc.right - rcSrc.left);
+        break;
+    case ABE_BOTTOM:
+        rcDst.top = rcDst.bottom - (rcSrc.bottom - rcSrc.top);
+        break;
+    }
+    
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// modifyNormalBar
+//
+// Helper function to barSetPos and barQueryPos
+//
+void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
+{
+    BarVector::const_iterator it;
+    AppBar* p;
+    bool bFound = FALSE;
+    
+    for(it = m_abVector.begin(); it != m_abVector.end(); it++)
+    {
+        p = *it;
+        
+        // ignore overlap bars and invalid windows
+        if(!p || p->IsOverLap())
+        {
+        }
+        /* if this is our appbar, mark it found and continue */
+        else if(abd.hWnd == p->hWnd())
+        {
+            bFound = true;
+        }
+        // ignore bars that haven't been initialized
+        else if(ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
+        {
+        }
+        /* Ignore other edge appbars for the most part */
+        else if(abd.uEdge != p->uEdge())
+        {
+            /* Left/Right bars must resize to top/bottom bars */
+            if(ABE_HORIZONTAL != (ABE_HORIZONTAL & abd.uEdge)
+                &&
+               ABE_HORIZONTAL == (ABE_HORIZONTAL & p->uEdge()))
+            {
+                RECT r; // dummy
+                
+                /* If our destination rectangle currently intersects
+                 * then resize it */
+                if(IntersectRect(&r, &(p->GetRectRef()), &dtRect))
+                {
+                    if(ABE_TOP == p->uEdge())
+                    {
+                        dtRect.top = p->GetRectRef().bottom;
+                    }
+                    else
+                    {
+                        dtRect.bottom = p->GetRectRef().top;
+                    }
+                }
+            }
+        }
+        /* Keep moving the destination appbar while we are looking
+         * at same edge appbars before our own.  Once we find our
+         * own, then we ignore all same edge appbars after ours. */
+        else if(!bFound)
+        {
+            switch(abd.uEdge)
+            {
+            case ABE_LEFT:
+                dtRect.left = p->GetRectRef().right;
+                break;
+            case ABE_TOP:
+                dtRect.top = p->GetRectRef().bottom;
+                break;
+            case ABE_RIGHT:
+                dtRect.right = p->GetRectRef().left;
+                break;
+            case ABE_BOTTOM:
+                dtRect.bottom = p->GetRectRef().top;
+                break;
+            }
+        }
+    }
+    
+    switch(abd.uEdge)
+    {
+    case ABE_LEFT:
+        dtRect.right = dtRect.left + (abd.rc.right - abd.rc.left);
+        break;
+    case ABE_TOP:
+        dtRect.bottom = dtRect.top + (abd.rc.bottom - abd.rc.top);
+        break;
+    case ABE_RIGHT:
+        dtRect.left = dtRect.right - (abd.rc.right - abd.rc.left);
+        break;
+    case ABE_BOTTOM:
+        dtRect.top = dtRect.bottom - (abd.rc.bottom - abd.rc.top);
+        break;
+    }
+    
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// modifyBar
+//
+// Helper function to barSetPos and barQueryPos
+//
+void TrayService::modifyBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge)
+{
+    GetWindowRect(GetDesktopWindow(), &rcDst);
+    
+    /* decrease to requesting bounding rect */
+    switch(uEdge)
+    {
+    case ABE_LEFT:
+    case ABE_RIGHT:
+        rcDst.top = rcSrc.top;
+        rcDst.bottom = rcSrc.bottom;
+        break;
+    case ABE_TOP:
+    case ABE_BOTTOM:
+        rcDst.left = rcSrc.left;
+        rcDst.right = rcSrc.right;
+        break;
+    }
+    
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// ABLock
+//
+// Calls SHLockShared API for the specified Shell AppBar memory
+//
+// Returns a pointer to shared memory location for an AppBarData structure
+//
+PAPPBARDATAV1 TrayService::ABLock(PSHELLAPPBARDATA psad)
+{
+    if(NULL != fpSHLockShared && NULL != psad->hSharedMemory)
+    {
+        return (PAPPBARDATAV1)fpSHLockShared(psad->hSharedMemory, psad->dwSourceProcessId);
+    }
+    
+    return NULL;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// ABUnlock
+//
+// Calls SHUnlockShared API for the specified AppBarData* memory
+//
+void TrayService::ABUnLock(PAPPBARDATAV1 pabd)
+{
+    if(NULL != fpSHUnlockShared && NULL != pabd)
+    {
+        fpSHUnlockShared(pabd);
+    }
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// FindAppBarPredicate_hWnd
+//
+// Predicate for std::find_if, used by findBar variants
+// Needs to be at global scope because of mingw issues
+//
+// Find the appbar matching the specified hWnd
+//
+struct FindAppBarPredicate_hWnd
+{
+    FindAppBarPredicate_hWnd(HWND hWnd) : m_hWnd(hWnd)
+    {}
+    
+    bool operator() (const AppBar* pab) const
+    {
+        return (pab->hWnd() == m_hWnd);
+    }
+    
+private:
+    const HWND m_hWnd;
+};
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// FindAppBarPredicate_MatchLParam
+//
+// Predicate for std::find_if, used by findBar variants
+// Needs to be at global scope because of mingw issues
+//
+// Find the appbar on the specified edge that has a matching lParam value
+//
+struct FindAppBarPredicate_MatchLParam
+{
+    FindAppBarPredicate_MatchLParam(UINT uEdge, LPARAM lParam) : m_uEdge(uEdge), m_lParam(lParam)
+    {}
+    
+    bool operator() (const AppBar* pab) const
+    {
+        return (pab->uEdge() == m_uEdge && m_lParam == (pab->lParam() & m_lParam));
+    }
+    
+private:
+    const UINT m_uEdge;
+    const LPARAM m_lParam;
+};
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// findBar
+//
+// Looks up an AppBar in the AppBarList
+//
+BarVector::iterator TrayService::findBar(HWND hWnd)
+{
+    return std::find_if(m_abVector.begin(), m_abVector.end(),
+                        FindAppBarPredicate_hWnd(hWnd));
+}
+BarVector::iterator TrayService::findBar(UINT uEdge, LPARAM lParam)
+{
+    return std::find_if(m_abVector.begin(), m_abVector.end(),
+                        FindAppBarPredicate_MatchLParam(uEdge, lParam));
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// isBar
+//
+// Determines whether the HWND is associated with any current AppBar.
+//
+bool TrayService::isBar(HWND hWnd)
+{
+    return m_abVector.end() != findBar(hWnd);
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// getBar
+//
+// Looks up an BarVector iterator based on the HWND
+//
+// returns true if found, otherwise false.
+//
+bool TrayService::getBar(HWND hWnd, BarVector::iterator& itBar)
+{
+    bool bReturn = false;
+    
+    itBar = findBar(hWnd);
+    
+    if(itBar != m_abVector.end())
+    {
+        bReturn = true;
+    }
+    
+    return bReturn;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// getBar
+//
+// Looks up an AppBar* based on the HWND
+//
+// Returns true if found, otherwise false.
+//
+bool TrayService::getBar(HWND hWnd, AppBar*& pBarRef)
+{
+    bool bReturn = false;
+    BarVector::iterator itBar;
+    
+    if(getBar(hWnd, itBar))
+    {
+        pBarRef = *itBar;
+        bReturn = true;
+    }
+    
+    return bReturn;
+}
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //

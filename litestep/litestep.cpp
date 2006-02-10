@@ -868,19 +868,49 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 
                 if (uMsg == LM_WINDOWACTIVATED)
                 {
-                    if (m_bAutoHideModules)
-					{
-						if ((lParam > 0) && (m_bAppIsFullScreen == false))
-						{
-							m_bAppIsFullScreen = true;
-							ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
-						}
-						else if ((lParam <= 0) && (m_bAppIsFullScreen == true))
-						{
-							m_bAppIsFullScreen = false;
-							ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
-						}
-					}
+                    /*
+                     * Note: The ShellHook will always set the HighBit when there
+                     * is any full screen app on the desktop, even if it does not
+                     * have focus.  Because of this, we have no easy way to tell
+                     * if the currently activated app is full screen or not. Thus
+                     * we will always hide our modules and appbars even when the
+                     * current application is not full screen but a full screen app
+                     * exists.  We could work around this by checking the window's
+                     * bounding RECT using GetWindowRect().  However, for now only
+                     * send notifications if the state has changed. (ie. when there
+                     * are no more full screen applications, or when the first full
+                     * screen app is displayed.  The correct behavior for this is
+                     * to hide when a full screen app is active, and to show when a
+                     * non full screen app is active. So, fix with a clean solution.
+                     */
+                    if ((0 != lParam) && (m_bAppIsFullScreen == false))
+                    {
+                        m_bAppIsFullScreen = true;
+
+                        if (m_pTrayService)
+                        {
+                            m_pTrayService->NotifyRudeApp(true);
+                        }
+
+                        if (m_bAutoHideModules)
+                        {
+                            ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
+                        }
+                    }
+                    else if ((0 == lParam) && (m_bAppIsFullScreen == true))
+                    {
+                        m_bAppIsFullScreen = false;
+
+                        if (m_bAutoHideModules)
+                        {
+                            ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
+                        }
+
+                        if (m_pTrayService)
+                        {
+                            m_pTrayService->NotifyRudeApp(false);
+                        }
+                    }
                 }
             }
 
