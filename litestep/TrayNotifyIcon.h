@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../utility/common.h"
 #include <shellapi.h>
+#include <vector>
 
 #define TRAY_MAX_TIP_LENGTH       128
 #define TRAY_MAX_INFO_LENGTH      256
@@ -215,6 +216,9 @@ typedef const NID_XX * PCNID_XX;
 
 class NotifyIcon
 {
+    typedef std::vector<NotifyIcon*> IcVtr;
+    static IcVtr s_icVtr;
+
 public:
     NotifyIcon(const NID_XX& nidSource);
     ~NotifyIcon();
@@ -265,6 +269,11 @@ private:
     void copy_state(PCNID_XX pnidSource);
 
     void update_state(DWORD dwState, DWORD dwMask);
+
+    // Internal tracking
+    HANDLE m_hOriginalIcon;
+    HANDLE m_hSharedWnd;
+    HANDLE m_hSharedID;
 
     // Preserved Notify Icon Data members
     const HWND  m_hWnd;                          /* persistent & non volatile */
