@@ -97,7 +97,7 @@ HRESULT TrayService::Start()
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG)this);
             
-            // tell apps to reregister their icons (see Note 6)
+            // tell apps to reregister their icons
             PostMessage(HWND_BROADCAST,
                 RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
             
@@ -200,7 +200,7 @@ bool TrayService::createWindows()
             bReturn = true;
 
             //
-            // Register "TrayNotifyWnd" class and create window (see Note 8)
+            // Register "TrayNotifyWnd" class and create window
             //
             ZeroMemory(&wc, sizeof(wc));
             wc.cbSize = sizeof(WNDCLASSEX);
@@ -384,12 +384,12 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                                 if(sizeof(APPBARDATAV2) != pamd->abd.cbSize)
                                     break;
                                 
+                                TRACE("dwMessage: %u", pamd->dwMessage);
+                                
                                 SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
                                 sbd.dwMessage = pamd->dwMessage;
                                 sbd.hSharedMemory = pamd->hSharedMemory;
                                 sbd.dwSourceProcessId = pamd->dwSourceProcessId;
-                                
-                                TRACE("dwMessage: %u", pamd->dwMessage);
                                 
                                 lResult = pTrayService->HandleAppBarMessage(&sbd);
                             }
@@ -666,7 +666,7 @@ LRESULT TrayService::barDestroy(const APPBARDATAV1& abd)
         PostMessage(
              m_hTrayWnd
             ,ABP_NOTIFYPOSCHANGED
-            ,(WPARAM)abd.hWnd
+            ,(WPARAM)NULL
             ,(LPARAM)MAKELONG(0, 0)
         );
     }
@@ -952,7 +952,7 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
             (*itBar)->lParam((*itBar)->lParam() | ABS_OVERLAPAUTOHIDE);
         }
         
-        // set edge bar is assigned to, and set that it an autohide bar
+        // set its assigned edge, and set it as an autohide bar
         (*itBar)->uEdge(abd.uEdge);
         (*itBar)->lParam((*itBar)->lParam() | ABS_AUTOHIDE);
     }
@@ -1084,7 +1084,7 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
         if(!p || p->IsOverLap())
         {
         }
-        /* if this is our appbar, mark it found and continue */
+        // if this is our appbar, mark it found and continue
         else if(abd.hWnd == p->hWnd())
         {
             bFound = true;
@@ -1093,18 +1093,18 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
         else if(ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
         {
         }
-        /* Ignore other edge appbars for the most part */
+        // Ignore other edge appbars for the most part
         else if(abd.uEdge != p->uEdge())
         {
-            /* Left/Right bars must resize to top/bottom bars */
+            // Left/Right bars must resize to top/bottom bars
             if(ABE_HORIZONTAL != (ABE_HORIZONTAL & abd.uEdge)
                 &&
                ABE_HORIZONTAL == (ABE_HORIZONTAL & p->uEdge()))
             {
                 RECT r; // dummy
                 
-                /* If our destination rectangle currently intersects
-                 * then resize it */
+                // If our destination rectangle currently intersects
+                // then resize it
                 if(IntersectRect(&r, &(p->GetRectRef()), &dtRect))
                 {
                     if(ABE_TOP == p->uEdge())
@@ -1118,9 +1118,9 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
                 }
             }
         }
-        /* Keep moving the destination appbar while we are looking
-         * at same edge appbars before our own.  Once we find our
-         * own, then we ignore all same edge appbars after ours. */
+        // Keep moving the destination appbar while we are looking
+        // at same edge appbars before our own.  Once we find our
+        // own, then we ignore all same edge appbars after ours.
         else if(!bFound)
         {
             switch(abd.uEdge)
@@ -1170,7 +1170,7 @@ void TrayService::modifyBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge)
 {
     GetWindowRect(GetDesktopWindow(), &rcDst);
     
-    /* decrease to requesting bounding rect */
+    // decrease to requesting bounding rect
     switch(uEdge)
     {
     case ABE_LEFT:
@@ -1547,7 +1547,7 @@ bool TrayService::addIcon(const NID_XX& nid)
 
         if (pni)
         {
-            /* Fail shared icons, unless a valid hIcon exists */
+            // Fail shared icons, unless a valid hIcon exists
             if(IsWindow(pni->GetHwnd()) && (!pni->IsShared() || pni->HasIcon()))
             {
                 m_siVector.push_back(pni);
@@ -1756,8 +1756,8 @@ struct FindIconPredicate
     }
 
 private:
-    HWND m_hWnd;
-    UINT m_uID;
+    const HWND m_hWnd;
+    const UINT m_uID;
 };
 
 

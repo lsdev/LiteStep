@@ -145,7 +145,7 @@ private:
     BarVector::iterator findBar(HWND hWnd);
     BarVector::iterator findBar(UINT uEdge, LPARAM lParam);
     bool isBar(HWND hWnd);
-    bool getBar(HWND hWnd, BarVector::iterator &itAppBar);
+    bool getBar(HWND hWnd, BarVector::iterator& itAppBar);
     bool getBar(HWND hWnd, AppBar*& pBarRef);
     
     //
