@@ -129,9 +129,10 @@ private:
     //
     // barSetPos and barQueryPos helpers
     //
-    void modifyOverlapBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge);
-    void modifyNormalBar(RECT& rcDst, const APPBARDATAV1& abd);
-    void modifyBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge);
+    void modifyOverlapBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
+    void modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HWND hWnd);
+    void modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
+    void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     
     //
     // AppBar Un/Lock handlers for shared data

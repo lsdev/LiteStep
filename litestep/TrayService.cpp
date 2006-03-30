@@ -624,6 +624,7 @@ void TrayService::NotifyRudeApp(bool bIsFullScreen) const
 //
 //  cbSize
 //  hWnd
+//  uCallbackMessage
 //
 LRESULT TrayService::barCreate(const APPBARDATAV1& abd)
 {
@@ -703,18 +704,16 @@ LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
         {
             lResult = 1;
             
-            p->uEdge(abd.uEdge);
-            
-            modifyBar(pabd->rc, abd.rc, p->uEdge());
-            
             if(ABS_OVERLAPAUTOHIDE == (p->lParam() & ABS_OVERLAPAUTOHIDE))
             {
-                modifyOverlapBar(pabd->rc, abd.rc, p->uEdge());
+                modifyOverlapBar(pabd->rc, abd.rc, abd.uEdge);
             }
             else
             {
-                modifyNormalBar(pabd->rc, abd);
+                modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, abd.hWnd);
             }
+            
+            p->uEdge(abd.uEdge);
         }
         
         ABUnLock(pabd);
@@ -752,18 +751,17 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
         {
             lResult = 1;
             
-            p->uEdge(abd.uEdge);
-            
-            modifyBar(pabd->rc, abd.rc, p->uEdge());
-            
             if(ABS_OVERLAPAUTOHIDE == (p->lParam() & ABS_OVERLAPAUTOHIDE))
             {
-                modifyOverlapBar(pabd->rc, abd.rc, p->uEdge());
+                modifyOverlapBar(pabd->rc, abd.rc, abd.uEdge);
             }
             else
             {
-                modifyNormalBar(pabd->rc, abd);
+                modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, abd.hWnd);
                 
+                // If this is the first time to position the bar or if
+                // the new position is different than the previous, then
+                // notify all other appbars.
                 if((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
                    || !EqualRect(&(p->GetRectRef()), &(pabd->rc)))
                 {
@@ -781,8 +779,10 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
                 }
             }
             
+            // Update the appbar stored parameters
             CopyRect(&(p->GetRectRef()), &(pabd->rc));
             p->lParam(p->lParam() | ABS_CLEANRECT);
+            p->uEdge(abd.uEdge);
         }
         
         ABUnLock(pabd);
@@ -1043,23 +1043,18 @@ LRESULT TrayService::barSetTaskBarState(const APPBARDATAV1& abd)
 //
 // Helper function to barSetPos and barQueryPos
 //
-void TrayService::modifyOverlapBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge)
+void TrayService::modifyOverlapBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 {
-    switch(uEdge)
-    {
-    case ABE_LEFT:
-        rcDst.right = rcDst.left + (rcSrc.right - rcSrc.left);
-        break;
-    case ABE_TOP:
-        rcDst.bottom = rcDst.top + (rcSrc.bottom - rcSrc.top);
-        break;
-    case ABE_RIGHT:
-        rcDst.left = rcDst.right - (rcSrc.right - rcSrc.left);
-        break;
-    case ABE_BOTTOM:
-        rcDst.top = rcDst.bottom - (rcSrc.bottom - rcSrc.top);
-        break;
-    }
+    // Use entire desktop for default rectangle
+    GetWindowRect(GetDesktopWindow(), &rcDst);
+    
+    // Set the bar's extent
+    modifyBarExtent(rcDst, rcOrg, uEdge);
+    
+    // The bar's position is anchored at the desktop edge - so nothing to do
+    
+    // Set the bar's breadth
+    modifyBarBreadth(rcDst, rcOrg, uEdge);
     
     return;
 }
@@ -1070,12 +1065,19 @@ void TrayService::modifyOverlapBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge)
 //
 // Helper function to barSetPos and barQueryPos
 //
-void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
+void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HWND hWnd)
 {
     BarVector::const_iterator it;
     AppBar* p;
     bool bFound = FALSE;
     
+    // Use entire desktop for default rectangle
+    GetWindowRect(GetDesktopWindow(), &rcDst);
+    
+    // Set the bar's extent
+    modifyBarExtent(rcDst, rcOrg, uEdge);
+    
+    // Set the bar's position
     for(it = m_abVector.begin(); it != m_abVector.end(); it++)
     {
         p = *it;
@@ -1085,7 +1087,7 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
         {
         }
         // if this is our appbar, mark it found and continue
-        else if(abd.hWnd == p->hWnd())
+        else if(hWnd == p->hWnd())
         {
             bFound = true;
         }
@@ -1094,26 +1096,26 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
         {
         }
         // Ignore other edge appbars for the most part
-        else if(abd.uEdge != p->uEdge())
+        else if(uEdge != p->uEdge())
         {
             // Left/Right bars must resize to top/bottom bars
-            if(ABE_HORIZONTAL != (ABE_HORIZONTAL & abd.uEdge)
+            if(ABE_HORIZONTAL != (ABE_HORIZONTAL & uEdge)
                 &&
                ABE_HORIZONTAL == (ABE_HORIZONTAL & p->uEdge()))
             {
-                RECT r; // dummy
+                RECT rc; // dummy
                 
                 // If our destination rectangle currently intersects
                 // then resize it
-                if(IntersectRect(&r, &(p->GetRectRef()), &dtRect))
+                if(IntersectRect(&rc, &(p->GetRectRef()), &rcDst))
                 {
                     if(ABE_TOP == p->uEdge())
                     {
-                        dtRect.top = p->GetRectRef().bottom;
+                        rcDst.top = p->GetRectRef().bottom;
                     }
                     else
                     {
-                        dtRect.bottom = p->GetRectRef().top;
+                        rcDst.bottom = p->GetRectRef().top;
                     }
                 }
             }
@@ -1123,37 +1125,49 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
         // own, then we ignore all same edge appbars after ours.
         else if(!bFound)
         {
-            switch(abd.uEdge)
+            switch(uEdge)
             {
             case ABE_LEFT:
-                dtRect.left = p->GetRectRef().right;
+                rcDst.left = p->GetRectRef().right;
                 break;
             case ABE_TOP:
-                dtRect.top = p->GetRectRef().bottom;
+                rcDst.top = p->GetRectRef().bottom;
                 break;
             case ABE_RIGHT:
-                dtRect.right = p->GetRectRef().left;
+                rcDst.right = p->GetRectRef().left;
                 break;
             case ABE_BOTTOM:
-                dtRect.bottom = p->GetRectRef().top;
+                rcDst.bottom = p->GetRectRef().top;
                 break;
             }
         }
     }
     
-    switch(abd.uEdge)
+    // Set the bar's breadth
+    modifyBarBreadth(rcDst, rcOrg, uEdge);
+    
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// modifyBarExtent
+//
+// Helper function to modifyNormalBar and modifyOverlapBar
+//
+void TrayService::modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
+{
+    switch(uEdge)
     {
     case ABE_LEFT:
-        dtRect.right = dtRect.left + (abd.rc.right - abd.rc.left);
+    case ABE_RIGHT:
+        rcDst.top = max(rcDst.top, rcOrg.top);
+        rcDst.bottom = min(rcDst.bottom, rcOrg.bottom);
         break;
     case ABE_TOP:
-        dtRect.bottom = dtRect.top + (abd.rc.bottom - abd.rc.top);
-        break;
-    case ABE_RIGHT:
-        dtRect.left = dtRect.right - (abd.rc.right - abd.rc.left);
-        break;
     case ABE_BOTTOM:
-        dtRect.top = dtRect.bottom - (abd.rc.bottom - abd.rc.top);
+        rcDst.left = max(rcDst.left, rcOrg.left);
+        rcDst.right = min(rcDst.right, rcOrg.right);
         break;
     }
     
@@ -1162,26 +1176,25 @@ void TrayService::modifyNormalBar(RECT& dtRect, const APPBARDATAV1& abd)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// modifyBar
+// modifyBarBreadth
 //
-// Helper function to barSetPos and barQueryPos
+// Helper function to modifyBarNormal and modifyBarOverlap
 //
-void TrayService::modifyBar(RECT& rcDst, const RECT& rcSrc, UINT uEdge)
+void TrayService::modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 {
-    GetWindowRect(GetDesktopWindow(), &rcDst);
-    
-    // decrease to requesting bounding rect
     switch(uEdge)
     {
     case ABE_LEFT:
-    case ABE_RIGHT:
-        rcDst.top = rcSrc.top;
-        rcDst.bottom = rcSrc.bottom;
+        rcDst.right = rcDst.left + (rcOrg.right - rcOrg.left);
         break;
     case ABE_TOP:
+        rcDst.bottom = rcDst.top + (rcOrg.bottom - rcOrg.top);
+        break;
+    case ABE_RIGHT:
+        rcDst.left = rcDst.right - (rcOrg.right - rcOrg.left);
+        break;
     case ABE_BOTTOM:
-        rcDst.left = rcSrc.left;
-        rcDst.right = rcSrc.right;
+        rcDst.top = rcDst.bottom - (rcOrg.bottom - rcOrg.top);
         break;
     }
     
