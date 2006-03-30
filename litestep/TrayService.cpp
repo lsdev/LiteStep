@@ -44,9 +44,15 @@ static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 // TrayService
 //
 TrayService::TrayService() :
-m_bWin2000(false), m_hNotifyWnd(NULL), m_hTrayWnd(NULL), m_hLiteStep(NULL),
-m_hInstance(NULL)
+m_bWin2000(false), m_bWorkAreaDirty(false), m_hNotifyWnd(NULL), m_hTrayWnd(NULL),
+m_hLiteStep(NULL), m_hInstance(NULL)
 {
+    SystemParametersInfo(
+         SPI_GETWORKAREA
+        ,0
+        ,&m_rWorkArea
+        ,0
+    );
 }
 
 
@@ -471,6 +477,8 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                         p = *rit;
                     }
                 }
+                
+                pTrayService->adjustWorkArea();
             }
             break;
             
@@ -503,6 +511,60 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     ,0,0,0,0
                     ,SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOSIZE|SWP_NOOWNERZORDER
                 );
+            }
+            break;
+            
+        case WM_SETTINGCHANGE:
+            {
+                if(SPI_SETWORKAREA == wParam && !pTrayService->m_bWorkAreaDirty)
+                {
+                    RECT rc;
+                    
+                    SystemParametersInfo(
+                         SPI_GETWORKAREA
+                        ,0
+                        ,&rc
+                        ,0
+                    );
+                    
+                    // Allow changing of workarea externally unless we
+                    // have an appbar on that edge.
+                    if(pTrayService->m_rWorkArea.left != rc.left)
+                    {
+                        if(pTrayService->m_abVector.end() == pTrayService->findBar(ABE_LEFT, 0))
+                        {
+                            pTrayService->m_rWorkArea.left = rc.left;
+                        }
+                    }
+                    if(pTrayService->m_rWorkArea.right != rc.right)
+                    {
+                        if(pTrayService->m_abVector.end() == pTrayService->findBar(ABE_RIGHT, 0))
+                        {
+                            pTrayService->m_rWorkArea.right = rc.right;
+                        }
+                    }
+                    if(pTrayService->m_rWorkArea.top != rc.top)
+                    {
+                        if(pTrayService->m_abVector.end() == pTrayService->findBar(ABE_TOP, 0))
+                        {
+                            pTrayService->m_rWorkArea.top = rc.top;
+                        }
+                    }
+                    if(pTrayService->m_rWorkArea.bottom != rc.bottom)
+                    {
+                        if(pTrayService->m_abVector.end() == pTrayService->findBar(ABE_BOTTOM, 0))
+                        {
+                            pTrayService->m_rWorkArea.bottom = rc.bottom;
+                        }
+                    }
+                    
+                    PostMessage(
+                         pTrayService->m_hTrayWnd
+                        ,ABP_NOTIFYPOSCHANGED
+                        ,(WPARAM)NULL
+                        ,(LPARAM)MAKELONG(0, 0)
+                    );
+                }
             }
             break;
             
@@ -765,10 +827,6 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
                 if((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
                    || !EqualRect(&(p->GetRectRef()), &(pabd->rc)))
                 {
-                    // Set Work Area
-                    // TODO: Integrate work area management, and have
-                    // desktop modules interact with us.
-                    
                     // Notify other bars
                     PostMessage(
                          m_hTrayWnd
@@ -1071,8 +1129,8 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
     AppBar* p;
     bool bFound = FALSE;
     
-    // Use entire desktop for default rectangle
-    GetWindowRect(GetDesktopWindow(), &rcDst);
+    // Use only the original workarea for the default rectangle
+    CopyRect(&rcDst, &m_rWorkArea);
     
     // Set the bar's extent
     modifyBarExtent(rcDst, rcOrg, uEdge);
@@ -1197,6 +1255,72 @@ void TrayService::modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
         rcDst.top = rcDst.bottom - (rcOrg.bottom - rcOrg.top);
         break;
     }
+    
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// adjustWorkArea
+//
+// Helper function to barSetPos (via ABP_NOTIFYPOSCHANGED)
+//
+void TrayService::adjustWorkArea()
+{
+    RECT rcWorker;
+    
+    CopyRect(&rcWorker, &m_rWorkArea);
+    
+    for(
+         BarVector::iterator it = m_abVector.begin()
+        ;it != m_abVector.end()
+        ;it++
+    )
+    {
+        AppBar* p = *it;
+        
+        if(p && (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
+        {
+            RECT rcBarEx;
+            
+            CopyRect(&rcBarEx, &p->GetRectRef());
+            
+            switch(p->uEdge())
+            {
+            case ABE_LEFT:
+                rcBarEx.left = m_rWorkArea.left;
+                rcBarEx.top = m_rWorkArea.top;
+                rcBarEx.bottom = m_rWorkArea.bottom;
+                break;
+            case ABE_RIGHT:
+                rcBarEx.right = m_rWorkArea.right;
+                rcBarEx.top = m_rWorkArea.top;
+                rcBarEx.bottom = m_rWorkArea.bottom;
+                break;
+            case ABE_TOP:
+                rcBarEx.top = m_rWorkArea.top;
+                rcBarEx.left = m_rWorkArea.left;
+                rcBarEx.right = m_rWorkArea.right;
+                break;
+            case ABE_BOTTOM:
+                rcBarEx.bottom = m_rWorkArea.bottom;
+                rcBarEx.left = m_rWorkArea.left;
+                rcBarEx.right = m_rWorkArea.right;
+                break;
+            }
+            
+            SubtractRect(&rcWorker, &rcWorker, &rcBarEx);
+        }
+    }
+    
+    m_bWorkAreaDirty = true;
+    SystemParametersInfo(
+         SPI_SETWORKAREA
+        ,1 // readjust maximized windows
+        ,&rcWorker
+        ,SPIF_SENDCHANGE
+    );
+    m_bWorkAreaDirty = false;
     
     return;
 }

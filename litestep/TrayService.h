@@ -133,6 +133,7 @@ private:
     void modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HWND hWnd);
     void modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
+    void adjustWorkArea();
     
     //
     // AppBar Un/Lock handlers for shared data
@@ -178,6 +179,8 @@ private:
     //
     //
     bool m_bWin2000;
+    bool m_bWorkAreaDirty;
+    RECT m_rWorkArea;
     HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
     HWND m_hLiteStep;
