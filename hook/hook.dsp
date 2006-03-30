@@ -33,8 +33,8 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "hook___W"
-# PROP BASE Intermediate_Dir "hook___W"
+# PROP BASE Output_Dir "Release"
+# PROP BASE Intermediate_Dir "Release"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
-# SUBTRACT CPP /YX /Yc /Yu
+# SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
@@ -71,7 +71,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /FD /c
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LS_NO_EXCEPTION" /FR /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /o "NUL" /win32
@@ -84,7 +84,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 advapi32.lib kernel32.lib user32.lib msvcrtd.lib oldnames.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib /def:"hook.def" /out:"..\litestep\Debug\hook.dll"
-# SUBTRACT LINK32 /pdb:none /pdbtype:<none>
+# SUBTRACT LINK32 /profile
 
 !ENDIF 
 
@@ -92,9 +92,9 @@ LINK32=link.exe
 
 # Name "hook - Win32 Release"
 # Name "hook - Win32 Debug"
-# Begin Group "Source Files"
+# Begin Group "Source"
 
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# PROP Default_Filter "*.cpp;*.c"
 # Begin Source File
 
 SOURCE=.\Hook.cpp
@@ -113,9 +113,9 @@ SOURCE=.\Hook.def
 
 # End Source File
 # End Group
-# Begin Group "Header Files"
+# Begin Group "Headers"
 
-# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# PROP Default_Filter "*.h"
 # Begin Source File
 
 SOURCE=.\Hook.h

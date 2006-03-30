@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=lsapi - Win32 Release
+CFG=lsapi - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=lsapi - Win32 Release
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "lsapi.mak" CFG="lsapi - Win32 Release"
+!MESSAGE NMAKE /f "lsapi.mak" CFG="lsapi - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -24,7 +24,7 @@ CFG=lsapi - Win32 Release
 # Begin Project
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
-# PROP Scc_LocalPath "Desktop"
+# PROP Scc_LocalPath ""
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
@@ -44,18 +44,18 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "LSAPI_INTERNAL" /D "LSAPI_PRIVATE" /FD /c
-# SUBTRACT CPP /Fr /YX
+# SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
-# ADD BASE RSC /l 0xc09 /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 delayimp.lib libpng13.lib ole32.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /subsystem:windows /dll /pdb:none /map:"../litestep/Release/lsapi.map" /machine:I386 /nodefaultlib /out:"..\litestep\Release\lsapi.dll" /delayload:"libpng13.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 libpng13.lib ole32.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /subsystem:windows /dll /pdb:none /map:"../litestep/Release/lsapi.map" /machine:I386 /nodefaultlib /out:"..\litestep\Release\lsapi.dll" /delayload:"libpng13.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "lsapi - Win32 Debug"
 
@@ -71,18 +71,19 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_INTERNAL" /D "LSAPI_PRIVATE" /FR /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_INTERNAL" /D "LSAPI_PRIVATE" /D "LS_NO_EXCEPTION" /FR /FD /GZ /c
+# SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
-# ADD BASE RSC /l 0xc09 /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 delayimp.lib libpng13d.lib ole32.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib /out:"..\litestep\Debug\lsapi.dll" /delayload:"libpng13d.dll"
+# ADD LINK32 libpng13d.lib ole32.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib /out:"..\litestep\Debug\lsapi.dll" /delayload:"libpng13d.dll"
 # SUBTRACT LINK32 /profile
 
 !ENDIF 

@@ -44,18 +44,18 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /FD /c
-# SUBTRACT CPP /Fr /YX
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
-# ADD MTL /nologo /D "NDEBUG" /o /win32 "NUL"
+# SUBTRACT CPP /YX
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "NDEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
-# ADD BASE RSC /l 0xc09 /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 ..\lsapi\release\lsapi.lib ..\hook\release\hook.lib ole32.lib oleaut32.lib uuid.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /subsystem:windows /pdb:none /map /machine:I386 /nodefaultlib /opt:NOWIN98 /delayload:"hook.dll" /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 ..\lsapi\release\lsapi.lib ..\hook\release\hook.lib ole32.lib oleaut32.lib uuid.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib oldnames.lib /nologo /subsystem:windows /pdb:none /map /machine:I386 /nodefaultlib /delayload:"hook.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
 
@@ -71,19 +71,19 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /FR /FD /c
-# SUBTRACT CPP /FA<none>
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
-# ADD MTL /nologo /D "_DEBUG" /o /win32 "NUL"
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /D "LS_NO_EXCEPTION" /FR /FD /c
+# SUBTRACT CPP /YX
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "_DEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
-# ADD BASE RSC /l 0xc09 /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\lsapi\debug\lsapi.lib ..\hook\debug\hook.lib ole32.lib oleaut32.lib uuid.lib delayimp.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib /delayload:"hook.dll"
+# ADD LINK32 ..\lsapi\debug\lsapi.lib ..\hook\debug\hook.lib ole32.lib oleaut32.lib uuid.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib oldnames.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib /delayload:"hook.dll"
 # SUBTRACT LINK32 /profile
 
 !ENDIF 
