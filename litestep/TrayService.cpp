@@ -766,7 +766,7 @@ LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
         {
             lResult = 1;
             
-            if(ABS_OVERLAPAUTOHIDE == (p->lParam() & ABS_OVERLAPAUTOHIDE))
+            if(p->IsOverLap())
             {
                 modifyOverlapBar(pabd->rc, abd.rc, abd.uEdge);
             }
@@ -813,7 +813,7 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
         {
             lResult = 1;
             
-            if(ABS_OVERLAPAUTOHIDE == (p->lParam() & ABS_OVERLAPAUTOHIDE))
+            if(p->IsOverLap())
             {
                 modifyOverlapBar(pabd->rc, abd.rc, abd.uEdge);
             }
@@ -1022,7 +1022,7 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
             lResult = 1;
             
             // if bar was overlap, destroy it
-            if((*itBar)->lParam() & ABS_OVERLAPAUTOHIDE)
+            if((*itBar)->IsOverLap())
             {
                 barDestroy(abd);
             }
@@ -1279,7 +1279,7 @@ void TrayService::adjustWorkArea()
     {
         AppBar* p = *it;
         
-        if(p && (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
+        if(p && !p->IsOverLap() && (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
         {
             RECT rcBarEx;
             
