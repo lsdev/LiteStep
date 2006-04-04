@@ -167,7 +167,7 @@ bool TrayService::createWindows()
     //
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
-    wc.cbWndExtra = 4;
+    wc.cbWndExtra = sizeof(TrayService*);
     wc.lpfnWndProc = TrayService::WindowTrayProc;
     wc.hInstance = m_hInstance;
     wc.lpszClassName = szTrayClass;
