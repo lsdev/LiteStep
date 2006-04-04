@@ -159,6 +159,9 @@
 				RelativePath=".\lsapi.cpp">
 			</File>
 			<File
+				RelativePath=".\lsapiInit.cpp">
+			</File>
+			<File
 				RelativePath=".\lsmultimon.cpp">
 			</File>
 			<File
@@ -177,13 +180,25 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\MathEvaluate.cpp">
+			</File>
+			<File
+				RelativePath=".\MathParser.cpp">
+			</File>
+			<File
+				RelativePath=".\MathScanner.cpp">
+			</File>
+			<File
+				RelativePath=".\MathToken.cpp">
+			</File>
+			<File
+				RelativePath=".\MathValue.cpp">
+			</File>
+			<File
 				RelativePath=".\png_support.cpp">
 			</File>
 			<File
 				RelativePath=".\settings.cpp">
-			</File>
-			<File
-				RelativePath=".\SettingsEvalParser.cpp">
 			</File>
 			<File
 				RelativePath=".\SettingsFileParser.cpp">
@@ -218,7 +233,28 @@
 				RelativePath=".\lsapidefines.h">
 			</File>
 			<File
+				RelativePath=".\lsapiInit.h">
+			</File>
+			<File
 				RelativePath=".\lsmultimon.h">
+			</File>
+			<File
+				RelativePath=".\MathEvaluate.h">
+			</File>
+			<File
+				RelativePath=".\MathException.h">
+			</File>
+			<File
+				RelativePath=".\MathParser.h">
+			</File>
+			<File
+				RelativePath=".\MathScanner.h">
+			</File>
+			<File
+				RelativePath=".\MathToken.h">
+			</File>
+			<File
+				RelativePath=".\MathValue.h">
 			</File>
 			<File
 				RelativePath=".\png_support.h">
