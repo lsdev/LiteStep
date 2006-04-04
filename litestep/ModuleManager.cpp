@@ -230,11 +230,16 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
             mqModules.erase(iterOld);
         }
         
-        // Wait for all modules to signal that they have started.
-        _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
+        // Are there any "threaded" modules?
+        if (vecInitEvents.size() > 0)
+        {
+            // Wait for all modules to signal that they have started.
+            _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
 
-        // Close the handles we have taken ownership of.
-        std::for_each(vecInitEvents.begin(), vecInitEvents.end(), CloseHandle);
+            // Close the handles we have taken ownership of.
+            std::for_each(
+                vecInitEvents.begin(), vecInitEvents.end(), CloseHandle);
+        }
     }
 
 	return uReturn;
