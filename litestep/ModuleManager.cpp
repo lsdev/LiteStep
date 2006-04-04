@@ -231,7 +231,7 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
         }
         
         // Are there any "threaded" modules?
-        if (vecInitEvents.size() > 0)
+        if (!vecInitEvents.empty())
         {
             // Wait for all modules to signal that they have started.
             _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
@@ -277,10 +277,14 @@ void ModuleManager::_QuitModules()
     
     m_ModuleQueue.clear();
 
-    _WaitForModules(&vecQuitObjects[0], vecQuitObjects.size());
+    if (!vecQuitObjects.empty())
+    {
+        _WaitForModules(&vecQuitObjects[0], vecQuitObjects.size());
 
-    // Close the handles we have taken ownership of.
-    std::for_each(vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle);
+        // Close the handles we have taken ownership of.
+        std::for_each(
+            vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle);
+    }
 
     // Clean it all up
     iter = TempQueue.rbegin();
