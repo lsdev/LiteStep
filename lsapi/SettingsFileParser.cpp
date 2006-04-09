@@ -85,6 +85,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 //            _T("Error opening \"%s\" for parsing.\n\n")
 //            _T("Requested as: %s\nResolved to: %s"),
 //            tzExpandedPath, ptzFileName, tzFullPath);
+        TRACE("Failed to open file for inclusion: \"%s\"", tzFullPath);
     }
 }
 
@@ -272,7 +273,10 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     {
         return;
     }
-    
+
+    TRACE("Expression \"%s\" evaluated to %s",
+        ptzExpression, result ? "TRUE" : "FALSE");
+
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
     TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
     
