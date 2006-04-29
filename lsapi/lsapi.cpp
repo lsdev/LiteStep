@@ -30,8 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.20.2.2 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.2 2006/01/25 21:10:59 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.20.2.3 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.3 2006/04/29 16:06:27 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -542,8 +542,14 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 
 		if (bAppendNextToken && *pszCurrent)
         {
-            GetToken(pszCurrent, pszToken + strlen(pszToken),
-                pszNextToken, bUseBrackets);
+            LPSTR pszNewToken = pszToken;
+
+            if (pszNewToken)
+            {
+                pszNewToken += strlen(pszToken);
+            }
+
+            GetToken(pszCurrent, pszNewToken, pszNextToken, bUseBrackets);
         }
 
 		return pszStartMarker != NULL;
