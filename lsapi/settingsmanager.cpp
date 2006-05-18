@@ -422,14 +422,16 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                         }
                         else
                         {
-                            string result;
                             pszTempExpandedString[0] = '\0';
+#ifdef LS_COMPAT_MATH
+                            string result;
                             
                             if (MathEvaluateString(m_SettingsMap, szVariable, result, recursiveVarSet, MATH_EXCEPTION_ON_UNDEFINED))
                             {
                                 StringCchCopy(pszTempExpandedString, stWorkLength, result.c_str());
                                 bSucceeded = true;
                             }
+#endif // LS_COMPAT_MATH
                         }
 					}
 				}
