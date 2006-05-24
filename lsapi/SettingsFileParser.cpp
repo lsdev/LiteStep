@@ -271,6 +271,9 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     
     if (!MathEvaluateBool(*m_pSettingsMap, ptzExpression, result))
     {
+        TRACE("Error parsing expression \"%s\"", ptzExpression);
+        
+        _SkipIf();
         return;
     }
 
