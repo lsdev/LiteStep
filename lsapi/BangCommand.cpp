@@ -83,3 +83,4 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
 #endif /* LS_NO_EXCEPTION */
 	}
 }
+

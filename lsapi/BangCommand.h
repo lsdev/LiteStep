@@ -39,7 +39,7 @@ private:
 	bool m_bEX;
 	BangCommand* m_bBang;
 	BangCommandEx* m_bBangEX;
-    std::string m_szCommand;
+	std::string m_szCommand;
 };
 
 #endif // __BANG_H
