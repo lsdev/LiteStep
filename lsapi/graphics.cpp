@@ -208,7 +208,7 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 
 	if (IsValidStringPtr(pszImage))
 	{
-		if (lstrcmpi(pszImage, ".none") != 0)
+		if (stricmp(pszImage, ".none") != 0)
 		{
 			char szImage[MAX_PATH];
 			StringCchCopy(szImage, MAX_PATH, pszImage);
@@ -409,7 +409,7 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 
 	if (IsValidStringPtr(pszIconPath))
 	{
-		if (lstrcmpi(pszIconPath, ".none") != 0)
+		if (stricmp(pszIconPath, ".none") != 0)
 		{
 			char szIconPath[MAX_PATH];
 			char szIconLSImagePath[MAX_PATH];
@@ -421,7 +421,7 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 
 			// if .extract but nothing else is there...
 			// then take the file specified as an icon (could probably be done earlier, but anyhow)
-			if (lstrcmpi(pszIconPath, ".extract") == 0)
+			if (stricmp(pszIconPath, ".extract") == 0)
 			{
 				pszIconFile = (LPSTR)pszFile;
 			}

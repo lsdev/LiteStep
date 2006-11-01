@@ -16,7 +16,7 @@
 #include "MathValue.h"
 #include "lsapi.h"
 #include "lsapiInit.h"
-#include <strsafe.h>
+#include "../utility/safestr.h"
 
 using namespace std;
 
@@ -355,7 +355,7 @@ MathValue MathParser::ParsePrimaryExpression()
     ostringstream message;
     
     message << "Syntax Error: Expected identifier, literal, or subexpression,";
-    message << "but found " << mLookahead[0].GetTypeName();
+    message << " but found " << mLookahead[0].GetTypeName();
     
     throw MathException(message.str());
 }

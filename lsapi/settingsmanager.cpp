@@ -81,7 +81,7 @@ BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
     // first appearance of a setting takes effect
     it = m_SettingsMap.lower_bound(pszName);
     
-    if (it != m_SettingsMap.end() && lstrcmpi(pszName, it->first.c_str()) == 0)
+    if (it != m_SettingsMap.end() && stricmp(pszName, it->first.c_str()) == 0)
 	{
 		bReturn = TRUE;
 	}
@@ -183,9 +183,9 @@ BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
 
 		if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
-			if (lstrcmpi(szToken, "off") &&
-                lstrcmpi(szToken, "false") &&
-                lstrcmpi(szToken, "no")) 
+			if (stricmp(szToken, "off") &&
+                stricmp(szToken, "false") &&
+                stricmp(szToken, "no")) 
 			{
 				return bIfFound;
 			}
@@ -215,9 +215,9 @@ BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
 		
         if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
-			if ((lstrcmpi(szToken, "off") == 0) ||
-                (lstrcmpi(szToken, "false") == 0) ||
-                (lstrcmpi(szToken, "no") == 0))
+			if ((stricmp(szToken, "off") == 0) ||
+                (stricmp(szToken, "false") == 0) ||
+                (stricmp(szToken, "no") == 0))
 			{
 				return FALSE;
 			}
@@ -367,10 +367,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				if (*pszTemplate == '\0')
 				{
 					bSucceeded = SUCCEEDED(
-                        StringCchCopyNEx(pszTempExpandedString,
+                        StringCchCopyN(pszTempExpandedString,
                         MAX_LINE_LENGTH - (pszTempExpandedString - szTempExpandedString),
-                        pszVariable, pszTemplate - pszVariable, NULL, NULL,
-                        STRSAFE_NULL_ON_FAILURE));
+                        pszVariable, pszTemplate - pszVariable));
 				}
 				else
 				{
@@ -380,9 +379,8 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 					//
                     char szVariable[MAX_LINE_LENGTH];
 
-                    StringCchCopyNEx(szVariable, MAX_LINE_LENGTH, pszVariable,
-                        pszTemplate - pszVariable, NULL, NULL,
-                        STRSAFE_NULL_ON_FAILURE);
+                    StringCchCopyN(szVariable, MAX_LINE_LENGTH, pszVariable,
+                        pszTemplate - pszVariable);
 
                     if (szVariable[0] != '\0')
                     {

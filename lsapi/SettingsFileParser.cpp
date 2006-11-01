@@ -113,29 +113,26 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         }
         
         LPTSTR ptzCurrent = tzBuffer;
-        ptzCurrent += StrSpn(ptzCurrent, WHITESPACE);
+        ptzCurrent += strspn(ptzCurrent, WHITESPACE);
 
         if (ptzCurrent[0] && ptzCurrent[0] != _T(';'))
         {
-            size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE);
+            size_t stEndConfig = strcspn(ptzCurrent, WHITESPACE);
             
-            if (SUCCEEDED(StringCchCopyNEx(ptzName, MAX_RCCOMMAND, ptzCurrent,
-                stEndConfig, NULL, NULL, STRSAFE_NULL_ON_FAILURE)))
+            if (SUCCEEDED(StringCchCopyN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
             {
                 if (ptzValue != NULL)
                 {
                     LPTSTR ptzValueStart = ptzCurrent + stEndConfig;
                     
-                    if (stEndConfig < (size_t)lstrlen(ptzCurrent))
+                    if (stEndConfig < (size_t)strlen(ptzCurrent))
                     {
                         ++ptzValueStart;
                     }
                     
                     _StripString(ptzValueStart);
                     
-                    StringCchCopyEx(ptzValue, MAX_LINE_LENGTH, ptzValueStart,
-                        NULL, NULL, STRSAFE_NULL_ON_FAILURE);
-
+                    StringCchCopy(ptzValue, MAX_LINE_LENGTH, ptzValueStart);
                 }
 
                 bReturn = true;
@@ -163,7 +160,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     while (*ptzCurrent != _T('\0'))
     {
-        if (StrChr(WHITESPACE, *ptzCurrent) == NULL)
+        if (strchr(WHITESPACE, *ptzCurrent) == NULL)
         {
             if (ptzStart == NULL)
             {
@@ -219,7 +216,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     if (ptzLast != NULL)
     {
-        while (ptzLast > ptzString && StrChr(WHITESPACE, *(ptzLast-1)))
+        while (ptzLast > ptzString && strchr(WHITESPACE, *(ptzLast-1)))
         {
             --ptzLast;
         }
@@ -229,7 +226,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     if ((ptzCurrent != ptzString) && ptzStart)
     {
-        StringCchCopy(ptzString, lstrlen(ptzString) + 1, ptzStart);
+        StringCchCopy(ptzString, strlen(ptzString) + 1, ptzStart);
     }
 }
 
@@ -243,11 +240,11 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
     ASSERT_ISNOTNULL(ptzName); ASSERT_ISNOTNULL(ptzValue);
 
-    if (lstrcmpi(ptzName, _T("if")) == 0)
+    if (stricmp(ptzName, _T("if")) == 0)
 	{
 		_ProcessIf(ptzValue);
 	}
-	else if (lstrcmpi(ptzName, _T("include")) == 0)
+	else if (stricmp(ptzName, _T("include")) == 0)
 	{
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
 
@@ -368,11 +365,11 @@ void FileParser::_SkipIf()
 
 	while (_ReadLineFromFile(tzName, NULL))
 	{
-		if (lstrcmpi(tzName, _T("if")) == 0)
+		if (strcmpi(tzName, _T("if")) == 0)
 		{
 			_SkipIf();
 		}
-		else if (lstrcmpi(tzName, _T("endif")) == 0)
+		else if (strcmpi(tzName, _T("endif")) == 0)
 		{
 			break;
 		}

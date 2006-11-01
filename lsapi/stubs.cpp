@@ -1,6 +1,6 @@
 #include "lsapi.h"
 #include "../utility/common.h"
-#include <strsafe.h>
+#include "../utility/safestr.h"
 
 BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {

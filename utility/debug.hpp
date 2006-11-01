@@ -27,13 +27,10 @@
 
 #include <assert.h>
 #if defined(_DEBUG)
-#  include <limits.h>
-#  include <stdarg.h>
-#  include <stdio.h>
+   // THIS IS BOGUS, WE NEED TO FIX OUR STRING FUNCTION USAGE!!!
 #  define STRSAFE_NO_DEPRECATE
-#  include <strsafe.h>
+#  include "../utility/safestr.h"
 #  undef STRSAFE_NO_DEPRECATE
-#  include <windows.h>
 #endif // defined(_DEBUG)
 
 

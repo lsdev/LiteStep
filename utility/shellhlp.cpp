@@ -167,8 +167,7 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
     if (SUCCEEDED(hr) && pOleString)
     {
 #ifdef UNICODE
-        hr = StringCchCopyEx(ptzBuffer, cchBuffer, pOleString, NULL, NULL,
-            STRSAFE_NULL_ON_FAILURE);
+        hr = StringCchCopy(ptzBuffer, cchBuffer, pOleString);
 
         switch (hr)
         {

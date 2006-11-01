@@ -216,7 +216,7 @@ BOOL LSGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpMonitorInfo)
 			MultiByteToWideChar(CP_ACP, 0, "DISPLAY", -1, ((MONITORINFOEX*)lpMonitorInfo)->szDevice, (sizeof(((MONITORINFOEX*)lpMonitorInfo)->szDevice) / sizeof(char)));
 #else // UNICODE
 
-			lstrcpy(((MONITORINFOEX*)lpMonitorInfo)->szDevice, "DISPLAY");
+			strcpy(((MONITORINFOEX*)lpMonitorInfo)->szDevice, "DISPLAY");
 #endif // UNICODE
 
 		}
@@ -319,8 +319,8 @@ BOOL LSEnumDisplayDevices(
 	MultiByteToWideChar(CP_ACP, 0, "DISPLAY", -1, lpDisplayDevice->DeviceString, (sizeof(lpDisplayDevice->DeviceName) / sizeof(char)));
 #else // UNICODE
 
-	lstrcpy((LPSTR)lpDisplayDevice->DeviceName, "DISPLAY");
-	lstrcpy((LPSTR)lpDisplayDevice->DeviceString, "DISPLAY");
+	strcpy((LPSTR)lpDisplayDevice->DeviceName, "DISPLAY");
+	strcpy((LPSTR)lpDisplayDevice->DeviceString, "DISPLAY");
 #endif // UNICODE
 
 	lpDisplayDevice->StateFlags = DISPLAY_DEVICE_ATTACHED_TO_DESKTOP | DISPLAY_DEVICE_PRIMARY_DEVICE;

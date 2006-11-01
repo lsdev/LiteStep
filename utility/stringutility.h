@@ -33,7 +33,7 @@ struct stringicmp
 {
     bool operator()(const std::string &s1, const std::string &s2) const
     {
-        return (lstrcmpi(s1.c_str(), s2.c_str()) < 0);
+        return (stricmp(s1.c_str(), s2.c_str()) < 0);
     }
 };
 
@@ -47,7 +47,7 @@ struct stringcmp
 {
 	bool operator()(const std::string &s1, const std::string &s2) const
 	{
-		return (lstrcmp(s1.c_str(), s2.c_str()) < 0);
+		return (strcmp(s1.c_str(), s2.c_str()) < 0);
 	}
 };
 

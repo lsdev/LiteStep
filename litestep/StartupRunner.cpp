@@ -390,7 +390,7 @@ bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
 
     HANDLE hProcess = INVALID_HANDLE_VALUE;
 
-    if (StrChr(tzToken, _T('\\')) || StrChr(tzToken, _T(':')))
+    if (strchr(tzToken, _T('\\')) || strchr(tzToken, _T(':')))
     {
         hProcess = _CreateProcess(ptzCommandLine);
     }

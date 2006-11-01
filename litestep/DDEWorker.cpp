@@ -62,18 +62,18 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 
 		StringCchCopy(pszWorkRequest, stLength, pszRequest);
 		pszWorkRequest[stLength - 3] = '\0';
-		pszWorkRequest = StrChr(pszWorkRequest, '(');
+		pszWorkRequest = strchr(pszWorkRequest, '(');
 		pszWorkRequest++;
 
 		pszParamList[0] = pszWorkRequest;
 
 		int nCurIndex = 1;
-		pszTmp = StrChr(pszWorkRequest, ','); // find a delimiter
+		pszTmp = strchr(pszWorkRequest, ','); // find a delimiter
 		while (NULL != pszTmp)
 		{
 			*(pszTmp++) = '\0'; // null terminate and cut.
 			pszParamList[nCurIndex++] = pszTmp; // put it in the pointer list
-			pszTmp = StrChr(pszTmp, ','); // get the next onf
+			pszTmp = strchr(pszTmp, ','); // get the next onf
 		}
 
 
@@ -122,7 +122,7 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 			{
 				if (2 == nCurIndex) // second parameter forces common/private
 				{
-					bCommon = StrToInt(pszParamList[1]);
+					bCommon = atoi(pszParamList[1]);
 				}
 				bReturn = _CreateGroup(pszParamList[0], bCommon);
 			}
@@ -133,7 +133,7 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 			{
 				if (2 == nCurIndex) // second parameter forces common/private
 				{
-					bCommon = StrToInt(pszParamList[1]);
+					bCommon = atoi(pszParamList[1]);
 				}
 				bReturn = _DeleteGroup(pszParamList[0], bCommon);
 			}
@@ -146,9 +146,9 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 				{
 					if (3 == nCurIndex) // third parameter forces common/private
 					{
-						bCommon = StrToInt(pszParamList[2]);
+						bCommon = atoi(pszParamList[2]);
 					}
-					int nShow = StrToInt(pszParamList[1]);
+					int nShow = atoi(pszParamList[1]);
 					bReturn = _ShowGroup(pszParamList[0], nShow, bCommon);
 				}
 			}
@@ -178,11 +178,11 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 					case 10:  // SeparateMemSpace ignored for now
 					case 9:
 					{ // Minimize
-						bMinimize = (BOOL)StrToInt(pszParamList[8]);
+						bMinimize = (BOOL)atoi(pszParamList[8]);
 					}
 					case 8:
 					{ // HotKey
-						dwHotKey = (WORD)StrToInt(pszParamList[7]);
+						dwHotKey = (WORD)atoi(pszParamList[7]);
 					}
 					case 7:
 					{ // DefDir
@@ -192,7 +192,7 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 					case 5:
 					case 4:
 					{ // IconIndex
-						nIconIndex = StrToInt(pszParamList[3]);
+						nIconIndex = atoi(pszParamList[3]);
 					}
 					case 3:
 					{ // IconPath
@@ -267,39 +267,39 @@ DWORD DDEWorker::_MatchRequest(LPCSTR pszCommand)
 {
 	DWORD dwReturn = DDE_REQUEST_NONE;
 
-	if (StrStr(pszCommand, "[ExploreFolder(") == pszCommand)
+	if (strstr(pszCommand, "[ExploreFolder(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_EXPLOREFOLDER;
 	}
-	else if (StrStr(pszCommand, "[ViewFolder(") == pszCommand)
+	else if (strstr(pszCommand, "[ViewFolder(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_VIEWFOLDER;
 	}
-	else if (StrStr(pszCommand, "[FindFolder(") == pszCommand)
+	else if (strstr(pszCommand, "[FindFolder(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_FINDFOLDER;
 	}
-	else if (StrStr(pszCommand, "[OpenFindFile(") == pszCommand)
+	else if (strstr(pszCommand, "[OpenFindFile(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_OPENFINDFILE;
 	}
-	else if (StrStr(pszCommand, "[CreateGroup(") == pszCommand)
+	else if (strstr(pszCommand, "[CreateGroup(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_CREATEGROUP;
 	}
-	else if (StrStr(pszCommand, "[DeleteGroup(") == pszCommand)
+	else if (strstr(pszCommand, "[DeleteGroup(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_DELETEGROUP;
 	}
-	else if (StrStr(pszCommand, "[ShowGroup(") == pszCommand)
+	else if (strstr(pszCommand, "[ShowGroup(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_SHOWGROUP;
 	}
-	else if (StrStr(pszCommand, "[AddItem(") == pszCommand)
+	else if (strstr(pszCommand, "[AddItem(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_ADDITEM;
 	}
-	else if (StrStr(pszCommand, "[DeleteItem(") == pszCommand)
+	else if (strstr(pszCommand, "[DeleteItem(") == pszCommand)
 	{
 		dwReturn = DDE_REQUEST_DELETEITEM;
 	}
@@ -489,7 +489,7 @@ BOOL DDEWorker::_ListGroupsHelper(HANDLE hHeap, char* szPath, LPVOID& pGroupList
 		{
 			if (*(FindData.cFileName) != '.' && (FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
 			{
-				int stLen = lstrlen(FindData.cFileName);
+				int stLen = strlen(FindData.cFileName);
 
 				pszTemp = (char*) HeapReAlloc(hHeap, HEAP_ZERO_MEMORY, pGroupList, ulSize + stLen + 2);
 				if (pszTemp != NULL)

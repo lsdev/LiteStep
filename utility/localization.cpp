@@ -286,8 +286,7 @@ static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
     
     if (FAILED(hr) && (hr != STRSAFE_E_INSUFFICIENT_BUFFER))
     {
-        StringCchCopyEx(ptzBuffer, cchBuffer, ptzFormat, NULL, NULL,
-            STRSAFE_NULL_ON_FAILURE);
+        StringCchCopy(ptzBuffer, cchBuffer, ptzFormat);
     }
 }
 
