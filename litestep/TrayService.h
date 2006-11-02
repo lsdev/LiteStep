@@ -86,7 +86,7 @@ public:
     virtual HRESULT Stop();
     
     // resend all icon data
-    HWND SendSystemTray() const;
+    HWND SendSystemTray();
     
     // Notify TrayService of full screen app change
     void NotifyRudeApp(bool bIsFullScreen) const;
@@ -164,6 +164,9 @@ private:
     //
     bool notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const;
     bool extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) const;
+
+    // Remove any "dead" icons
+    void removeDeadIcons();
 
     //
     // findIcon variants

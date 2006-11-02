@@ -1549,8 +1549,10 @@ bool TrayService::notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const
 // Resend all icon data; systray modules will request this via LM_SYSTRAYREADY
 // during their startup.
 //
-HWND TrayService::SendSystemTray() const
+HWND TrayService::SendSystemTray()
 {
+    removeDeadIcons();
+
     for (IconVector::const_iterator it = m_siVector.begin();
          it != m_siVector.end(); ++it)
     {
@@ -1565,6 +1567,33 @@ HWND TrayService::SendSystemTray() const
     }
 
     return m_hNotifyWnd;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// removeDeadIcons
+//
+// Removes all "dead" icons.  ie. Those that no longer have a valid HWND
+// associated with them.
+//
+void TrayService::removeDeadIcons()
+{
+    IconVector::iterator it = m_siVector.begin();
+
+    while(it != m_siVector.end())
+    {
+        if(IsWindow((*it)->GetHwnd()))
+        {
+            it++;
+            continue;
+        }
+
+        delete *it;
+        it = m_siVector.erase(it);
+    }
+
+    return;
 }
 
 
