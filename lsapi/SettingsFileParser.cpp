@@ -113,6 +113,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
     {
         if (!_fgetts(tzBuffer, MAX_LINE_LENGTH, m_phFile))
         {
+            // End Of File or an Error occured. We don't care which.
             break;
         }
         
@@ -266,6 +267,10 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// _ProcessIf
+//
 void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
     ASSERT_ISNOTNULL(ptzExpression);
@@ -277,6 +282,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         TRACE("Error parsing expression \"%s\" (%s, line %d)",
             ptzExpression, m_tzFullPath, m_uLineNumber);
         
+        // Invalid syntax, so quit processing entire conditional block
         _SkipIf();
         return;
     }
@@ -338,7 +344,12 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                     if (stricmp(tzName, "elseif") == 0)
                     {
                         // Error: ElseIf after Else
-                        MessageBox(GetLitestepWnd(), "Error: ElseIf after Else", NULL, MB_SETFOREGROUND);
+                        TRACE("Syntax Error (%s, %d): \"ElseIf\" directive after \"Else\"",
+                            m_tzFullPath, m_uLineNumber);
+                        
+                        // Invalid syntax, so quit processing conditional block
+                        _SkipIf();
+                        break;
                     }
                     else if (stricmp(tzName, "endif") == 0)
                     {
