@@ -76,6 +76,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
         }
         
         fclose(m_phFile);
+        m_phFile = NULL;
     }
     else
     {
