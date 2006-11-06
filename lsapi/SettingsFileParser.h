@@ -34,7 +34,10 @@ public:
 private:
 	SettingsMap* m_pSettingsMap;
 	FILE* m_phFile;
-    
+
+	unsigned int m_uLineNumber;
+	TCHAR m_tzFullPath[MAX_PATH_LENGTH];
+
 	bool _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
 	void _StripString(LPTSTR ptzString);
 	void _ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue);

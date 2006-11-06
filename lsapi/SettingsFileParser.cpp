@@ -52,42 +52,45 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     ASSERT_ISNULL(m_phFile);
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
-    TCHAR tzFullPath[MAX_PATH_LENGTH];
     
     VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
-
     PathUnquoteSpaces(tzExpandedPath);
-    GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, tzFullPath, NULL);
     
-    TRACE("Parsing \"%s\"", tzFullPath);
-
-    m_phFile = _tfopen(tzFullPath, _T("r"));
+    DWORD dwLen;
+    dwLen = GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, NULL);
     
-    if (m_phFile)
+    if(0 == dwLen || dwLen > MAX_PATH_LENGTH)
     {
-        fseek(m_phFile, 0, SEEK_SET);
-        
-        TCHAR tzKey[MAX_RCCOMMAND] = { 0 };
-        TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
-
-        while (_ReadLineFromFile(tzKey, tzValue))
-        {
-            _ProcessLine(tzKey, tzValue);
-        }
-        
-        fclose(m_phFile);
-        m_phFile = NULL;
+        TRACE("Error: Can not get full path for \"%s\"", tzExpandedPath);
+        return;
     }
-    else
+    
+    m_phFile = fopen(m_tzFullPath, "r");
+    
+    if(NULL == m_phFile)
     {
-// Should display an error message here, but it breaks some themes. Should push
-// it back until 0.25.0 or something.
-//        Error(LOCALIZE_THIS,
-//            _T("Error opening \"%s\" for parsing.\n\n")
-//            _T("Requested as: %s\nResolved to: %s"),
-//            tzExpandedPath, ptzFileName, tzFullPath);
-        TRACE("Failed to open file for inclusion: \"%s\"", tzFullPath);
+        TRACE("Error: Can not open file \"%s\" (Defined as %s).", m_tzFullPath, ptzFileName);
+        return;
     }
+    
+    TRACE("Parsing \"%s\"", m_tzFullPath);
+    
+    fseek(m_phFile, 0, SEEK_SET);
+    
+    TCHAR tzKey[MAX_RCCOMMAND] = { 0 };
+    TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
+    
+    m_uLineNumber = 0;
+    
+    while(_ReadLineFromFile(tzKey, tzValue))
+    {
+        _ProcessLine(tzKey, tzValue);
+    }
+    
+    fclose(m_phFile);
+    m_phFile = NULL;
+    
+    TRACE("Finished Parsing \"%s\"", m_tzFullPath);
 }
 
 
@@ -112,6 +115,8 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         {
             break;
         }
+        
+        m_uLineNumber++;
         
         LPTSTR ptzCurrent = tzBuffer;
         ptzCurrent += strspn(ptzCurrent, WHITESPACE);
@@ -269,13 +274,15 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     
     if (!MathEvaluateBool(*m_pSettingsMap, ptzExpression, result))
     {
-        TRACE("Error parsing expression \"%s\"", ptzExpression);
+        TRACE("Error parsing expression \"%s\" (%s, line %d)",
+            ptzExpression, m_tzFullPath, m_uLineNumber);
         
         _SkipIf();
         return;
     }
 
-    TRACE("Expression \"%s\" evaluated to %s",
+    TRACE("Expression (%s, line %d): \"%s\" evaluated to %s",
+        m_tzFullPath, m_uLineNumber,
         ptzExpression, result ? "TRUE" : "FALSE");
 
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
