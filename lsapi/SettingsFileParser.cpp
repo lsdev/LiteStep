@@ -238,7 +238,6 @@ void FileParser::_StripString(LPTSTR ptzString)
 }
 
 
-
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // _ProcessLine
@@ -247,23 +246,44 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
     ASSERT_ISNOTNULL(ptzName); ASSERT_ISNOTNULL(ptzValue);
 
-    if (stricmp(ptzName, _T("if")) == 0)
-	{
-		_ProcessIf(ptzValue);
-	}
-	else if (stricmp(ptzName, _T("include")) == 0)
-	{
+    if (stricmp(ptzName, "if") == 0)
+    {
+        _ProcessIf(ptzValue);
+    }
+#ifdef _DEBUG
+    // In a release build ignore dangling elseif/else/endif.
+    // Too much overhead just for error handling
+    else if (
+           (stricmp(ptzName, "else") == 0)
+        || (stricmp(ptzName, "elseif") == 0)
+        || (stricmp(ptzName, "endif") == 0)
+    )
+    {
+        TRACE("Error: Dangling pre-processor directive (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, ptzName);
+    }
+#endif
+    else if (stricmp(ptzName, "include") == 0)
+    {
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
-
-		GetToken(ptzValue, tzPath, NULL, FALSE);
-		
-		FileParser fpParser(m_pSettingsMap);
+        
+        if (!GetToken(ptzValue, tzPath, NULL, FALSE))
+        {
+            TRACE("Syntax Error (%s, %d): Empty \"Include\" directive",
+                m_tzFullPath, m_uLineNumber);
+            return;
+        }
+        
+        TRACE("Include (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, tzPath);
+        
+        FileParser fpParser(m_pSettingsMap);
         fpParser.ParseFile(tzPath);
     }
     else
-	{
-		m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
-	}
+    {
+        m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
+    }
 }
 
 
