@@ -22,6 +22,7 @@
 #include "../utility/core.hpp"
 #include "MathEvaluate.h"
 
+
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // FileParser constructor
@@ -29,7 +30,7 @@
 FileParser::FileParser(SettingsMap* pSettingsMap)
 : m_pSettingsMap(pSettingsMap), m_phFile(NULL)
 {
-    ASSERT_ISNOTNULL(m_pSettingsMap);
+    ASSERT(NULL != m_pSettingsMap);
 }
 
 
@@ -48,8 +49,8 @@ FileParser::~FileParser()
 //
 void FileParser::ParseFile(LPCTSTR ptzFileName)
 {
-    ASSERT_ISNOTNULL(ptzFileName);
-    ASSERT_ISNULL(m_phFile);
+    ASSERT(NULL == m_phFile);    // in case of possible threading problem?
+    ASSERT(NULL != ptzFileName);
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
     
@@ -98,20 +99,20 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 //
 // _ReadLineFromFile
 //
-// ptzName must be MAX_RCOCOMMAND size
+// ptzName must be MAX_RCCOMMAND size
 // ptzValue must be MAX_LINE_LENGTH size (or NULL)
 //
 bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 {
-    ASSERT_ISNOTNULL(m_phFile);
-    ASSERT_ISVALIDBUF(ptzName, MAX_RCCOMMAND);
+    ASSERT(NULL != m_phFile);
+    ASSERT(NULL != ptzName);
     
-    TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
+    TCHAR tzBuffer[MAX_LINE_LENGTH];
     bool bReturn = false;
     
     while (!feof(m_phFile) && !bReturn)
     {
-        if (!_fgetts(tzBuffer, MAX_LINE_LENGTH, m_phFile))
+        if (!fgets(tzBuffer, MAX_LINE_LENGTH, m_phFile))
         {
             // End Of File or an Error occured. We don't care which.
             break;
@@ -121,8 +122,8 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         
         LPTSTR ptzCurrent = tzBuffer;
         ptzCurrent += strspn(ptzCurrent, WHITESPACE);
-
-        if (ptzCurrent[0] && ptzCurrent[0] != _T(';'))
+        
+        if (ptzCurrent[0] && ptzCurrent[0] != ';')
         {
             size_t stEndConfig = strcspn(ptzCurrent, WHITESPACE);
             
@@ -141,12 +142,12 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     
                     StringCchCopy(ptzValue, MAX_LINE_LENGTH, ptzValueStart);
                 }
-
+                
                 bReturn = true;
             }
         }
     }
-
+    
     return bReturn;
 }
 
@@ -157,15 +158,15 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 //
 void FileParser::_StripString(LPTSTR ptzString)
 {
-    ASSERT_ISNOTNULL(ptzString);
+    ASSERT(NULL != ptzString);
     
     LPTSTR ptzCurrent = ptzString;
     LPTSTR ptzStart = NULL;
     LPTSTR ptzLast = NULL;
     size_t stQuoteLevel = 0;
-    TCHAR tLastQuote = _T('\0');
+    TCHAR tLastQuote = '\0';
     
-    while (*ptzCurrent != _T('\0'))
+    while (*ptzCurrent != '\0')
     {
         if (strchr(WHITESPACE, *ptzCurrent) == NULL)
         {
@@ -184,12 +185,12 @@ void FileParser::_StripString(LPTSTR ptzString)
         if (ptzStart != NULL)
         {
             if (*ptzCurrent == '[')
-			{
-				++stQuoteLevel;
-			}
-			else if (*ptzCurrent == ']')
-			{
-				if (stQuoteLevel > 0)
+            {
+                ++stQuoteLevel;
+            }
+            else if (*ptzCurrent == ']')
+            {
+                if (stQuoteLevel > 0)
                 {
                     --stQuoteLevel;
                 }
@@ -227,7 +228,7 @@ void FileParser::_StripString(LPTSTR ptzString)
         {
             --ptzLast;
         }
-
+        
         *ptzLast = '\0';
     }
     
@@ -244,8 +245,9 @@ void FileParser::_StripString(LPTSTR ptzString)
 //
 void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
-    ASSERT_ISNOTNULL(ptzName); ASSERT_ISNOTNULL(ptzValue);
-
+    ASSERT(NULL != m_pSettingsMap);
+    ASSERT(NULL != ptzName); ASSERT(NULL != ptzValue);
+    
     if (stricmp(ptzName, "if") == 0)
     {
         _ProcessIf(ptzValue);
@@ -293,7 +295,8 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 //
 void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
-    ASSERT_ISNOTNULL(ptzExpression);
+    ASSERT(NULL != m_pSettingsMap);
+    ASSERT(NULL != ptzExpression);
     
     bool result = false;
     
@@ -306,11 +309,11 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         _SkipIf();
         return;
     }
-
+    
     TRACE("Expression (%s, line %d): \"%s\" evaluated to %s",
         m_tzFullPath, m_uLineNumber,
         ptzExpression, result ? "TRUE" : "FALSE");
-
+    
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
     TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
     
@@ -394,23 +397,24 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     }
 }
 
+
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // _SkipIf
 //
 void FileParser::_SkipIf()
 {
-    TCHAR tzName[MAX_RCCOMMAND] = { 0 };
-
-	while (_ReadLineFromFile(tzName, NULL))
-	{
-		if (strcmpi(tzName, _T("if")) == 0)
-		{
-			_SkipIf();
-		}
-		else if (strcmpi(tzName, _T("endif")) == 0)
-		{
-			break;
-		}
-	}
+    TCHAR tzName[MAX_RCCOMMAND];
+    
+    while (_ReadLineFromFile(tzName, NULL))
+    {
+        if (stricmp(tzName, "if") == 0)
+        {
+            _SkipIf();
+        }
+        else if (stricmp(tzName, "endif") == 0)
+        {
+            break;
+        }
+    }
 }
