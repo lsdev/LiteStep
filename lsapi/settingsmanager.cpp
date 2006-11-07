@@ -390,10 +390,8 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                         if (recursiveVarSet.count(szVariable) > 0)
                         {
                             // Output an error message (localize this)
-                            TCHAR szError[MAX_LINE_LENGTH];
-                            StringCchPrintf(szError, MAX_LINE_LENGTH, "Error: Variable \"%s\" is defined recursively.", szVariable);
-                            MessageBox(NULL, szError, "Litestep", MB_SETFOREGROUND);
-
+                            Error(LOCALIZE_THIS, "Error: Variable \"%s\" is defined recursively.", szVariable);
+                            
                             pszExpandedString[0] = '\0';
                             return;
                         }
