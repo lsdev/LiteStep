@@ -70,7 +70,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     if(NULL == m_phFile)
     {
-        TRACE("Error: Can not open file \"%s\" (Defined as %s).", m_tzFullPath, ptzFileName);
+        TRACE("Error: Can not open file \"%s\" (Defined as \"%s\").", m_tzFullPath, ptzFileName);
         return;
     }
     
