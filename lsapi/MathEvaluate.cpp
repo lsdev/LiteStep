@@ -1,10 +1,9 @@
 #include <sstream>
 #include <string>
-#include "lsapi.h"
+#include "../utility/localization.h"
 #include "MathEvaluate.h"
 #include "MathException.h"
 #include "MathParser.h"
-#include "MathValue.h"
 #include "SettingsDefines.h"
 
 using namespace std;
@@ -24,13 +23,13 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
         // FIXME: Localize this
         ostringstream message;
         
-        message << "Error in Expression:\n"
+        message << "Error in Expression:\n  "
                 << expression << "\n"
                 << "\n"
-                << "Description:\n"
+                << "Description:\n  "
                 << e.what();
         
-        MessageBox(GetLitestepWnd(), message.str().c_str(), NULL, MB_SETFOREGROUND);
+        Error(LOCALIZE_THIS, message.str().c_str());
         return false;
     }
     
@@ -51,13 +50,13 @@ bool MathEvaluateString(const SettingsMap& context, const string& expression,
         // FIXME: Localize this
         ostringstream message;
         
-        message << "Error in Expression:\n"
+        message << "Error in Expression:\n  "
                 << expression << "\n"
                 << "\n"
-                << "Description:\n"
+                << "Description:\n  "
                 << e.what();
         
-        MessageBox(GetLitestepWnd(), message.str().c_str(), NULL, MB_SETFOREGROUND);
+        Error(LOCALIZE_THIS, message.str().c_str());
         return false;
     }
     
