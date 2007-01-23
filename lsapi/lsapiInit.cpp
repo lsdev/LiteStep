@@ -236,6 +236,17 @@ void LSAPIInit::setLitestepVars()
     OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
     GetVersionEx(&OsVersionInfo);
     
+    // Default platform conditionals to FALSE
+    pSM->SetVariable("Win9x", "false");
+    pSM->SetVariable("WinME", "false");
+    pSM->SetVariable("Win98", "false");
+    pSM->SetVariable("Win95", "false");
+    pSM->SetVariable("WinNT", "false");
+    pSM->SetVariable("WinXP", "false");
+    pSM->SetVariable("Win2000", "false");
+    pSM->SetVariable("WinNT4", "false");
+    
+    // Now set the correct platform conditional to TRUE
     if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     {
         // Any Win9x-series OS
