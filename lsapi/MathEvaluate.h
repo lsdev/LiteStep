@@ -11,7 +11,9 @@
 enum
 {
     /** Throws an exception if an undefined variable is referenced. */
-    MATH_EXCEPTION_ON_UNDEFINED = (1 << 0)
+     MATH_EXCEPTION_ON_UNDEFINED      = (1 << 0)
+    /** Evaluates all numbers as integers when converting to a String. */
+    ,MATH_VALUE_TO_COMPATIBLE_STRING  = (1 << 2)
 };
 
 

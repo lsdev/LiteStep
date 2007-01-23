@@ -43,7 +43,15 @@ bool MathEvaluateString(const SettingsMap& context, const string& expression,
     try
     {
         MathParser mathParser(context, expression, recursiveVarSet, flags);
-        result = mathParser.Evaluate().ToString();
+        
+        if (MATH_VALUE_TO_COMPATIBLE_STRING & flags)
+        {
+            result = mathParser.Evaluate().ToCompatibleString();
+        }
+        else
+        {
+            result = mathParser.Evaluate().ToString();
+        }
     }
     catch (const MathException& e)
     {
