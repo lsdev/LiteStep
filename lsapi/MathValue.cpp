@@ -193,6 +193,27 @@ string MathValue::ToString() const
 }
 
 
+string MathValue::ToCompatibleString() const
+{
+    // To keep compatible with 0.24.x math evaluations, we must
+    // return an integer formatted string for all number type
+    // results.  Thus, convert number value to an Integer prior
+    // to returning it as a string.
+    if(NUMBER == mType)
+    {
+        ostringstream stream;
+        
+        stream << ToInteger();
+        
+        return stream.str();
+    }
+    
+    // All other values, let the default handler deal with the
+    // conversion process.
+    return ToString();
+}
+
+
 MathValue operator+(const MathValue& a, const MathValue& b)
 {
     if (a.IsUndefined() || b.IsUndefined())

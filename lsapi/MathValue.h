@@ -125,6 +125,12 @@ public:
      */
     std::string ToString() const;
     
+    /**
+     * Converts this value to a string using integer representation
+     * for any NUMBER type.
+     */
+    std::string ToCompatibleString() const;
+    
     /** Operators */
     friend MathValue operator+ (const MathValue& a, const MathValue& b);
     friend MathValue operator+ (const MathValue& a);
