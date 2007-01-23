@@ -14,7 +14,7 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
 {
     try
     {
-        StringSet recursiveVarSet;
+        const StringSet recursiveVarSet; // dummy set
         MathParser mathParser(context, expression, recursiveVarSet, flags);
         result = mathParser.Evaluate().ToBoolean();
     }
