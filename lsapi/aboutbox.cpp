@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 2001-2005 The LiteStep Development Team
+Copyright (C) 2001-2007 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -98,7 +98,7 @@ const char * lsLicense = \
  "LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
  "\r\n"
  "Copyright (C) 1997-1998  Francis Gastellu\r\n"
- "Copyright (C) 1998-2005  Litestep Development Team\r\n"
+ "Copyright (C) 1998-2007  Litestep Development Team\r\n"
  "\r\n"
  "This program is free software; you can redistribute it and/or modify it under "
  "the terms of the GNU General Public License as published by the Free Software "
