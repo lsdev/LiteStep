@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 1997-2006 The LiteStep Development Team
+Copyright (C) 2002-2003,2005 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
-
 #ifndef __SETTINGSITERATOR_H
 #define __SETTINGSITERATOR_H
 
@@ -25,62 +24,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "settingsdefines.h"
 
 
-/**
- * Iterator for settings with more than one value.
- */
 class SettingsIterator
 {
-public:
 
-    /**
-     * Constructs a SettingsIterator for the given SettingsMap and associated with the
-     * given file.
-     *
-     * @param  pSettingsMap  SettingsMap to iterate over
-     * @param  szPath        Path to configuration file
-     */
+public:
     SettingsIterator(SettingsMap* pSettingsMap, std::string szPath);
-    
-    /**
-     * Retrieve the next value.
-     *
-     * @param   pszValue  buffer to receive value
-     * @param   cchValue  size of buffer
-     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code> if there are
-     *          no more values to retrieve
-     */
-    BOOL ReadNextLine(LPSTR pszValue, size_t cchValue);
-    
-    /**
-     * Retrieve the next value with the specified setting name.
-     *
-     * @param   pszConfig  setting name
-     * @param   pszValue   buffer to receive value
-     * @param   cchValue   size of buffer
-     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code> if there are
-     *          no more values to retrieve
-     */
-    BOOL ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
-    
-    /**
-     * Returns path to configuration file.
-     */
-    std::string get_Path() { return m_Path; }
+
+	BOOL ReadNextLine(LPSTR pszValue, size_t cchValue);
+	BOOL ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
+
+    std::string get_Path()
+	{
+		return m_Path;
+	};
 
 private:
-
-    /** Settings map to iterate */
-    SettingsMap* m_pSettingsMap;
-    
-    /** Iterator for LCReadNextLine */
-    SettingsMap::iterator m_pFileIterator;
-    
-    /** Iterators for each setting name used with LCReadNextConfig. */
-    IteratorMap m_Iterators;
-    
-    /** Path to configuration file */
+	SettingsMap* m_pSettingsMap;
+	SettingsMap::iterator m_pFileIterator;
+	IteratorMap m_Iterators;
     std::string m_Path;
 };
+
 
 
 #endif // __SETTINGSITERATOR_H

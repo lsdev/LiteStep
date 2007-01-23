@@ -1,3 +1,24 @@
+/*
+This is a part of the LiteStep Shell Source code.
+
+Copyright (C) 2006 The LiteStep Development Team
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/ 
+/****************************************************************************
+****************************************************************************/
 #include <cassert>
 #include <cfloat>
 #include <cmath>
@@ -102,13 +123,13 @@ string MathValue::GetTypeName() const
     {
     case UNDEFINED:
         return "undefined";
-    
+        
     case BOOLEAN:
         return "boolean";
-    
+        
     case NUMBER:
         return "number";
-    
+        
     case STRING:
         return "string";
     }
@@ -221,7 +242,7 @@ MathValue operator+(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return (a.ToNumber() + b.ToNumber());
 }
 
@@ -233,7 +254,7 @@ MathValue operator+(const MathValue& a)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return a.ToNumber();
 }
 
@@ -245,7 +266,7 @@ MathValue operator-(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return (a.ToNumber() - b.ToNumber());
 }
 
@@ -257,7 +278,7 @@ MathValue operator-(const MathValue& a)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return -a.ToNumber();
 }
 
@@ -269,7 +290,7 @@ MathValue operator*(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return (a.ToNumber() * b.ToNumber());
 }
 
@@ -281,7 +302,7 @@ MathValue operator/(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return (a.ToNumber() / b.ToNumber());
 }
 
@@ -293,7 +314,7 @@ MathValue operator%(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     double divisor = b.ToNumber();
     
     if (divisor == 0.0)
@@ -467,7 +488,7 @@ MathValue MathConcatenate(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     return (a.ToString() + b.ToString());
 }
 
@@ -479,7 +500,7 @@ MathValue MathIntDivide(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-
+    
     int divisor = b.ToInteger();
     
     if (divisor == 0)
