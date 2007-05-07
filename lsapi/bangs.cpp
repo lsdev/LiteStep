@@ -23,6 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 
 
+extern ULONG WINAPI AboutBoxThread(void *);
+
+
 void SetupBangs()
 {
 	AddBangCommand("!About", BangAbout);
@@ -30,7 +33,7 @@ void SetupBangs()
 	AddBangCommand("!CascadeWindows", BangCascadeWindows);
 	AddBangCommand("!Confirm", BangConfirm);
 	AddBangCommand("!Execute", BangExecute);
-	AddBangCommand("!Gather", BangGather);
+	AddBangCommand("!HideModules", BangHideModules);
 	AddBangCommand("!Logoff", BangLogoff);
 	AddBangCommand("!MinimizeWindows", BangMinimizeWindows);
 	AddBangCommand("!Quit", BangQuit);
@@ -40,18 +43,14 @@ void SetupBangs()
 	AddBangCommand("!ReloadModule", BangReloadModule);
 	AddBangCommand("!RestoreWindows", BangRestoreWindows);
 	AddBangCommand("!Run", BangRun);
+	AddBangCommand("!ShowModules", BangShowModules);
 	AddBangCommand("!Shutdown", BangShutdown);
 	AddBangCommand("!SwitchUser", BangSwitchUser);
 	AddBangCommand("!TileWindowsH", BangTileWindowsH);
 	AddBangCommand("!TileWindowsV", BangTileWindowsV);
+	AddBangCommand("!ToggleModules", BangToggleModules);
 	AddBangCommand("!UnloadModule", BangUnloadModule);
-	AddBangCommand("!HideModules", BangHideModules);
-	AddBangCommand("!ShowModules", BangShowModules);
-    AddBangCommand("!ToggleModules", BangToggleModules);
 }
-
-
-ULONG WINAPI AboutBoxThread(void *);
 
 
 //
@@ -146,20 +145,6 @@ void BangExecute(HWND hCaller, LPCSTR pszArgs)
 		{
 			LSExecute(hCaller, szCommand, SW_SHOWDEFAULT);
 		}
-	}
-}
-
-
-//
-// BangGather(HWND hCaller, LPCSTR pszArgs)
-//
-void BangGather(HWND /* hCaller */, LPCSTR /* pszArgs */)
-{
-	HWND hLiteStep = GetLitestepWnd();
-
-	if (hLiteStep)
-	{
-		SendMessage(hLiteStep, LM_BRINGTOFRONT, 1, 0);
 	}
 }
 
