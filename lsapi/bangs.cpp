@@ -58,9 +58,8 @@ void SetupBangs()
 //
 void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    DWORD dwThread;
-
-    CloseHandle(CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread));
+	DWORD dwThread;
+	CloseHandle(CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread));
 }
 
 
@@ -69,8 +68,8 @@ void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangAlert(HWND hCaller, LPCSTR pszArgs)
 {
-    char szMessage[MAX_LINE_LENGTH] = { 0 };
-    char szTitle[MAX_LINE_LENGTH] = { 0 };
+	char szMessage[MAX_LINE_LENGTH] = { 0 };
+	char szTitle[MAX_LINE_LENGTH] = { 0 };
 	LPSTR aszTokens[] = { szMessage, szTitle };
 
 	int nTokenCount = LCTokenize(pszArgs, aszTokens, 2, 0);
@@ -103,7 +102,7 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 {
 	if (IsValidStringPtr(pszArgs))
 	{
-        char szFirst[MAX_LINE_LENGTH] = { 0 };
+		char szFirst[MAX_LINE_LENGTH] = { 0 };
 		char szSecond[MAX_LINE_LENGTH] = { 0 };
 		char szThird[MAX_LINE_LENGTH] = { 0 };
 		char szFourth[MAX_LINE_LENGTH] = { 0 };
@@ -238,8 +237,8 @@ void BangRefresh(HWND hCaller, LPCSTR pszArgs)
 
 void BangReload(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    DeleteSettingsManager();
-    SetupSettingsManager(NULL, NULL);
+	DeleteSettingsManager();
+	SetupSettingsManager(NULL, NULL);
 }
 
 
@@ -255,13 +254,13 @@ void BangReloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 		if (hLiteStep)
 		{
 			LPCSTR pszNextToken = pszArgs;
-            char szModuleString[MAX_LINE_LENGTH] = { 0 };
+			char szModuleString[MAX_LINE_LENGTH] = { 0 };
 
 			while (GetToken(pszNextToken, szModuleString, &pszNextToken, TRUE))
 			{
 				SendMessage(hLiteStep, LM_RELOADMODULE, (WPARAM)szModuleString, 0);
 			}
-        }
+		}
 	}
 }
 
@@ -280,15 +279,15 @@ void BangRestoreWindows(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangRun(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    typedef void (WINAPI* RunDlgType)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT);
-    
-    RunDlgType RunDlg = (RunDlgType)GetProcAddress(
-        GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3D));
+	typedef void (WINAPI* RunDlgType)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT);
+
+	RunDlgType RunDlg = (RunDlgType)GetProcAddress(
+		GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3D));
 
 	if (RunDlg)
-    {
-        RunDlg(NULL, NULL, NULL, NULL, NULL, 0);
-    }
+	{
+		RunDlg(NULL, NULL, NULL, NULL, NULL, 0);
+	}
 }
 
 
@@ -311,10 +310,10 @@ void BangShutdown(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangSwitchUser(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    typedef BOOL (__stdcall *LockWorkStationType)();
+	typedef BOOL (__stdcall *LockWorkStationType)();
 
 	LockWorkStationType LockWorkStation = (LockWorkStationType )GetProcAddress(
-        GetModuleHandle("USER32.DLL"), "LockWorkStation");
+		GetModuleHandle("USER32.DLL"), "LockWorkStation");
 
 	if (LockWorkStation)
 	{
@@ -351,7 +350,7 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 	if (hLiteStep)
 	{
 		LPCSTR pszNextToken = pszArgs;
-        char szPath[MAX_LINE_LENGTH] = { 0 };
+		char szPath[MAX_LINE_LENGTH] = { 0 };
 
 		while (GetToken(pszNextToken, szPath, &pszNextToken, TRUE))
 		{
@@ -370,25 +369,25 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 //
 BOOL CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
 {
-    if (IsWindow(hWnd))
-    {
-        long lUserData = GetWindowLong(hWnd, GWL_USERDATA);
+	if (IsWindow(hWnd))
+	{
+		long lUserData = GetWindowLong(hWnd, GWL_USERDATA);
 
-        if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
-            (lParam == EMP_HIDE || lParam == EMP_TOGGLE))
-        {
-            SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
-            ShowWindow(hWnd, SW_HIDE);
-        }
-        else if ((lUserData == HIDEmagicDWord) &&
-            (lParam == EMP_SHOW || lParam == EMP_TOGGLE))
-        {
-            SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
-            ShowWindow(hWnd, SW_SHOW);
-        }
-    }
+		if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
+		    (lParam == EMP_HIDE || lParam == EMP_TOGGLE))
+		{
+			SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
+			ShowWindow(hWnd, SW_HIDE);
+		}
+		else if ((lUserData == HIDEmagicDWord) &&
+		         (lParam == EMP_SHOW || lParam == EMP_TOGGLE))
+		{
+			SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
+			ShowWindow(hWnd, SW_SHOW);
+		}
+	}
 
-    return TRUE;
+	return TRUE;
 }
 
 
@@ -415,5 +414,5 @@ void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangToggleModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    EnumWindows(EnumModulesProc, EMP_TOGGLE);
+	EnumWindows(EnumModulesProc, EMP_TOGGLE);
 }
