@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/ 
+*/
 /****************************************************************************
 ****************************************************************************/
 
@@ -75,7 +75,7 @@ bool SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
         SetVariable(pszVariable, szPath);
     }
     
-    return bReturn;    
+    return bReturn;
 }
 
 
@@ -212,7 +212,7 @@ BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
 {
     ASSERT_ISNOTNULL(pszName);
     BOOL bReturn = FALSE;
-    	
+    
     // first appearance of a setting takes effect
     it = m_SettingsMap.lower_bound(pszName);
     
@@ -339,7 +339,7 @@ BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
         
         VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
-        		
+        
         if (GetToken(szExpanded, szToken, NULL, FALSE))
         {
             if ((lstrcmpi(szToken, "off") == 0) ||
@@ -692,23 +692,23 @@ BOOL SettingsManager::LCClose(FILE* pFile)
 //
 BOOL SettingsManager::LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
-	BOOL bReturn = FALSE;
-	char szTempValue[MAX_LINE_LENGTH];
-
-	if ((pFile != NULL) && IsValidStringPtr(pszConfig) && IsValidStringPtr(pszValue, cchValue))
-	{
-		IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
-		if (it != m_Iterators.end())
-		{
-			bReturn = (*it)->ReadNextConfig(pszConfig, szTempValue, MAX_LINE_LENGTH);
-			if (bReturn)
-			{
-				VarExpansionEx(pszValue, szTempValue, cchValue);
-			}
-		}
-	}
-
-	return bReturn;
+    BOOL bReturn = FALSE;
+    char szTempValue[MAX_LINE_LENGTH];
+    
+    if ((pFile != NULL) && IsValidStringPtr(pszConfig) && IsValidStringPtr(pszValue, cchValue))
+    {
+        IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
+        if (it != m_Iterators.end())
+        {
+            bReturn = (*it)->ReadNextConfig(pszConfig, szTempValue, MAX_LINE_LENGTH);
+            if (bReturn)
+            {
+                VarExpansionEx(pszValue, szTempValue, cchValue);
+            }
+        }
+    }
+    
+    return bReturn;
 }
 
 
@@ -761,7 +761,7 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
         else if ((ptzInput[nCount] == _T(')')) && !--nBlock && !nStart &&
             (nCount == (nLen - 1)))
         {
-            // one pair of parentheses surrounding the whole expression		
+            // one pair of parentheses surrounding the whole expression
             ptzInput[nCount] = 0;
             return _MathEvaluate(ptzInput + 1);
         }
@@ -788,17 +788,17 @@ double SettingsManager::_MathEvaluate(LPTSTR ptzInput)
                 switch(nSign)
                 {
                 case 0: return _MathEvaluate(ptzInput) +
-                            _MathEvaluate(ptzInput + nCount + 1);
+                               _MathEvaluate(ptzInput + nCount + 1);
                     
                 case 1: return _MathEvaluate(ptzInput) -
-                            _MathEvaluate(ptzInput + nCount + 1);
+                               _MathEvaluate(ptzInput + nCount + 1);
                     
                 case 2: return _MathEvaluate(ptzInput) *
-                            _MathEvaluate(ptzInput + nCount + 1);
+                               _MathEvaluate(ptzInput + nCount + 1);
                     
                 case 3: return _MathEvaluate(ptzInput) /
-                            _MathEvaluate(ptzInput + nCount + 1);
-                            
+                               _MathEvaluate(ptzInput + nCount + 1);
+                    
                 default: break;
                 }
             }

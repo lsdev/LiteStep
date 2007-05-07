@@ -91,7 +91,6 @@ namespace debug
         Tracer::Output(szBuffer);
         va_end(args);
     }
-
     
     template <class Tracer> class PrefixedOutput
     {
@@ -100,8 +99,8 @@ namespace debug
         
     public:
         PrefixedOutput(unsigned int uLine, const char* pszFile) :
-          m_uLine(uLine), m_pszFile(pszFile) {}
-          
+            m_uLine(uLine), m_pszFile(pszFile) {}
+        
         void operator()(const char* pszFormat, ...)
         {
             ASSERT_ISNOTNULL(pszFormat);
@@ -119,7 +118,7 @@ namespace debug
                 STRSAFE_NULL_ON_FAILURE, szFormatBuffer, args);
             
             Tracer::Output(szBuffer);
-            va_end(args);              
+            va_end(args);
         }
     };
 }
@@ -141,19 +140,19 @@ struct DebugOutputTracer
     static void Output(const char* pszText)
     {
         OutputDebugStringA(pszText);
-
+        
     #if !defined(__GNUC__)
         // This just outputs a blank line in gdb
         OutputDebugStringA("\n");
     #endif
     }
 };
-    
+
 #define TRACE_ENABLED
 #define TRACE  debug::Trace<DebugOutputTracer>
 #define INFO   debug::PrefixedOutput<DebugOutputTracer>(__LINE__, __FILE__)
 
-#else	// !defined(_DEBUG)
+#else // !defined(_DEBUG)
 
 namespace debug
 {
@@ -164,7 +163,7 @@ namespace debug
 #define TRACE  1 ? (void)0 : debug::TraceDummy
 #define INFO   TRACE
 
-#endif	// !defined(_DEBUG)
+#endif // !defined(_DEBUG)
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -214,12 +213,12 @@ namespace debug
                              trace_fn_7acc0ecb_09ab_4dec_86a2_0d075c666120(name)
 #define TRACE_LASTERR(desc)  debug::TraceLastError(desc)
 
-#else	// !defined(_DEBUG)
+#else // !defined(_DEBUG)
 
 #define TRACE_FN(name)       (void)0
 #define TRACE_LASTERR(desc)  (void)0
 
-#endif	// !defined(_DEBUG)
+#endif // !defined(_DEBUG)
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -237,17 +236,17 @@ namespace debug
 //
 #if defined(_DEBUG)
 
-#define	VERIFY(f)  ASSERT(f)
-#define	BREAK()	   DebugBreak()
-#define	DBG(f)     (f)
+#define VERIFY(f)  ASSERT(f)
+#define BREAK()    DebugBreak()
+#define DBG(f)     (f)
 
-#else	// !defined(_DEBUG)
+#else // !defined(_DEBUG)
 
-#define	VERIFY(f)  ((void)(f))
-#define	BREAK()    (void)0
-#define	DBG(f)     (void)0
+#define VERIFY(f)  ((void)(f))
+#define BREAK()    (void)0
+#define DBG(f)     (void)0
 
-#endif	// !defined(_DEBUG)
+#endif // !defined(_DEBUG)
 
 
 #endif // !defined(LS_DEBUG_HPP_INCLUDED)

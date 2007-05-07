@@ -26,8 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct _PNGERROR
 {
-    HWND Wnd;
-    jmp_buf ErrorJump;
+	HWND Wnd;
+	jmp_buf ErrorJump;
 }
 PNGERROR, *PPNGERROR;
 
@@ -47,20 +47,20 @@ void PNGErrorHandler(png_structp PngStruct, png_const_charp Message)
 
 png_voidp ls_png_malloc(png_structp /* png_ptr */, png_size_t size)
 {
-    return malloc(size);
+	return malloc(size);
 }
 
 void ls_png_free(png_structp /* png_ptr */, png_voidp ptr)
 {
-    free(ptr);
+	free(ptr);
 }
 
 void ls_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-    FILE* file = (FILE*)png_get_io_ptr(png_ptr);
-    ASSERT(file); // if libpng calls this function, this mustn't be empty
+	FILE* file = (FILE*)png_get_io_ptr(png_ptr);
+	ASSERT(file); // if libpng calls this function, this mustn't be empty
 
-    fread(data, 1, length, file);
+	fread(data, 1, length, file);
 }
 
 
@@ -79,27 +79,29 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 		FILE * hFile = fopen(pszFilename, "rb");
 		if (hFile)
 		{
-            const size_t num_sig_bytes = 8;
+			const size_t num_sig_bytes = 8;
 			unsigned char sig[num_sig_bytes];
 			fread(sig, 1, num_sig_bytes, hFile);
 
 			int is_png = png_check_sig(sig, num_sig_bytes);
+
 			if (is_png)
 			{
 				PNGERROR PngError = { GetForegroundWindow() };
 
 				png_structp Read = png_create_read_struct_2(PNG_LIBPNG_VER_STRING,
-                    &PngError, PNGErrorHandler, NULL,
-                    NULL, ls_png_malloc, ls_png_free);
+					&PngError, PNGErrorHandler, NULL,
+					NULL, ls_png_malloc, ls_png_free);
 
 				if (Read)
 				{
-                    png_infop Info = png_create_info_struct(Read);
+					png_infop Info = png_create_info_struct(Read);
+
 					if (Info)
 					{
 						if (!setjmp(PngError.ErrorJump))
 						{
-                            png_set_read_fn(Read, hFile, ls_png_read_data);
+							png_set_read_fn(Read, hFile, ls_png_read_data);
 							png_set_sig_bytes(Read, num_sig_bytes);
 							png_read_info(Read, Info);
 
@@ -170,7 +172,6 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 							}
 
 							png_read_end(Read, Info);
-
 							png_destroy_read_struct(&Read, &Info, NULL);
 						}
 						else
@@ -187,7 +188,6 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 
 			fclose(hFile);
 		}
-
 	}
 
 	return hDibSection;

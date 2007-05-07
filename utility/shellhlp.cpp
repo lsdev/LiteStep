@@ -33,18 +33,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
-	ASSERT(cchPath >= MAX_PATH);
+    ASSERT(cchPath >= MAX_PATH);
     ASSERT_ISVALIDBUF(ptzPath, cchPath);
-
-	IMalloc* pMalloc;
-	bool bReturn = false;
-
+    
+    IMalloc* pMalloc;
+    bool bReturn = false;
+    
     // SHGetSpecialFolderPath is not available on Win95
     // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
     if (SUCCEEDED(SHGetMalloc(&pMalloc)))
     {
         LPITEMIDLIST pidl;
-
+        
         if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
         {
             bReturn = SHGetPathFromIDList(pidl, ptzPath) ? true : false;
@@ -56,7 +56,7 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
             
             pMalloc->Free(pidl);
         }
-
+        
         pMalloc->Release();
     }
     
@@ -78,10 +78,10 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 {
     ASSERT(cchPath <= STRSAFE_MAX_CCH);
     ASSERT_ISVALIDBUF(ptzPath, cchPath);
-
+    
     HRESULT hr = E_FAIL;
     size_t cchCurrentLength = 0;
-
+    
     if (SUCCEEDED(StringCchLength(ptzPath, cchPath, &cchCurrentLength)))
     {
         bool bHasQuote = false;
@@ -92,7 +92,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
             --ptzEnd;
             bHasQuote = true;
         }
-
+        
         if (ptzEnd > ptzPath)
         {
             if (*(ptzEnd-1) != _T('\\'))
@@ -127,7 +127,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
             }
         }
     }
-
+    
     return hr;
 }
 
@@ -138,7 +138,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 {
     ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
-
+    
     return (0 != FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -148,7 +148,7 @@ bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
         ptzBuffer,
         cchBuffer,
         NULL
-        ));
+    ));
 }
 
 
@@ -159,46 +159,46 @@ bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 {
     ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
-
+    
     LPOLESTR pOleString = NULL;
-
+    
     HRESULT hr = StringFromCLSID(rclsid, &pOleString);
-
+    
     if (SUCCEEDED(hr) && pOleString)
     {
 #ifdef UNICODE
         hr = StringCchCopyEx(ptzBuffer, cchBuffer, pOleString, NULL, NULL,
             STRSAFE_NULL_ON_FAILURE);
-
+        
         switch (hr)
         {
             case S_OK:
             break;
-
+            
             case STRSAFE_E_INSUFFICIENT_BUFFER:
             {
                 hr = E_OUTOFMEMORY;
             }
             break;
-
+            
             case STRSAFE_E_INVALID_PARAMETER:
             {
                 hr = E_INVALIDARG;
             }
             break;
-
+            
             default:
             {
                 ASSERT(false);
                 hr = E_UNEXPECTED;
             }
         }
-
+        
 #else // UNICODE
-
+        
         int nReturn = WideCharToMultiByte(CP_ACP, 0, pOleString,
             wcslen(pOleString), ptzBuffer, cchBuffer, NULL, NULL);
-
+        
         if (nReturn == 0)
         {
             switch (GetLastError())
@@ -230,9 +230,9 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
         }
 #endif
     }
-
+    
     CoTaskMemFree(pOleString);
-
+    
     return hr;
 }
 
@@ -247,13 +247,13 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
 {
     bool bSuccess = false;
-
+    
     DWORD cchCopied = GetModuleFileName(hInst, pszBuffer, cchBuffer);
-
+    
     if (cchCopied == cchBuffer)
     {
         ASSERT(GetLastError() == ERROR_INSUFFICIENT_BUFFER);
-
+        
         // GetModuleFileName doesn't null-terminate the buffer if it is too
         // small. Make sure that even in this error case the buffer is properly
         // terminated - some people don't check return values.
@@ -263,6 +263,6 @@ bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
     {
         bSuccess = true;
     }
-
+    
     return bSuccess;
 }

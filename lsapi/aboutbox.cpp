@@ -73,8 +73,8 @@ aboutOptions[] =
 
 struct
 {
-    const char *nick;
-    const char *realName;
+	const char *nick;
+	const char *realName;
 }
 theDevTeam[] =
 {
@@ -90,8 +90,8 @@ const unsigned int theDevTeamCount = sizeof(theDevTeam) / sizeof(theDevTeam[0]);
 
 struct CallbackInfo
 {
-    HWND hListView;
-    int nItem;
+	HWND hListView;
+	int nItem;
 };
 
 /* LiteStep license notice */
@@ -126,20 +126,20 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		case WM_COMMAND:
 		{
 			if (LOWORD(wParam) == IDC_COMBOBOX &&
-                HIWORD(wParam) == CBN_SELCHANGE)
+			    HIWORD(wParam) == CBN_SELCHANGE)
 			{
 				// delete listview items
 				SendDlgItemMessage(hWnd, IDC_LISTVIEW,
-                    LVM_DELETEALLITEMS, 0, 0);
+					LVM_DELETEALLITEMS, 0, 0);
 
 				int i;
 
-                // delete listview columns
+				// delete listview columns
 				for (i = 3; i >= 0; i--)
-                {
-                    SendDlgItemMessage(hWnd, IDC_LISTVIEW,
-                        LVM_DELETECOLUMN, (WPARAM)i, 0);
-                }
+				{
+					SendDlgItemMessage(hWnd, IDC_LISTVIEW,
+						LVM_DELETECOLUMN, (WPARAM)i, 0);
+				}
 
 				// get new selection
 				i = (int)SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_GETCURSEL, 0, 0);
@@ -174,14 +174,14 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			{
 				// release title font
 				HFONT titleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
-                    WM_GETFONT, 0, 0);
+					WM_GETFONT, 0, 0);
 
 				DeleteObject(titleFont);
 
 				// close the dialog box
 				EndDialog(hWnd, IDOK);
 
-                return TRUE;
+				return TRUE;
 			}
 			/* This isn't necessary as we have the edit control set to read only.
 			 * It just ensures our text doesn't get changed somehow */
@@ -199,13 +199,13 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			return FALSE;
 		}
 
-        case WM_CTLCOLOREDIT:
-        case WM_CTLCOLORSTATIC:
+		case WM_CTLCOLOREDIT:
+		case WM_CTLCOLORSTATIC:
 		{
 			HBRUSH hbReturn = FALSE; // special return value to tell the system
-                                     // to perform default message processing
+			                         // to perform default message processing
 
-            // the header and title need a white (COLOR_WINDOW) background
+			// the header and title need a white (COLOR_WINDOW) background
 			int id = GetDlgCtrlID((HWND)lParam);
 
 			if (id == IDC_TITLE || id == IDC_THEME_INFO || id == IDC_EDIT)
@@ -230,35 +230,35 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			// set title font
 			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
 			SendDlgItemMessage(hWnd, IDC_TITLE, WM_SETFONT,
-                (WPARAM)hTitleFont, FALSE);
+				(WPARAM)hTitleFont, FALSE);
 
 			// set title with LS version
 			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep");
 
 			// set Theme info
-            char themeAuthor[16] = { 0 };
-            char themeName[21] = { 0 };
-            char themeOut[MAX_LINE_LENGTH] = { 0 };
+			char themeAuthor[16] = { 0 };
+			char themeName[21] = { 0 };
+			char themeOut[MAX_LINE_LENGTH] = { 0 };
 
 			GetRCString("ThemeAuthor", themeAuthor, "(unknown)", sizeof(themeAuthor));
 
 			if (GetRCString("ThemeName", themeName, NULL, sizeof(themeName)))
-            {
-                StringCchPrintf(themeOut, MAX_LINE_LENGTH,
-                    "Theme: %s by %s", themeName, themeAuthor);
-            }
+			{
+				StringCchPrintf(themeOut, MAX_LINE_LENGTH,
+					"Theme: %s by %s", themeName, themeAuthor);
+			}
 			else
-            {
-                StringCchPrintf(themeOut, MAX_LINE_LENGTH, 
-                    "Theme by %s", themeAuthor);
-            }
+			{
+				StringCchPrintf(themeOut, MAX_LINE_LENGTH,
+					"Theme by %s", themeAuthor);
+			}
 
 			SetDlgItemText(hWnd, IDC_THEME_INFO, themeOut);
 
 			// set compile time
-            char compileTime[64] = { 0 };
+			char compileTime[64] = { 0 };
 			StringCchPrintf(compileTime, 64,
-                "Compiled on %s at %s", __DATE__, __TIME__);
+				"Compiled on %s at %s", __DATE__, __TIME__);
 
 			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
 
@@ -267,10 +267,10 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 			// add options to combo box
 			for (unsigned int i = 0; i < aboutOptionsCount; ++i)
-            {
-                SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_ADDSTRING,
-                    0, (LPARAM)aboutOptions[i].option);
-            }
+			{
+				SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_ADDSTRING,
+					0, (LPARAM)aboutOptions[i].option);
+			}
 
 			// default to License Notice
 			SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_SETCURSEL, ABOUT_LICENSE, 0);
@@ -283,15 +283,15 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			GetWindowRect(hWnd, &rc);
 
 			SetWindowPos(hWnd, HWND_TOP,
-                (GetSystemMetrics(SM_CXSCREEN) - (rc.right - rc.left)) / 2,
-                (GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
-                0, 0, SWP_NOSIZE);
+				(GetSystemMetrics(SM_CXSCREEN) - (rc.right - rc.left)) / 2,
+				(GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
+				0, 0, SWP_NOSIZE);
 
 #ifdef __GNUC__
-            typedef void (__stdcall *STTWTYPE)(HWND, BOOL);
-            
-            static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
-                GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
+			typedef void (__stdcall *STTWTYPE)(HWND, BOOL);
+
+			static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
+				GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
 #endif
 			SwitchToThisWindow(hWnd, TRUE);
 			SetFocus(GetDlgItem(hWnd, IDC_COMBOBOX));
@@ -299,8 +299,8 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			return FALSE;
 		}
 
-        default:
-        break;
+		default:
+		break;
 	}
 
 	return FALSE;
@@ -312,8 +312,8 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 ULONG WINAPI AboutBoxThread(void *)
 {
-    return DialogBox(GetModuleHandle(NULL),
-        MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
+	return DialogBox(GetModuleHandle(NULL),
+		MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
 }
 
 
@@ -322,17 +322,17 @@ ULONG WINAPI AboutBoxThread(void *)
 
 BOOL __stdcall BangCallback(LPCSTR pszName, LPARAM lParam)
 {
-    CallbackInfo* pCi = (CallbackInfo*)lParam;
+	CallbackInfo* pCi = (CallbackInfo*)lParam;
 
-    LVITEM itemInfo;
-    itemInfo.mask = LVIF_TEXT;
-    itemInfo.iItem = pCi->nItem++;
-    itemInfo.pszText = (char*)pszName;
-    itemInfo.iSubItem = 0;
+	LVITEM itemInfo;
+	itemInfo.mask = LVIF_TEXT;
+	itemInfo.iItem = pCi->nItem++;
+	itemInfo.pszText = (char*)pszName;
+	itemInfo.iSubItem = 0;
 
-    ListView_InsertItem(pCi->hListView, &itemInfo);
+	ListView_InsertItem(pCi->hListView, &itemInfo);
 
-    return TRUE;
+	return TRUE;
 }
 
 void AboutBangs(HWND hListView)
@@ -347,10 +347,10 @@ void AboutBangs(HWND hListView)
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
 
-    CallbackInfo ci = { 0 };
-    ci.hListView = hListView;
+	CallbackInfo ci = { 0 };
+	ci.hListView = hListView;
 
-    EnumLSData(ELD_BANGS, (FARPROC)BangCallback, (LPARAM)&ci);
+	EnumLSData(ELD_BANGS, (FARPROC)BangCallback, (LPARAM)&ci);
 }
 
 
@@ -404,36 +404,36 @@ void AboutLicense(HWND hEdit)
 
 BOOL __stdcall ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
 {
-    CallbackInfo* pCi = (CallbackInfo*)lParam;
-    
-    LVITEM itemInfo;
-    itemInfo.mask = LVIF_TEXT;
-    itemInfo.iItem = pCi->nItem++;
-    itemInfo.pszText = (char*)pszPath;
-    itemInfo.iSubItem = 0;
-    
-    ListView_InsertItem(pCi->hListView, &itemInfo);
+	CallbackInfo* pCi = (CallbackInfo*)lParam;
 
-    return TRUE;
+	LVITEM itemInfo;
+	itemInfo.mask = LVIF_TEXT;
+	itemInfo.iItem = pCi->nItem++;
+	itemInfo.pszText = (char*)pszPath;
+	itemInfo.iSubItem = 0;
+
+	ListView_InsertItem(pCi->hListView, &itemInfo);
+
+	return TRUE;
 }
 
 
 void AboutModules(HWND hListView)
 {
-    LVCOLUMN columnInfo;
-    
-    columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-    columnInfo.fmt = LVCFMT_LEFT;
-    columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
-    columnInfo.pszText = "Module";
-    columnInfo.iSubItem = 0;
+	LVCOLUMN columnInfo;
 
-    ListView_InsertColumn(hListView, 0, &columnInfo);
-    
-    CallbackInfo ci = { 0 };
-    ci.hListView = hListView;
-    
-    EnumLSData(ELD_MODULES, (FARPROC)ModulesCallback, (LPARAM)&ci);
+	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+	columnInfo.fmt = LVCFMT_LEFT;
+	columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
+	columnInfo.pszText = "Module";
+	columnInfo.iSubItem = 0;
+
+	ListView_InsertColumn(hListView, 0, &columnInfo);
+
+	CallbackInfo ci = { 0 };
+	ci.hListView = hListView;
+
+	EnumLSData(ELD_MODULES, (FARPROC)ModulesCallback, (LPARAM)&ci);
 }
 
 
@@ -442,17 +442,17 @@ void AboutModules(HWND hListView)
 
 BOOL __stdcall RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 {
-    CallbackInfo* pCi = (CallbackInfo*)lParam;
-    
-    LVITEM itemInfo;
-    itemInfo.mask = LVIF_TEXT;
-    itemInfo.iItem = pCi->nItem++;
-    itemInfo.pszText = (char*)pszRevID;
-    itemInfo.iSubItem = 0;
-    
-    ListView_InsertItem(pCi->hListView, &itemInfo);
-    
-    return TRUE;
+	CallbackInfo* pCi = (CallbackInfo*)lParam;
+
+	LVITEM itemInfo;
+	itemInfo.mask = LVIF_TEXT;
+	itemInfo.iItem = pCi->nItem++;
+	itemInfo.pszText = (char*)pszRevID;
+	itemInfo.iSubItem = 0;
+
+	ListView_InsertItem(pCi->hListView, &itemInfo);
+
+	return TRUE;
 }
 
 
@@ -483,11 +483,11 @@ void AboutRevIDs(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-    CallbackInfo ci = { 0 };
-    ci.hListView = hListView;
-    ci.nItem = i;
-    
-    EnumLSData(ELD_REVIDS, (FARPROC)RevIDCallback, (LPARAM)&ci);
+	CallbackInfo ci = { 0 };
+	ci.hListView = hListView;
+	ci.nItem = i;
+
+	EnumLSData(ELD_REVIDS, (FARPROC)RevIDCallback, (LPARAM)&ci);
 }
 
 
@@ -535,40 +535,40 @@ void AboutSysInfo(HWND hListView)
 	if (versionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
 	{
 		if (versionInfo.dwMinorVersion >= 90)
-        {
-            StringCchCopy(buffer, MAX_PATH, "Windows ME");
-        }
+		{
+			StringCchCopy(buffer, MAX_PATH, "Windows ME");
+		}
 		else if (versionInfo.dwMinorVersion >= 10)
-        {
-            StringCchCopy(buffer, MAX_PATH, "Windows 98");
-        }
+		{
+			StringCchCopy(buffer, MAX_PATH, "Windows 98");
+		}
 		else
-        {
-            StringCchCopy(buffer, MAX_PATH, "Windows 95");
-        }
+		{
+			StringCchCopy(buffer, MAX_PATH, "Windows 95");
+		}
 	}
 	else
 	{
 		if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1))
-        {
-            StringCchCopy(buffer, MAX_PATH, "Windows XP");
-        }
+		{
+			StringCchCopy(buffer, MAX_PATH, "Windows XP");
+		}
 		else if (versionInfo.dwMajorVersion == 5)
-        {
-            StringCchCopy(buffer, MAX_PATH, "Windows 2000");
-        }
+		{
+			StringCchCopy(buffer, MAX_PATH, "Windows 2000");
+		}
 		else
-        {
-            StringCchPrintf(buffer, MAX_PATH, "Windows NT %d.%d",
-                versionInfo.dwMajorVersion, versionInfo.dwMinorVersion);
-        }
+		{
+			StringCchPrintf(buffer, MAX_PATH, "Windows NT %d.%d",
+				versionInfo.dwMajorVersion, versionInfo.dwMinorVersion);
+		}
 	}
 
 	TrimLeft(versionInfo.szCSDVersion);
 
 	if (versionInfo.szCSDVersion[0])
 	{
-        StringCchCat(buffer, MAX_PATH, " (");
+		StringCchCat(buffer, MAX_PATH, " (");
 		StringCchCat(buffer, MAX_PATH, versionInfo.szCSDVersion);
 		StringCchCat(buffer, MAX_PATH, ")");
 	}
@@ -630,15 +630,15 @@ HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
 {
 	ASSERT_ISNOTNULL(pszName); ASSERT(nSizeInPoints > 0);
 
-    // convert size from points to pixels
+	// convert size from points to pixels
 	HDC hDC = GetDC(NULL);
 	int sizeInPixels = -MulDiv(nSizeInPoints,
-        GetDeviceCaps(hDC, LOGPIXELSY), 72);
+		GetDeviceCaps(hDC, LOGPIXELSY), 72);
 
 	ReleaseDC(NULL, hDC);
 
 	// fill in LOGFONT structure
-    LOGFONT lf = { 0 };
+	LOGFONT lf = { 0 };
 	lf.lfHeight = sizeInPixels;
 	lf.lfWeight = bBold ? FW_BOLD : FW_NORMAL;
 	StringCchCopy(lf.lfFaceName, LF_FACESIZE, pszName);
@@ -662,7 +662,7 @@ int GetClientWidth(HWND hWnd)
 
 // Trims whitespace from the beginning of a string in-place
 //
-void TrimLeft(char* pszToTrim)
+void TrimLeft(char *pszToTrim)
 {
 	char * trimmed = pszToTrim;
 
@@ -698,5 +698,5 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 	}
 
 	StringCchPrintf(pszBuffer, cchBuffer,
-        "%d %s", (int)floor(dValue + 0.5), units[uUnit]);
+		"%d %s", (int)floor(dValue + 0.5), units[uUnit]);
 }

@@ -85,7 +85,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 					}
 
 #ifdef LS_COMPAT_TRANSPTOL
-                    // get the limits for the colors
+					// get the limits for the colors
 					BYTE clrHiR = ( 0xff - GetRValue( clrTolerance ) > GetRValue( clrTransp ) ) ? GetRValue( clrTransp ) + GetRValue( clrTolerance ) : 0xff;
 					BYTE clrHiG = ( 0xff - GetGValue( clrTolerance ) > GetGValue( clrTransp ) ) ? GetGValue( clrTransp ) + GetGValue( clrTolerance ) : 0xff;
 					BYTE clrHiB = ( 0xff - GetBValue( clrTolerance ) > GetBValue( clrTransp ) ) ? GetBValue( clrTransp ) + GetBValue( clrTolerance ) : 0xff;
@@ -101,7 +101,7 @@ HRGN BitmapToRegion (HBITMAP hbm, COLORREF clrTransp, COLORREF clrTolerance, int
 
 					// Scan each bitmap row from bottom to top (the bitmap is inverted vertically
 #ifdef LS_COMPAT_TRANSPTOL
-                    BYTE *p;
+					BYTE *p;
 #else
 					DWORD *p;
 #endif // LS_COMPAT_TRANSPTOL
@@ -258,8 +258,8 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 					// now let's paint both images to a new one
 
 					// and we support different sized images!! therefore:
-                    wdtResult = max(wdtFirst, wdtSecond);
-                    hgtResult = max(hgtFirst, hgtSecond);
+					wdtResult = max(wdtFirst, wdtSecond);
+					hgtResult = max(hgtFirst, hgtSecond);
 
 					// create another dc, compatible with second dc
 					hdcResult = CreateCompatibleDC(hdcSecond);
@@ -471,7 +471,7 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 			else
 			{
 				HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(
-                    GetLitestepWnd(), GWL_HINSTANCE);
+					GetLitestepWnd(), GWL_HINSTANCE);
 
 				hIcon = ExtractIcon(hInstance, pszIconFile, nIcon);
 			}
@@ -510,8 +510,8 @@ void TransparentBltLS(HDC hdcDst, int nXDest, int nYDest, int nWidth, int nHeigh
 
 	// create a destination compatble dc containing
 	// a copy of the destination dc
-	hdcDstCpy	= CreateCompatibleDC(hdcDst);
-	hbmDstCpy	= CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
+	hdcDstCpy = CreateCompatibleDC(hdcDst);
+	hbmDstCpy = CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
 	hbmOldDstCpy = (HBITMAP)SelectObject(hdcDstCpy, hbmDstCpy);
 
 	BitBlt(hdcDstCpy, 0, 0, nWidth, nHeight, hdcDst, nXDest, nYDest, SRCCOPY);
@@ -536,8 +536,8 @@ void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int
 
 	// create a destination compatble dc containing
 	// a copy of the source dc
-	hdcMem	= CreateCompatibleDC(hdcDst);
-	hbmMem	= CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
+	hdcMem = CreateCompatibleDC(hdcDst);
+	hbmMem = CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
 	hbmOldMem = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, SRCCOPY);
@@ -547,7 +547,7 @@ void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int
 	SetBkColor(hdcMem, colorTransparent);
 
 	// Create monochrome bitmap for the mask
-	hdcMask	= CreateCompatibleDC(hdcDst);
+	hdcMask = CreateCompatibleDC(hdcDst);
 	hbmMask = CreateBitmap(nWidth, nHeight, 1, 1, NULL);
 	hbmOldMask = (HBITMAP)SelectObject(hdcMask, hbmMask);
 
@@ -562,7 +562,7 @@ void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int
 
 	BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
 
-    BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
+	BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
 
 	// Combine the foreground with the background
 	BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMem, 0, 0, SRCPAINT);

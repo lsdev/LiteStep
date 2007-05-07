@@ -71,15 +71,15 @@ HRESULT TrayService::Start()
     {
         OSVERSIONINFO OsVersionInfo = { 0 };
         OsVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
+        
         GetVersionEx(&OsVersionInfo);
-
+        
         if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
             OsVersionInfo.dwMajorVersion >= 5)
         {
             m_bWin2000 = true;
         }
-
+        
         if (createWindows())
         {
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
@@ -97,8 +97,8 @@ HRESULT TrayService::Start()
             hr = S_OK;
         }
     }
-
-	return hr;
+    
+    return hr;
 }
 
 
@@ -108,22 +108,22 @@ HRESULT TrayService::Start()
 //
 HRESULT TrayService::Stop()
 {
-	HRESULT hr = S_OK;
-
+    HRESULT hr = S_OK;
+    
     if (m_bWin2000 && m_hTrayWnd)
     {
         unloadShellServiceObjects();
     }
-
+    
     destroyWindows();
-
+    
     while (!m_siVector.empty())
     {
         delete m_siVector.back();
         m_siVector.pop_back();
     }
-
-	return hr;
+    
+    return hr;
 }
 
 
@@ -134,7 +134,7 @@ HRESULT TrayService::Stop()
 bool TrayService::createWindows()
 {
     bool bReturn = false;
-
+    
     //
     // Register tray window class
     //
@@ -145,7 +145,7 @@ bool TrayService::createWindows()
     wc.hInstance = m_hInstance;
     wc.lpszClassName = szTrayClass;
     wc.style = CS_DBLCLKS;
-
+    
     if(!RegisterClassEx(&wc))
     {
         RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
@@ -164,11 +164,11 @@ bool TrayService::createWindows()
             NULL, NULL,
             m_hInstance,
             NULL);
-
+        
         if(NULL == m_hTrayWnd)
         {
             UnregisterClass(szTrayClass, m_hInstance);
-
+            
             RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
                 "Unable to create window.", szTrayTitle);
         }
@@ -177,7 +177,7 @@ bool TrayService::createWindows()
             // Our main window is enough to start up, we can do without the
             // TrayNotifyWnd if necessary.
             bReturn = true;
-
+            
             //
             // Register "TrayNotifyWnd" class and create window (see Note 8)
             //
@@ -187,7 +187,7 @@ bool TrayService::createWindows()
             wc.hInstance = m_hInstance;
             wc.lpszClassName = szNotifyClass;
             wc.style = CS_DBLCLKS;
-
+            
             if (RegisterClassEx(&wc))
             {
                 m_hNotifyWnd = CreateWindowEx(
@@ -198,7 +198,7 @@ bool TrayService::createWindows()
                     m_hTrayWnd, NULL,
                     m_hInstance,
                     NULL);
-
+                
                 if (!m_hNotifyWnd)
                 {
                     UnregisterClass(szNotifyClass, m_hInstance);
@@ -206,7 +206,7 @@ bool TrayService::createWindows()
             }
     }
     }
-
+    
     return bReturn;
 }
 
@@ -221,10 +221,10 @@ void TrayService::destroyWindows()
     {
         DestroyWindow(m_hNotifyWnd);
         m_hNotifyWnd = NULL;
-
+        
         UnregisterClass(szNotifyClass, m_hInstance);
     }
-
+    
     if (m_hTrayWnd)
     {
         DestroyWindow(m_hTrayWnd);
@@ -250,7 +250,6 @@ void TrayService::loadShellServiceObjects()
         REGSTR_PATH_SHELLSERVICEOBJECTDELAYED,
         0, KEY_READ, &hkeyServices);
     
-    
     while (lErrorCode == ERROR_SUCCESS)
     {
         TCHAR szValueName[32] = { 0 };
@@ -271,7 +270,7 @@ void TrayService::loadShellServiceObjects()
             MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, 40);
             
             CLSIDFromString(wszCLSID, &clsid);
-
+            
             HRESULT hr = CoCreateInstance(clsid, NULL,
                 CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
                 IID_IOleCommandTarget, (void **)&pCmdTarget);
@@ -323,11 +322,11 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
 {
     static TrayService* pTrayService = NULL;
     
-	if (!pTrayService)
-	{
-		pTrayService = (TrayService*)GetWindowLongPtr(hWnd, 0);
-	}
-
+    if (!pTrayService)
+    {
+        pTrayService = (TrayService*)GetWindowLongPtr(hWnd, 0);
+    }
+    
     if (pTrayService)
     {
         switch (uMsg)
@@ -365,7 +364,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                         return pTrayService->HandleNotification(pstd);
                     }
                     break;
-
+                    
                 case SH_LOADPROC_DATA:
                     default:
                     {
@@ -411,11 +410,11 @@ BOOL TrayService::HandleAppBarMessage(PSHELLAPPBARDATA pData)
             return TRUE;
         }
         break;
-
+        
         default:
             break;
     }
-
+    
     return FALSE;
 }
 
@@ -429,7 +428,7 @@ BOOL TrayService::HandleAppBarMessage(PSHELLAPPBARDATA pData)
 BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
 {
     bool bReturn = false;
-
+    
     switch (pstd->dwMessage)
     {
         case NIM_ADD:
@@ -437,7 +436,7 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
             bReturn = addIcon(pstd->nid);
         }
         break;
-
+        
         case NIM_MODIFY:
         {
             bReturn = modifyIcon(pstd->nid);
@@ -449,26 +448,26 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
             bReturn = deleteIcon(pstd->nid);
         }
         break;
-
+        
     case NIM_SETFOCUS:
             {
             bReturn = setFocusIcon(pstd->nid);
             }
         break;
-
+        
     case NIM_SETVERSION:
         {
             bReturn = setVersionIcon(pstd->nid);
         }
         break;
-
+        
         default:
         {
             TRACE("NIM unknown: %u", pstd->dwMessage);
         }
         break;
     }
-
+    
     return bReturn ? TRUE : FALSE;
 }
 
@@ -500,13 +499,13 @@ HWND TrayService::SendSystemTray() const
         if((*it)->IsValid())
         {
             LSNOTIFYICONDATA lsnid = {0};
-
+            
             (*it)->CopyLSNID(&lsnid);
-
+            
             notify(NIM_ADD, &lsnid);
         }
     }
-
+    
     return m_hNotifyWnd;
 }
 
@@ -526,27 +525,27 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
         {
         case NID_6W_SIZE:
         case NID_5W_SIZE:
-{
+            {
                 NID_5W* pnid = (NID_5W*)&nid;
-
+                
                 int nReturn;
-
+                
                 nReturn = WideCharToMultiByte(CP_ACP, 0, pnid->szInfo, 256,
                     lsnid.szInfo, TRAY_MAX_INFO_LENGTH, NULL, NULL);
-
+                
                 if(!nReturn)
                 {
                     lsnid.szInfo[0] = 0;
                 }
-
+                
                 nReturn = WideCharToMultiByte(CP_ACP, 0, pnid->szInfoTitle, 64,
                     lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, NULL, NULL);
-
+                
                 if(!nReturn)
                 {
                     lsnid.szInfoTitle[0] = 0;
                 }
-
+                
                 lsnid.dwInfoFlags = pnid->dwInfoFlags;
                 lsnid.uTimeout = pnid->uTimeout;
                 lsnid.uFlags |= NIF_INFO;
@@ -554,25 +553,25 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
             break;
         case NID_6A_SIZE:
         case NID_5A_SIZE:
-    {
+            {
                 NID_5A* pnid = (NID_5A*)&nid;
-
+                
                 HRESULT hr;
-
+                
                 hr = StringCchCopy(lsnid.szInfo, TRAY_MAX_INFO_LENGTH, pnid->szInfo);
-
+                
                 if(FAILED(hr))
-        {
+                {
                     lsnid.szInfo[0] = 0;
                 }
-
+                
                 hr = StringCchCopy(lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
-
+                
                 if(FAILED(hr))
-            {
+                {
                     lsnid.szInfoTitle[0] = 0;
-            }
-
+                }
+                
                 lsnid.dwInfoFlags = pnid->dwInfoFlags;
                 lsnid.uTimeout = pnid->uTimeout;
                 lsnid.uFlags |= NIF_INFO;
@@ -582,7 +581,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
             break;
         }
     }
-
+    
     // Copy GUID
     if(nid.uFlags & NIF_GUID)
     {
@@ -591,7 +590,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
         case NID_6W_SIZE:
             {
                 NID_6W* pnid = (NID_6W*)&nid;
-
+                
                 lsnid.guidItem = pnid->guidItem;
                 lsnid.uFlags |= NIF_GUID;
             }
@@ -599,7 +598,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
         case NID_6A_SIZE:
             {
                 NID_6A* pnid = (NID_6A*)&nid;
-
+                
                 lsnid.guidItem = pnid->guidItem;
                 lsnid.uFlags |= NIF_GUID;
             }
@@ -620,36 +619,36 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
 bool TrayService::addIcon(const NID_XX& nid)
 {
     bool bReturn = false;
-
+    
     if(m_siVector.end() == findIcon(nid))
     {
         NotifyIcon * pni = new NotifyIcon(nid);
-
+        
         if (pni)
         {
             /* Fail shared icons, unless a valid hIcon exists */
             if(IsWindow(pni->GetHwnd()) && (!pni->IsShared() || pni->HasIcon()))
             {
                 m_siVector.push_back(pni);
-
+                
                 if(pni->IsValid())
-        {
+                {
                     LSNOTIFYICONDATA lsnid = {0};
-
+                    
                     pni->CopyLSNID(&lsnid);
                     extendNIDCopy(lsnid, nid);
-
+                    
                     notify(NIM_ADD, &lsnid);
                 }
                 bReturn = true;
-        }
+            }
             else
-        {
+            {
                 delete pni;
+            }
         }
     }
-    }
-
+    
     return bReturn;
 }
 
@@ -661,36 +660,36 @@ bool TrayService::addIcon(const NID_XX& nid)
 bool TrayService::modifyIcon(const NID_XX& nid)
 {
     bool bReturn = false;
-
+    
     IconVector::iterator it = findIcon(nid);
-
+    
     if(m_siVector.end() != it && *it)
     {
         NotifyIcon * pni = *it;
-
+        
         bool bWasValid = pni->IsValid();
-
+        
         // Update stored NotifyIcon
         pni->Update(nid);
-
+        
         if(pni->IsValid())
-{
+        {
             LSNOTIFYICONDATA lsnid = {0};
-
+            
             if(!bWasValid)
-    {
+            {
                 // This is a "new" icon, send entire stored NotifyIcon
                 pni->CopyLSNID(&lsnid);
                 extendNIDCopy(lsnid, nid);
-        
+                
                 notify(NIM_ADD, &lsnid);
             }
             else
-        {
+            {
                 // This icon already exists, just send updated flags
                 pni->CopyLSNID(&lsnid, nid.uFlags);
                 extendNIDCopy(lsnid, nid);
-
+                
                 notify(NIM_MODIFY, &lsnid);
             }
         }
@@ -702,14 +701,14 @@ bool TrayService::modifyIcon(const NID_XX& nid)
                 ,pni->GetuID()
                 ,0
             };
-        
+            
             // This icon is no longer visible, remove
             notify(NIM_DELETE, &lsnid);
-    }
-    
+        }
+        
         bReturn = true;
     }
-
+    
     return bReturn;
 }
 
@@ -725,7 +724,7 @@ bool TrayService::deleteIcon(const NID_XX& nid)
     bool bReturn = false;
     
     IconVector::iterator it = findIcon(nid);
-
+    
     if(m_siVector.end() != it)
     {
         LSNOTIFYICONDATA lsnid = {
@@ -734,7 +733,7 @@ bool TrayService::deleteIcon(const NID_XX& nid)
             ,(*it)->GetuID()
             ,0
         };
-
+        
         notify(NIM_DELETE, &lsnid);
         
         delete *it;
@@ -756,18 +755,18 @@ bool TrayService::deleteIcon(const NID_XX& nid)
 bool TrayService::setFocusIcon(const NID_XX& nid)
 {
     bool bReturn = false;
-
+    
     IconVector::iterator it = findIcon(nid);
-
+    
     if(m_siVector.end() != it)
-{
+    {
         LSNOTIFYICONDATA lsnid = {
              sizeof(LSNOTIFYICONDATA)
             ,(*it)->GetHwnd()
             ,(*it)->GetuID()
             ,0
         };
-    
+        
         bReturn = notify(NIM_SETFOCUS, &lsnid);
     }
     
@@ -784,37 +783,37 @@ bool TrayService::setFocusIcon(const NID_XX& nid)
 bool TrayService::setVersionIcon(const NID_XX& nid)
 {
     bool bReturn = false;
-
+    
     IconVector::iterator it = findIcon(nid);
-
+    
     if(m_siVector.end() != it)
-{
+    {
         LSNOTIFYICONDATA lsnid = {
              sizeof(LSNOTIFYICONDATA)
             ,(*it)->GetHwnd()
             ,(*it)->GetuID()
             ,0
         };
-
+        
         switch(nid.cbSize)
         {
             case NID_6W_SIZE:
             case NID_5W_SIZE:
             lsnid.uVersion = ((NID_5W&)nid).uVersion;
             break;
-
+            
         case NID_6A_SIZE:
         case NID_5A_SIZE:
             lsnid.uVersion = ((NID_5A&)nid).uVersion;
             break;
-
-            default:
+            
+        default:
             break;
-            }
-
+        }
+        
         bReturn = notify(NIM_SETVERSION, &lsnid);
-                }
-
+    }
+    
     return bReturn;
 }
 
@@ -852,4 +851,3 @@ IconVector::iterator TrayService::findIcon(HWND hWnd, UINT uId)
     return std::find_if(m_siVector.begin(),
         m_siVector.end(), FindIconPredicate(hWnd, uId));
 }
-

@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.20 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.20 2005/11/05 01:07:10 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.21 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.21 2007/05/07 20:38:00 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -112,17 +112,18 @@ BOOL LSAPIInit::GetLiteStepPath(LPSTR pszPath, size_t cchPath)
 			else
 			{
 				HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(
-                    GetLitestepWnd(), GWLP_HINSTANCE);
+					GetLitestepWnd(), GWLP_HINSTANCE);
 				
-                if (hInstance &&
-                    LSGetModuleFileName(hInstance, m_szLiteStepPath, MAX_PATH))
-                {
-                    PathRemoveFileSpec(m_szLiteStepPath);
-                    PathAddBackslashEx(m_szLiteStepPath, MAX_PATH);
-                    bReturn = TRUE;
-                }
+				if (hInstance)
+				{
+					if (LSGetModuleFileName(hInstance, m_szLiteStepPath, MAX_PATH))
+					{
+						PathRemoveFileSpec(m_szLiteStepPath);
+						PathAddBackslashEx(m_szLiteStepPath, MAX_PATH);
+						bReturn = TRUE;
+					}
+				}
 			}
-
 		}
 		else
 		{
@@ -143,19 +144,19 @@ static LSAPIInit LSAPIManager;
 
 BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath)
 {
-    BOOL bReturn = FALSE;
+	BOOL bReturn = FALSE;
 
-    // Storing the paths here to make !reload work. It calls this function
-    // with NULL, NULL as parameters. In the future SettingsManager or LSAPIInit
-    // could store these paths and/or SettingsManager could provide a Reload().
-    static char szAppPath[MAX_PATH] = { 0 };
-    static char szRcPath[MAX_PATH] = { 0 };
+	// Storing the paths here to make !reload work. It calls this function
+	// with NULL, NULL as parameters. In the future SettingsManager or LSAPIInit
+	// could store these paths and/or SettingsManager could provide a Reload().
+	static char szAppPath[MAX_PATH] = { 0 };
+	static char szRcPath[MAX_PATH] = { 0 };
 
-    if (pszLiteStepPath && pszRCPath)
-    {
-        StringCchCopy(szAppPath, MAX_PATH, pszLiteStepPath);
-        StringCchCopy(szRcPath, MAX_PATH, pszRCPath);
-    }
+	if (pszLiteStepPath && pszRCPath)
+	{
+		StringCchCopy(szAppPath, MAX_PATH, pszLiteStepPath);
+		StringCchCopy(szRcPath, MAX_PATH, pszRCPath);
+	}
 
 	if (gSettingsManager == NULL)
 	{
@@ -184,31 +185,31 @@ void DeleteSettingsManager(void)
 
 void ClearBangs()
 {
-    LSAPIManager.GetBangManager()->ClearBangCommands();
+	LSAPIManager.GetBangManager()->ClearBangCommands();
 }
 
 
 template<typename T>
 BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
 {
-    BOOL bReturn = false;
-    
-    if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
-    {
-        DWORD dwCurrentThreadID = GetCurrentThreadId();
-        
-        Bang* pBang = new Bang(dwCurrentThreadID, pfnBangCommand, pszCommand);
-        
-        if (IsValidReadPtr(pBang))
-        {
-            //bBang->AddRef();
-            LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, pBang);
-            pBang->Release();
-            bReturn = TRUE;
-        }
-    }
+	BOOL bReturn = false;
 
-    return bReturn;
+	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
+	{
+		DWORD dwCurrentThreadID = GetCurrentThreadId();
+
+		Bang* pBang = new Bang(dwCurrentThreadID, pfnBangCommand, pszCommand);
+
+		if (IsValidReadPtr(pBang))
+		{
+			//bBang->AddRef();
+			LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, pBang);
+			pBang->Release();
+			bReturn = TRUE;
+		}
+	}
+
+	return bReturn;
 }
 
 
@@ -217,7 +218,7 @@ BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
 //
 BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 {
-    return AddBangCommandWorker(pszCommand, pfnBangCommand);
+	return AddBangCommandWorker(pszCommand, pfnBangCommand);
 }
 
 
@@ -226,7 +227,7 @@ BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand)
 //
 BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
 {
-    return AddBangCommandWorker(pszCommand, pfnBangCommand);
+	return AddBangCommandWorker(pszCommand, pfnBangCommand);
 }
 
 
@@ -245,8 +246,8 @@ BOOL RemoveBangCommand(LPCSTR pszCommand)
 //
 BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 {
-    return LSAPIManager.GetBangManager()->
-        ExecuteBangCommand(pszCommand, hCaller, pszArgs);
+	return LSAPIManager.GetBangManager()->
+		ExecuteBangCommand(pszCommand, hCaller, pszArgs);
 }
 
 
@@ -255,7 +256,7 @@ BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 //
 BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 {
-    char szExpandedArgs[MAX_LINE_LENGTH] = { 0 };
+	char szExpandedArgs[MAX_LINE_LENGTH] = { 0 };
 	BOOL bReturn = FALSE;
 
 	if (IsValidStringPtr(pszCommand))
@@ -266,7 +267,7 @@ BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 		}
 
 		bReturn = \
-            InternalExecuteBangCommand(hCaller, pszCommand, szExpandedArgs);
+			InternalExecuteBangCommand(hCaller, pszCommand, szExpandedArgs);
 	}
 
 	return bReturn;
@@ -322,7 +323,7 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 			}
 			else
 			{
-                SHELLEXECUTEINFO seiCommand = { 0 };
+				SHELLEXECUTEINFO seiCommand = { 0 };
 				seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
 				seiCommand.hwnd = hOwner;
 				seiCommand.lpVerb = pszOperation;
@@ -377,7 +378,7 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 				StringCchCat(szFullDir, _MAX_DIR + _MAX_DRIVE, szDir);
 
 				hResult = LSExecuteEx(hOwner, NULL, szCommand, pszArgs,
-                    szFullDir, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
+					szFullDir, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
 			}
 		}
 	}
@@ -547,50 +548,50 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 	if (pszString)
 	{
 		if (pszToken)
-        {
-            pszToken[0] = '\0';
-        }
+		{
+			pszToken[0] = '\0';
+		}
 
-        if (pszNextToken)
-        {
-            *pszNextToken = NULL;
-        }
+		if (pszNextToken)
+		{
+			*pszNextToken = NULL;
+		}
 
 		pszCurrent += strspn(pszCurrent, WHITESPACE);
 
 		for (; *pszCurrent; pszCurrent++)
 		{
 			if (isspace((unsigned char)*pszCurrent) && !cQuote)
-            {
-                break;
-            }
+			{
+				break;
+			}
 
 			if (bUseBrackets && strchr("[]", *pszCurrent) &&
-                (!strchr("\'\"", cQuote) || !cQuote))
+				(!strchr("\'\"", cQuote) || !cQuote))
 			{
 				if (*pszCurrent == '[')
 				{
 					if (bIsToken && !cQuote)
-                    {
-                        break;
-                    }
+					{
+						break;
+					}
 
 					iBracketLevel++;
 					cQuote = '[';
 					
-                    if (iBracketLevel == 1)
-                    {
-                        continue;
-                    }
+					if (iBracketLevel == 1)
+					{
+						continue;
+					}
 				}
 				else
 				{
 					iBracketLevel--;
 					
-                    if (iBracketLevel <= 0)
-                    {
-                        break;
-                    }
+					if (iBracketLevel <= 0)
+					{
+						break;
+					}
 				}
 			}
 
@@ -628,22 +629,22 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 
 
 		if (!bAppendNextToken && *pszCurrent)
-        {
-            pszCurrent++;
-        }
+		{
+			pszCurrent++;
+		}
 
 		pszCurrent += strspn(pszCurrent, WHITESPACE);
 
 		if (*pszCurrent && pszNextToken)
-        {
-            *pszNextToken = pszCurrent;
-        }
+		{
+			*pszNextToken = pszCurrent;
+		}
 
 		if (bAppendNextToken && *pszCurrent)
-        {
-            GetToken(pszCurrent, pszToken + strlen(pszToken),
-                pszNextToken, bUseBrackets);
-        }
+		{
+			GetToken(pszCurrent, pszToken + strlen(pszToken),
+				pszNextToken, bUseBrackets);
+		}
 
 		return pszStartMarker != NULL;
 	}
@@ -681,7 +682,7 @@ void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
 void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString)
 {
 	if (IsValidStringPtr(pszExpandedString, cchExpandedString) &&
-	        IsValidStringPtr(pszTemplate))
+	    IsValidStringPtr(pszTemplate))
 	{
 		if (gSettingsManager != NULL)
 		{
@@ -707,41 +708,41 @@ void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpan
 //
 HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
 {
-    HRESULT hr = E_INVALIDARG;
+	HRESULT hr = E_INVALIDARG;
 
 	if (NULL != pfnCallback)
-    {
-        switch (uInfo)
-        {   
-            case ELD_BANGS:
-            {
-                hr = LSAPIManager.GetBangManager()->
-                    EnumBangs((LSENUMBANGSPROC)pfnCallback, lParam);
-            }
-            break;
+	{
+		switch (uInfo)
+		{
+			case ELD_BANGS:
+			{
+				hr = LSAPIManager.GetBangManager()->
+					EnumBangs((LSENUMBANGSPROC)pfnCallback, lParam);
+			}
+			break;
 
-            case ELD_REVIDS:
-            {
-                hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMREVIDS,
-                    (WPARAM)pfnCallback, lParam);
-            }
-            break;
-            
-            case ELD_MODULES:
-            {
-                hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMMODULES,
-                    (WPARAM)pfnCallback, lParam);
-            }
-            break;
+			case ELD_REVIDS:
+			{
+				hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMREVIDS,
+					(WPARAM)pfnCallback, lParam);
+			}
+			break;
 
-            default:
-            break;
-        }
-    }
-    else
-    {
-        hr = E_POINTER;
-    }
+			case ELD_MODULES:
+			{
+				hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMMODULES,
+					(WPARAM)pfnCallback, lParam);
+			}
+			break;
 
-    return hr;
+			default:
+			break;
+		}
+	}
+	else
+	{
+		hr = E_POINTER;
+	}
+
+	return hr;
 }

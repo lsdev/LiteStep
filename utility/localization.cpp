@@ -212,10 +212,10 @@ void Localization::LoadString(UINT uID, LPTSTR ptzBuffer, size_t cchMax)
 		{
 			if (::LoadString(GetModuleHandle(NULL), uID, ptzBuffer, cchMax) == 0)
 		 	{
-                ptzBuffer[0] = _T('\0');
-            }
-        }
-    }
+				ptzBuffer[0] = _T('\0');
+			}
+		}
+	}
 }
 
 

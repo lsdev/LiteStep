@@ -25,17 +25,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class StartupRunner
 {
 public:
-	StartupRunner();
-	virtual ~StartupRunner();
-
-	static DWORD WINAPI Run(void* pvVoid);
-
+    StartupRunner();
+    virtual ~StartupRunner();
+    
+    static DWORD WINAPI Run(void* pvVoid);
+    
 private:
-	static bool _IsFirstRunThisSession();
-	static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
-	static void _RunRunOnceEx();
+    static bool _IsFirstRunThisSession();
+    static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
+    static void _RunRunOnceEx();
     static void _RunStartupMenu();
-	static void _RunFolderContents(LPCTSTR ptzPath);
+    static void _RunFolderContents(LPCTSTR ptzPath);
     static bool _SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags);
     static HANDLE _CreateProcess(LPTSTR ptzCommandLine);
     static HANDLE _ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs);
