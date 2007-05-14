@@ -128,8 +128,10 @@ HRESULT BangManager::EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const
     
     HRESULT hr = S_OK;
     
+#if !defined(LS_NO_EXCEPTION)
     try
     {
+#endif /* LS_NO_EXCEPTION */
         for (BangMap::const_iterator iter = bang_map.begin();
              iter != bang_map.end(); iter++)
         {
@@ -139,11 +141,13 @@ HRESULT BangManager::EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const
                 break;
             }
         }
+#if !defined(LS_NO_EXCEPTION)
     }
     catch (...)
     {
         hr = E_UNEXPECTED;
     }
+#endif /* LS_NO_EXCEPTION */
     
     return hr;
 }

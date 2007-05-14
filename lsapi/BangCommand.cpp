@@ -65,8 +65,10 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
     }
     else
     {
+#if !defined(LS_NO_EXCEPTION)
         try
         {
+#endif /* LS_NO_EXCEPTION */
             if (m_bEX)
             {
                 m_bBangEX(hCaller, m_szCommand.c_str(), pszParams);
@@ -75,6 +77,7 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
             {
                 m_bBang(hCaller, pszParams);
             }
+#if !defined(LS_NO_EXCEPTION)
         }
         catch (...)
         {
@@ -83,5 +86,6 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
                 _T("Please contact the module author.\n\nBang parameters: %s"),
                 pszParams != NULL ? pszParams : _T("(null)"));
         }
+#endif /* LS_NO_EXCEPTION */
     }
 }
