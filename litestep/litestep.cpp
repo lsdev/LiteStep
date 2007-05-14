@@ -35,7 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "TrayService.h"
 
 // Managers
-#include "HookManager.h"
 #include "MessageManager.h"
 #include "ModuleManager.h"
 
@@ -256,7 +255,6 @@ CLiteStep::CLiteStep()
     m_pModuleManager = NULL;
     m_pDataStoreManager = NULL;
     m_pMessageManager = NULL;
-    m_bHookManagerStarted = false;
     m_bSignalExit = false;
     m_pTrayService = NULL;
     m_BlockRecycle = 0;
@@ -798,32 +796,6 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         }
         break;
         
-        case LM_REGISTERHOOKMESSAGE:
-        {
-            if (!m_bHookManagerStarted)
-            {
-                m_bHookManagerStarted = startHookManager(m_hInstance) ? true : false;
-            }
-            if (m_bHookManagerStarted)
-            {
-                lReturn = RegisterHookMessage(hWnd, wParam, (HookCallback*)lParam);
-            }
-        }
-        break;
-        
-        case LM_UNREGISTERHOOKMESSAGE:
-        {
-            if (m_bHookManagerStarted)
-            {
-                if (UnregisterHookMessage(hWnd, wParam, (HookCallback*)lParam) == 0)
-                {
-                    stopHookManager();
-                    m_bHookManagerStarted = false;
-                }
-            }
-        }
-        break;
-        
         case LM_REGISTERMESSAGE:     // Message Handler Message
         {
             if (m_pMessageManager)
@@ -1017,7 +989,6 @@ HRESULT CLiteStep::_InitManagers()
     // - The DataStore manager is dynamically initialized/started.
     // - The Bang manager is located in LSAPI, and
     //   is instantiated via LSAPIInit.
-    // - The Hook mamanger is dynamically initialized/started.
     
     return hr;
 }
@@ -1043,7 +1014,6 @@ HRESULT CLiteStep::_StartManagers()
     //   here as it also needs to happen on Recycle.
     // - MessageManager has/needs no Start method.
     // - The DataStore manager is dynamically initialized/started.
-    // - The Hook mamanger is dynamically initialized/started.
     
     return hr;
 }
@@ -1055,12 +1025,6 @@ HRESULT CLiteStep::_StartManagers()
 HRESULT CLiteStep::_StopManagers()
 {
     HRESULT hr = S_OK;
-    
-    if (m_bHookManagerStarted)
-    {
-        stopHookManager();
-        m_bHookManagerStarted = false;
-    }
     
     m_pModuleManager->Stop();
     
@@ -1099,10 +1063,6 @@ void CLiteStep::_CleanupManagers()
         delete m_pDataStoreManager;
         m_pDataStoreManager = NULL;
     }
-    
-    // Note:
-    // - The Hook manager is dynamically started/stopped.
-    
 }
 
 

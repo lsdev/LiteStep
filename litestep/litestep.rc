@@ -221,8 +221,6 @@ BEGIN
     IDS_MODULEINITEXCEPTION_ERROR 
                             "Error: Exception during module initialization.\n\nPlease contact the module writer."
     IDS_LITESTEP_CREATEWINDOW_ERROR "Unable to create window."
-    IDS_HOOKMGR_CREATETHREAD_ERROR "Could not create Hook Manager Thread"
-    IDS_HOOKMGR_LOADHOOK_ERROR "Could not load hook.dll"
     IDS_LITESTEP_BANGEXCEPTION 
                             "Exception during bang command execution.\nPlease contact the module author.\n\nBang parameters: %s"
     IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."

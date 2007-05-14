@@ -100,7 +100,6 @@ private:
 	HRESULT _StopManagers();
 	void _CleanupManagers();
 
-	bool m_bHookManagerStarted; // = false
 	bool m_bSignalExit; // = false
 
 	//

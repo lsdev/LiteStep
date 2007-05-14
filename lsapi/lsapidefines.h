@@ -91,8 +91,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LM_GETREVID					9265
 #define LM_UNLOADMODULE				9266
 #define LM_RELOADMODULE				9267
-#define LM_REGISTERHOOKMESSAGE		9268
-#define LM_UNREGISTERHOOKMESSAGE	9269
+#define LM_REGISTERHOOKMESSAGE		9268  // Deprecated
+#define LM_UNREGISTERHOOKMESSAGE	9269  // Deprecated
 #define LM_SHADETOGGLE				9300
 #define LM_REFRESH					9305
 
@@ -124,8 +124,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LM_DATASTORE				9410 // Deprecated
 #define LM_MESSAGEMANAGER			9411 // Deprecated
 #define LM_BANGCOMMAND				9420
-#define LM_ENUMREVIDS               9430
-#define LM_ENUMMODULES              9431
+#define LM_ENUMREVIDS				9430
+#define LM_ENUMMODULES				9431
 #endif
 
 // shell hook messages

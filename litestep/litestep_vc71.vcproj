@@ -108,7 +108,6 @@
 				OutputFile="$(OutDir)/litestep.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				DelayLoadDLLs="hook.dll"
 				GenerateDebugInformation="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -157,9 +156,6 @@
 				RelativePath=".\DDEWorker.cpp">
 			</File>
 			<File
-				RelativePath=".\HookManager.cpp">
-			</File>
-			<File
 				RelativePath=".\litestep.cpp">
 			</File>
 			<File
@@ -199,9 +195,6 @@
 			</File>
 			<File
 				RelativePath=".\DDEWorker.h">
-			</File>
-			<File
-				RelativePath=".\HookManager.h">
 			</File>
 			<File
 				RelativePath=".\litestep.h">

@@ -284,9 +284,6 @@ Contents:
                      handles $evars$ and all other configuration. Manages !bang
                      commands, includes core !bangs.
 
-  - hook.dll         The system shell hook used by some legacy LiteStep modules
-                     for receiving global system messages.
-
  LiteStep also depends on "libpng13.dll" and "zlib1.dll" for Portable Network
  Graphics (PNG) image support.  Those two files must exist in the same directory
  as "litestep.exe" or in the system path.

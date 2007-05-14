@@ -113,7 +113,6 @@
      directory has the following structure:
 
      \LiteStep
-         \hook
          \litestep
          \lsapi
          \utility

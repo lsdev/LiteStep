@@ -15,18 +15,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "hook"=".\hook\hook.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "litestep"=".\litestep\litestep.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -37,9 +25,6 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name lsapi
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name hook
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name utility

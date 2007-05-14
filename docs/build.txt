@@ -23,9 +23,6 @@
   \LiteStep\lsapi
     - Contains the "lsapi.dll" source files
 
-  \LiteStep\hook
-    - Contains the "hook.dll" source files
-
   \LiteStep\utility
     - Contains common utility source files used across all code modules
 
@@ -39,8 +36,5 @@
  - lsapi.dll        LiteStep API for modules to use. Loads and parses step.rc;
                     handles $evars$ and all other configuration. Manages !bang
                     commands, includes core !bangs.
-
- - hook.dll         The system shell hook used by some legacy LiteStep modules
-                    for receiving global system messages.
 
 -- LITESTEP MODULE DEVELOPMENT -------------------------------------------------

@@ -47,7 +47,7 @@ RM = rm -f
 #-----------------------------------------------------------------------------
 
 # Search path for dependencies
-VPATH = hook;litestep;lsapi;utility
+VPATH = litestep;lsapi;utility
 
 # Output directory
 ifdef DEBUG
@@ -60,7 +60,7 @@ endif
 EXE = $(OUTPUT)/litestep.exe
 
 # Libraries that litestep.exe uses
-EXELIBS = -L$(OUTPUT) -lhook -llsapi -lole32 -lshlwapi -luuid
+EXELIBS = -L$(OUTPUT) -llsapi -lole32 -lshlwapi -luuid
 
 # Object files for litestep.exe
 EXEOBJS = $(OUTPUT)/BangCommand.o \
@@ -68,7 +68,6 @@ EXEOBJS = $(OUTPUT)/BangCommand.o \
 	$(OUTPUT)/DDEService.o \
 	$(OUTPUT)/DDEStub.o \
 	$(OUTPUT)/DDEWorker.o \
-	$(OUTPUT)/HookManager.o \
 	$(OUTPUT)/litestep.o \
 	$(OUTPUT)/litestep.res \
 	$(OUTPUT)/localization.o \
@@ -115,27 +114,12 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/shellhlp.o \
 	$(OUTPUT)/stubs.o
 
-# Path to hook.dll
-HOOKDLL = $(OUTPUT)/hook.dll
-
-# Path to hook.dll export definitions file
-HOOKDLLDEF = hook/hook_mingw.def
-
-# Path to hook.dll import library
-HOOKDLLIMPLIB = $(OUTPUT)/libhook.a
-
-# Libraries that hook.dll uses
-HOOKDLLLIBS = 
-
-# Object files for hook.dll
-HOOKDLLOBJS = $(OUTPUT)/hook.o
-
 #-----------------------------------------------------------------------------
 # Rules
 #-----------------------------------------------------------------------------
 
 # litestep.exe
-$(EXE): $(EXEOBJS) $(DLL) $(HOOKDLL)
+$(EXE): $(EXEOBJS) $(DLL)
 	$(CXX) -o $(EXE) $(LDFLAGS) $(EXEOBJS) $(EXELIBS)
 ifndef DEBUG
 	$(STRIP) $(EXE)
@@ -148,21 +132,12 @@ ifndef DEBUG
 	$(STRIP) $(DLL)
 endif
 
-# hook.dll
-$(HOOKDLL): $(HOOKDLLOBJS) $(HOOKDLLDEF)
-	$(DLLWRAP) --driver-name $(CXX) --def $(HOOKDLLDEF) --implib $(HOOKDLLIMPLIB) -o $(HOOKDLL) $(LDFLAGS) $(HOOKDLLOBJS) $(HOOKDLLLIBS)
-ifndef DEBUG
-	$(STRIP) $(HOOKDLL)
-endif
-
 # Remove output files
 .PHONY: clean
 clean:
 	-$(RM) $(EXE)
 	-$(RM) $(DLL)
 	-$(RM) $(DLLIMPLIB)
-	-$(RM) $(HOOKDLL)
-	-$(RM) $(HOOKDLLIMPLIB)
 	-$(RM) $(OUTPUT)/*.o
 	-$(RM) $(OUTPUT)/*.res
 
@@ -181,16 +156,6 @@ $(OUTPUT)/%.o: %.cpp
 #-----------------------------------------------------------------------------
 # Dependencies
 #-----------------------------------------------------------------------------
-
-$(OUTPUT)/hook.o: hook/hook.cpp \
-	hook/hook.h \
-	litestep/buildoptions.h \
-	litestep/litestep.h \
-	lsapi/lsapidefines.h \
-	utility/Base.h \
-	utility/common.h  \
-	utility/debug.hpp \
-	utility/ILiteStep.h
 
 $(OUTPUT)/BangManager.o: litestep/BangManager.cpp \
 	litestep/BangManager.h \
@@ -250,26 +215,12 @@ $(OUTPUT)/DDEWorker.o: litestep/DDEWorker.cpp \
 	utility/safestr.h \
 	utility/shellhlp.h
 
-$(OUTPUT)/HookManager.o: litestep/HookManager.cpp \
-	hook/hook.h \
-	litestep/buildoptions.h \
-	litestep/HookManager.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/debug.hpp \
-	utility/macros.h
-
 $(OUTPUT)/litestep.o: litestep/litestep.cpp \
-	hook/hook.h \
 	litestep/buildoptions.h \
 	litestep/DataStore.h \
 	litestep/DDEService.h \
 	litestep/DDEStub.h \
 	litestep/DDEWorker.h \
-	litestep/HookManager.h \
 	litestep/litestep.h \
 	litestep/MessageManager.h \
 	litestep/Module.h \
