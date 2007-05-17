@@ -252,7 +252,7 @@ void LSAPIInit::setLitestepVars()
         // Any Win9x-series OS
         pSM->SetVariable("Win9x", "true");
         
-        if (OsVersionInfo.dwMinorVersion >= 90) // Windows ME (4.90)
+        if (OsVersionInfo.dwMinorVersion >= 90)      // Windows ME (4.90)
         {
             pSM->SetVariable("WinME", "true");
         }
@@ -260,7 +260,7 @@ void LSAPIInit::setLitestepVars()
         {
             pSM->SetVariable("Win98", "true");
         }
-        else // Windows 95 (4.00)
+        else                                         // Windows 95 (4.00)
         {
             pSM->SetVariable("Win95", "true");
         }
@@ -272,16 +272,20 @@ void LSAPIInit::setLitestepVars()
         
         if (OsVersionInfo.dwMajorVersion == 5)
         {
-            if (OsVersionInfo.dwMinorVersion >= 1)
+            if (OsVersionInfo.dwMinorVersion >= 2)   // Windows 2003 (5.2)
             {
-                pSM->SetVariable("WinXP", "true");       // Windows XP (5.1)
+                pSM->SetVariable("Win2003", "true");
             }
-            else
+            if (OsVersionInfo.dwMinorVersion >= 1)   // Windows XP (5.1)
             {
-                pSM->SetVariable("Win2000", "true");     // Windows 2000 (5.0)
+                pSM->SetVariable("WinXP", "true");
+            }
+            else                                     // Windows 2000 (5.0)
+            {
+                pSM->SetVariable("Win2000", "true");
             }
         }
-        else if (OsVersionInfo.dwMajorVersion >= 4) // Windows NT 4.0
+        else if (OsVersionInfo.dwMajorVersion >= 4)  // Windows NT 4.0
         {
             pSM->SetVariable("WinNT4", "true");
         }
