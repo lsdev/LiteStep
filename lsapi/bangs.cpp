@@ -282,7 +282,7 @@ void BangRun(HWND /* hCaller */, LPCSTR /* pszArgs */)
 	typedef void (WINAPI* RunDlgType)(HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT);
 
 	RunDlgType RunDlg = (RunDlgType)GetProcAddress(
-		GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3D));
+		GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003D));
 
 	if (RunDlg)
 	{

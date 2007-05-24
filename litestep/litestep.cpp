@@ -368,9 +368,9 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         // Set magic DWORD to prevent VWM from seeing main window
         SetWindowLong (m_hMainWindow, GWL_USERDATA, magicDWord);
         
-        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) =
+        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = \
             (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
-            GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0xB5));
+                GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x00B5));
         
         WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
         
@@ -452,7 +452,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         _StopServices();
         _CleanupServices();
         
-        // Destroy _main window
+		// Destroy main window
         DestroyWindow(m_hMainWindow);
         m_hMainWindow = NULL;
     }
@@ -711,7 +711,7 @@ LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 default:  // wParam == LR_MSSHUTDOWN
                 {
                     FARPROC (__stdcall * MSWinShutdown)(HWND) = NULL;
-                    MSWinShutdown = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPSTR)((long)0x3C));
+                    MSWinShutdown = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003C));
                     if (MSWinShutdown)
                     {
                         MSWinShutdown(m_hMainWindow); // shouldn't this be NULL?
