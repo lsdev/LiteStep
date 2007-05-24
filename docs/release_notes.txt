@@ -222,8 +222,8 @@ Contents:
 
         HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Winlogon
 
-      * Change the string value named "Shell" to the location of the file you
-        want to use as your current user shell.
+      * Change (create) the string value named "Shell" to the location of the
+        file you want to use as your current user shell.
 
         For LiteStep use (adjust path as necessary):
 
@@ -233,20 +233,13 @@ Contents:
 
           Explorer.exe
 
-    - To use any shell besides Explorer, the following keys MUST be changed.
-      If you do not configure these keys, you will not be able to use the
+    - To use any shell besides Explorer, the following key MUST be changed.
+      If you do not configure this key, you will not be able to use the
       Explorer File Manager.
 
       * Locate the following key:
 
         HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer
-
-      * Change (create) the DWORD value named "DesktopProcess" to a value of 1.
-
-      * Locate the following key:
-
-        HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion
-          \Explorer\Advanced
 
       * Change (create) the DWORD value named "DesktopProcess" to a value of 1.
 
@@ -263,7 +256,7 @@ Contents:
 -- USAGE (HELP) ----------------------------------------------------------------
 
  The following section lays out the structure of LiteStep, and the available
- configuration options.  When used within this document to describe a paramter
+ configuration options.  When used within this document to describe a parameter
  value, <> means a required parameter, and [] means an optional parameter.
  Otherwise, those characters have special meaning in the LiteStep configuration.
 
@@ -583,10 +576,10 @@ Contents:
   LSImageFolder <path>
   --------------------
    Sets the default folder that LiteStep looks in when loading images. This will
-   default to <install path>\images (e.g. C:\LiteStep\images).
+   default to <install path>\images\ (e.g. C:\LiteStep\images\).
 
    Usage:
-    C:\LiteStep\themes\mytheme\images
+    LSImageFolder "C:\LiteStep\themes\mytheme\images\"
 
   ThemeAuthor <string>
   --------------------
@@ -714,13 +707,6 @@ Contents:
 
    Usage:
     !Execute <command1> [<command2> [...]]
-
-  !Gather
-  -------
-   Moves all application windows to the current virtual desktop.
-
-   Usage:
-    !Gather
 
   !HideModules
   ------------
@@ -1079,7 +1065,7 @@ Contents:
  LiteStep is a replacement shell for the standard Windows® Explorer shell.
 
  Copyright (C) 1997-1998  Francis Gastellu
- Copyright (C) 1997-2005  Litestep Development Team
+ Copyright (C) 1998-2007  Litestep Development Team
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
