@@ -38,5 +38,8 @@ typedef std::multimap<std::string, std::string, stringicmp> SettingsMap;
 /** Maps setting names to iterators */
 typedef std::map<std::string, SettingsMap::iterator, stringicmp> IteratorMap;
 
+/** Set of strings with case-insensitive ordering. */
+typedef std::set<std::string, stringicmp> StringSet;
+
 
 #endif // __SETTINGSDEFINES_H_

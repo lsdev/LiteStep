@@ -246,7 +246,9 @@ BOOL SettingsManager::GetRCString(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszD
                 char szToken[MAX_LINE_LENGTH] = { 0 };
                 GetToken(it->second.c_str(), szToken, NULL, FALSE);
                 
-                VarExpansionEx(pszValue, szToken, nMaxLen);
+                StringSet recursiveVarSet;
+                recursiveVarSet.insert(pszKeyName);
+                VarExpansionEx(pszValue, szToken, nMaxLen, recursiveVarSet);
             }
         }
         else if (pszDefStr && pszValue)
@@ -282,7 +284,9 @@ BOOL SettingsManager::GetRCLine(LPCSTR pszKeyName, LPSTR pszValue, int nMaxLen, 
             if (pszValue)
             {
                 // for compatibility reasons GetRCLine expands $evars$
-                VarExpansionEx(pszValue, it->second.c_str(), nMaxLen);
+                StringSet recursiveVarSet;
+                recursiveVarSet.insert(pszKeyName);
+                VarExpansionEx(pszValue, it->second.c_str(), nMaxLen, recursiveVarSet);
             }
         }
         else if (pszDefStr && pszValue)
@@ -308,7 +312,9 @@ BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
         char szToken[MAX_LINE_LENGTH] = { 0 };
         
-        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetToken(szExpanded, szToken, NULL, FALSE))
         {
@@ -338,7 +344,9 @@ BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
         char szToken[MAX_LINE_LENGTH] = { 0 };
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
         
-        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetToken(szExpanded, szToken, NULL, FALSE))
         {
@@ -367,7 +375,9 @@ int SettingsManager::GetRCInt(LPCSTR pszKeyName, int nDefault)
         char szToken[MAX_LINE_LENGTH] = { 0 };
         char szExpanded[MAX_LINE_LENGTH] = { 0 };
         
-        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+        VarExpansionEx(szExpanded, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetToken(szExpanded, szToken, NULL, FALSE))
         {
@@ -393,7 +403,10 @@ COLORREF SettingsManager::GetRCColor(LPCSTR pszKeyName, COLORREF crDefault)
         
         LPSTR lpszTokens[3] = { szFirst, szSecond, szThird};
         
-        VarExpansionEx(szBuffer, it->second.c_str(), MAX_LINE_LENGTH);
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+        VarExpansionEx(szBuffer, it->second.c_str(), MAX_LINE_LENGTH, recursiveVarSet);
+        
         int nCount = LCTokenize(szBuffer, lpszTokens, 3, NULL);
         
         if (nCount >= 3)
@@ -446,6 +459,13 @@ void SettingsManager::SetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
 
 
 void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength)
+{
+    StringSet recursiveVarSet;
+    VarExpansionEx(pszExpandedString, pszTemplate, stLength, recursiveVarSet);
+}
+
+
+void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength, const StringSet& recursiveVarSet)
 {
     LPCSTR pszOriginalTemplate = pszTemplate;
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
@@ -503,13 +523,30 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                     
                     if (szVariable[0] != '\0')
                     {
+                        // Check for recursive variable definitions
+                        if (recursiveVarSet.count(szVariable) > 0)
+                        {
+                            // Output an error message (localize this)
+                            Error(LOCALIZE_THIS, "Error: Variable \"%s\" is defined recursively.", szVariable);
+                            
+                            pszExpandedString[0] = '\0';
+                            return;
+                        }
+                        
                         //
                         // Get the value, if we can.
                         //
                         SettingsMap::iterator it;
                         if (_FindLine(szVariable, it))
                         {
-                            GetToken(it->second.c_str(), pszTempExpandedString, NULL, FALSE);
+                            // Add this variable to the set to check for recursion
+                            StringSet newRecursiveVarSet(recursiveVarSet);
+                            newRecursiveVarSet.insert(szVariable);
+                            
+                            // FIXME: Should we call GetToken here?!
+                            TCHAR szTemp[MAX_LINE_LENGTH];
+                            GetToken(it->second.c_str(), szTemp, NULL, FALSE);
+                            VarExpansionEx(pszTempExpandedString, szTemp, stWorkLength, newRecursiveVarSet);
                             bSucceeded = true;
                         }
                         else if (GetEnvironmentVariable(szVariable,
@@ -546,15 +583,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
         }
         
         *pszTempExpandedString = '\0';
-        
-        if (strchr(szTempExpandedString, '$'))
-        {
-            VarExpansionEx(pszExpandedString, szTempExpandedString, stLength);
-        }
-        else
-        {
-            StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
-        }
+        StringCchCopy(pszExpandedString, stLength, szTempExpandedString);
     }
 }
 

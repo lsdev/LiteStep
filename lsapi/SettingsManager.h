@@ -281,6 +281,17 @@ public:
      * @param  cchBufferLen  size of the buffer
      */
     void VarExpansionEx(LPSTR pszBuffer, LPCSTR pszTemplate, size_t cchBufferLen);
+    
+    /**
+     * Expands variable references. The template string is copied into the buffer with all
+     * variable references (<code>$var$</code>) replaced by the value of the variable.
+     *
+     * @param  pszBuffer        buffer to received the expanded string
+     * @param  pszTemplate      string to be expanded
+     * @param  cchBufferLen     size of the buffer
+     * @param  recursiveVarSet  recursive variable set
+     */
+    void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength, const StringSet& recursiveVarSet);
 };
 
 #endif // __SETTINGSMANAGER_H
