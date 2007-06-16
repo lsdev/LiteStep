@@ -33,10 +33,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // hacks are scheduled to be taken out in the next LiteStep version.
 // 
 
-// Enables Indie LS-like math evaluation in VarExpansion(Ex).
-// 0.24.7 default: ENABLED
-#define LS_COMPAT_MATH
-
 // "Unoptimizes" BitmapToRegion to make it work the 0.24.6 way. It enables the
 // clrTolerance parameter, which can be used to interpret e.g. FE00FE as Magic
 // Pink.

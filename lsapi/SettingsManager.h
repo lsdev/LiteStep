@@ -92,16 +92,6 @@ protected:
      */
     void _SetupVars(LPCSTR szLSPath);
     
-#ifdef LS_COMPAT_MATH
-    /**
-     * Evalulates a mathematical expression.
-     *
-     * @param   ptzInput  expression to evaluate
-     * @return  value of the expression
-     */
-    double _MathEvaluate(LPTSTR ptzInput);
-#endif //LS_COMPAT_MATH
-    
     /**
      * Sets the value of a setting to the path of a special shell folder.
      *
