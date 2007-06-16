@@ -73,15 +73,12 @@ bool EvalParser::basicExpression(int &result)
         if (GetRCString(stringValue.c_str(), szValue, NULL, MAX_LINE_LENGTH))
         {
             char szToken[MAX_LINE_LENGTH + 1];
-            char szExpanded[MAX_LINE_LENGTH + 1];
-            
-            VarExpansionEx(szExpanded, szValue, MAX_LINE_LENGTH);
             
             if (isDigit(szValue[0]))
             {
                 result = 0;
                 
-                if (GetToken(szExpanded, szToken, NULL, FALSE))
+                if (GetToken(szValue, szToken, NULL, FALSE))
                 {
                     result = strtol(szToken, NULL, 0);
                 }
@@ -90,7 +87,7 @@ bool EvalParser::basicExpression(int &result)
             {
                 result = TRUE;
                 
-                if (GetToken(szExpanded, szToken, NULL, FALSE))
+                if (GetToken(szValue, szToken, NULL, FALSE))
                 {
                     if ((lstrcmpi(szToken, "off") == 0) ||
                         (lstrcmpi(szToken, "false") == 0) ||
