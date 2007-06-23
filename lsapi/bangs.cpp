@@ -78,7 +78,7 @@ void BangAlert(HWND hCaller, LPCSTR pszArgs)
 	{
 		if (nTokenCount == 1)
 		{
-			StringCchCopy(szTitle, MAX_PATH, "Litestep");
+			StringCchCopy(szTitle, MAX_PATH, "!Alert Litestep");
 		}
 
 		MessageBox(hCaller, szMessage, szTitle, MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
