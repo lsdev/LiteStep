@@ -452,7 +452,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         _StopServices();
         _CleanupServices();
         
-		// Destroy main window
+        // Destroy main window
         DestroyWindow(m_hMainWindow);
         m_hMainWindow = NULL;
     }
@@ -1063,7 +1063,6 @@ void CLiteStep::_CleanupManagers()
     
     if (m_pDataStoreManager)
     {
-        m_pDataStoreManager->Clear();
         delete m_pDataStoreManager;
         m_pDataStoreManager = NULL;
     }
