@@ -78,7 +78,7 @@ public:
     BOOL HandleNotification(PSHELLTRAYDATA pstd);
     
     // resend all icon data
-    HWND SendSystemTray() const;
+    HWND SendSystemTray();
     
     // Message Handler
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
@@ -108,6 +108,9 @@ private:
     //
     bool notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const;
     bool extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) const;
+    
+    // Remove any "dead" icons
+    void removeDeadIcons();
     
     //
     // findIcon variants
