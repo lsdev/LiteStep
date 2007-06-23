@@ -341,7 +341,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
     // Register Window Class
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
-    wc.lpfnWndProc = CLiteStep::InternalWndProc;
+    wc.lpfnWndProc = CLiteStep::ExternalWndProc;
     wc.hInstance = m_hInstance;
     wc.lpszClassName = szMainWindowClass;
     
@@ -541,7 +541,7 @@ int CLiteStep::MessageHandler(MSG &message)
 //
 //
 //
-LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static CLiteStep* pLiteStep = NULL;
     
@@ -555,7 +555,7 @@ LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     
     if (pLiteStep)
     {
-        return pLiteStep->ExternalWndProc(hWnd, uMsg, wParam, lParam);
+        return pLiteStep->InternalWndProc(hWnd, uMsg, wParam, lParam);
     }
     
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -565,7 +565,7 @@ LRESULT CALLBACK CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 //
 //
 //
-LRESULT CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT lReturn = FALSE;
     
