@@ -142,7 +142,7 @@ void StartupRunner::_RunStartupMenu()
     
     TCHAR tzPath[MAX_PATH];
     
-    for (int i = 0; i < STARTUPMENU_SIZE; ++i)
+    for (ULONG i = 0; i < STARTUPMENU_SIZE; ++i)
     {
         if (GetShellFolderPath(STARTUPMENU_TABLE[i], tzPath, MAX_PATH))
         {
