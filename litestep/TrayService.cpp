@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
-#  include <docobj.h>
+#include <docobj.h>
 
 #ifndef REGSTR_PATH_SHELLSERVICEOBJECTDELAYED
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
@@ -83,9 +83,9 @@ HRESULT TrayService::Start()
         if (createWindows())
         {
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
-            SetWindowLongPtr(m_hTrayWnd, 0, (LONG)this);
+            SetWindowLongPtr(m_hTrayWnd, 0, (LONG_PTR)this);
             
-            // tell apps to reregister their icons (see Note 6)
+            // tell apps to reregister their icons
             PostMessage(HWND_BROADCAST,
                 RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
             
@@ -140,7 +140,7 @@ bool TrayService::createWindows()
     //
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
-    wc.cbWndExtra = 4;
+    wc.cbWndExtra = sizeof(TrayService*);
     wc.lpfnWndProc = TrayService::WindowProc;
     wc.hInstance = m_hInstance;
     wc.lpszClassName = szTrayClass;
@@ -204,7 +204,7 @@ bool TrayService::createWindows()
                     UnregisterClass(szNotifyClass, m_hInstance);
                 }
             }
-    }
+        }
     }
     
     return bReturn;
@@ -331,7 +331,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
     {
         switch (uMsg)
         {
-            case WM_COPYDATA:
+        case WM_COPYDATA:
             {
                 //
                 // Undocumented: This is how we can make our own system tray
@@ -366,7 +366,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
                     break;
                     
                 case SH_LOADPROC_DATA:
-                    default:
+                default:
                     {
                         TRACE("Unsupported tray message: %u", pcds->dwData);
                     }
@@ -375,7 +375,7 @@ LRESULT CALLBACK TrayService::WindowProc(HWND hWnd, UINT uMsg,
             }
             break;
             
-            default:
+        default:
             break;
         }
     }
@@ -400,19 +400,19 @@ BOOL TrayService::HandleAppBarMessage(PSHELLAPPBARDATA pData)
     //
     switch(pData->dwMessage)
     {
-        case ABM_NEW:
-        case ABM_REMOVE:
-        case ABM_QUERYPOS:
-        case ABM_SETPOS:
-        case ABM_ACTIVATE:
-        case ABM_WINDOWPOSCHANGED:
+    case ABM_NEW:
+    case ABM_REMOVE:
+    case ABM_QUERYPOS:
+    case ABM_SETPOS:
+    case ABM_ACTIVATE:
+    case ABM_WINDOWPOSCHANGED:
         {
             return TRUE;
         }
         break;
         
-        default:
-            break;
+    default:
+        break;
     }
     
     return FALSE;
@@ -431,28 +431,28 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
     
     switch (pstd->dwMessage)
     {
-        case NIM_ADD:
+    case NIM_ADD:
         {
             bReturn = addIcon(pstd->nid);
         }
         break;
         
-        case NIM_MODIFY:
+    case NIM_MODIFY:
         {
             bReturn = modifyIcon(pstd->nid);
         }
         break;
         
-        case NIM_DELETE:
+    case NIM_DELETE:
         {
             bReturn = deleteIcon(pstd->nid);
         }
         break;
         
     case NIM_SETFOCUS:
-            {
+        {
             bReturn = setFocusIcon(pstd->nid);
-            }
+        }
         break;
         
     case NIM_SETVERSION:
@@ -461,7 +461,7 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
         }
         break;
         
-        default:
+    default:
         {
             TRACE("NIM unknown: %u", pstd->dwMessage);
         }
@@ -626,7 +626,7 @@ bool TrayService::addIcon(const NID_XX& nid)
         
         if (pni)
         {
-            /* Fail shared icons, unless a valid hIcon exists */
+            // Fail shared icons, unless a valid hIcon exists
             if(IsWindow(pni->GetHwnd()) && (!pni->IsShared() || pni->HasIcon()))
             {
                 m_siVector.push_back(pni);
@@ -797,8 +797,8 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
         
         switch(nid.cbSize)
         {
-            case NID_6W_SIZE:
-            case NID_5W_SIZE:
+        case NID_6W_SIZE:
+        case NID_5W_SIZE:
             lsnid.uVersion = ((NID_5W&)nid).uVersion;
             break;
             
@@ -835,8 +835,8 @@ struct FindIconPredicate
     }
     
 private:
-    HWND m_hWnd;
-    UINT m_uID;
+    const HWND m_hWnd;
+    const UINT m_uID;
 };
 
 

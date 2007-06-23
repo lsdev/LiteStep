@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // data sent by shell via Shell_NotifyIcon
 typedef struct _SHELLTRAYDATA
-    {
+{
     DWORD dwUnknown;
     DWORD dwMessage;
     NID_XX nid;
@@ -41,7 +41,7 @@ typedef struct _SHELLTRAYDATA
 
 // Data sent with AppBar Message
 typedef struct _SHELLAPPBARDATA
-    {
+{
     APPBARDATA abd;
     DWORD dwMessage;
     DWORD dwDontKnow;
