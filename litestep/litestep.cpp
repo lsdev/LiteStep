@@ -108,7 +108,7 @@ HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
             cds.dwData = LM_BANGCOMMAND;
             cds.lpData = &bangCommand;
             
-            SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+            SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds);
             hr = S_OK;
         }
     }
@@ -330,7 +330,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
                 "\n"
                 "Continue to load Litestep?\n");
             RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
-            if (MessageBox(0, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
+            if (MessageBox(NULL, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
             {
                 return E_ABORT;
             }
