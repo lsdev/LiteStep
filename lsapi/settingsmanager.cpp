@@ -205,6 +205,8 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
 
 void SettingsManager::ParseFile(LPCSTR pszFileName)
 {
+    TRACE("Loading config file \"%s\"", pszFileName);
+    
     FileParser fpParser(&m_SettingsMap);
     fpParser.ParseFile(pszFileName);
 }
@@ -619,6 +621,8 @@ FILE* SettingsManager::LCOpen(LPCSTR pszPath)
             {
                 pFileInfo->m_pSettingsMap = new SettingsMap;
                 pFileInfo->m_Count = 1;
+                
+                TRACE("Loading config file \"%s\"", szPath);
                 
                 FileParser fpParser(pFileInfo->m_pSettingsMap);
                 fpParser.ParseFile(szPath);
