@@ -641,6 +641,7 @@ Contents:
   2. Conditional Expansions
 
    Win2000
+   Win2003
    Win95
    Win98
    Win9X
