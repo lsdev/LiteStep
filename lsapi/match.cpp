@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "lsapidefines.h"
 #include "lsapi.h"
 
-int matche_after_star (LPCSTR pattern, LPCSTR text);
+static int matche_after_star (LPCSTR pattern, LPCSTR text);
 
 /*----------------------------------------------------------------------------
 *
@@ -386,7 +386,7 @@ int matche (LPCSTR p, LPCSTR t)
 *
 ----------------------------------------------------------------------------*/
 
-int matche_after_star (LPCSTR p, LPCSTR t)
+static int matche_after_star (LPCSTR p, LPCSTR t)
 {
 	int match = 0;
 	char nextp;
