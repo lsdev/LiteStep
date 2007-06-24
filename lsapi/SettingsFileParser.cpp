@@ -40,7 +40,10 @@ FileParser::FileParser(SettingsMap* pSettingsMap) :
 //
 FileParser::~FileParser()
 {
-    delete m_pEvalParser;
+    if(NULL != m_pEvalParser)
+    {
+        delete m_pEvalParser;
+    }
 }
 
 
@@ -54,40 +57,45 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     ASSERT_ISNULL(m_phFile);
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
-    TCHAR tzFullPath[MAX_PATH_LENGTH];
     
     VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
-    
     PathUnquoteSpaces(tzExpandedPath);
-    GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, tzFullPath, NULL);
     
-    TRACE("Parsing \"%s\"", tzFullPath);
+    DWORD dwLen;
+    dwLen = GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, NULL);
     
-    m_phFile = _tfopen(tzFullPath, _T("r"));
-    
-    if (m_phFile)
+    if(0 == dwLen || dwLen > MAX_PATH_LENGTH)
     {
-        fseek(m_phFile, 0, SEEK_SET);
-        
-        TCHAR tzKey[MAX_RCCOMMAND] = { 0 };
-        TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
-        
-        while (_ReadLineFromFile(tzKey, tzValue))
-        {
-            _ProcessLine(tzKey, tzValue);
-        }
-        
-        fclose(m_phFile);
+        TRACE("Error: Can not get full path for \"%s\"", tzExpandedPath);
+        return;
     }
-    else
+    
+    m_phFile = _tfopen(m_tzFullPath, _T("r"));
+    
+    if(NULL == m_phFile)
     {
-// Should display an error message here, but it breaks some themes. Should push
-// it back until 0.25.0 or something.
-//        Error(LOCALIZE_THIS,
-//            _T("Error opening \"%s\" for parsing.\n\n")
-//            _T("Requested as: %s\nResolved to: %s"),
-//            tzExpandedPath, ptzFileName, tzFullPath);
+        TRACE("Error: Can not open file \"%s\" (Defined as \"%s\").", m_tzFullPath, ptzFileName);
+        return;
     }
+    
+    TRACE("Parsing \"%s\"", m_tzFullPath);
+    
+    fseek(m_phFile, 0, SEEK_SET);
+    
+    TCHAR tzKey[MAX_RCCOMMAND] = { 0 };
+    TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
+    
+    m_uLineNumber = 0;
+    
+    while(_ReadLineFromFile(tzKey, tzValue))
+    {
+        _ProcessLine(tzKey, tzValue);
+    }
+    
+    fclose(m_phFile);
+    m_phFile = NULL;
+    
+    TRACE("Finished Parsing \"%s\"", m_tzFullPath);
 }
 
 
@@ -95,7 +103,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 //
 // _ReadLineFromFile
 //
-// ptzName must be MAX_RCOCOMMAND size
+// ptzName must be MAX_RCCOMMAND size
 // ptzValue must be MAX_LINE_LENGTH size (or NULL)
 //
 bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
@@ -103,15 +111,18 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
     ASSERT_ISNOTNULL(m_phFile);
     ASSERT_ISVALIDBUF(ptzName, MAX_RCCOMMAND);
     
-    TCHAR tzBuffer[MAX_LINE_LENGTH] = { 0 };
+    TCHAR tzBuffer[MAX_LINE_LENGTH];
     bool bReturn = false;
     
     while (!feof(m_phFile) && !bReturn)
     {
         if (!_fgetts(tzBuffer, MAX_LINE_LENGTH, m_phFile))
         {
+            // End Of File or an Error occured. We don't care which.
             break;
         }
+        
+        m_uLineNumber++;
         
         LPTSTR ptzCurrent = tzBuffer;
         ptzCurrent += StrSpn(ptzCurrent, WHITESPACE);
@@ -234,7 +245,6 @@ void FileParser::_StripString(LPTSTR ptzString)
 }
 
 
-
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // _ProcessLine
@@ -247,11 +257,32 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     {
         _ProcessIf(ptzValue);
     }
-    else if (lstrcmpi(ptzName, _T("include")) == 0)
+#ifdef _DEBUG
+    // In a release build ignore dangling elseif/else/endif.
+    // Too much overhead just for error handling
+    else if (
+           (lstrcmpi(ptzName, "else") == 0)
+        || (lstrcmpi(ptzName, "elseif") == 0)
+        || (lstrcmpi(ptzName, "endif") == 0)
+    )
+    {
+        TRACE("Error: Dangling pre-processor directive (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, ptzName);
+    }
+#endif
+    else if (lstrcmpi(ptzName, "include") == 0)
     {
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
         
-        GetToken(ptzValue, tzPath, NULL, FALSE);
+        if (!GetToken(ptzValue, tzPath, NULL, FALSE))
+        {
+            TRACE("Syntax Error (%s, %d): Empty \"Include\" directive",
+                m_tzFullPath, m_uLineNumber);
+            return;
+        }
+        
+        TRACE("Include (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, tzPath);
         
         FileParser fpParser(m_pSettingsMap);
         fpParser.ParseFile(tzPath);
@@ -271,97 +302,108 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
     ASSERT_ISNOTNULL(ptzExpression);
     
-    TCHAR tzName[MAX_RCCOMMAND] = { 0 };
-    TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
+    BOOL result = FALSE;
     
-    if (!m_pEvalParser)
+    if (NULL == m_pEvalParser)
     {
+        // Don't create it until the first time conditionals are used.  No reason
+        // to penalize people who don't use them.
         m_pEvalParser = new EvalParser();
     }
     
-    if (m_pEvalParser)
+    if (NULL == m_pEvalParser || !m_pEvalParser->evaluate(ptzExpression, &result))
     {
-        BOOL bResult;
+        TRACE("Error parsing expression \"%s\" (%s, line %d)",
+            ptzExpression, m_tzFullPath, m_uLineNumber);
         
-        if (!m_pEvalParser->evaluate(ptzExpression, &bResult))
+        // Invalid syntax, so quit processing entire conditional block
+        _SkipIf();
+        return;
+    }
+    
+    TRACE("Expression (%s, line %d): \"%s\" evaluated to %s",
+        m_tzFullPath, m_uLineNumber,
+        ptzExpression, result ? "TRUE" : "FALSE");
+    
+    TCHAR tzName[MAX_RCCOMMAND] = { 0 };
+    TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
+    
+    if (result)
+    {
+        // When the If expression evaluates true, process lines until we find
+        // an ElseIf. Else, or EndIf
+        while (_ReadLineFromFile(tzName, tzValue))
         {
-            Error(LOCALIZE_THIS,
-                _T("Syntax error in IF expression:\n%s"), ptzExpression);
-        }
-        else
-        {
-            if (bResult)
+            if ((lstrcmpi(tzName, _T("else")) == 0) ||
+                (lstrcmpi(tzName, _T("elseif")) == 0))
             {
-                // when the If condition evaluates true we read and process
-                // all lines until we reach ElseIf, Else, or EndIf
+                // After an ElseIf or Else, skip all lines until EndIf
+                _SkipIf();
+                break;
+            }
+            else if (lstrcmpi(tzName, _T("endif")) == 0)
+            {
+                // We're done
+                break;
+            }
+            else
+            {
+                // Just a line, so process it
+                _ProcessLine(tzName, tzValue);
+            }
+        }
+    }
+    else
+    {
+        // When the If expression evaluates false, skip lines until we find an
+        // ElseIf, Else, or EndIf
+        while (_ReadLineFromFile(tzName, tzValue))
+        {
+            if (lstrcmpi(tzName, _T("if")) == 0)
+            {
+                // Nested Ifs are a special case
+                _SkipIf();
+            }
+            else if (lstrcmpi(tzName, _T("elseif")) == 0)
+            {
+                // Handle ElseIfs by recursively calling ProcessIf
+                _ProcessIf(tzValue);
+                break;
+            }
+            else if (lstrcmpi(tzName, _T("else")) == 0)
+            {
+                // Since the If expression was false, when we see Else we
+                // start processing lines until EndIf
                 while (_ReadLineFromFile(tzName, tzValue))
                 {
-                    if ((lstrcmpi(tzName, _T("else")) == 0) ||
-                        (lstrcmpi(tzName, _T("elseif")) == 0))
+                    if (lstrcmpi(tzName, "elseif") == 0)
                     {
-                        // if we find an ElseIf or Else then we read and ignore
-                        // all lines until we find EndIf
+                        // Error: ElseIf after Else
+                        TRACE("Syntax Error (%s, %d): \"ElseIf\" directive after \"Else\"",
+                            m_tzFullPath, m_uLineNumber);
+                        
+                        // Invalid syntax, so quit processing conditional block
                         _SkipIf();
                         break;
                     }
                     else if (lstrcmpi(tzName, _T("endif")) == 0)
                     {
-                        // we're done
+                        // We're done
                         break;
                     }
                     else
                     {
-                        // just a normal line, process it
+                        // Just a line, so process it
                         _ProcessLine(tzName, tzValue);
                     }
                 }
+                // We're done
+                break;
             }
-            else
+            else if (lstrcmpi(tzName, _T("endif")) == 0)
             {
-                // when the If expression evaluates false we read and ignore
-                // all lines until we find an ElseIf, Else, or EndIf
-                while (_ReadLineFromFile(tzName, tzValue))
-                {
-                    if (lstrcmpi(tzName, _T("if")) == 0)
-                    {
-                        // nested Ifs are a special case
-                        _SkipIf();
-                    }
-                    else if (lstrcmpi(tzName, _T("elseif")) == 0)
-                    {
-                        // we handle ElseIfs by recursively calling ProcessIf
-                        _ProcessIf(tzValue);
-                        break;
-                    }
-                    else if (lstrcmpi(tzName, _T("else")) == 0)
-                    {
-                        // since the If expression was false, when we see Else
-                        // we start process lines until EndIf
-                        while (_ReadLineFromFile(tzName, tzValue))
-                        {
-                            // we should probably check that there are no
-                            // ElseIfs after the Else, but for now we silently
-                            // ignore such an error
-                            
-                            // break on EndIf
-                            if (lstrcmpi(tzName, _T("endif")) == 0)
-                            {
-                                break;
-                            }
-                            
-                            // otherwise process the line
-                            _ProcessLine(tzName, tzValue);
-                        }
-                        
-                        // we're done
-                        break;
-                    }
-                    else if (lstrcmpi(tzName, _T("endif")) == 0)
-                    {
-                        // we're done
-                        break;
-                    }
-                }
+                // We're done
+                break;
             }
         }
     }
@@ -374,7 +416,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 //
 void FileParser::_SkipIf()
 {
-    TCHAR tzName[MAX_RCCOMMAND] = { 0 };
+    TCHAR tzName[MAX_RCCOMMAND];
     
     while (_ReadLineFromFile(tzName, NULL))
     {

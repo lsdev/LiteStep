@@ -64,6 +64,12 @@ private:
     /** Conditional expression parser */
     EvalParser* m_pEvalParser;
     
+    /** Current Line Number */
+    unsigned int m_uLineNumber;
+    
+    /** Full path to configuration file */
+    TCHAR m_tzFullPath[MAX_PATH_LENGTH];
+    
     /**
      * Reads the next line from current file. The line is split into a setting name and
      * a setting value and the value is stripped of extraneous space and comments.
