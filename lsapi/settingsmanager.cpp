@@ -335,9 +335,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 {
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
 	LPSTR pszTempExpandedString = szTempExpandedString;
-	size_t stWorkLength = stLength;
+	size_t stWorkLength = MAX_LINE_LENGTH; // available working length in szTempExpandedString
 
-	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stWorkLength > 0))
+	if ((pszTemplate != NULL) && (pszExpandedString != NULL) && (stLength > 0))
 	{
 		//szTempExpandedString[0] = '\0';
 
@@ -370,7 +370,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				{
 					bSucceeded = SUCCEEDED(
                         StringCchCopyN(pszTempExpandedString,
-                        MAX_LINE_LENGTH - (pszTempExpandedString - szTempExpandedString),
+                        stWorkLength,
                         pszVariable, pszTemplate - pszVariable));
 				}
 				else
@@ -381,10 +381,8 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 					//
                     char szVariable[MAX_LINE_LENGTH];
 
-                    StringCchCopyN(szVariable, MAX_LINE_LENGTH, pszVariable,
-                        pszTemplate - pszVariable);
-
-                    if (szVariable[0] != '\0')
+                    if(SUCCEEDED(StringCchCopyN(szVariable, MAX_LINE_LENGTH,
+                        pszVariable, pszTemplate - pszVariable)) && (szVariable[0] != '\0'))
                     {
                         // Check for recursive variable definitions
                         if (recursiveVarSet.count(szVariable) > 0)
@@ -439,8 +437,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 				//
 				if (bSucceeded)
 				{
-					stWorkLength -= strlen(pszTempExpandedString);
-					pszTempExpandedString += strlen(pszTempExpandedString);
+					size_t stTempLen = strlen(pszTempExpandedString);
+					stWorkLength -= stTempLen;
+					pszTempExpandedString += stTempLen;
 				}
 
 				//
