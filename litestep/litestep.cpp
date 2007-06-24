@@ -304,7 +304,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
     SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
     
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
-        (nStartupMode != STARTUP_FORCE_RUN && !GetRCBool("LSNoStartup", FALSE)))
+        (nStartupMode != STARTUP_FORCE_RUN && GetRCBool("LSNoStartup", TRUE)))
     {
         nStartupMode = STARTUP_DONT_RUN;
     }
