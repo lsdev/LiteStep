@@ -644,6 +644,7 @@ Contents:
   2. Conditional Expansions
 
    Win2000
+   Win2003
    Win95
    Win98
    Win9X
@@ -1068,7 +1069,7 @@ Contents:
  LiteStep is a replacement shell for the standard Windows® Explorer shell.
 
  Copyright (C) 1997-1998  Francis Gastellu
- Copyright (C) 1998-2006  Litestep Development Team
+ Copyright (C) 1998-2007  Litestep Development Team
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
