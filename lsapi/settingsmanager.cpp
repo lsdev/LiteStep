@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SettingsFileParser.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
-#include <stdexcept>
 
 #if !defined(CSIDL_COMMON_ADMINTOOLS)
 #  define CSIDL_COMMON_ADMINTOOLS 0x002F
@@ -153,20 +152,32 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
     OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
     GetVersionEx(&OsVersionInfo);
     
+    // Default platform conditionals to FALSE
+    SetVariable("Win9x", "false");
+    SetVariable("WinME", "false");
+    SetVariable("Win98", "false");
+    SetVariable("Win95", "false");
+    SetVariable("WinNT", "false");
+    SetVariable("Win2003", "false");
+    SetVariable("WinXP", "false");
+    SetVariable("Win2000", "false");
+    SetVariable("WinNT4", "false");
+    
+    // Now set the correct platform conditional to TRUE
     if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     {
         // Any Win9x-series OS
         SetVariable("Win9x", "true");
         
-        if (OsVersionInfo.dwMinorVersion >= 90) // Windows ME (4.90)
+        if (OsVersionInfo.dwMinorVersion >= 90)         // Windows ME (4.90)
         {
             SetVariable("WinME", "true");
         }
-        else if (OsVersionInfo.dwMinorVersion >= 10) // Windows 98 (4.10)
+        else if (OsVersionInfo.dwMinorVersion >= 10)    // Windows 98 (4.10)
         {
             SetVariable("Win98", "true");
         }
-        else // Windows 95 (4.00)
+        else                                            // Windows 95 (4.00)
         {
             SetVariable("Win95", "true");
         }
@@ -178,16 +189,20 @@ void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
         
         if (OsVersionInfo.dwMajorVersion == 5)
         {
-            if (OsVersionInfo.dwMinorVersion >= 1)
+            if (OsVersionInfo.dwMinorVersion >= 2)      // Windows 2003 (5.2)
             {
-                SetVariable("WinXP", "true");       // Windows XP (5.1)
+                SetVariable("Win2003", "true");
             }
-            else
+            else if (OsVersionInfo.dwMinorVersion >= 1) // Windows XP (5.1)
             {
-                SetVariable("Win2000", "true");     // Windows 2000 (5.0)
+                SetVariable("WinXP", "true");
+            }
+            else                                        // Windows 2000 (5.0)
+            {
+                SetVariable("Win2000", "true");
             }
         }
-        else if (OsVersionInfo.dwMajorVersion >= 4) // Windows NT 4.0
+        else if (OsVersionInfo.dwMajorVersion >= 4)     // Windows NT 4.0
         {
             SetVariable("WinNT4", "true");
         }
