@@ -30,14 +30,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
+static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.22 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.22 2007/06/24 01:34:04 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.23 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.23 2007/06/24 01:36:52 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
-
-int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 class LSAPIInit
 {
@@ -477,7 +476,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 }
 
 
-int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets)
+static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets)
 {
 	char szBuffer[MAX_LINE_LENGTH];
 	LPCSTR pszNextToken;
