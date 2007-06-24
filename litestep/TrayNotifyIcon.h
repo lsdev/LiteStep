@@ -1,22 +1,24 @@
-/*
-This is a part of the LiteStep Shell Source code.
-
-Copyright (C) 1997-2006 The LiteStep Development Team
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// This is a part of the Litestep Shell source code.
+//
+// Copyright (C) 1997-2007  Litestep Development Team
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #if !defined(TRAYNOTIFYICON_H)
 #define TRAYNOTIFYICON_H
 
@@ -205,7 +207,7 @@ typedef const NID_XX * PCNID_XX;
 #define NID_6W_SIZE     (sizeof(NID_6W)) // IE 6 (XP)
 
 
-#ifndef NIF_STATE
+#if !defined(NIF_STATE)
 #define NIF_STATE       0x00000008
 #define NIF_INFO        0x00000010
 #define NIF_GUID        0x00000020 // not supported
@@ -213,7 +215,7 @@ typedef const NID_XX * PCNID_XX;
 #define NIS_SHAREDICON  0x00000002
 #define NIM_SETFOCUS    0x00000003 // relayed to systray module
 #define NIM_SETVERSION  0x00000004 // relayed to systray module
-#endif
+#endif // NIF_STATE
 
 class NotifyIcon
 {

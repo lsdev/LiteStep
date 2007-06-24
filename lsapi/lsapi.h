@@ -1,24 +1,26 @@
-/*
-This is a part of the LiteStep Shell Source code.
-
-Copyright (C) 1997-2002 The LiteStep Development Team
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-#ifndef  __LSAPI_H
-#define  __LSAPI_H
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// This is a part of the Litestep Shell source code.
+//
+// Copyright (C) 1997-2007  Litestep Development Team
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#ifndef LSAPI_H
+#define LSAPI_H
 
 /*
  * IMPORTANT:
@@ -40,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #  define LSAPI __declspec(dllexport)
 #else
 #  define LSAPI
-#endif	/* LSAPI_INTERNAL */
+#endif /* LSAPI_INTERNAL */
 
 
 #ifdef  __cplusplus
@@ -115,18 +117,18 @@ extern "C"
 	LSAPI int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal);
 	LSAPI int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal);
 
-    LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
+	LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
 
 #ifdef LSAPI_PRIVATE
-    LSAPI BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath);
-    LSAPI void DeleteSettingsManager(void);
-    LSAPI void SetupBangs(void);
-    LSAPI void ClearBangs(void);
-    LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
+	LSAPI BOOL SetupSettingsManager(LPCSTR pszLiteStepPath, LPCSTR pszRCPath);
+	LSAPI void DeleteSettingsManager(void);
+	LSAPI void SetupBangs(void);
+	LSAPI void ClearBangs(void);
+	LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
 #endif /* LSAPI_PRIVATE */
-    
+
 #ifdef  __cplusplus
 };
 #endif  // __cplusplus
 
-#endif  // __LSAPI_H
+#endif  // LSAPI_H

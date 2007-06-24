@@ -1,25 +1,24 @@
-/*
-This is a part of the LiteStep Shell Source code.
-
-Copyright (C) 1997-2006 The LiteStep Development Team
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/ 
-/****************************************************************************
-****************************************************************************/
-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// This is a part of the Litestep Shell source code.
+//
+// Copyright (C) 1997-2007  Litestep Development Team
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "../utility/common.h"
 #include "lsapi.h"
 #include "SettingsEvalParser.h"
@@ -60,9 +59,9 @@ bool EvalParser::evaluate(LPCSTR expr, int *result)
 
 
 // basic-expression:
-//		identifier
-//		integer
-//		( expression )
+//      identifier
+//      integer
+//      ( expression )
 
 bool EvalParser::basicExpression(int &result)
 {
@@ -139,9 +138,9 @@ bool EvalParser::basicExpression(int &result)
 
 
 // unary-expression
-//		"not" unary-expression
-//		- unary-expression
-//		basic-expression
+//      "not" unary-expression
+//      - unary-expression
+//      basic-expression
 
 bool EvalParser::unaryExpression(int &result)
 {
@@ -171,8 +170,8 @@ bool EvalParser::unaryExpression(int &result)
 
 
 // relational-expression:
-//		unary-expression relational-operator unary-expression
-//		unary-expression
+//      unary-expression relational-operator unary-expression
+//      unary-expression
 
 bool EvalParser::relationalExpression(int &result)
 {
@@ -206,19 +205,19 @@ bool EvalParser::relationalExpression(int &result)
     case TT_NE:
         result = (result != subresult);
         break;
-    
+        
     case TT_GT:
         result = (result > subresult);
         break;
-    
+        
     case TT_GE:
         result = (result >= subresult);
         break;
-    
+        
     case TT_LT:
         result = (result < subresult);
         break;
-    
+        
     case TT_LE:
         result = (result <= subresult);
         break;
@@ -229,8 +228,8 @@ bool EvalParser::relationalExpression(int &result)
 
 
 // and-expression
-//		and-expression "and" relational-expression
-//		relational-expression
+//      and-expression "and" relational-expression
+//      relational-expression
 
 bool EvalParser::andExpression(int &result)
 {
@@ -256,8 +255,8 @@ bool EvalParser::andExpression(int &result)
 
 
 // or-expression:
-//		or-expression "or" and-expression
-//		and-expression
+//      or-expression "or" and-expression
+//      and-expression
 
 bool EvalParser::orExpression(int &result)
 {
@@ -283,7 +282,7 @@ bool EvalParser::orExpression(int &result)
 
 
 // expression:
-//		or-expression
+//      or-expression
 
 bool EvalParser::expression(int &result)
 {
@@ -448,14 +447,14 @@ bool EvalParser::matchChar(int ch)
 // if the next two chars are ch1 and ch2, consume both
 bool EvalParser::matchChars(int ch1, int ch2)
 {
-	if (currentChar == ch1 && lookaheadChar == ch2)
-	{
-		nextChar();
-		nextChar();
-		return true;
-	}
-
-	return false;
+    if (currentChar == ch1 && lookaheadChar == ch2)
+    {
+        nextChar();
+        nextChar();
+        return true;
+    }
+    
+    return false;
 }
 
 

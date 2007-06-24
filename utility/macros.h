@@ -1,36 +1,36 @@
-/*
-This is a part of the LiteStep Shell Source code.
-
-Copyright (C) 1997-2005 The LiteStep Development Team
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/ 
-/****************************************************************************
-****************************************************************************/
-#ifndef __LSMACROS_H
-#define __LSMACROS_H
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// This is a part of the Litestep Shell source code.
+//
+// Copyright (C) 1997-2007  Litestep Development Team
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#if !defined(MACROS_H)
+#define MACROS_H
 
 #include "common.h"
 #include "..\lsapi\lsapi.h"
 
 // Macros for Resource strings and localization
-#ifndef _LSRESOURCEBUFFER
-#define _LSRESOURCEBUFFER
+#if !defined(LSRESOURCEBUFFER)
+#define LSRESOURCEBUFFER
 static char resourceTextBuffer[MAX_LINE_LENGTH + 1];
 static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
-#endif
+#endif // LSRESOURCEBUFFER
 
 #define RESOURCE_MSGBOX(instance, id, deftext, title) \
     GetResStr( (instance), (id)                       \
@@ -87,4 +87,4 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
 #define CONVERT_COORDINATE_X(x) (SCREEN_LEFT + CONVERT_COORDINATE_WIDTH((x)))
 #define CONVERT_COORDINATE_Y(y) (SCREEN_TOP + CONVERT_COORDINATE_HEIGHT((y)))
 
-#endif // __LSMACROS_H
+#endif // MACROS_H

@@ -1,26 +1,26 @@
-/*
-This is a part of the LiteStep Shell Source code.
-
-Copyright (C) 1997-2002 The LiteStep Development Team
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/ 
-/****************************************************************************
-****************************************************************************/
-#ifndef __LSAPIDEFINES_H
-#define __LSAPIDEFINES_H
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// This is a part of the Litestep Shell source code.
+//
+// Copyright (C) 1997-2007  Litestep Development Team
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#ifndef LSAPIDEFINES_H
+#define LSAPIDEFINES_H
 
 /*
 * IMPORTANT:
@@ -175,7 +175,7 @@ typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
 #else  // __cplusplus
 typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
 typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
-#endif	// __cplusplus
+#endif // __cplusplus
 
 typedef struct _LMBANGCOMMANDA
 {
@@ -222,7 +222,7 @@ LSDESKTOPINFO;
 //---------------------------------------------------------
 #define LR_RECYCLE		0
 #define LR_LOGOFF		1
-#define	LR_QUIT			2
+#define LR_QUIT			2
 #define LR_MSSHUTDOWN	3
 
 
@@ -256,5 +256,4 @@ typedef BOOL (__stdcall* LSENUMBANGSPROC)(LPCSTR, LPARAM);
 typedef BOOL (__stdcall* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
 typedef BOOL (__stdcall* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
 
-
-#endif // __LSAPIDEFINES_H
+#endif // LSAPIDEFINES_H
