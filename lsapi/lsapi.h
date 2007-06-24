@@ -23,10 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /*
  * IMPORTANT:
  *   The exports and definitions included
- *   with LSAPI_PRIVATE are for INTERNAL USE ONLY!
+ *   with LSAPI_PRIVATE are for CORE USE ONLY!
  *
  *   They MUST NOT be used by any module.
- *   Their names and/or functionality may be changed at ANY time!
+ *   Use outside of the CORE may cause instability and unexpected behavior.
  *
  */
 
