@@ -301,6 +301,10 @@ void LSAPIInit::setLitestepVars()
     
     StringCchPrintf(szTemp, MAX_PATH, "\"%s\"", __DATE__);
     pSM->SetVariable("CompileDate", szTemp);
+    
+#ifdef LS_CUSTOM_INCLUDEFOLDER
+    pSM->SetVariable("IncludeFolder", "1");
+#endif // LS_CUSTOM_INCLUDEFOLDER
 }
 
 bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)

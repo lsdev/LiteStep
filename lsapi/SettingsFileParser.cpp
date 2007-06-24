@@ -282,6 +282,65 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         FileParser fpParser(m_pSettingsMap);
         fpParser.ParseFile(tzPath);
     }
+#ifdef LS_CUSTOM_INCLUDEFOLDER
+    else if (stricmp(ptzName, _T("includefolder")) == 0)
+    {
+        TCHAR tzPath[MAX_PATH_LENGTH]; // path+pattern
+        TCHAR tzFilter[MAX_PATH_LENGTH]; // path only
+        
+        // expands string in ptzValue to tzPath - buffer size defined by MAX_PATH_LENGTH
+        VarExpansionEx(tzPath, ptzValue, MAX_PATH_LENGTH);
+        
+        PathUnquoteSpaces(tzPath); // strips quotation marks from string
+        
+        TRACE("Searching IncludeFolder (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, tzPath);
+        
+        // Hard-coded filter for *.rc files to limit search operation.
+        //
+        // Create tzFilter as tzPath appended with *.rc
+        //  - the API takes care of trailing slash handling thankfully.
+        PathCombine(tzFilter, tzPath, _T("*.rc"));
+        
+        WIN32_FIND_DATA findData; // defining variable for filename
+        
+        HANDLE hSearch = FindFirstFile(tzFilter, &findData); // Looking in tzFilter for data :)
+        
+        if (INVALID_HANDLE_VALUE != hSearch)
+        {
+            BOOL FoundNextFile;
+            
+            do
+            {
+                // stripping out directories, system and hidden files as we're not interested
+                // in them and MS throws these kind of files around from time to time....
+                const DWORD dwAttrib = FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_SYSTEM;
+                
+                if (0 == (dwAttrib & findData.dwFileAttributes))
+                {
+                    // Processing the valid cFileName data now.
+                    TCHAR tzFile[MAX_PATH_LENGTH];
+                    
+                    // adding (like above) filename to tzPath to set tzFile for opening.
+                    if (tzFile == PathCombine(tzFile, tzPath, findData.cFileName))
+                    {
+                        TRACE("Found and including: \"%s\"", tzFile);
+                        
+                        FileParser fpParser(m_pSettingsMap);
+                        fpParser.ParseFile(tzFile);
+                    }
+                }
+                
+                FoundNextFile = FindNextFile(hSearch, &findData);
+            }while (FoundNextFile);
+            
+            FindClose(hSearch);
+        }
+        
+        TRACE("Done searching IncludeFolder (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, tzPath);
+    }
+#endif // LS_CUSTOM_INCLUDEFOLDER
     else
     {
         m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
