@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __SAFESTR_H
 #define __SAFESTR_H
 
-#define STRSAFE_NO_DEPRECATE
 #include <strsafe.h>
 
 #ifdef StringCchCopy

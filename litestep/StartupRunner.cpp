@@ -142,7 +142,7 @@ void StartupRunner::_RunStartupMenu()
     
     TCHAR tzPath[MAX_PATH];
     
-    for (ULONG i = 0; i < STARTUPMENU_SIZE; ++i)
+    for (ULONG i = 0; i < STARTUPMENU_SIZE; i++)
     {
         if (GetShellFolderPath(STARTUPMENU_TABLE[i], tzPath, MAX_PATH))
         {
@@ -390,7 +390,7 @@ bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     
     HANDLE hProcess = INVALID_HANDLE_VALUE;
     
-    if (StrChr(tzToken, _T('\\')) || StrChr(tzToken, _T(':')))
+    if (strchr(tzToken, _T('\\')) || strchr(tzToken, _T(':')))
     {
         hProcess = _CreateProcess(ptzCommandLine);
     }

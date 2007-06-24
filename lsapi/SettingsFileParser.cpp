@@ -125,28 +125,26 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         m_uLineNumber++;
         
         LPTSTR ptzCurrent = tzBuffer;
-        ptzCurrent += StrSpn(ptzCurrent, WHITESPACE);
+        ptzCurrent += strspn(ptzCurrent, WHITESPACE);
         
         if (ptzCurrent[0] && ptzCurrent[0] != _T(';'))
         {
             size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE);
             
-            if (SUCCEEDED(StringCchCopyNEx(ptzName, MAX_RCCOMMAND, ptzCurrent,
-                stEndConfig, NULL, NULL, STRSAFE_NULL_ON_FAILURE)))
+            if (SUCCEEDED(StringCchCopyN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
             {
                 if (ptzValue != NULL)
                 {
                     LPTSTR ptzValueStart = ptzCurrent + stEndConfig;
                     
-                    if (stEndConfig < (size_t)lstrlen(ptzCurrent))
+                    if (stEndConfig < (size_t)strlen(ptzCurrent))
                     {
                         ++ptzValueStart;
                     }
                     
                     _StripString(ptzValueStart);
                     
-                    StringCchCopyEx(ptzValue, MAX_LINE_LENGTH, ptzValueStart,
-                        NULL, NULL, STRSAFE_NULL_ON_FAILURE);
+                    StringCchCopy(ptzValue, MAX_LINE_LENGTH, ptzValueStart);
                 }
                 
                 bReturn = true;
@@ -174,7 +172,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     while (*ptzCurrent != _T('\0'))
     {
-        if (StrChr(WHITESPACE, *ptzCurrent) == NULL)
+        if (strchr(WHITESPACE, *ptzCurrent) == NULL)
         {
             if (ptzStart == NULL)
             {
@@ -230,7 +228,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     if (ptzLast != NULL)
     {
-        while (ptzLast > ptzString && StrChr(WHITESPACE, *(ptzLast-1)))
+        while (ptzLast > ptzString && strchr(WHITESPACE, *(ptzLast-1)))
         {
             --ptzLast;
         }
@@ -240,7 +238,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     if ((ptzCurrent != ptzString) && ptzStart)
     {
-        StringCchCopy(ptzString, lstrlen(ptzString) + 1, ptzStart);
+        StringCchCopy(ptzString, strlen(ptzString) + 1, ptzStart);
     }
 }
 
@@ -254,7 +252,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     ASSERT(NULL != m_pSettingsMap);
     ASSERT(NULL != ptzName); ASSERT(NULL != ptzValue);
     
-    if (lstrcmpi(ptzName, _T("if")) == 0)
+    if (stricmp(ptzName, _T("if")) == 0)
     {
         _ProcessIf(ptzValue);
     }
@@ -262,16 +260,16 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     // In a release build ignore dangling elseif/else/endif.
     // Too much overhead just for error handling
     else if (
-           (lstrcmpi(ptzName, "else") == 0)
-        || (lstrcmpi(ptzName, "elseif") == 0)
-        || (lstrcmpi(ptzName, "endif") == 0)
+           (stricmp(ptzName, "else") == 0)
+        || (stricmp(ptzName, "elseif") == 0)
+        || (stricmp(ptzName, "endif") == 0)
     )
     {
         TRACE("Error: Dangling pre-processor directive (%s, line %d): \"%s\"",
             m_tzFullPath, m_uLineNumber, ptzName);
     }
 #endif
-    else if (lstrcmpi(ptzName, "include") == 0)
+    else if (stricmp(ptzName, "include") == 0)
     {
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
         
@@ -336,14 +334,14 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         // an ElseIf. Else, or EndIf
         while (_ReadLineFromFile(tzName, tzValue))
         {
-            if ((lstrcmpi(tzName, _T("else")) == 0) ||
-                (lstrcmpi(tzName, _T("elseif")) == 0))
+            if ((stricmp(tzName, _T("else")) == 0) ||
+                (stricmp(tzName, _T("elseif")) == 0))
             {
                 // After an ElseIf or Else, skip all lines until EndIf
                 _SkipIf();
                 break;
             }
-            else if (lstrcmpi(tzName, _T("endif")) == 0)
+            else if (stricmp(tzName, _T("endif")) == 0)
             {
                 // We're done
                 break;
@@ -361,24 +359,24 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         // ElseIf, Else, or EndIf
         while (_ReadLineFromFile(tzName, tzValue))
         {
-            if (lstrcmpi(tzName, _T("if")) == 0)
+            if (stricmp(tzName, _T("if")) == 0)
             {
                 // Nested Ifs are a special case
                 _SkipIf();
             }
-            else if (lstrcmpi(tzName, _T("elseif")) == 0)
+            else if (stricmp(tzName, _T("elseif")) == 0)
             {
                 // Handle ElseIfs by recursively calling ProcessIf
                 _ProcessIf(tzValue);
                 break;
             }
-            else if (lstrcmpi(tzName, _T("else")) == 0)
+            else if (stricmp(tzName, _T("else")) == 0)
             {
                 // Since the If expression was false, when we see Else we
                 // start processing lines until EndIf
                 while (_ReadLineFromFile(tzName, tzValue))
                 {
-                    if (lstrcmpi(tzName, "elseif") == 0)
+                    if (stricmp(tzName, "elseif") == 0)
                     {
                         // Error: ElseIf after Else
                         TRACE("Syntax Error (%s, %d): \"ElseIf\" directive after \"Else\"",
@@ -388,7 +386,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                         _SkipIf();
                         break;
                     }
-                    else if (lstrcmpi(tzName, _T("endif")) == 0)
+                    else if (stricmp(tzName, _T("endif")) == 0)
                     {
                         // We're done
                         break;
@@ -402,7 +400,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                 // We're done
                 break;
             }
-            else if (lstrcmpi(tzName, _T("endif")) == 0)
+            else if (stricmp(tzName, _T("endif")) == 0)
             {
                 // We're done
                 break;
@@ -422,11 +420,11 @@ void FileParser::_SkipIf()
     
     while (_ReadLineFromFile(tzName, NULL))
     {
-        if (lstrcmpi(tzName, _T("if")) == 0)
+        if (stricmp(tzName, _T("if")) == 0)
         {
             _SkipIf();
         }
-        else if (lstrcmpi(tzName, _T("endif")) == 0)
+        else if (stricmp(tzName, _T("endif")) == 0)
         {
             break;
         }

@@ -21,19 +21,16 @@
 #ifndef LS_DEBUG_HPP_INCLUDED
 #define LS_DEBUG_HPP_INCLUDED
 
-#if	defined(_MFC_VER)
+#if defined(_MFC_VER)
 #  error This file is not meant to be used with MFC
 #endif // defined(_MFC_VER)
 
 #include <assert.h>
 #if defined(_DEBUG)
-#  include <limits.h>
-#  include <stdarg.h>
-#  include <stdio.h>
+   // THIS IS BOGUS, WE NEED TO FIX OUR STRING FUNCTION USAGE!!!
 #  define STRSAFE_NO_DEPRECATE
-#  include <strsafe.h>
+#  include "../utility/safestr.h"
 #  undef STRSAFE_NO_DEPRECATE
-#  include <windows.h>
 #endif // defined(_DEBUG)
 
 
@@ -80,7 +77,8 @@ namespace debug
         va_start(args, pszFormat);
         
         char szBuffer[512];
-        StringCchVPrintfExA(szBuffer, 512, NULL, NULL, STRSAFE_NULL_ON_FAILURE,
+        StringCchVPrintfExA(szBuffer, 512,
+            NULL, NULL, STRSAFE_NULL_ON_FAILURE,
             pszFormat, args);
         
         Tracer::Output(szBuffer);
@@ -101,16 +99,17 @@ namespace debug
             ASSERT(NULL != pszFormat);
             char szFormatBuffer[512] = { 0 };
             
-            StringCchPrintfExA(szFormatBuffer, 512, NULL, NULL,
-                STRSAFE_NULL_ON_FAILURE, "%s (%u) : %s", m_pszFile, m_uLine,
-                pszFormat);
+            StringCchPrintfExA(szFormatBuffer, 512,
+                NULL, NULL, STRSAFE_NULL_ON_FAILURE,
+                "%s (%u) : %s", m_pszFile, m_uLine, pszFormat);
             
             va_list args;
             va_start(args, pszFormat);
             char szBuffer[4096] = { 0 };
             
-            StringCchVPrintfExA(szBuffer, 4096, NULL, NULL,
-                STRSAFE_NULL_ON_FAILURE, szFormatBuffer, args);
+            StringCchVPrintfExA(szBuffer, 4096,
+                NULL, NULL, STRSAFE_NULL_ON_FAILURE,
+                szFormatBuffer, args);
             
             Tracer::Output(szBuffer);
             va_end(args);

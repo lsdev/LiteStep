@@ -33,8 +33,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.23 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.23 2007/06/24 01:36:52 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.24 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.24 2007/06/24 05:19:03 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -359,7 +359,7 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 
 		if (GetToken(szExpandedCommand, szCommand, &pszArgs, true))
 		{
-			if (pszArgs > (szExpandedCommand + lstrlen(szExpandedCommand)))
+			if (pszArgs > (szExpandedCommand + strlen(szExpandedCommand)))
 			{
 				pszArgs = NULL;
 			}

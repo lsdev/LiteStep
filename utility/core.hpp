@@ -29,6 +29,9 @@
 //
 
 #include <shellapi.h>
+
+// mainly used for Path helper functions
+#define NO_SHLWAPI_STRFCNS
 #include <shlwapi.h>
 
 #include "../litestep/resource.h"

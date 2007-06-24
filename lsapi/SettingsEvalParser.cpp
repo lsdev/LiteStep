@@ -89,9 +89,9 @@ bool EvalParser::basicExpression(int &result)
                 
                 if (GetToken(szValue, szToken, NULL, FALSE))
                 {
-                    if ((lstrcmpi(szToken, "off") == 0) ||
-                        (lstrcmpi(szToken, "false") == 0) ||
-                        (lstrcmpi(szToken, "no") == 0))
+                    if ((stricmp(szToken, "off") == 0) ||
+                        (stricmp(szToken, "false") == 0) ||
+                        (stricmp(szToken, "no") == 0))
                     {
                         result = FALSE;
                     }
@@ -336,23 +336,23 @@ bool EvalParser::nextToken()
         currentToken = TT_ID;
         
         // is it a keyword?
-        if (!lstrcmpi(stringValue.c_str(), "and"))
+        if (!stricmp(stringValue.c_str(), "and"))
         {
             currentToken = TT_AND, true;
         }
-        else if (!lstrcmpi(stringValue.c_str(), "or"))
+        else if (!stricmp(stringValue.c_str(), "or"))
         {
             currentToken = TT_OR, true;
         }
-        else if (!lstrcmpi(stringValue.c_str(), "not"))
+        else if (!stricmp(stringValue.c_str(), "not"))
         {
             currentToken = TT_NOT, true;
         }
-        else if (!lstrcmpi(stringValue.c_str(), "false"))
+        else if (!stricmp(stringValue.c_str(), "false"))
         {
             currentToken = TT_FALSE, true;
         }
-        else if (!lstrcmpi(stringValue.c_str(), "true"))
+        else if (!stricmp(stringValue.c_str(), "true"))
         {
             currentToken = TT_TRUE, true;
         }
