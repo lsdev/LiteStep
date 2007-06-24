@@ -65,11 +65,6 @@
 //
 #define ASSERT assert
 
-#define ASSERT_ISVALIDBUF(p,c)   ASSERT((NULL != (p) && 0 != (c)))
-#define ASSERT_ISNOTNULL(p)      ASSERT((NULL != (p)))
-#define ASSERT_ISNULL(p)         ASSERT((NULL == (p)))
-
-
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // Tracing helpers (ignore)
@@ -79,7 +74,7 @@ namespace debug
 {
     template <class Tracer> inline void Trace(const char* pszFormat, ...)
     {
-        ASSERT_ISNOTNULL(pszFormat);
+        ASSERT(NULL != pszFormat);
         
         va_list args;
         va_start(args, pszFormat);
@@ -103,7 +98,7 @@ namespace debug
         
         void operator()(const char* pszFormat, ...)
         {
-            ASSERT_ISNOTNULL(pszFormat);
+            ASSERT(NULL != pszFormat);
             char szFormatBuffer[512] = { 0 };
             
             StringCchPrintfExA(szFormatBuffer, 512, NULL, NULL,
@@ -179,7 +174,7 @@ namespace debug
 {
     inline void TraceLastError(const char* pszDescription)
     {
-        ASSERT_ISNOTNULL(pszDescription);
+        ASSERT(NULL != pszDescription);
         void* pvBuffer;
         
         FormatMessage(

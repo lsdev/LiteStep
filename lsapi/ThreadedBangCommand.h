@@ -29,7 +29,7 @@ public:
     ThreadedBangCommand(HWND hCaller, LPCSTR pszName, LPCSTR pszParams)
     :m_hCaller(hCaller)
     {
-        ASSERT_ISNOTNULL(pszName);
+        ASSERT(NULL != pszName);
 
         // pszName is guaranteed to be non-NULL
         StringCchCopy(m_szName, MAX_BANGCOMMAND, pszName);

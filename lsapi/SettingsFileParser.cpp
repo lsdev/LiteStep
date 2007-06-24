@@ -30,7 +30,7 @@
 FileParser::FileParser(SettingsMap* pSettingsMap) :
     m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_pEvalParser(NULL)
 {
-    ASSERT_ISNOTNULL(m_pSettingsMap);
+    ASSERT(NULL != m_pSettingsMap);
 }
 
 
@@ -53,8 +53,8 @@ FileParser::~FileParser()
 //
 void FileParser::ParseFile(LPCTSTR ptzFileName)
 {
-    ASSERT_ISNOTNULL(ptzFileName);
-    ASSERT_ISNULL(m_phFile);
+    ASSERT(NULL == m_phFile);
+    ASSERT(NULL != ptzFileName);
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
     
@@ -108,8 +108,8 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 //
 bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 {
-    ASSERT_ISNOTNULL(m_phFile);
-    ASSERT_ISVALIDBUF(ptzName, MAX_RCCOMMAND);
+    ASSERT(NULL != m_phFile);
+    ASSERT(NULL != ptzName);
     
     TCHAR tzBuffer[MAX_LINE_LENGTH];
     bool bReturn = false;
@@ -164,7 +164,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 //
 void FileParser::_StripString(LPTSTR ptzString)
 {
-    ASSERT_ISNOTNULL(ptzString);
+    ASSERT(NULL != ptzString);
     
     LPTSTR ptzCurrent = ptzString;
     LPTSTR ptzStart = NULL;
@@ -251,7 +251,8 @@ void FileParser::_StripString(LPTSTR ptzString)
 //
 void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
-    ASSERT_ISNOTNULL(ptzName); ASSERT_ISNOTNULL(ptzValue);
+    ASSERT(NULL != m_pSettingsMap);
+    ASSERT(NULL != ptzName); ASSERT(NULL != ptzValue);
     
     if (lstrcmpi(ptzName, _T("if")) == 0)
     {
@@ -300,7 +301,8 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 //
 void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
-    ASSERT_ISNOTNULL(ptzExpression);
+    ASSERT(NULL != m_pSettingsMap);
+    ASSERT(NULL != ptzExpression);
     
     BOOL result = FALSE;
     

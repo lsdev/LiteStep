@@ -132,14 +132,14 @@ Module::~Module()
 
 bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
 {
-    ASSERT_ISNULL(m_hInstance);
+    ASSERT(NULL == m_hInstance);
     
     // delaying the LoadLibrary call until this point is necessary to make
     // grdtransparent work (it hooks LoadLibrary)
     if (_LoadDll())
     {
-        ASSERT_ISNOTNULL(m_pInitEx);
-        ASSERT_ISNOTNULL(m_pQuit);
+        ASSERT(NULL != m_pInitEx);
+        ASSERT(NULL != m_pQuit);
         
         m_hMainWindow = hMainWindow;
         m_tzAppPath = sAppPath;

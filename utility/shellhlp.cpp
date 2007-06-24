@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
     ASSERT(cchPath >= MAX_PATH);
-    ASSERT_ISVALIDBUF(ptzPath, cchPath);
+    ASSERT(NULL != ptzPath); ASSERT(0 != cchPath);
     
     IMalloc* pMalloc;
     bool bReturn = false;
@@ -77,7 +77,7 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 {
     ASSERT(cchPath <= STRSAFE_MAX_CCH);
-    ASSERT_ISVALIDBUF(ptzPath, cchPath);
+    ASSERT(NULL != ptzPath); ASSERT(0 != cchPath);
     
     HRESULT hr = E_FAIL;
     size_t cchCurrentLength = 0;
@@ -137,7 +137,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 //
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 {
-    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
+    ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
     
     return (0 != FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM |
@@ -158,7 +158,7 @@ bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
 //
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 {
-    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
+    ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
     
     LPOLESTR pOleString = NULL;
     

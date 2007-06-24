@@ -40,7 +40,7 @@ ModuleManager::~ModuleManager()
 
 HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
 {
-    ASSERT_ISNULL(m_pILiteStep);
+    ASSERT(NULL == m_pILiteStep);
     
     HRESULT hr = E_FAIL;
     

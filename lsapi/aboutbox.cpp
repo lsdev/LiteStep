@@ -624,7 +624,7 @@ void AboutSysInfo(HWND hListView)
 
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
 {
-	ASSERT_ISNOTNULL(pszName); ASSERT(nSizeInPoints > 0);
+	ASSERT(NULL != pszName); ASSERT(nSizeInPoints > 0);
 
 	// convert size from points to pixels
 	HDC hDC = GetDC(NULL);

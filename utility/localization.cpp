@@ -243,8 +243,8 @@ int Localization::MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType)
 static void GetString(UINT uId, TCHAR* ptzBuffer, size_t cchBuffer,
                       const TCHAR* ptzDefault)
 {
-    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
-    ASSERT_ISNOTNULL(ptzDefault);
+    ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
+    ASSERT(NULL != ptzDefault);
     
     if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, cchBuffer) == 0)
     {
@@ -265,8 +265,8 @@ static void GetString(UINT uId, TCHAR* ptzBuffer, size_t cchBuffer,
 static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
                           const TCHAR* ptzFormat, const va_list& vargs)
 {
-    ASSERT_ISVALIDBUF(ptzBuffer, cchBuffer);
-    ASSERT_ISNOTNULL(ptzFormat);
+    ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
+    ASSERT(NULL != ptzFormat);
     
     HRESULT hr = E_FAIL;
     
@@ -298,7 +298,7 @@ static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
 //
 static int DoError(const TCHAR* ptzText, const TCHAR* ptzCaption = NULL)
 {
-    ASSERT_ISNOTNULL(ptzText);
+    ASSERT(NULL != ptzText);
 
     TCHAR tzCaption[MAX_LINE_LENGTH] = { _T("LiteStep :: Error") };
     
@@ -320,7 +320,7 @@ static int DoError(const TCHAR* ptzText, const TCHAR* ptzCaption = NULL)
 //
 void Error(UINT uMessageId, LPCTSTR ptzDefault, ...)
 {
-    ASSERT_ISNOTNULL(ptzDefault);
+    ASSERT(NULL != ptzDefault);
 
     TCHAR tzMessage[MAX_LINE_LENGTH] = { 0 };
     TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
@@ -344,8 +344,8 @@ void Error(UINT uMessageId, LPCTSTR ptzDefault, ...)
 //
 void ErrorEx(LPCTSTR ptzCaption, UINT uMessageId, LPCTSTR ptzDefault, ...)
 {
-    ASSERT_ISNOTNULL(ptzDefault);
-    ASSERT_ISNOTNULL(ptzCaption);
+    ASSERT(NULL != ptzDefault);
+    ASSERT(NULL != ptzCaption);
     
     TCHAR tzFormat[MAX_LINE_LENGTH] = { 0 };
     TCHAR tzMessage[MAX_LINE_LENGTH] = { 0 };

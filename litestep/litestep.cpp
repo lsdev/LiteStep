@@ -75,7 +75,7 @@ int g_nStartupMode = STARTUP_DEFAULT;
 //
 HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
 {
-    ASSERT_ISNOTNULL(pszCommand);
+    ASSERT(NULL != pszCommand);
     
     HRESULT hr = E_FAIL;
     HWND hWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
@@ -550,7 +550,7 @@ LRESULT CALLBACK CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         pLiteStep = static_cast<CLiteStep*>(
             reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
         
-        ASSERT_ISNOTNULL(pLiteStep);
+        ASSERT(NULL != pLiteStep);
     }
     
     if (pLiteStep)

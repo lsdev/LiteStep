@@ -61,7 +61,7 @@ TrayService::~TrayService()
 //
 HRESULT TrayService::Start()
 {
-    ASSERT_ISNULL(m_hTrayWnd);
+    ASSERT(NULL == m_hTrayWnd);
     HRESULT hr = E_FAIL;
     
     m_hLiteStep = GetLitestepWnd();

@@ -214,7 +214,7 @@ void SettingsManager::ParseFile(LPCSTR pszFileName)
 
 BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
 {
-    ASSERT_ISNOTNULL(pszName);
+    ASSERT(NULL != pszName);
     BOOL bReturn = FALSE;
     
     // first appearance of a setting takes effect
