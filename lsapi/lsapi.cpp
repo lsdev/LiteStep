@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.21 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.21 2007/05/07 20:38:00 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.22 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.22 2007/06/24 01:34:04 jugg Exp $"; // The Full RCS ID.
 
 SettingsManager* gSettingsManager = NULL;
 
@@ -642,8 +642,14 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
 
 		if (bAppendNextToken && *pszCurrent)
 		{
-			GetToken(pszCurrent, pszToken + strlen(pszToken),
-				pszNextToken, bUseBrackets);
+			LPSTR pszNewToken = pszToken;
+
+			if (pszNewToken)
+			{
+				pszNewToken += strlen(pszToken);
+			}
+
+			GetToken(pszCurrent, pszNewToken, pszNextToken, bUseBrackets);
 		}
 
 		return pszStartMarker != NULL;
