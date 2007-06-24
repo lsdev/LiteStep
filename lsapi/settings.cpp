@@ -140,7 +140,7 @@ BOOL GetRCString(LPCSTR szKeyName, LPSTR szValue, LPCSTR defStr, int maxLen)
 	{
 		return gSettingsManager->GetRCString(szKeyName, szValue, defStr, maxLen);
 	}
-	else
+	else if (szValue && defStr)
 	{
 		strncpy(szValue, defStr, maxLen);
 	}
@@ -165,7 +165,7 @@ BOOL GetRCLine(LPCSTR szKeyName, LPSTR szBuffer, UINT nBufLen, LPCSTR szDefault)
 	{
 		return gSettingsManager->GetRCLine(szKeyName, szBuffer, nBufLen, szDefault);
 	}
-	else
+	else if(szBuffer && szDefault)
 	{
 		strncpy(szBuffer, szDefault, nBufLen);
 	}
@@ -187,12 +187,16 @@ BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
 	BOOL bReturn = FALSE;
 	char szTempValue[MAX_LINE_LENGTH];
 
-	pszValue[0] = '\0';
+	if (pszValue)
+	{
+		pszValue[0] = '\0';
+	}
+
 	if (gSettingsManager)
 	{
-
 		bReturn = gSettingsManager->GetVariable(pszKeyName, szTempValue, MAX_LINE_LENGTH);
-		if (bReturn)
+
+		if (bReturn && pszValue)
 		{
 			StringCchCopy(pszValue, strlen(szTempValue) + 1, szTempValue);
 		}
