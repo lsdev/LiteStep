@@ -62,12 +62,18 @@ void WindowX::onGetRevId(Message & message)
 {
 	LPSTR buf = (LPSTR)(message.lParam);
     char path[MAX_PATH + 1] = { 0 };
+	int len;
 
 	GetModuleFileName(hInstance, path, MAX_PATH);
-	sprintf(buf, "%s: %s", strrchr(path, '\\') + 1, Revision());
-	buf[strlen(buf) - 1] = '\0';
+	len = sprintf(buf, "%s: %s", strrchr(path, '\\') + 1, Revision());
 
-	message.lResult = strlen(buf);
+	if(0 > len) // sprintf failed, null out buffer
+	{
+		buf[0] = '\0';
+		len = 0;
+	}
+
+	message.lResult = len;
 }
 
 void WindowX::onTop(bool bSetAlwaysOnTop)
