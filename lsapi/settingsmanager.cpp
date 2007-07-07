@@ -487,7 +487,6 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 
 void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength, const StringSet& recursiveVarSet)
 {
-    LPCSTR pszOriginalTemplate = pszTemplate;
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
     LPSTR pszTempExpandedString = szTempExpandedString;
     size_t stWorkLength = MAX_LINE_LENGTH; // available working length in szTempExpandedString
