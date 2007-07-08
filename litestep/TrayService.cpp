@@ -85,8 +85,24 @@ HRESULT TrayService::Start()
             SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG_PTR)this);
             
+            // http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=1427677&SiteID=1
+            //
+            // Re: TaskbarCreated message (not working in Vista)
+            //
+            //  > The code is still in there to broadcast the message.
+            //  > SendNotifyMessage(HWND_BROADCAST, RegisterWindowMessage(TEXT("TaskbarCreated")), 0, 0);
+            //
+            //  >> It looks as though applications running as admin cannot receive the message.
+            //  >> Presumably, this is because Explorer, which publishes the message, is not
+            //  >> running as admin
+            //
+            //  >>> The message is blocked by User Interface Privilege Isolation, Administrative
+            //  >>> applications that need to see it can allow it through by calling
+            //  >>> ChangeWindowMessageFilter after making sure the necessary security precautions
+            //  >>> are in place. 
+            
             // tell apps to reregister their icons
-            PostMessage(HWND_BROADCAST,
+            SendNotifyMessage(HWND_BROADCAST,
                 RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
             
             if (m_bWin2000)
