@@ -48,7 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LS_COMPAT_LOGGING
 
 // Adds support for IncludeFolder Directive (all .rc files in specified folder
-// will be included - order not gauranteed).  This was added by the LDE(X) team.
+// will be included - order not guaranteed).  This was added by the LDE(X) team.
 // Thanks Phil!
 // 0.24.8 default: DISABLED
 //#define LS_CUSTOM_INCLUDEFOLDER
