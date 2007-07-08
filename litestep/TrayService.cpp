@@ -308,7 +308,7 @@ void TrayService::loadShellServiceObjects()
                 pCmdTarget->Exec(&CGID_ShellServiceObject, OLECMDID_NEW,
                     OLECMDEXECOPT_DODEFAULT, NULL, NULL);
                 
-                m_ssoList.push_back(pCmdTarget);
+                m_ssoVector.push_back(pCmdTarget);
             }
         }
         
@@ -328,13 +328,13 @@ void TrayService::loadShellServiceObjects()
 //
 void TrayService::unloadShellServiceObjects()
 {
-    while (!m_ssoList.empty())
+    while (!m_ssoVector.empty())
     {
-        m_ssoList.back()->Exec(&CGID_ShellServiceObject, OLECMDID_SAVE,
+        m_ssoVector.back()->Exec(&CGID_ShellServiceObject, OLECMDID_SAVE,
             OLECMDEXECOPT_DODEFAULT, NULL, NULL);
         
-        m_ssoList.back()->Release();
-        m_ssoList.pop_back();
+        m_ssoVector.back()->Release();
+        m_ssoVector.pop_back();
     }
 }
 
