@@ -125,23 +125,41 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         m_uLineNumber++;
         
         LPTSTR ptzCurrent = tzBuffer;
-        ptzCurrent += strspn(ptzCurrent, WHITESPACE);
         
+        // Jump over any initial whitespace
+        ptzCurrent += _tcsspn(ptzCurrent, WHITESPACE);
+        
+        // Ignore empty lines, and comments
         if (ptzCurrent[0] && ptzCurrent[0] != _T(';'))
         {
-            size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE);
+            // End on first reserved character or whitespace
+            size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE RESERVEDCHARS);
             
-            if (SUCCEEDED(StringCchCopyN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
+            // If the character is not whitespace or a comment
+            // then the line has an invalid format.  Ignore it.
+            if (_tcschr (WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
             {
+                TRACE("Syntax Error (%s, %d): Invalid line format",
+                    m_tzFullPath, m_uLineNumber);
+                continue;
+            }
+            
+            // Copy directive name to ptzName.
+            if (stEndConfig && SUCCEEDED(StringCchCopyN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
+            {
+                // If ptzValue is NULL, then the caller doesn't want the value,
+                // however, we still will return TRUE.  If the caller does want
+                // the value, then we need to ensure we put something into the
+                // buffer, even if its is zero length.
                 if (ptzValue != NULL)
                 {
                     LPTSTR ptzValueStart = ptzCurrent + stEndConfig;
                     
-                    if (stEndConfig < (size_t)strlen(ptzCurrent))
-                    {
-                        ++ptzValueStart;
-                    }
+                    // Avoid expensive in-place copy from _StripString
+                    // Simply increment passed any whitespace, here.
+                    ptzValueStart += _tcsspn(ptzValueStart, WHITESPACE);
                     
+                    // Removing trailing whitespace and comments
                     _StripString(ptzValueStart);
                     
                     StringCchCopy(ptzValue, MAX_LINE_LENGTH, ptzValueStart);

@@ -150,12 +150,17 @@
 #define MAX_PATH_LENGTH				1024
 
 #define WHITESPACEW					L" \t\n\r"
-#define WHITESPACEA					" \t\n\r"
+#define WHITESPACEA					 " \t\n\r"
+
+#define RESERVEDCHARSW				L"\"\'[];$"
+#define RESERVEDCHARSA				 "\"\'[];$"
 
 #ifdef _UNICODE
 #define WHITESPACE WHITESPACEW
+#define RESERVEDCHARS RESERVEDCHARSW
 #else
 #define WHITESPACE WHITESPACEA
+#define RESERVEDCHARS RESERVEDCHARSA
 #endif
 
 #ifdef LSAPI_PRIVATE
