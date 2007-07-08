@@ -51,6 +51,7 @@ typedef struct _SHELLAPPBARDATA
 } *PSHELLAPPBARDATA;
 
 typedef std::vector<NotifyIcon*> IconVector;
+typedef std::vector<struct IOleCommandTarget*> SsoVector;
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -133,7 +134,7 @@ private:
     HWND m_hLiteStep;
     HINSTANCE m_hInstance;
     
-    std::vector<struct IOleCommandTarget*> m_ssoList;
+    SsoVector m_ssoVector;
     IconVector m_siVector;
 };
 
