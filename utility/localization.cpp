@@ -29,38 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define CHINESESIMPLIFIED_CHARSET 134
 
-//
-// void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText)
-//
-void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText)
-{
-	if (IsValidStringPtr(pszText, cchText))
-	{
-		if (LoadString(hInstance, uIDText, pszText, cchText) == 0)
-		{
-			StringCchCopy(pszText, cchText, pszDefText);
-		}
-	}
-}
-
-
-//
-// GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
-//
-void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
-{
-	char szFormat[MAX_LINE_LENGTH];
-	va_list vargs;
-
-	if (IsValidStringPtr(pszText, cchText))
-	{
-		GetResStr(hInstance, uIDText, szFormat, MAX_LINE_LENGTH, pszDefText);
-
-		va_start(vargs, pszDefText);
-		StringCchVPrintf(pszText, cchText, szFormat, vargs);
-		va_end(vargs);
-	}
-}
 
 HFONT LocalCreateFont(int nHeight,
                       int nWidth,
