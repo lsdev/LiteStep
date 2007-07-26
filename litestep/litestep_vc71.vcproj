@@ -218,6 +218,9 @@
 				RelativePath=".\StartupRunner.h">
 			</File>
 			<File
+				RelativePath=".\TrayAppBar.h">
+			</File>
+			<File
 				RelativePath=".\TrayNotifyIcon.h">
 			</File>
 			<File

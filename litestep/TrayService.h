@@ -23,15 +23,25 @@
 #define TRAYSERVICE_H
 
 #include "TrayNotifyIcon.h"
+#include "TrayAppBar.h"
 #include "../utility/common.h"
 #include "../utility/IService.h"
 #include "../utility/safestr.h"
 #include <shellapi.h>
 #include <vector>
 
+typedef PVOID (WINAPI *FUNC_PVOID__HANDLE_DWORD)(HANDLE, DWORD);
+typedef BOOL (WINAPI *FUNC_BOOL__PVOID)(PVOID);
+
+// shell copy data types
 #define SH_APPBAR_DATA    (0)
 #define SH_TRAY_DATA      (1)
 #define SH_LOADPROC_DATA  (2)
+
+// internally posted AppBar messages 
+#define ABP_NOTIFYPOSCHANGED   (WM_USER+350) 
+#define ABP_NOTIFYSTATECHANGE  (WM_USER+351) 
+#define ABP_RAISEAUTOHIDEHWND  (WM_USER+360) 
 
 // data sent by shell via Shell_NotifyIcon
 typedef struct _SHELLTRAYDATA
@@ -44,13 +54,18 @@ typedef struct _SHELLTRAYDATA
 // Data sent with AppBar Message
 typedef struct _SHELLAPPBARDATA
 {
-    APPBARDATA abd;
-    DWORD dwMessage;
-    DWORD dwDontKnow;
-    DWORD dwNoClue;
-} *PSHELLAPPBARDATA;
+    _SHELLAPPBARDATA(APPBARDATAV1& abdsrc):abd(abdsrc) {}
+
+    const APPBARDATAV1& abd;
+    /**/
+    DWORD  dwMessage;
+    HANDLE hSharedMemory;
+    DWORD  dwSourceProcessId;
+    /**/
+} SHELLAPPBARDATA, *PSHELLAPPBARDATA;
 
 typedef std::vector<NotifyIcon*> IconVector;
+typedef std::vector<AppBar*> BarVector;
 typedef std::vector<struct IOleCommandTarget*> SsoVector;
 
 
@@ -74,12 +89,6 @@ public:
     virtual HRESULT Start();
     virtual HRESULT Stop();
     
-    // Handler for AppBar messages
-    BOOL HandleAppBarMessage(PSHELLAPPBARDATA pData);
-    
-    // Handler for system tray notifications
-    BOOL HandleNotification(PSHELLTRAYDATA pstd);
-    
     // resend all icon data
     HWND SendSystemTray();
 
@@ -87,8 +96,9 @@ public:
     void NotifyRudeApp(bool bIsFullScreen) const; 
 
     // Message Handler
-    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
-        LPARAM lParam);
+    static LRESULT CALLBACK WindowTrayProc(HWND, UINT, WPARAM, LPARAM); 
+    static LRESULT CALLBACK WindowNotifyProc(HWND, UINT, WPARAM, LPARAM); 
+
     
 private:
     bool createWindows();
@@ -100,6 +110,51 @@ private:
     void loadShellServiceObjects();
     void unloadShellServiceObjects();
     
+    // Handler for AppBar messages 
+    LRESULT HandleAppBarMessage(PSHELLAPPBARDATA psad); 
+
+    // Handler for system tray notifications 
+    BOOL HandleNotification(PSHELLTRAYDATA pstd); 
+
+    //
+    // ABM_* Notification handlers
+    //
+    LRESULT barCreate(const APPBARDATAV1& abd);
+    LRESULT barDestroy(const APPBARDATAV1& abd);
+    LRESULT barQueryPos(PSHELLAPPBARDATA psad);
+    LRESULT barSetPos(PSHELLAPPBARDATA psad);
+    LRESULT barGetTaskBarState();
+    LRESULT barGetTaskBarPos(PSHELLAPPBARDATA psad);
+    LRESULT barActivate(const APPBARDATAV1& abd);
+    LRESULT barGetAutoHide(UINT uEdge);
+    LRESULT barSetAutoHide(const APPBARDATAV1& abd);
+    LRESULT barPosChanged(const APPBARDATAV1& abd);
+    LRESULT barSetTaskBarState(const APPBARDATAV1& abd);
+
+    //
+    // barSetPos and barQueryPos helpers
+    //
+    void modifyOverlapBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
+    void modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HWND hWnd);
+    void modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
+    void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
+    void adjustWorkArea();
+
+    //
+    // AppBar Un/Lock handlers for shared data
+    //
+    PAPPBARDATAV1 ABLock(PSHELLAPPBARDATA psad);
+    void ABUnLock(PAPPBARDATAV1 pabd);
+
+    //
+    // findBar variants and wrappers
+    //
+    BarVector::iterator findBar(HWND hWnd);
+    BarVector::iterator findBar(UINT uEdge, LPARAM lParam);
+    bool isBar(HWND hWnd);
+    bool getBar(HWND hWnd, BarVector::iterator& itAppBar);
+    bool getBar(HWND hWnd, AppBar*& pBarRef);
+
     //
     // NIM_* Notification handlers
     //
@@ -132,13 +187,16 @@ private:
     //
     //
     bool m_bWin2000;
+    bool m_bWorkAreaDirty;
+    RECT m_rWorkArea;
     HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
     HWND m_hLiteStep;
     HINSTANCE m_hInstance;
-    
+
     SsoVector m_ssoVector;
     IconVector m_siVector;
+    BarVector m_abVector;
 };
 
 #endif // TRAYSERVICE_H
