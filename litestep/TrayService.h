@@ -82,7 +82,10 @@ public:
     
     // resend all icon data
     HWND SendSystemTray();
-    
+
+    // Notify TrayService of full screen app change 
+    void NotifyRudeApp(bool bIsFullScreen) const; 
+
     // Message Handler
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         LPARAM lParam);

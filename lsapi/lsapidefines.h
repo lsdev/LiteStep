@@ -255,7 +255,7 @@ LSDESKTOPINFO;
 
 // ELD_MODULES: possible dwFlags values
 #define LS_MODULE_THREADED  0x0001
-#define LS_MODULE_NOTPUMPED 0x0002
+//      LS_MODULE_NOTPUMPED 0x0002    no longer used
 
 typedef BOOL (__stdcall* LSENUMBANGSPROC)(LPCSTR, LPARAM);
 typedef BOOL (__stdcall* LSENUMREVIDSPROC)(LPCSTR, LPARAM);

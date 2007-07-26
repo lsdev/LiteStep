@@ -21,25 +21,24 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "settingsmanager.h"
 #include "../utility/core.hpp"
-
-extern SettingsManager* gSettingsManager;
+#include "lsapiinit.h"
 
 FILE* LCOpen(LPCSTR pszPath)
 {
 	FILE * pFile = NULL;
 
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
 		if (pszPath)
 		{
 			if (pszPath[0] != '\0')
 			{
-				pFile = gSettingsManager->LCOpen(pszPath);
+				pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(pszPath);
 			}
 		}
 		if (pFile == NULL)
 		{
-			pFile = gSettingsManager->LCOpen(NULL);
+			pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(NULL);
 		}
 	}
 
@@ -51,10 +50,13 @@ BOOL LCClose(FILE *pFile)
 {
 	BOOL bReturn = FALSE;
 
-	if ((pFile != NULL) && (gSettingsManager))
-	{
-		bReturn = gSettingsManager->LCClose(pFile);
-	}
+	if (g_LSAPIManager.IsInitialized())
+    {
+        if (pFile != NULL)
+        {
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCClose(pFile);
+        }
+    }
 
 	return bReturn;
 }
@@ -64,11 +66,13 @@ BOOL LCReadNextCommand(FILE *pFile, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
 
-	if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue)
-	        && (gSettingsManager))
-	{
-		bReturn = gSettingsManager->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
-	}
+    if (g_LSAPIManager.IsInitialized())
+    {
+        if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
+        {
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
+        }
+    }
 
 	return bReturn;
 }
@@ -78,11 +82,14 @@ BOOL LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchV
 {
 	BOOL bReturn = FALSE;
 
-	if ((pFile != NULL) && IsValidStringPtr(pszConfig) &&
-	        IsValidStringPtr(pszValue, cchValue) && (gSettingsManager))
-	{
-		bReturn = gSettingsManager->LCReadNextConfig(pFile, pszConfig, pszValue, cchValue);
-	}
+    if (g_LSAPIManager.IsInitialized())
+    {
+        if ((pFile != NULL) && IsValidStringPtr(pszConfig) &&
+	        IsValidStringPtr(pszValue, cchValue))
+        {
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextConfig(pFile, pszConfig, pszValue, cchValue);
+        }
+    }
 
 	return bReturn;
 }
@@ -92,20 +99,22 @@ BOOL LCReadNextLine(FILE *pFile, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
 
-	if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue)
-	        && (gSettingsManager))
-	{
-		bReturn = gSettingsManager->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
-	}
+    if (g_LSAPIManager.IsInitialized())
+    {
+    	if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
+	    {
+    		bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
+	    }
+    }
 
 	return bReturn;
 }
 
 int GetRCInt(LPCSTR szKeyName, int nDefault)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetRCInt(szKeyName, nDefault);
+		return g_LSAPIManager.GetSettingsManager()->GetRCInt(szKeyName, nDefault);
 	}
 
 	return nDefault;
@@ -114,9 +123,9 @@ int GetRCInt(LPCSTR szKeyName, int nDefault)
 
 BOOL GetRCBool(LPCSTR szKeyName, BOOL ifFound)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetRCBool(szKeyName, ifFound);
+		return g_LSAPIManager.GetSettingsManager()->GetRCBool(szKeyName, ifFound);
 	}
 
 	return !ifFound;
@@ -125,9 +134,9 @@ BOOL GetRCBool(LPCSTR szKeyName, BOOL ifFound)
 
 BOOL GetRCBoolDef(LPCSTR szKeyName, BOOL bDefault)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetRCBoolDef(szKeyName, bDefault);
+		return g_LSAPIManager.GetSettingsManager()->GetRCBoolDef(szKeyName, bDefault);
 	}
 
 	return bDefault;
@@ -136,9 +145,9 @@ BOOL GetRCBoolDef(LPCSTR szKeyName, BOOL bDefault)
 
 BOOL GetRCString(LPCSTR szKeyName, LPSTR szValue, LPCSTR defStr, int maxLen)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetRCString(szKeyName, szValue, defStr, maxLen);
+		return g_LSAPIManager.GetSettingsManager()->GetRCString(szKeyName, szValue, defStr, maxLen);
 	}
 	else if (szValue && defStr)
 	{
@@ -150,9 +159,9 @@ BOOL GetRCString(LPCSTR szKeyName, LPSTR szValue, LPCSTR defStr, int maxLen)
 
 COLORREF GetRCColor(LPCSTR szKeyName, COLORREF colDef)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetRCColor(szKeyName, colDef);
+		return g_LSAPIManager.GetSettingsManager()->GetRCColor(szKeyName, colDef);
 	}
 
 	return colDef;
@@ -161,9 +170,9 @@ COLORREF GetRCColor(LPCSTR szKeyName, COLORREF colDef)
 
 BOOL GetRCLine(LPCSTR szKeyName, LPSTR szBuffer, UINT nBufLen, LPCSTR szDefault)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetRCLine(szKeyName, szBuffer, nBufLen, szDefault);
+		return g_LSAPIManager.GetSettingsManager()->GetRCLine(szKeyName, szBuffer, nBufLen, szDefault);
 	}
 	else if(szBuffer && szDefault)
 	{
@@ -174,9 +183,9 @@ BOOL GetRCLine(LPCSTR szKeyName, LPSTR szBuffer, UINT nBufLen, LPCSTR szDefault)
 
 BOOL LSGetVariableEx(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		return gSettingsManager->GetVariable(pszKeyName, pszValue, dwLength);
+		return g_LSAPIManager.GetSettingsManager()->GetVariable(pszKeyName, pszValue, dwLength);
 	}
 
 	return FALSE;
@@ -192,9 +201,9 @@ BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
 		pszValue[0] = '\0';
 	}
 
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		bReturn = gSettingsManager->GetVariable(pszKeyName, szTempValue, MAX_LINE_LENGTH);
+		bReturn = g_LSAPIManager.GetSettingsManager()->GetVariable(pszKeyName, szTempValue, MAX_LINE_LENGTH);
 
 		if (bReturn && pszValue)
 		{
@@ -208,8 +217,8 @@ BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
 
 void LSSetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
 {
-	if (gSettingsManager)
+	if (g_LSAPIManager.IsInitialized())
 	{
-		gSettingsManager->SetVariable(pszKeyName, pszValue);
+		g_LSAPIManager.GetSettingsManager()->SetVariable(pszKeyName, pszValue);
 	}
 }

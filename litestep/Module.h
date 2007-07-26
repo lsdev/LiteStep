@@ -65,9 +65,7 @@ private:
     
     /** Event that is triggered when a threaded module completes initialization */
     HANDLE m_hInitEvent;
-    
-    /** Event that is triggered to tell a threaded module to shut down */
-    HANDLE m_hQuitEvent;
+    HANDLE m_hInitCopyEvent;
 
 public:
 
@@ -116,7 +114,7 @@ public:
      *
      * @param  msg  message information
      */
-    void HandleThreadMessage(MSG &msg);
+    static void HandleThreadMessage(MSG &msg);
     
     /**
      * Returns this module's DLL instance handle.
@@ -129,15 +127,30 @@ public:
      */
     HANDLE GetThread() const { return m_hThread; }
     
+    /* Caller may NOT call CloseHandle() until the thread 
+    * has an exit signal. */ 
+    HANDLE TakeThread() 
+    { 
+        HANDLE hTemp = m_hThread; 
+        m_hThread = NULL; 
+
+        return hTemp; 
+    }
+
     /**
      * Returns an event that is set once this module has been initialized.
      */
     HANDLE GetInitEvent() const { return m_hInitEvent; }
     
-    /**
-     * Returns an event that is set once this module has shut down.
-     */
-    HANDLE GetQuitEvent() const { return m_hQuitEvent; }
+    /* Caller may NOT call CloseHandle() until the event
+    * has been set to signaled. */ 
+    HANDLE TakeInitEvent() 
+    {
+        HANDLE hTemp = m_hInitEvent; 
+        m_hInitEvent = NULL; 
+
+        return hTemp; 
+    }
     
     /**
      * Returns the path to this module's DLL.
@@ -148,12 +161,6 @@ public:
      * Returns the set of flags used to load this module.
      */
     DWORD GetFlags() const { return m_dwFlags; }
-    
-    /**
-     * Returns <code>TRUE</code> if Litestep provides the message pump for this module's
-     * main thread.
-     */
-    BOOL HasMessagePump() const { return !(m_dwFlags & LS_MODULE_NOTPUMPED); }
     
     /**
      * Returns a pointer to this module's <code>quitModule</code> function.

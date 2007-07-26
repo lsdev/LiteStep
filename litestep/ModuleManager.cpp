@@ -125,27 +125,19 @@ UINT ModuleManager::_LoadModules()
         {
             char szToken1[MAX_LINE_LENGTH] = { 0 };
             char szToken2[MAX_LINE_LENGTH] = { 0 };
-            char szToken3[MAX_LINE_LENGTH] = { 0 };
             
             // first buffer takes the "LoadModule" token
-            LPSTR lpszBuffers[] = { NULL, szToken1, szToken2, szToken3 };
+            LPSTR lpszBuffers[] = { NULL, szToken1, szToken2 };
             
-            if (LCTokenize(szLine, lpszBuffers, 4, NULL) >= 2)
+            if (LCTokenize(szLine, lpszBuffers, 3, NULL) >= 2)
             {
                 DWORD dwFlags = 0;
                 
-                if ((stricmp(szToken2, "threaded") == 0) ||
-                    (stricmp(szToken3, "threaded") == 0))
+                if (stricmp(szToken2, "threaded") == 0)
                 {
                     dwFlags |= LS_MODULE_THREADED;
                 }
-                
-                if ((stricmp(szToken2, "nopump") == 0) ||
-                    (stricmp(szToken3, "nopump") == 0))
-                {
-                    dwFlags |= LS_MODULE_NOTPUMPED;
-                }
-                
+
                 Module* pModule = _MakeModule(szToken1, dwFlags);
                 
                 if (pModule)
@@ -221,7 +213,9 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
                     {
                         if ((*iter)->GetInitEvent())
                         {
-                            vecInitEvents.push_back((*iter)->GetInitEvent());
+                            /* Note: We are taking ownership of the Event handle 
+                            * here.  We call CloseHandle() below. */ 
+                            vecInitEvents.push_back((*iter)->TakeInitEvent());
                         }
                         
                         m_ModuleQueue.push_back(*iter);
@@ -241,8 +235,12 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
             mqModules.erase(iterOld);
         }
         
-        // Wait for all modules to signal that they have started
-        _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
+        // Are there any "threaded" modules? 
+        if (!vecInitEvents.empty()) 
+        { 
+            // Wait for all modules to signal that they have started. 
+            _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
+        }
     }
     
     return uReturn;
@@ -251,37 +249,53 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
 
 void ModuleManager::_QuitModules()
 {
-    std::vector<HANDLE> vecQuitEvents;
+    std::vector<HANDLE> vecQuitObjects;
     ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
+    ModuleQueue TempQueue; 
+
+    /* Note: 
+    * Store each module in a temporary queue, so that the module 
+    * may not be accessed via our main queue while it is being 
+    * unloaded.  This does -not- protect us from threads, however 
+    * it does hopefully add some security through obscurity from 
+    * recursion. */ 
     
     while (iter != m_ModuleQueue.rend())
     {
+        TempQueue.push_back(*iter);
+
         if (*iter)
         {
             (*iter)->Quit();
-            
-            HANDLE hEvent = (*iter)->GetQuitEvent();
-            
-            if (hEvent)
+
+            if ((*iter)->GetThread())
             {
-                vecQuitEvents.push_back(hEvent);
+                vecQuitObjects.push_back((*iter)->TakeThread());
             }
         }
         
         ++iter;
     }
-    
-    _WaitForModules(&vecQuitEvents[0], vecQuitEvents.size());
-    
+
+    m_ModuleQueue.clear();
+
+    if (!vecQuitObjects.empty())
+    {
+        _WaitForModules(&vecQuitObjects[0], vecQuitObjects.size());
+
+        // Close the handles we have taken ownership of. 
+        std::for_each( 
+            vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle); 
+    }
+
     // Clean it all up
-    iter = m_ModuleQueue.rbegin();
-    while (iter != m_ModuleQueue.rend())
+    iter = TempQueue.rbegin();
+    while (iter != TempQueue.rend())
     {
         delete *iter;
         ++iter;
     }
     
-    m_ModuleQueue.clear();
 }
 
 
@@ -293,11 +307,13 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
     {
         (*iter)->Quit();
         
-        HANDLE hQuitEvent = (*iter)->GetQuitEvent();
-        
-        if (hQuitEvent)
+        if ((*iter)->GetThread())
         {
-            _WaitForModules(&hQuitEvent, 1);
+            HANDLE hThread = (*iter)->TakeThread(); 
+
+            _WaitForModules(&hThread, 1); 
+
+            CloseHandle(hThread); 
         }
         
         delete *iter;
@@ -358,30 +374,37 @@ ModuleQueue::iterator ModuleManager::_FindModule(HINSTANCE hModule)
 
 void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
 {
-    DWORD dwRest = dwCount;
+    std::vector<HANDLE> vWait(pHandles, pHandles+dwCount);
     
-    while (dwRest)
+    /* Loop for as long as we have an object whose state is not signaled. */ 
+    while (vWait.size())
     {
-        DWORD dwWaitStatus = MsgWaitForMultipleObjects(dwCount, pHandles,
+        MSG message;
+
+        /* Handle all window messages for current thread */
+        while (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
+        {
+            m_pILiteStep->MessageHandler(message);
+        }
+
+        /* Handle all messages posted to the current thread */ 
+        while (PeekMessage(&message, (HWND)INVALID_HANDLE_VALUE, 0, 0, PM_REMOVE)) 
+        { 
+            m_pILiteStep->MessageHandler(message); 
+        }
+
+        /* Wait for a new message to come in, or for one of our objects 
+        * to become signaled. */ 
+        DWORD dwWaitStatus = MsgWaitForMultipleObjects(vWait.size(), &vWait[0],
             FALSE, INFINITE, QS_ALLINPUT);
         
-        if (dwWaitStatus == (WAIT_OBJECT_0 + dwCount))
+        /* Recreate the pObject list, in case any of the objects do not auto 
+        * reset their signaled state.  Otherwise, we would drop through our 
+        * outer loop immediately without waiting for all of our objects. */ 
+        if ((dwWaitStatus >= WAIT_OBJECT_0) && 
+            (dwWaitStatus < (WAIT_OBJECT_0 + vWait.size()))) 
         {
-            MSG message;
-            // if we use NULL instead of hLiteStep here.. it locks us up...
-            // TODO: could the above coment be because PeekMessage used to be
-            // called in an if statement instead of a while statement?
-            // We will have to test and see for 0.24.8 release.
-            while (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
-            {
-                TranslateMessage(&message);
-                DispatchMessage (&message);
-            }
-        }
-        else if ((dwWaitStatus >= WAIT_OBJECT_0) &&
-            (dwWaitStatus <= (WAIT_OBJECT_0 + dwCount - 1)))
-        {
-            --dwRest;
+            vWait.erase(vWait.begin() + (dwWaitStatus - WAIT_OBJECT_0));
         }
     }
 }

@@ -19,11 +19,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include <process.h>
 #include "module.h"
-#include "../utility/macros.h"
 #include "../lsapi/ThreadedBangCommand.h"
+#include "../utility/macros.h"
 #include "../utility/core.hpp"
+
+#include <process.h>
 
 
 Module::Module(const std::string& sLocation, DWORD dwFlags)
@@ -32,7 +33,7 @@ Module::Module(const std::string& sLocation, DWORD dwFlags)
     m_hThread = NULL;
     m_pInitEx = NULL;
     m_hInitEvent = NULL;
-    m_hQuitEvent = NULL;
+    m_hInitCopyEvent = NULL;
     m_pQuit = NULL;
     m_dwFlags = dwFlags;
     m_tzLocation = sLocation;
@@ -116,9 +117,28 @@ Module::~Module()
 {
     if (m_dwFlags & LS_MODULE_THREADED)
     {
-        CloseHandle(m_hThread);
-        CloseHandle(m_hInitEvent);
-        CloseHandle(m_hQuitEvent);
+        // Note: 
+        // - This is problematic because these handles may currently 
+        //   be used in _WaitForModules(), and by closing the handle 
+        //   here before it is done being used, we may cause invalid 
+        //   behavior of that function, with potential lockups. 
+        // - The solution within our current structure, is to allow 
+        //   an external procedure to take ownership of these handles. 
+        //   Meaning, whoever calls _WaitForModules would be required 
+        //   to free these objects when done with them, instead of us 
+        //   releasing them here. (See: TakeThread() TakeInitEvent()) 
+        // - The correct solution is re-writing our module threading 
+        //   behavior, which we will be doing on the trunk code. 
+        if (m_hInitEvent)
+        {
+            CloseHandle(m_hInitEvent);
+            m_hInitEvent = NULL;
+        }
+
+        if (m_hThread)
+        {
+            CloseHandle(m_hThread);
+        }
     }
     
     if (m_hInstance)
@@ -151,7 +171,8 @@ bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
             sa.lpSecurityDescriptor = NULL;
             sa.bInheritHandle = FALSE;
             
-            m_hInitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            m_hInitCopyEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            m_hInitEvent = m_hInitCopyEvent;
             // using _beginthreadex instead of CreateThread because modules
             // might use CRT functions
             m_hThread = (HANDLE)_beginthreadex(&sa, 0, Module::ThreadProc,
@@ -221,9 +242,8 @@ void Module::Quit()
 {
     if (m_hInstance)
     {
-        if (m_hThread)
+        if (m_dwFlags & LS_MODULE_THREADED)
         {
-            m_hQuitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
             PostThreadMessage(m_dwThreadID, WM_DESTROY, 0, (LPARAM)this);
         }
         else
@@ -240,43 +260,41 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
     
     dllMod->CallInit();
     
-    SetEvent(dllMod->GetInitEvent());
-    
-    if (dllMod->HasMessagePump())
+    /* We must use a copy of our event, and hope no one 
+    * has closed it before waiting for it to be signaled. 
+    * See: TakeThread() member function. */ 
+    SetEvent(dllMod->m_hInitCopyEvent); 
+
+    MSG msg;
+
+    while (GetMessage(&msg, 0, 0, 0))
     {
-        MSG msg;
-        
-        while (GetMessage(&msg, 0, 0, 0))
+#if !defined(LS_NO_EXCEPTION)
+        try
         {
-#if !defined(LS_NO_EXCEPTION)
-            try
-            {
 #endif /* LS_NO_EXCEPTION */
-                if (msg.hwnd == NULL)
-                {
-                    // Thread message
-                    dllMod->HandleThreadMessage(msg);
-                }
-                else
-                {
-                    // Window message
-                    TranslateMessage(&msg);
-                    DispatchMessage(&msg);
-                }
-#if !defined(LS_NO_EXCEPTION)
-            }
-            catch (...)
+            if (msg.hwnd == NULL)
             {
-                TRACE("Exception in module's main thread: %s", dllMod->m_tzLocation.c_str());
-                
-                // Quietly ignore exceptions?
-                // #pragma COMPILE_WARN(Note: Need stronger exception-handling code here...restart the module or something)
+                // Thread message
+                HandleThreadMessage(msg);
             }
-#endif /* LS_NO_EXCEPTION */
+            else
+            {
+                // Window message
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+#if !defined(LS_NO_EXCEPTION)
         }
+        catch (...)
+        {
+            TRACE("Exception in module's main thread: %s", dllMod->m_tzLocation.c_str());
+
+            // Quietly ignore exceptions?
+            // #pragma COMPILE_WARN(Note: Need stronger exception-handling code here...restart the module or something)
+        }
+#endif /* LS_NO_EXCEPTION */
     }
-    
-    SetEvent(dllMod->GetQuitEvent());
     
     return 0;
 }

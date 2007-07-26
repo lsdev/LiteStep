@@ -659,6 +659,30 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
+// NotifyRudeApp
+//
+// External interface to let us know a window has gone/left full screen mode
+//
+void TrayService::NotifyRudeApp(bool bIsFullScreen) const
+{
+#if 0
+    BarVector::const_reverse_iterator rit;
+
+    for(rit = m_abVector.rbegin(); rit != m_abVector.rend(); rit++)
+    {
+        SendMessage(
+            (*rit)->hWnd()
+            ,(*rit)->uMsg()
+            ,ABN_FULLSCREENAPP
+            ,(LPARAM)(bIsFullScreen ? 1:0)
+            );
+    }
+#endif
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
 // addIcon
 //
 bool TrayService::addIcon(const NID_XX& nid)

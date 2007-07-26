@@ -24,6 +24,8 @@
 
 #include "../utility/common.h"
 
+void SetupBangs();
+
 void BangAbout(HWND hCaller, LPCSTR pszArgs);
 void BangAlert(HWND hCaller, LPCSTR pszArgs);
 void BangCascadeWindows(HWND hCaller, LPCSTR pszArgs);

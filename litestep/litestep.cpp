@@ -24,6 +24,7 @@
 // Misc Helpers
 #include "RecoveryMenu.h"
 #include "StartupRunner.h"
+#include "../lsapi/lsapiInit.h"
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
@@ -187,6 +188,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
         PathRemoveFileSpec(szAppPath);
         PathAddBackslashEx(szAppPath, MAX_PATH);
     }
+    else 
+    { 
+        // something really crappy is going on. 
+        return -1; 
+    }
     PathCombine(szRcPath, szAppPath, "step.rc");
     
     // Parse command line, setting appropriate variables
@@ -215,7 +221,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
         MessageBox(NULL, resourceTextBuffer, "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
         return 2;
     }
-    
+
+    // Initialize the LSAPI.  Note: The LSAPI controls the bang and settings managers 
+    // so they will be started at this point. 
+    if (!LSAPIInitialize(szAppPath, szRcPath)) 
+    { 
+        //TODO: Localize this. 
+        MessageBox(NULL, "Failed to initialize the LiteStep API.", "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION); 
+        return 3; 
+    } 
+
     // Check for previous instance
     HANDLE hMutex = CreateMutex(NULL, FALSE, "LiteStep");
     
@@ -276,8 +291,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
     HRESULT hr;
     bool bUnderExplorer = false;
     
-    m_sAppPath.assign(pszAppPath);  // could throw length_error
-    m_sConfigFile.assign(pszRcPath);
     m_hInstance = hInstance;
     
     // Initialize OLE/COM
@@ -299,8 +312,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         mm.iArrange |= ARW_HIDE;
         SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
     }
-    
-    SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
     
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
         (nStartupMode != STARTUP_FORCE_RUN && GetRCBool("LSNoStartup", TRUE)))
@@ -367,6 +378,9 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         // Set magic DWORD to prevent VWM from seeing main window
         SetWindowLong (m_hMainWindow, GWL_USERDATA, magicDWord);
         
+        // Set our window in LSAPI 
+        LSAPISetLitestepWindow(m_hMainWindow); 
+
         FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = \
             (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
                 GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x00B5));
@@ -454,6 +468,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         // Destroy main window
         DestroyWindow(m_hMainWindow);
         m_hMainWindow = NULL;
+        LSAPISetLitestepWindow(NULL);
     }
     else
     {
@@ -464,9 +479,6 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
     
     // Unreg class
     UnregisterClass(szMainWindowClass, m_hInstance);
-    
-    // deinitialize stepsettings
-    DeleteSettingsManager();
     
     // Uninitialize OLE/COM
     OleUninitialize();
@@ -828,17 +840,47 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 
                 if (uMsg == LM_WINDOWACTIVATED)
                 {
-                    if (m_bAutoHideModules)
+                    /*
+                    * Note: The ShellHook will always set the HighBit when there
+                    * is any full screen app on the desktop, even if it does not
+                    * have focus.  Because of this, we have no easy way to tell
+                    * if the currently activated app is full screen or not. Thus
+                    * we will always hide our modules and appbars even when the
+                    * current application is not full screen but a full screen app
+                    * exists.  We could work around this by checking the window's
+                    * bounding RECT using GetWindowRect().  However, for now only
+                    * send notifications if the state has changed. (ie. when there
+                    * are no more full screen applications, or when the first full
+                    * screen app is displayed.  The correct behavior for this is
+                    * to hide when a full screen app is active, and to show when a
+                    * non full screen app is active. So, fix with a clean solution.
+                    */
+                    if ((0 != lParam) && (m_bAppIsFullScreen == false))
                     {
-                        if ((lParam > 0) && (m_bAppIsFullScreen == false))
+                        m_bAppIsFullScreen = true;
+
+                        if (m_pTrayService)
                         {
-                            m_bAppIsFullScreen = true;
+                            m_pTrayService->NotifyRudeApp(true);
+                        }
+
+                        if (m_bAutoHideModules)
+                        {
                             ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
                         }
-                        else if ((lParam <= 0) && (m_bAppIsFullScreen == true))
+                    }
+                    else if ((0 == lParam) && (m_bAppIsFullScreen == true))
+                    {
+                        m_bAppIsFullScreen = false;
+
+                        if (m_bAutoHideModules)
                         {
-                            m_bAppIsFullScreen = false;
                             ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
+                        }
+
+                        if (m_pTrayService)
+                        {
+                            m_pTrayService->NotifyRudeApp(false);
                         }
                     }
                 }
@@ -855,41 +897,6 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     }
     
     return lReturn;
-}
-
-
-HRESULT CLiteStep::get_Window(/*[out, retval]*/ long *phWnd) const
-{
-    HRESULT hr;
-    
-    if (phWnd != NULL)
-    {
-        *phWnd = (LONG)m_hMainWindow;
-        hr = S_OK;
-    }
-    else
-    {
-        hr = E_INVALIDARG;
-    }
-    
-    return hr;
-}
-
-
-HRESULT CLiteStep::get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const
-{
-    HRESULT hr;
-    
-    if (IsValidStringPtr(pszPath, cchPath))
-    {
-        hr = StringCchCopy(pszPath, cchPath, m_sAppPath.c_str());
-    }
-    else
-    {
-        hr = E_INVALIDARG;
-    }
-    
-    return hr;
 }
 
 
@@ -990,8 +997,8 @@ HRESULT CLiteStep::_InitManagers()
     
     // Note:
     // - The DataStore manager is dynamically initialized/started.
-    // - The Bang manager is located in LSAPI, and
-    //   is instantiated via LSAPIInit.
+    // - The Bang and Settings managers are located in LSAPI, and
+    //   are instantiated via LSAPIInit.
     
     return hr;
 }
@@ -1003,9 +1010,6 @@ HRESULT CLiteStep::_InitManagers()
 HRESULT CLiteStep::_StartManagers()
 {
     HRESULT hr = S_OK;
-    
-    // Setup bang commands in lsapi
-    SetupBangs();
     
     // Load modules
     m_pModuleManager->Start(this);
@@ -1031,8 +1035,8 @@ HRESULT CLiteStep::_StopManagers()
     
     m_pModuleManager->Stop();
     
+    // Clean up as modules might not have
     m_pMessageManager->ClearMessages();
-    ClearBangs();
     
     // Note:
     // - The DataStore manager is persistent.
@@ -1085,18 +1089,18 @@ void CLiteStep::_Recycle()
     
     _StopManagers();
     
-    DeleteSettingsManager();
-    
     if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
     {
         RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_ERROR6,
                         "Recycle has been paused, click OK to continue.", "LiteStep");
     }
     
-    SetupSettingsManager(m_sAppPath.c_str(), m_sConfigFile.c_str());
-    
-    /* Read in our locally affected settings */
-    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
+    // Re-initialize the bang and settings manager in LSAPI 
+    LSAPIReloadBangs(); 
+    LSAPIReloadSettings(); 
+
+    /* Read in our locally affected settings */ 
+    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false; 
     
     _StartManagers();
 }

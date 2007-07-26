@@ -81,31 +81,13 @@ protected:
      * @return  <code>TRUE</code> if the setting exists or <code>FALSE</code> otherwise
      */
     BOOL _FindLine(LPCSTR pszName, SettingsMap::iterator &it);
-    
-    /**
-     * Assigns values to predefined settings.
-     *
-     * @param  szLSPath  path to Litestep directory
-     */
-    void _SetupVars(LPCSTR szLSPath);
-    
-    /**
-     * Sets the value of a setting to the path of a special shell folder.
-     *
-     * @param   pszVariable  setting name
-     * @param   nFolder      one of the <code>CSIDL_*</code> constants
-     * @return  <code>true</code> if the operation succeeded or <code>false</code> otherwise
-     */
-    bool _SetShellFolderVariable(LPCSTR pszVariable, int nFolder);
 
 public:
 
     /**
      * Constructor.
-     *
-     * @param  pszLiteStepPath  path to Litestep directory
      */
-    SettingsManager(LPCSTR pszLiteStepPath);
+    SettingsManager();
     
     /**
      * Destructor.

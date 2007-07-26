@@ -24,15 +24,18 @@
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
+#include <string>
+
+using std::string;
+
 #if !defined(CSIDL_COMMON_ADMINTOOLS)
 #  define CSIDL_COMMON_ADMINTOOLS 0x002F
 #  define CSIDL_ADMINTOOLS 0x0030
 #endif
 
 
-SettingsManager::SettingsManager(LPCSTR pszLiteStepPath)
+SettingsManager::SettingsManager()
 {
-    _SetupVars(pszLiteStepPath);
 }
 
 
@@ -60,162 +63,6 @@ SettingsManager::~SettingsManager()
             itFiles->second->m_Count--;
         }
     }
-}
-
-
-bool SettingsManager::_SetShellFolderVariable(LPCSTR pszVariable, int nFolder)
-{
-    char szPath[MAX_PATH] = { 0 };
-    
-    bool bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
-    
-    if (bReturn)
-    {
-        PathQuoteSpaces(szPath);
-        SetVariable(pszVariable, szPath);
-    }
-    
-    return bReturn;
-}
-
-
-void SettingsManager::_SetupVars(LPCSTR pszLiteStepPath)
-{
-    char szTemp[MAX_PATH];
-    DWORD dwLength = MAX_PATH;
-    OSVERSIONINFO OsVersionInfo;
-    
-    if (SUCCEEDED(StringCchCopy(szTemp, MAX_PATH, pszLiteStepPath)))
-    {
-        PathQuoteSpaces(szTemp);
-        SetVariable("litestepdir", szTemp);
-    }
-    
-    if (GetWindowsDirectory(szTemp, MAX_PATH))
-    {
-        PathAddBackslashEx(szTemp, MAX_PATH);
-        SetVariable("windir", szTemp);
-    }
-    
-    if (GetUserName(szTemp, &dwLength))
-    {
-        PathQuoteSpaces(szTemp);
-        SetVariable("username", szTemp);
-    }
-    
-    if (GetShellFolderPath(CSIDL_APPDATA, szTemp, MAX_PATH))
-    {
-        StringCchCat(szTemp, MAX_PATH,
-            "Microsoft\\Internet Explorer\\Quick Launch\\");
-        
-        PathQuoteSpaces(szTemp);
-        SetVariable("quicklaunch", szTemp);
-    }
-    
-    SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
-    SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
-    SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
-    SetVariable("network", "::{208D2C60-3AEA-1069-A2D7-08002B30309D}");
-    SetVariable("controls", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
-    SetVariable("dialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{992CFFA0-F557-101A-88EC-00DD010CCC48}");
-    SetVariable("networkanddialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
-    SetVariable("printers", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{2227A280-3AEA-1069-A2DE-08002B30309D}");
-    SetVariable("scheduled", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
-    SetVariable("admintools", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
-    
-    _SetShellFolderVariable("commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
-    _SetShellFolderVariable("commonfavorites", CSIDL_COMMON_FAVORITES);
-    _SetShellFolderVariable("commonprograms", CSIDL_COMMON_PROGRAMS);
-    _SetShellFolderVariable("commonstartmenu", CSIDL_COMMON_STARTMENU);
-    _SetShellFolderVariable("commonstartup", CSIDL_COMMON_STARTUP);
-    _SetShellFolderVariable("cookies", CSIDL_COOKIES);
-    _SetShellFolderVariable("desktop", CSIDL_DESKTOP);
-    _SetShellFolderVariable("desktopdir", CSIDL_DESKTOPDIRECTORY);
-    _SetShellFolderVariable("favorites", CSIDL_FAVORITES);
-    _SetShellFolderVariable("fonts", CSIDL_FONTS);
-    _SetShellFolderVariable("history", CSIDL_HISTORY);
-    _SetShellFolderVariable("internet", CSIDL_INTERNET);
-    _SetShellFolderVariable("internetcache", CSIDL_INTERNET_CACHE);
-    _SetShellFolderVariable("nethood", CSIDL_NETHOOD);
-    _SetShellFolderVariable("documentsdir", CSIDL_PERSONAL);
-    _SetShellFolderVariable("printhood", CSIDL_PRINTHOOD);
-    _SetShellFolderVariable("programs", CSIDL_PROGRAMS);
-    _SetShellFolderVariable("recent", CSIDL_RECENT);
-    _SetShellFolderVariable("sendto", CSIDL_SENDTO);
-    _SetShellFolderVariable("startmenu", CSIDL_STARTMENU);
-    _SetShellFolderVariable("startup", CSIDL_STARTUP);
-    _SetShellFolderVariable("templates", CSIDL_TEMPLATES);
-    _SetShellFolderVariable("commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
-    _SetShellFolderVariable("admintoolsdir", CSIDL_ADMINTOOLS);
-    
-    OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
-    GetVersionEx(&OsVersionInfo);
-    
-    // Default platform conditionals to FALSE
-    SetVariable("Win9x", "false");
-    SetVariable("WinME", "false");
-    SetVariable("Win98", "false");
-    SetVariable("Win95", "false");
-    SetVariable("WinNT", "false");
-    SetVariable("Win2003", "false");
-    SetVariable("WinXP", "false");
-    SetVariable("Win2000", "false");
-    SetVariable("WinNT4", "false");
-    
-    // Now set the correct platform conditional to TRUE
-    if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-    {
-        // Any Win9x-series OS
-        SetVariable("Win9x", "true");
-        
-        if (OsVersionInfo.dwMinorVersion >= 90)         // Windows ME (4.90)
-        {
-            SetVariable("WinME", "true");
-        }
-        else if (OsVersionInfo.dwMinorVersion >= 10)    // Windows 98 (4.10)
-        {
-            SetVariable("Win98", "true");
-        }
-        else                                            // Windows 95 (4.00)
-        {
-            SetVariable("Win95", "true");
-        }
-    }
-    else if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-    {
-        // Any WinNT-series OS
-        SetVariable("WinNT", "true");
-        
-        if (OsVersionInfo.dwMajorVersion == 5)
-        {
-            if (OsVersionInfo.dwMinorVersion >= 2)      // Windows 2003 (5.2)
-            {
-                SetVariable("Win2003", "true");
-            }
-            else if (OsVersionInfo.dwMinorVersion >= 1) // Windows XP (5.1)
-            {
-                SetVariable("WinXP", "true");
-            }
-            else                                        // Windows 2000 (5.0)
-            {
-                SetVariable("Win2000", "true");
-            }
-        }
-        else if (OsVersionInfo.dwMajorVersion >= 4)     // Windows NT 4.0
-        {
-            SetVariable("WinNT4", "true");
-        }
-    }
-    
-    // screen resolution
-    StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
-    SetVariable("ResolutionX", szTemp);
-    
-    StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
-    SetVariable("ResolutionY", szTemp);
-    
-    StringCchPrintf(szTemp, MAX_PATH, "\"%s\"", __DATE__);
-    SetVariable("CompileDate", szTemp);
 }
 
 

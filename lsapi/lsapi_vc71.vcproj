@@ -159,6 +159,9 @@
 				RelativePath=".\lsapi.cpp">
 			</File>
 			<File
+				RelativePath=".\lsapiInit.cpp">
+			</File>
+			<File
 				RelativePath=".\lsmultimon.cpp">
 			</File>
 			<File
@@ -216,6 +219,9 @@
 			</File>
 			<File
 				RelativePath=".\lsapidefines.h">
+			</File>
+			<File
+				RelativePath=".\lsapiInit.h">
 			</File>
 			<File
 				RelativePath=".\lsmultimon.h">
