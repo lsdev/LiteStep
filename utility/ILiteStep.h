@@ -29,9 +29,7 @@
 class ILiteStep: public CountedBase
 {
 public:
-
-	virtual HRESULT get_Window(/*[out, retval]*/ long* phWnd) const = 0;
-	virtual HRESULT get_AppPath(/*[out, retval]*/ LPSTR pszPath, /*[in]*/ size_t cchPath) const = 0;
+    virtual int MessageHandler(/*[in]*/ MSG &message) = 0;
 };
 
 #endif // ILITESTEP_H

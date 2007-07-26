@@ -50,8 +50,9 @@ HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
         
         char szAppPath[MAX_PATH] = { 0 };
         
-        if (SUCCEEDED(m_pILiteStep->get_Window((LONG*)&m_hLiteStep)) &&
-            SUCCEEDED(m_pILiteStep->get_AppPath(szAppPath, MAX_PATH)))
+        m_hLiteStep = GetLitestepWnd();
+        
+        if (m_hLiteStep && LSGetLitestepPath(szAppPath, MAX_PATH))
         {
             m_sAppPath = szAppPath;
             
