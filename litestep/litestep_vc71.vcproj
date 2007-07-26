@@ -174,6 +174,9 @@
 				RelativePath=".\StartupRunner.cpp">
 			</File>
 			<File
+				RelativePath=".\TrayNotifyIcon.cpp">
+			</File>
+			<File
 				RelativePath=".\TrayService.cpp">
 			</File>
 		</Filter>
@@ -213,6 +216,9 @@
 			</File>
 			<File
 				RelativePath=".\StartupRunner.h">
+			</File>
+			<File
+				RelativePath=".\TrayNotifyIcon.h">
 			</File>
 			<File
 				RelativePath=".\TrayService.h">
