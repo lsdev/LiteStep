@@ -43,5 +43,10 @@
 // 0.24.7 default: ENABLED
 #define LS_COMPAT_LOGGING
 
+// Adds support for IncludeFolder Directive (all .rc files in specified folder
+// will be included - order not guaranteed).  This was added by the LDE(X) team.
+// Thanks Phil!
+// 0.24.8 default: DISABLED
+//#define LS_CUSTOM_INCLUDEFOLDER
 
 #endif // BUILDOPTIONS_H
