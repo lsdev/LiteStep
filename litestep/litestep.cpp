@@ -102,6 +102,10 @@ HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
         
         if (SUCCEEDED(hr))
         {
+            // Since we're a new, different litestep.exe process here, give the
+            // other, "real" instance the right to set the foreground window
+            TryAllowSetForegroundWindow(hWnd);
+
             COPYDATASTRUCT cds = { 0 };
             
             cds.cbData = sizeof(LMBANGCOMMAND);
