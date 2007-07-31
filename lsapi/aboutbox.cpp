@@ -45,6 +45,10 @@ int GetClientWidth(HWND hWnd);
 void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
 
+
+// Global handle to the running AboutBox instance (if any)
+HWND g_hAboutbox = NULL;
+
 /* Keep this enum synch'd with aboutOptions */
 enum
 {
@@ -226,6 +230,9 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 		case WM_INITDIALOG:
 		{
+            // save global handle
+            g_hAboutbox = hWnd;
+
 			// set title font
 			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
 			SendDlgItemMessage(hWnd, IDC_TITLE, WM_SETFONT,
@@ -311,8 +318,19 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 ULONG WINAPI AboutBoxThread(void *)
 {
-    return DialogBox(GetModuleHandle(NULL),
-        MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
+    if (!g_hAboutbox)
+    {
+        DialogBox(GetModuleHandle(NULL),
+            MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
+
+        g_hAboutbox = NULL;
+    }
+    else
+    {
+        SetForegroundWindow(g_hAboutbox);
+    }
+
+    return 0;
 }
 
 
