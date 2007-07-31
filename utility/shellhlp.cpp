@@ -265,3 +265,42 @@ bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
 
     return bSuccess;
 }
+
+
+//
+// TryAllowSetForegroundWindow
+// Calls AllowSetForegroundWindow on platforms that support it
+//
+HRESULT TryAllowSetForegroundWindow(HWND hWnd)
+{
+    ASSERT(hWnd != NULL);
+    HRESULT hr = E_FAIL;
+
+    typedef BOOL (WINAPI* ASFWPROC)(DWORD);
+
+    ASFWPROC pAllowSetForegroundWindow = (ASFWPROC)GetProcAddress(
+        GetModuleHandle(_T("user32.dll")), "AllowSetForegroundWindow");
+
+    if (pAllowSetForegroundWindow)
+    {
+        DWORD dwProcessId = 0;
+        GetWindowThreadProcessId(hWnd, &dwProcessId);
+
+        if (pAllowSetForegroundWindow(dwProcessId))
+        {
+            hr = S_OK;
+        }
+        else
+        {
+            hr = HRESULT_FROM_WIN32(GetLastError());
+        }
+    }
+    else
+    {
+        // this platform doesn't have ASFW (Win95, NT4), so the
+        // target process is allowed to set the foreground window anyway
+        hr = S_FALSE;
+    }
+
+    return hr;
+}
