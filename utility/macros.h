@@ -25,6 +25,9 @@
 #include "common.h"
 #include "..\lsapi\lsapi.h"
 
+// Count array elements
+#define COUNTOF(array)  (sizeof(array)/sizeof(array[0]))
+
 // Macros for Resource strings and localization
 #if !defined(LSRESOURCEBUFFER)
 #define LSRESOURCEBUFFER
