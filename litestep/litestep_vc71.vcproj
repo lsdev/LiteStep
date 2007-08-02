@@ -179,6 +179,9 @@
 			<File
 				RelativePath=".\TrayService.cpp">
 			</File>
+			<File
+				RelativePath=".\WinMain.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

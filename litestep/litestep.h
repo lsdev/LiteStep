@@ -50,13 +50,23 @@ const char szMainWindowTitle[] = "LiteStep";
 #define GWL_CLASSPOINTER	0
 
 
+// Litestep Startup Flags (LSF)
+#define LSF_RUN_STARTUPAPPS     0x0001
+#define LSF_FORCE_STARTUPAPPS   0x0002  // ignored unless LSF_RUN_STARTUPAPPS is set
+#define LSF_ALTERNATE_CONFIG    0x0004
+#define LSF_RUN_LITESTEP        0x0008
+#define LSF_RUN_EXPLORER        0x0010
+
+int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile);
+
+
 class CLiteStep: public ILiteStep
 {
 public:
 	CLiteStep();
 	~CLiteStep();
 
-	HRESULT Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode);
+	HRESULT Start(HINSTANCE hInstance, WORD wStartFlags);
 
 	static LRESULT CALLBACK ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

@@ -52,142 +52,20 @@ using std::for_each;
 using std::mem_fun;
 
 
-// Parse the command line
-bool ParseCmdLine(LPCSTR pszCmdLine);
-HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
-
+// Globals
 CLiteStep gLiteStep;
-CHAR szAppPath[MAX_PATH];
-CHAR szRcPath[MAX_PATH];
 
-enum StartupMode
+
+//
+//
+//
+int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 {
-    STARTUP_DONT_RUN  = -1,
-    STARTUP_DEFAULT   = 0,  // run only if first time
-    STARTUP_FORCE_RUN = TRUE
-};
+    TCHAR szAppPath[MAX_PATH] = { 0 };
+    TCHAR szRcPath[MAX_PATH] = { 0 };
 
-int g_nStartupMode = STARTUP_DEFAULT;
-
-
-//
-// ExecuteCmdLineBang
-//
-HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
-{
-    ASSERT(NULL != pszCommand);
-    
-    HRESULT hr = E_FAIL;
-    HWND hWnd = FindWindow(szMainWindowClass, szMainWindowTitle);
-    
-    if (IsWindow(hWnd))
-    {
-        LMBANGCOMMAND bangCommand;
-        bangCommand.cbSize = sizeof(LMBANGCOMMAND);
-        bangCommand.hWnd = NULL;
-        
-        hr = StringCchCopy(bangCommand.szCommand, MAX_BANGCOMMAND, pszCommand);
-        
-        if (SUCCEEDED(hr))
-        {
-            if (pszArgs)
-            {
-                hr = StringCchCopy(bangCommand.szArgs, MAX_BANGARGS, pszArgs);
-            }
-            else
-            {
-                bangCommand.szArgs[0] = '\0';
-            }
-        }
-        
-        if (SUCCEEDED(hr))
-        {
-            // Since we're a new, different litestep.exe process here, give the
-            // other, "real" instance the right to set the foreground window
-            TryAllowSetForegroundWindow(hWnd);
-
-            COPYDATASTRUCT cds = { 0 };
-            
-            cds.cbData = sizeof(LMBANGCOMMAND);
-            cds.dwData = LM_BANGCOMMAND;
-            cds.lpData = &bangCommand;
-            
-            SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds);
-            hr = S_OK;
-        }
-    }
-    
-    return hr;
-}
-
-
-//
-// ParseCmdLine(LPCSTR pszCmdLine)
-//
-bool ParseCmdLine(LPCSTR pszCmdLine)
-{
-    if (IsValidStringPtr(pszCmdLine))
-    {
-        char szToken[MAX_LINE_LENGTH];
-        LPCSTR pszNextToken = pszCmdLine;
-        
-        while (GetToken(pszNextToken, szToken, &pszNextToken, false))
-        {
-            switch (szToken[0])
-            {
-                case '-':
-                {
-                    if (!stricmp(szToken, "-nostartup"))
-                    {
-                        g_nStartupMode = STARTUP_DONT_RUN;
-                    }
-                    else if (!stricmp(szToken, "-startup"))
-                    {
-                        g_nStartupMode = STARTUP_FORCE_RUN;
-                    }
-                }
-                break;
-                
-                case '!':
-                {
-                    ExecuteCmdLineBang(szToken, pszNextToken);
-                    return false;
-                }
-                break;
-                
-                default:
-                {
-                    if (PathFileExists(szToken))
-                    {
-                        if (strchr(szToken, '\\'))
-                        {
-                            StringCchCopy(szRcPath, MAX_PATH, szToken);
-                        }
-                        else
-                        {
-                            StringCchPrintfEx(szRcPath, MAX_PATH, NULL, NULL, STRSAFE_NULL_ON_FAILURE, "%s%s", szAppPath, szToken);
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
-    
-    return true;
-}
-
-
-//
-//
-//
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
-                   LPSTR lpCmdLine, int /* nCmdShow */)
-{
-    HRESULT hr = S_OK;
-    
     // Determine our application's path
-    if (LSGetModuleFileName(hInstance, szAppPath, sizeof(szAppPath)))
+    if (LSGetModuleFileName(hInst, szAppPath, COUNTOF(szAppPath)))
     {
         PathRemoveFileSpec(szAppPath);
         PathAddBackslashEx(szAppPath, MAX_PATH);
@@ -197,32 +75,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
         // something really crappy is going on. 
         return -1; 
     }
-    PathCombine(szRcPath, szAppPath, "step.rc");
-    
-    // Parse command line, setting appropriate variables
-    if (!ParseCmdLine(lpCmdLine))
+
+    if (wStartFlags & LSF_ALTERNATE_CONFIG)
     {
-        return 1;
+        StringCchCopy(szRcPath, COUNTOF(szRcPath), pszAltConfigFile);
     }
-    
+    else
+    {
+        PathCombine(szRcPath, szAppPath, "step.rc");
+    }
+
     // Tell the Welcome Screen to close
-    // This has to be done before the first MessageBox call, else that box
-    // would pop up "under" the welcome screen
+    // This has to be done before the first MessageBox call in shell mode,
+    // else that box would pop up "under" the welcome screen
     HANDLE hShellReadyEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE,
         "msgina: ShellReadyEvent");
-    
+
     if (hShellReadyEvent != NULL)
     {
         SetEvent(hShellReadyEvent);
         CloseHandle(hShellReadyEvent);
     }
-    
+
     // If we can't find "step.rc", there's no point in proceeding
     if (!PathFileExists(szRcPath))
     {
-        RESOURCE_STREX(hInstance, IDS_LITESTEP_ERROR2, resourceTextBuffer, MAX_LINE_LENGTH,
-                       "Unable to find the file \"%s\".\nPlease verify the location of the file, and try again.", szRcPath);
-        MessageBox(NULL, resourceTextBuffer, "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
+        RESOURCE_STREX(
+            hInst, IDS_LITESTEP_ERROR2, resourceTextBuffer, MAX_LINE_LENGTH,
+            "Unable to find the file \"%s\".\n"
+            "Please verify the location of the file, and try again.", szRcPath);
+
+        MessageBox(NULL, resourceTextBuffer, "LiteStep",
+            MB_TOPMOST | MB_ICONEXCLAMATION);
+
         return 2;
     }
 
@@ -231,31 +116,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     if (!LSAPIInitialize(szAppPath, szRcPath)) 
     { 
         //TODO: Localize this. 
-        MessageBox(NULL, "Failed to initialize the LiteStep API.", "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION); 
+        MessageBox(NULL, "Failed to initialize the LiteStep API.",
+            "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
+
         return 3; 
     } 
 
-    // Check for previous instance
-    HANDLE hMutex = CreateMutex(NULL, FALSE, "LiteStep");
-    
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-    {
-        // Prevent multiple instances of LiteStep
-        RESOURCE_STR(hInstance, IDS_LITESTEP_ERROR1,
-                     "A previous instance of LiteStep was detected.\nAre you sure you want to continue?");
-        if (IDNO == MessageBox(NULL, resourceTextBuffer, "LiteStep", MB_TOPMOST | MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2))
-        {
-            hr = E_ABORT;
-        }
-    }
-    
-    if (SUCCEEDED(hr))
-    {
-        hr = gLiteStep.Start(szAppPath, szRcPath, hInstance, g_nStartupMode);
-    }
-    
-    CloseHandle(hMutex);
-    
+    HRESULT hr = gLiteStep.Start(hInst, wStartFlags);
+
     return HRESULT_CODE(hr);
 }
 
@@ -288,9 +156,9 @@ CLiteStep::~CLiteStep()
 
 
 //
-// Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
+// Start
 //
-HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
+HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 {
     HRESULT hr;
     bool bUnderExplorer = false;
@@ -316,13 +184,16 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         mm.iArrange |= ARW_HIDE;
         SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
     }
-    
-    if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
-        (nStartupMode != STARTUP_FORCE_RUN && GetRCBool("LSNoStartup", TRUE)))
+
+    // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
+    if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
+        GetRCBool("LSNoStartup", TRUE) &&
+        !(wStartFlags & LSF_FORCE_STARTUPAPPS))
+
     {
-        nStartupMode = STARTUP_DONT_RUN;
+        wStartFlags &= ~LSF_RUN_STARTUPAPPS;
     }
-    
+
     m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
     
     // Check for explorer
@@ -351,7 +222,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         }
         bUnderExplorer = true;
     }
-    
+
     // Register Window Class
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -435,13 +306,14 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
             // Quietly swallow manager errors... in the future.. do something
         }
         
-        // Run startup items if the SHIFT key is not down
-        if (nStartupMode != STARTUP_DONT_RUN)
+        // Run startup items
+        if (wStartFlags & LSF_RUN_STARTUPAPPS)
         {
             DWORD dwThread;
-            
+            BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
+
             CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
-                (void*)nStartupMode, 0, &dwThread));
+                (void*)bForceStartup, 0, &dwThread));
         }
         
         // Undocumented call: Shell Loading Finished
