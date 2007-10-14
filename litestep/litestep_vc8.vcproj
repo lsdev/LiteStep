@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="litestep"
 	ProjectGUID="{994556EE-2F21-4811-A85D-6925F7F84B0D}"
 	RootNamespace="litestep"
@@ -246,7 +246,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TrayNotifyIcon.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TrayService.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WinMain.cpp"
 				>
 			</File>
 		</Filter>
@@ -297,6 +305,14 @@
 			</File>
 			<File
 				RelativePath=".\StartupRunner.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TrayAppBar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TrayNotifyIcon.h"
 				>
 			</File>
 			<File
