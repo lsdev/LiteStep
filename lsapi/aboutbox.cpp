@@ -172,16 +172,16 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			}
 			else if (LOWORD(wParam) == IDOK || LOWORD(wParam == IDCANCEL))
 			{
-				// release title font
-				HFONT titleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
-					WM_GETFONT, 0, 0);
+                HFONT hTitleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
+                    WM_GETFONT, 0, 0);
 
-				DeleteObject(titleFont);
+                // close the dialog box
+                EndDialog(hWnd, IDOK);
 
-				// close the dialog box
-				EndDialog(hWnd, IDOK);
+                // release title font
+                DeleteObject(hTitleFont);
 
-				return TRUE;
+                return TRUE;
 			}
 			/* This isn't necessary as we have the edit control set to read only.
 			 * It just ensures our text doesn't get changed somehow */
