@@ -133,6 +133,7 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
     {
         switch(pnidSource->cbSize)
         {
+        case NID_7W_SIZE:
         case NID_6W_SIZE:
         case NID_5W_SIZE:
             {
@@ -177,7 +178,6 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
             break;
 
         case NID_4A_SIZE:
-        default:
             {
                 LPCSTR pwzSrc = ((NID_4A*)(pnidSource))->szTip;
 
@@ -188,6 +188,9 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
                     m_szTip[0] = 0;
                 }
             }
+            break;
+        
+        default:
             break;
         }
 
@@ -206,6 +209,7 @@ void NotifyIcon::copy_state(PCNID_XX pnidSource)
 {
     switch (pnidSource->cbSize)
     {
+    case NID_7W_SIZE:
     case NID_6W_SIZE:
     case NID_5W_SIZE:
         {
