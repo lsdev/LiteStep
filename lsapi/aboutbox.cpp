@@ -175,14 +175,14 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			}
 			else if (LOWORD(wParam) == IDOK || LOWORD(wParam == IDCANCEL))
 			{
-				// release title font
-				HFONT titleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
+				HFONT hTitleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
                     WM_GETFONT, 0, 0);
-
-				DeleteObject(titleFont);
 
 				// close the dialog box
 				EndDialog(hWnd, IDOK);
+
+				// release title font
+				DeleteObject(hTitleFont);
 
                 return TRUE;
 			}
