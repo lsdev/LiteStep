@@ -474,6 +474,10 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
                     GetLitestepWnd(), GWL_HINSTANCE);
 
 				hIcon = ExtractIcon(hInstance, pszIconFile, nIcon);
+				if(1 == (int)hIcon)
+				{
+					hIcon = NULL;
+				}
 			}
 		}
 	}
