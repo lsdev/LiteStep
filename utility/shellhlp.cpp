@@ -304,3 +304,58 @@ HRESULT TryAllowSetForegroundWindow(HWND hWnd)
 
     return hr;
 }
+
+
+//
+// IsVistaOrAbove
+//
+bool IsVistaOrAbove()
+{
+    bool bVistaOrAbove = false;
+
+    OSVERSIONINFO ovi = { 0 };
+    ovi.dwOSVersionInfoSize = sizeof(ovi);
+
+    VERIFY(GetVersionEx(&ovi));
+
+    if (ovi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+        ovi.dwMajorVersion >= 6)
+    {
+        bVistaOrAbove = true;
+    }
+
+    return bVistaOrAbove;
+}
+
+
+//
+// LSShutdownDialog
+//
+void LSShutdownDialog(HWND hWnd)
+{
+    FARPROC fnProc = GetProcAddress(
+        GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003C));
+
+    if (fnProc)
+    {
+        if (IsVistaOrAbove())
+        {
+            typedef void (WINAPI* ExitWindowsDialogProc)(HWND, DWORD);
+
+            ExitWindowsDialogProc fnExitWindowsDialog =
+                (ExitWindowsDialogProc)fnProc;
+
+            // Meaning of second parameter unknown
+            fnExitWindowsDialog(hWnd, NULL);
+        }
+        else
+        {
+            typedef void (WINAPI* ExitWindowsDialogProc)(HWND);
+
+            ExitWindowsDialogProc fnExitWindowsDialog =
+                (ExitWindowsDialogProc)fnProc;
+
+            fnExitWindowsDialog(hWnd);
+        }
+    }
+}

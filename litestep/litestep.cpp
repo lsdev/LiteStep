@@ -618,13 +618,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 
                 default:  // wParam == LR_MSSHUTDOWN
                 {
-                    FARPROC (__stdcall * MSWinShutdown)(HWND) = NULL;
-                    MSWinShutdown = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003C));
-                    if (MSWinShutdown)
-                    {
-                        MSWinShutdown(m_hMainWindow); // shouldn't this be NULL?
-                        // Could also use the now-documented RestartDialog(Ex)
-                    }
+                    LSShutdownDialog(m_hMainWindow);
                 }
                 break;
             }

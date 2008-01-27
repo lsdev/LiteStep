@@ -22,6 +22,7 @@
 #include "RecoveryMenu.h"
 #include "resource.h"
 #include "../lsapi/lsapi.h"
+#include "../utility/shellhlp.h"
 
 struct
 {
@@ -168,11 +169,7 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
                 
                 case ID_SHUTDOWN:
                 {
-                    void (WINAPI * ShutdownDlg)(HWND) = \
-                        (void (WINAPI *)(HWND)) GetProcAddress(
-                            GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x003C));
-                    
-                    ShutdownDlg(NULL);
+                    LSShutdownDialog(GetLitestepWnd());
                 }
                 break;
                 
