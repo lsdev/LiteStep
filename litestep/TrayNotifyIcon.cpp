@@ -20,6 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "TrayNotifyIcon.h"
+#include "../utility/safestr.h"
 
 //
 // ReadMe
