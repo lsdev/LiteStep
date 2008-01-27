@@ -263,9 +263,6 @@
 				RelativePath=".\SettingsDefines.h">
 			</File>
 			<File
-				RelativePath=".\SettingsEvalParser.h">
-			</File>
-			<File
 				RelativePath=".\SettingsFileParser.h">
 			</File>
 			<File
