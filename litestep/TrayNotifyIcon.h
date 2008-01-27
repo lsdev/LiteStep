@@ -274,6 +274,7 @@ public:
     {
         return m_hWnd;
     }
+
     inline UINT GetuID() const
     {
         return m_uID;
@@ -294,8 +295,9 @@ private:
 
     void update_state(DWORD dwState, DWORD dwMask);
 
-    HWND  m_hWnd;                                /* persistent & non volatile */
-    UINT  m_uID;                                 /* persistent & non volatile */
+    // Preserved Notify Icon Data members
+    const HWND  m_hWnd;                          /* persistent & non volatile */
+    const UINT  m_uID;                           /* persistent & non volatile */
 
     UINT  m_uFlags;                              /* persistent &     volatile */
     UINT  m_uCallbackMessage;                    /* persistent &     volatile */
@@ -304,6 +306,5 @@ private:
 
     DWORD m_dwState;                             /* persistent &     volatile */
 };
-
 
 #endif //!defined(TRAYNOTIFYICON_H)
