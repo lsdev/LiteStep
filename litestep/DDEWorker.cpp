@@ -36,8 +36,6 @@ DDEWorker::DDEWorker()
 	{
 		m_bIsUserAnAdmin = FALSE;
 	}
-
-	SHFindFiles = (BOOL (__stdcall *)(LPCITEMIDLIST, LPCITEMIDLIST))GetProcAddress(GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x005A));
 }
 
 
@@ -310,45 +308,26 @@ DWORD DDEWorker::_MatchRequest(LPCSTR pszCommand)
 
 BOOL DDEWorker::_FindFiles(LPSTR pszPath, BOOL bFindFolder)
 {
-	LPMALLOC pMalloc = NULL;
-	BOOL bReturn = FALSE;
-    WCHAR wzPath[MAX_PATH] = { 0 };
+    BOOL bReturn = FALSE;
 
-	PathUnquoteSpaces(pszPath);
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszPath, -1, wzPath, MAX_PATH);
+    PathUnquoteSpaces(pszPath);
+    LPITEMIDLIST pidl = ILCreateFromPath(pszPath);
 
-	HRESULT hr = SHGetMalloc(&pMalloc);
-	if (SUCCEEDED(hr))
-	{
-		IShellFolder* psfParent = NULL;
+    if (pidl)
+    {
+        if (bFindFolder) // FindFolder
+        {
+            bReturn = (BOOL)SHFindFiles(pidl, NULL);
+        }
+        else // OpenFindFile
+        {
+            bReturn = (BOOL)SHFindFiles(NULL, pidl);
+        }
 
-		hr = SHGetDesktopFolder(&psfParent);
-		if (SUCCEEDED(hr))
-		{
-			LPITEMIDLIST pidl = NULL;
+        ILFree(pidl);
+    }
 
-			hr = psfParent->ParseDisplayName(NULL, NULL, wzPath, NULL, &pidl, NULL);
-			if (SUCCEEDED(hr))
-			{
-				if (bFindFolder) // FindFolder
-				{
-					bReturn = (BOOL)SHFindFiles(pidl, NULL);
-				}
-				else // OpenFindFile
-				{
-					bReturn = (BOOL)SHFindFiles(NULL, pidl);
-				}
-
-                pMalloc->Free(pidl);
-			}
-
-			psfParent->Release();
-		}
-
-		pMalloc->Release();
-	}
-
-	return bReturn;
+    return bReturn;
 }
 
 
