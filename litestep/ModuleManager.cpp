@@ -240,6 +240,10 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
         { 
             // Wait for all modules to signal that they have started. 
             _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
+            
+            // Close the handles we have taken ownership of.
+            std::for_each(
+                vecInitEvents.begin(), vecInitEvents.end(), CloseHandle);
         }
     }
     
@@ -382,7 +386,7 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
         MSG message;
 
         /* Handle all window messages for current thread */
-        while (PeekMessage(&message, m_hLiteStep, 0, 0, PM_REMOVE))
+        while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
         {
             m_pILiteStep->MessageHandler(message);
         }

@@ -134,10 +134,11 @@ Module::~Module()
             CloseHandle(m_hInitEvent);
             m_hInitEvent = NULL;
         }
-
+        
         if (m_hThread)
         {
             CloseHandle(m_hThread);
+            m_hThread = NULL;
         }
     }
     
@@ -171,7 +172,7 @@ bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
             sa.lpSecurityDescriptor = NULL;
             sa.bInheritHandle = FALSE;
             
-            m_hInitCopyEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            m_hInitCopyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
             m_hInitEvent = m_hInitCopyEvent;
             // using _beginthreadex instead of CreateThread because modules
             // might use CRT functions

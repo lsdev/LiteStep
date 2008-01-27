@@ -119,7 +119,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
         MessageBox(NULL, "Failed to initialize the LiteStep API.",
             "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
 
-        return 3; 
+        return 3;
     } 
 
     HRESULT hr = gLiteStep.Start(hInst, wStartFlags);
@@ -891,10 +891,6 @@ HRESULT CLiteStep::_StartManagers()
     m_pModuleManager->Start(this);
     
     // Note:
-    // - The BangManger is continually running
-    //   however, we must add our internal bang commands
-    //   at startup.  We take responsibility for that
-    //   here as it also needs to happen on Recycle.
     // - MessageManager has/needs no Start method.
     // - The DataStore manager is dynamically initialized/started.
     
@@ -917,7 +913,6 @@ HRESULT CLiteStep::_StopManagers()
     // Note:
     // - The DataStore manager is persistent.
     // - The Message manager can not be "stopped", just cleared.
-    // - The Bang manager can not be "stopped", just cleraed.
     
     return hr;
 }
