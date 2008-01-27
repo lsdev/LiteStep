@@ -19,10 +19,10 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include "../utility/core.hpp"
+#include "litestep.h"
 #include "../utility/macros.h"
 #include "../utility/shellhlp.h"
-#include "litestep.h"
+#include "../utility/core.hpp"
 
 
 // How long to wait for Explorer to start up as shell, in milliseconds
