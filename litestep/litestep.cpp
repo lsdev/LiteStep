@@ -72,11 +72,10 @@ HRESULT GetAppPath(LPTSTR pszAppPath, SIZE_T cchAppPath)
     }
 #else
     // In release builds use litestep.exe's location as base path
-    hr = LSGetModuleFileName(NULL, pszAppPath, cchAppPath);
-
-    if (SUCCEEDED(hr))
+    if (LSGetModuleFileName(NULL, pszAppPath, cchAppPath))
     {
         PathRemoveFileSpec(pszAppPath);
+        hr = S_OK;
     }
 #endif
 
