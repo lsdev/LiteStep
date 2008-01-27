@@ -143,6 +143,10 @@ SOURCE=.\TrayNotifyIcon.cpp
 
 SOURCE=.\TrayService.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\WinMain.cpp
+# End Source File
 # End Group
 # Begin Group "Headers"
 
