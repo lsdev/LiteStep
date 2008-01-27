@@ -46,8 +46,9 @@ HRESULT DDEStub::Start()
         
         if(m_hShDocVw && !m_pShellDDEInit)
         {
+            // Ordinal 0x00BC in shell32.dll
+            // Ordinal 0x0076 in shdocvw.dll
             m_pShellDDEInit = (void (__stdcall*)(BOOL))GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
-                //(LPSTR)188); // shell32.dll
         }
         
         if(m_pShellDDEInit)

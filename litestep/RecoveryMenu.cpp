@@ -56,7 +56,7 @@ DWORD WINAPI RecoveryThreadProc(LPVOID pvData)
 
 	if (RegisterClassEx(&wc))
     {
-        HWND hRecoveryWnd =
+        HWND hRecoveryWnd = \
             CreateWindowEx(0,
             szRecoveryMenuWndClass,
             NULL,
@@ -107,7 +107,6 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
                 if (rgMenuCommands[i].nStringID)
 				{
 					char szBuffer[MAX_PATH];
-					//LoadString( (HINSTANCE) GetWindowLong( hWnd, GWL_HINSTANCE ), rgMenuCommands[i].nStringID, szBuffer, MAX_PATH );
 					GetResStr(hInstance,
 					          rgMenuCommands[i].nStringID, szBuffer, MAX_PATH,
 					          rgMenuCommands[i].pszDefText);
@@ -167,7 +166,7 @@ LRESULT WINAPI RecoveryMenuWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPAR
 
 				case ID_SHUTDOWN:
 				{
-					void (WINAPI * ShutdownDlg)(HWND) =
+					void (WINAPI * ShutdownDlg)(HWND) = \
                         (void (WINAPI *)(HWND)) GetProcAddress(
                             GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x003C));
 

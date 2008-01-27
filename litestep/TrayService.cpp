@@ -357,12 +357,12 @@ void TrayService::unloadShellServiceObjects()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// WindowProc
+// WindowTrayProc
 //
 // Redirects all messages to the appropriate handler
 //
 LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
-                                         WPARAM wParam, LPARAM lParam)
+                                             WPARAM wParam, LPARAM lParam)
 {
     static TrayService* pTrayService = NULL;
     

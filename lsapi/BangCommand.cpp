@@ -20,8 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "BangCommand.h"
-#include "../utility/core.hpp"
 #include "ThreadedBangCommand.h"
+#include "../utility/core.hpp"
+
 
 Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
 :m_szCommand(pszCommand)
@@ -48,7 +49,7 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
 
 	if (dwThreadID != m_dwThreadID)
 	{
-		ThreadedBangCommand * pInfo =
+		ThreadedBangCommand * pInfo = \
             new ThreadedBangCommand(hCaller, m_szCommand.c_str(), pszParams);
 
 		if (pInfo != NULL)

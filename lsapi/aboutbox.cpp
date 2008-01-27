@@ -64,9 +64,7 @@ struct
 {
 	const char *option;
 	AboutFunction function;
-}
-aboutOptions[] =
-{
+} aboutOptions[] = {
 	 {"Bang Commands",      AboutBangs}
 	,{"Development Team",   AboutDevTeam}
 	,{"License",            AboutLicense}
@@ -77,11 +75,9 @@ aboutOptions[] =
 
 struct
 {
-    const char *nick;
-    const char *realName;
-}
-theDevTeam[] =
-{
+	const char *nick;
+	const char *realName;
+} theDevTeam[] = {
 	 {"ilmcuts", "Simon"}
 	,{"jugg",    "Chris Rempel"}
 	,{"Maduin",  "Kevin Schaffer"}

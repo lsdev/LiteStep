@@ -252,7 +252,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 
 	if (SUCCEEDED(hr))
     {
-        hr = gLiteStep.Start(szAppPath, szRcPath, hInstance, g_nStartupMode);
+        hr = gLiteStep.Start(hInstance, g_nStartupMode);
     }
 
     CloseHandle(hMutex);
@@ -290,9 +290,9 @@ CLiteStep::~CLiteStep()
 
 
 //
-// Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
+// Start(HINSTANCE hInstance, int nStartupMode)
 //
-HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode)
+HRESULT CLiteStep::Start(HINSTANCE hInstance, int nStartupMode)
 {
 	HRESULT hr;
 	bool bUnderExplorer = false;
@@ -320,7 +320,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
 	}
 
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
-        (nStartupMode != STARTUP_FORCE_RUN && !GetRCBool("LSNoStartup", FALSE)))
+        (nStartupMode != STARTUP_FORCE_RUN && GetRCBool("LSNoStartup", TRUE)))
     {
         nStartupMode = STARTUP_DONT_RUN;
     }
@@ -387,7 +387,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
         // Set our window in LSAPI
         LSAPISetLitestepWindow(m_hMainWindow);
 
-        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) =
+        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = \
             (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
             GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x00B5));
 
@@ -437,7 +437,7 @@ HRESULT CLiteStep::Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstanc
             // Quietly swallow manager errors... in the future.. do something
         }
         
-		// Run startup items if the SHIFT key is not down
+		// Run startup items
 		if (nStartupMode != STARTUP_DONT_RUN)
 		{
 			DWORD dwThread;
@@ -1029,7 +1029,7 @@ HRESULT CLiteStep::_InitManagers()
 	// Note:
 	// - The DataStore manager is dynamically initialized/started.
 	// - The Bang and Settings managers are located in LSAPI, and
-	//   is instantiated via LSAPIInit.
+	//   are instantiated via LSAPIInit.
 	// - The Hook mamanger is dynamically initialized/started.
 
 	return hr;

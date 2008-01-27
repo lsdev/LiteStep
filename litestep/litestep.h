@@ -54,7 +54,7 @@ public:
 	CLiteStep();
 	~CLiteStep();
 
-	HRESULT Start(LPCSTR pszAppPath, LPCSTR pszRcPath, HINSTANCE hInstance, int nStartupMode);
+	HRESULT Start(HINSTANCE hInstance, int nStartupMode);
 
 	static LRESULT CALLBACK ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -110,25 +110,4 @@ private:
 	void _CleanupServices();
 };
 
-#endif	// __LITESTEP_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // __LITESTEP_H

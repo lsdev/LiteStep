@@ -29,6 +29,7 @@ void BangAlert(HWND hCaller, LPCSTR pszArgs);
 void BangCascadeWindows(HWND hCaller, LPCSTR pszArgs);
 void BangConfirm(HWND hCaller, LPCSTR pszArgs);
 void BangExecute(HWND hCaller, LPCSTR pszArgs);
+void BangHideModules (HWND hCaller, LPCSTR pszArgs);
 void BangLogoff(HWND hCaller, LPCSTR pszArgs);
 void BangMinimizeWindows(HWND hCaller, LPCSTR pszArgs);
 void BangQuit(HWND caller, LPCSTR param);
@@ -38,14 +39,13 @@ void BangReload(HWND hCaller, LPCSTR pszArgs);
 void BangReloadModule (HWND hCaller, LPCSTR pszArgs);
 void BangRestoreWindows(HWND hCaller, LPCSTR pszArgs);
 void BangRun (HWND hCaller, LPCSTR pszArgs);
+void BangShowModules (HWND hCaller, LPCSTR pszArgs);
 void BangShutdown(HWND hCaller, LPCSTR pszArgs);
 void BangSwitchUser(HWND hCaller, LPCSTR pszArgs);
 void BangTileWindowsH(HWND hCaller, LPCSTR pszArgs);
 void BangTileWindowsV(HWND hCaller, LPCSTR pszArgs);
-void BangUnloadModule (HWND hCaller, LPCSTR pszArgs);
-void BangHideModules (HWND hCaller, LPCSTR pszArgs);
-void BangShowModules (HWND hCaller, LPCSTR pszArgs);
 void BangToggleModules (HWND hCaller, LPCSTR pszArgs);
+void BangUnloadModule (HWND hCaller, LPCSTR pszArgs);
 
 #endif // __BANGS_H
 
