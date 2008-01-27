@@ -37,10 +37,10 @@ typedef BOOL (WINAPI *FUNC_BOOL__PVOID)(PVOID);
 #define SH_TRAY_DATA      (1)
 #define SH_LOADPROC_DATA  (2)
 
-// internally posted AppBar messages 
-#define ABP_NOTIFYPOSCHANGED   (WM_USER+350) 
-#define ABP_NOTIFYSTATECHANGE  (WM_USER+351) 
-#define ABP_RAISEAUTOHIDEHWND  (WM_USER+360) 
+// internally posted AppBar messages
+#define ABP_NOTIFYPOSCHANGED   (WM_USER+350)
+#define ABP_NOTIFYSTATECHANGE  (WM_USER+351)
+#define ABP_RAISEAUTOHIDEHWND  (WM_USER+360)
 
 // data sent by shell via Shell_NotifyIcon
 typedef struct _SHELLTRAYDATA
@@ -90,14 +90,13 @@ public:
     
     // resend all icon data
     HWND SendSystemTray();
-
-    // Notify TrayService of full screen app change 
-    void NotifyRudeApp(bool bIsFullScreen) const; 
-
+    
+    // Notify TrayService of full screen app change
+    void NotifyRudeApp(bool bIsFullScreen) const;
+    
     // Message Handler
-    static LRESULT CALLBACK WindowTrayProc(HWND, UINT, WPARAM, LPARAM); 
-    static LRESULT CALLBACK WindowNotifyProc(HWND, UINT, WPARAM, LPARAM); 
-
+    static LRESULT CALLBACK WindowTrayProc(HWND, UINT, WPARAM, LPARAM);
+    static LRESULT CALLBACK WindowNotifyProc(HWND, UINT, WPARAM, LPARAM);
     
 private:
     bool createWindows();
@@ -109,12 +108,12 @@ private:
     void loadShellServiceObjects();
     void unloadShellServiceObjects();
     
-    // Handler for AppBar messages 
-    LRESULT HandleAppBarMessage(PSHELLAPPBARDATA psad); 
-
-    // Handler for system tray notifications 
-    BOOL HandleNotification(PSHELLTRAYDATA pstd); 
-
+    // Handler for AppBar messages
+    LRESULT HandleAppBarMessage(PSHELLAPPBARDATA psad);
+    
+    // Handler for system tray notifications
+    BOOL HandleNotification(PSHELLTRAYDATA pstd);
+    
     //
     // ABM_* Notification handlers
     //
@@ -129,7 +128,7 @@ private:
     LRESULT barSetAutoHide(const APPBARDATAV1& abd);
     LRESULT barPosChanged(const APPBARDATAV1& abd);
     LRESULT barSetTaskBarState(const APPBARDATAV1& abd);
-
+    
     //
     // barSetPos and barQueryPos helpers
     //
@@ -138,13 +137,13 @@ private:
     void modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void adjustWorkArea();
-
+    
     //
     // AppBar Un/Lock handlers for shared data
     //
     PAPPBARDATAV1 ABLock(PSHELLAPPBARDATA psad);
     void ABUnLock(PAPPBARDATAV1 pabd);
-
+    
     //
     // findBar variants and wrappers
     //
@@ -153,7 +152,7 @@ private:
     bool isBar(HWND hWnd);
     bool getBar(HWND hWnd, BarVector::iterator& itAppBar);
     bool getBar(HWND hWnd, AppBar*& pBarRef);
-
+    
     //
     // NIM_* Notification handlers
     //
@@ -192,7 +191,7 @@ private:
     HWND m_hTrayWnd;
     HWND m_hLiteStep;
     HINSTANCE m_hInstance;
-
+    
     SsoVector m_ssoVector;
     IconVector m_siVector;
     BarVector m_abVector;

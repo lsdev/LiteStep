@@ -137,7 +137,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
             
             // If the character is not whitespace or a comment
             // then the line has an invalid format.  Ignore it.
-            if (_tcschr (WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
+            if (_tcschr(WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
             {
                 TRACE("Syntax Error (%s, %d): Invalid line format",
                     m_tzFullPath, m_uLineNumber);

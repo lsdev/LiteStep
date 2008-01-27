@@ -172,16 +172,16 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			}
 			else if (LOWORD(wParam) == IDOK || LOWORD(wParam == IDCANCEL))
 			{
-                HFONT hTitleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
-                    WM_GETFONT, 0, 0);
+				HFONT hTitleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
+					WM_GETFONT, 0, 0);
 
-                // close the dialog box
-                EndDialog(hWnd, IDOK);
+				// close the dialog box
+				EndDialog(hWnd, IDOK);
 
-                // release title font
-                DeleteObject(hTitleFont);
+				// release title font
+				DeleteObject(hTitleFont);
 
-                return TRUE;
+				return TRUE;
 			}
 			/* This isn't necessary as we have the edit control set to read only.
 			 * It just ensures our text doesn't get changed somehow */
@@ -195,7 +195,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 				SendDlgItemMessage(hWnd, IDC_EDIT, EM_SETSEL, dwStart-1, dwStart-1);
 			}
-            
+
 			return FALSE;
 		}
 
@@ -227,8 +227,8 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 		case WM_INITDIALOG:
 		{
-            // save global handle
-            g_hAboutbox = hWnd;
+			// save global handle
+			g_hAboutbox = hWnd;
 
 			// set title font
 			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
@@ -315,19 +315,19 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 ULONG WINAPI AboutBoxThread(void *)
 {
-    if (!g_hAboutbox)
-    {
-        DialogBox(GetModuleHandle(NULL),
-            MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
-        
-        g_hAboutbox = NULL;
-    }
-    else
-    {
-        SetForegroundWindow(g_hAboutbox);
-    }
+	if (!g_hAboutbox)
+	{
+		DialogBox(GetModuleHandle(NULL),
+			MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
 
-    return 0;
+		g_hAboutbox = NULL;
+	}
+	else
+	{
+		SetForegroundWindow(g_hAboutbox);
+	}
+
+	return 0;
 }
 
 

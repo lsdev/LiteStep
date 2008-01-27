@@ -137,7 +137,7 @@ UINT ModuleManager::_LoadModules()
                 {
                     dwFlags |= LS_MODULE_THREADED;
                 }
-
+                
                 Module* pModule = _MakeModule(szToken1, dwFlags);
                 
                 if (pModule)
@@ -256,7 +256,7 @@ void ModuleManager::_QuitModules()
     std::vector<HANDLE> vecQuitObjects;
     ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
     ModuleQueue TempQueue; 
-
+    
     /* Note: 
     * Store each module in a temporary queue, so that the module 
     * may not be accessed via our main queue while it is being 
@@ -267,11 +267,11 @@ void ModuleManager::_QuitModules()
     while (iter != m_ModuleQueue.rend())
     {
         TempQueue.push_back(*iter);
-
+        
         if (*iter)
         {
             (*iter)->Quit();
-
+            
             if ((*iter)->GetThread())
             {
                 vecQuitObjects.push_back((*iter)->TakeThread());
@@ -280,18 +280,18 @@ void ModuleManager::_QuitModules()
         
         ++iter;
     }
-
+    
     m_ModuleQueue.clear();
-
+    
     if (!vecQuitObjects.empty())
     {
         _WaitForModules(&vecQuitObjects[0], vecQuitObjects.size());
-
+        
         // Close the handles we have taken ownership of. 
         std::for_each( 
             vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle); 
     }
-
+    
     // Clean it all up
     iter = TempQueue.rbegin();
     while (iter != TempQueue.rend())
@@ -299,7 +299,6 @@ void ModuleManager::_QuitModules()
         delete *iter;
         ++iter;
     }
-    
 }
 
 
@@ -314,9 +313,9 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
         if ((*iter)->GetThread())
         {
             HANDLE hThread = (*iter)->TakeThread(); 
-
+            
             _WaitForModules(&hThread, 1); 
-
+            
             CloseHandle(hThread); 
         }
         
@@ -384,19 +383,19 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
     while (vWait.size())
     {
         MSG message;
-
+        
         /* Handle all window messages for current thread */
         while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
         {
             m_pILiteStep->MessageHandler(message);
         }
-
+        
         /* Handle all messages posted to the current thread */ 
         while (PeekMessage(&message, (HWND)INVALID_HANDLE_VALUE, 0, 0, PM_REMOVE)) 
         { 
             m_pILiteStep->MessageHandler(message); 
         }
-
+        
         /* Wait for a new message to come in, or for one of our objects 
         * to become signaled. */ 
         DWORD dwWaitStatus = MsgWaitForMultipleObjects(vWait.size(), &vWait[0],
