@@ -22,6 +22,8 @@
 #include "TrayNotifyIcon.h"
 #include "../utility/safestr.h"
 
+NotifyIcon::IcVtr NotifyIcon::s_icVtr;
+
 //
 // ReadMe
 //
@@ -61,17 +63,29 @@ NotifyIcon::NotifyIcon(const NID_XX& nidSource)
     ,m_uFlags(0)
     ,m_uCallbackMessage(0)
     ,m_hIcon(NULL)
+    ,m_hOriginalIcon(NULL)
     ,m_dwState(0)
 {
     m_szTip[0] = 0;
     Update(nidSource);
+
+    s_icVtr.push_back(this);
 }
 
 NotifyIcon::~NotifyIcon()
 {
-    if(NULL != m_hIcon)// && !IsShared())
+    if(NULL != m_hIcon)
     {
         DestroyIcon(m_hIcon);
+    }
+
+    for(IcVtr::iterator it = s_icVtr.begin(); it != s_icVtr.end(); it++)
+    {
+        if(*it == this)
+        {
+            s_icVtr.erase(it);
+            break;
+        }
     }
 }
 
@@ -82,17 +96,17 @@ void NotifyIcon::Update(const NID_XX& nidSource)
     // Copy persistent values only
     //
 
+    // state values
+    copy_state(&nidSource);
+
     // callback message
     copy_message(&nidSource);
 
-    // icon
+    // icon (note, this depends on copy_state)
     copy_icon(&nidSource);
 
     // tool tip string
     copy_tip(&nidSource);
-
-    // state values
-    copy_state(&nidSource);
 }
 
 
@@ -107,14 +121,43 @@ void NotifyIcon::copy_message(PCNID_XX pnidSource)
 
 void NotifyIcon::copy_icon(PCNID_XX pnidSource)
 {
-    if(NIF_ICON & pnidSource->uFlags)
+    // ignore if we are being told to use the same icon as before.
+    if(NIF_ICON & pnidSource->uFlags && m_hOriginalIcon != pnidSource->hIcon)
     {
-        if(m_hIcon)// && !IsShared())
+        HICON hNewIcon = NULL;
+
+        if(IsShared())
         {
-            DestroyIcon(m_hIcon);
+            for(IcVtr::const_iterator it = s_icVtr.begin(); it != s_icVtr.end(); it++)
+            {
+                const NotifyIcon* p = *it;
+
+                if(p->m_hOriginalIcon == pnidSource->hIcon)
+                {
+                    m_hSharedWnd = (HANDLE)p->m_hWnd;
+                    m_hSharedID = (HANDLE)p->m_uID;
+                    hNewIcon = CopyIcon(p->m_hIcon);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            hNewIcon = CopyIcon(pnidSource->hIcon);
         }
 
-        m_hIcon = CopyIcon(pnidSource->hIcon);
+        // Update if we have a new icon, or we were told
+        // to clear the current icon.
+        if(hNewIcon || !pnidSource->hIcon)
+        {
+            if(m_hIcon)
+            {
+                DestroyIcon(m_hIcon);
+            }
+
+            m_hIcon = hNewIcon;
+            m_hOriginalIcon = pnidSource->hIcon;
+        }
 
         if(!m_hIcon)
         {
@@ -278,7 +321,7 @@ void NotifyIcon::CopyLSNID(LSNOTIFYICONDATA * plsnid, UINT uFlagMask) const
 
     if(NIF_TIP & m_uFlags & uFlagMask)
     {
-        // Use our copy of the string
+        // Make a copy of the string
         HRESULT hr = StringCchCopy(plsnid->szTip, TRAY_MAX_TIP_LENGTH, m_szTip);
 
         if(SUCCEEDED(hr))
