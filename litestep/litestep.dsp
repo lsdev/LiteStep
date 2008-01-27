@@ -44,11 +44,11 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /FD /c
-# SUBTRACT CPP /Fr /YX
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
-# ADD MTL /nologo /D "NDEBUG" /o /win32 "NUL"
+# SUBTRACT CPP /YX
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "NDEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
-# ADD BASE RSC /l 0xc09 /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
@@ -71,12 +71,12 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /FR /FD /c
-# SUBTRACT CPP /FA<none>
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
-# ADD MTL /nologo /D "_DEBUG" /o /win32 "NUL"
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /D "LS_NO_EXCEPTION" /FR /FD /c
+# SUBTRACT CPP /YX
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "_DEBUG" /o "NUL" /win32
 # SUBTRACT MTL /mktyplib203
-# ADD BASE RSC /l 0xc09 /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
@@ -190,6 +190,10 @@ SOURCE=.\RecoveryMenu.h
 # Begin Source File
 
 SOURCE=.\StartupRunner.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrayAppBar.h
 # End Source File
 # Begin Source File
 

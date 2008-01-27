@@ -74,9 +74,9 @@ EXPORTS
 
     EnumLSData
 
-    SetupSettingsManager
-    DeleteSettingsManager
-    SetupBangs
-    ClearBangs
     InternalExecuteBangCommand
-
+    LSAPIInitialize
+    LSAPIReloadBangs
+    LSAPIReloadSettings
+    LSAPISetLitestepWindow
+    

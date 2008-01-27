@@ -102,6 +102,7 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/localization.o \
 	$(OUTPUT)/lsapi.o \
 	$(OUTPUT)/lsapi.res \
+	$(OUTPUT)/lsapiInit.o \
 	$(OUTPUT)/lsmultimon.o \
 	$(OUTPUT)/match.o \
 	$(OUTPUT)/png_support.o \
@@ -228,9 +229,12 @@ $(OUTPUT)/litestep.o: litestep/litestep.cpp \
 	litestep/RecoveryMenu.h \
 	litestep/resource.h \
 	litestep/StartupRunner.h \
+	litestep/TrayAppBar.h \
+	litestep/TrayNotifyIcon.h \
 	litestep/TrayService.h \
 	lsapi/BangCommand.h \
 	lsapi/lsapi.h \
+	lsapi/lsapiInit.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsmultimon.h \
 	lsapi/ThreadedBangCommand.h \
@@ -322,16 +326,16 @@ $(OUTPUT)/TrayNotifyIcon.o: litestep/TrayNotifyIcon.cpp \
 	litestep/buildoptions.h \
 	litestep/TrayNotifyIcon.h \
 	lsapi/lsapidefines.h \
-	utility/Base.h \
 	utility/common.h \
 	utility/debug.hpp \
-	utility/IService.h \
 	utility/safestr.h
 
 $(OUTPUT)/TrayService.o: litestep/TrayService.cpp \
 	litestep/buildoptions.h \
-	litestep/TrayService.h \
 	litestep/resource.h \
+	litestep/TrayAppBar.h \
+	litestep/TrayNotifyIcon.h \
+	litestep/TrayService.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsmultimon.h \
@@ -406,12 +410,11 @@ $(OUTPUT)/graphics.o: lsapi/graphics.cpp \
 $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
 	litestep/BangManager.h \
 	litestep/buildoptions.h \
-	litestep/litestep.h \
 	litestep/resource.h \
 	lsapi/BangCommand.h \
-	lsapi/bangs.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
+	lsapi/lsapiInit.h \
 	lsapi/lsmultimon.h \
 	lsapi/SettingsDefines.h \
 	lsapi/SettingsIterator.h \
@@ -421,7 +424,30 @@ $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
 	utility/core.hpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
-	utility/ILiteStep.h \
+	utility/localization.h \
+	utility/safeptr.h \
+	utility/safestr.h \
+	utility/shellhlp.h \
+	utility/stringutility.h
+
+$(OUTPUT)/lsapiInit.o: lsapi/lsapiInit.cpp \
+	litestep/BangManager.h \
+	litestep/buildoptions.h \
+	litestep/resource.h \
+	lsapi/BangCommand.h \
+	lsapi/bangs.h \
+	lsapi/lsapidefines.h \
+	lsapi/lsapi.h \
+	lsapi/lsapiInit.h \
+	lsapi/lsmultimon.h \
+	lsapi/SettingsDefines.h \
+	lsapi/SettingsIterator.h \
+	lsapi/SettingsManager.h \
+	utility/Base.h \
+	utility/common.h \
+	utility/core.hpp \
+	utility/CriticalSection.h \
+	utility/debug.hpp \
 	utility/localization.h \
 	utility/safeptr.h \
 	utility/safestr.h \
@@ -450,14 +476,18 @@ $(OUTPUT)/png_support.o: lsapi/png_support.cpp \
 	utility/safeptr.h
 
 $(OUTPUT)/settings.o: lsapi/settings.cpp \
+	litestep/BangManager.h \
 	litestep/buildoptions.h \
 	litestep/resource.h \
+	lsapi/BangCommand.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
+	lsapi/lsapiInit.h \
 	lsapi/lsmultimon.h \
 	lsapi/SettingsDefines.h \
 	lsapi/SettingsIterator.h \
 	lsapi/SettingsManager.h \
+	utility/Base.h \
 	utility/common.h \
 	utility/core.hpp \
 	utility/CriticalSection.h \
