@@ -882,6 +882,8 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
 //
 LRESULT TrayService::barGetTaskBarState()
 {
+    // Zero means neither always-on-top nor autohide,
+    // which is the safest guess for most LS setups
     return 0;
 }
 
@@ -1630,6 +1632,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
     {
         switch(nid.cbSize)
         {
+        case NID_7W_SIZE:
         case NID_6W_SIZE:
         case NID_5W_SIZE:
             {
@@ -1694,6 +1697,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
     {
         switch(nid.cbSize)
         {
+        case NID_7W_SIZE:
         case NID_6W_SIZE:
             {
                 NID_6W* pnid = (NID_6W*)&nid;
@@ -1904,6 +1908,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
         
         switch(nid.cbSize)
         {
+        case NID_7W_SIZE:
         case NID_6W_SIZE:
         case NID_5W_SIZE:
             lsnid.uVersion = ((NID_5W&)nid).uVersion;
