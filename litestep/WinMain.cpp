@@ -87,13 +87,14 @@ WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, size_t cchFile)
         else
         {
             ASSERT(szToken[0] != '!');
-            if (PathFileExists(szToken))
+            DWORD dwCopied = GetFullPathName(szToken, cchFile, pszFile, NULL);
+
+            if (dwCopied == 0 || dwCopied > cchFile)
             {
-                if (SUCCEEDED(StringCchCopy(pszFile, cchFile, szToken)))
-                {
-                    wStartFlags |= LSF_ALTERNATE_CONFIG;
-                }
+                pszFile[0] = _T('\0');
             }
+
+            wStartFlags |= LSF_ALTERNATE_CONFIG;
         }
     }
 
@@ -306,6 +307,8 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
                     "A previous instance of LiteStep was detected.\n"
                     "Are you sure you want to continue?");
 
+                // Can show a MessageBox here since the other instance
+                // should have closed the welcome screen already
                 if (IDNO == MessageBox(NULL, resourceTextBuffer, "LiteStep",
                     MB_TOPMOST | MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2))
                 {
