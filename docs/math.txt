@@ -1,0 +1,196 @@
+Introduction
+------------
+
+Starting with version 0.24.8, LiteStep now uses the same parser for both
+conditional expressions (If and ElseIf) and expressions enclosed in dollar
+signs ($). The new parser also adds new features not previously available,
+such as comparison and concatenation of strings and builtin functions.
+
+
+Variable Names
+--------------
+
+In order to work with the math parser, a variable name must not begin with a
+digit or contain any of the following reserved characters:
+
+  ! $ & * ( ) - + = [ ] ; " ' < > , /
+
+Furthermore, it is recommended that you do not use @, #, or | (vertical bar),
+because these characters may become reserved in the future.
+
+
+Data Types
+----------
+
+Values in an expression are of one three fundamental types: Boolean, number,
+or string. Booleans are logical true or false values. Numbers are IEEE 754
+double-precision numbers, which includes the special values: positive/negative
+infinity and Not a Number (NaN). There is no distinct integer data type, as
+integers are subsumed by the number type. Strings are sequences of characters.
+
+As an expression is evaluated, values are automatically converted to different 
+types as necessary. In the event that an explicit type conversion is needed,
+use one of the conversion functions. Whether implicit or explicit, type
+conversions follow the same set of rules, which are described in the section
+on Functions, below.
+
+
+Undefined Variables
+-------------------
+
+For compatibility reasons, conditional expressions (If and ElseIf) can use
+undefined variables without generating an error. Any operator or function
+applied to an undefined value produces an undefined result. If the result of a
+conditional expression is undefined, then it is treated as if it were false.
+
+This behavior, while supported in 0.24.8, will be removed in the future. The
+correct way to detect undefined variables is to use the "defined" keyword:
+
+  If defined(SomeVariable)
+  If not defined(AnotherVariable)
+
+Defined behaves like a function that takes a variable name and returns true if
+that variable is defined or false if it is not. Defined is not, however, a
+real function because its argument must be a variable name.
+
+Using an undefined variable in an inline expression (one enclosed in $'s)
+generates an error, just as it always has.
+
+
+Operators
+---------
+
+The operators that LiteStep supports are listed below from highest precedence
+to lowest precedence. With the exception of the three unary operators, all
+operators are binary and left associative.
+
+Unary:          + - not
+Multiplicative: * / div mod
+Additive:       + -
+Concatenation:  &
+Relational:     = < <= > >= <> !=
+Logical AND:    and
+Logical OR:     or
+
+Identity (unary +)
+  Returns the operand, converted to a number.
+
+Negation (unary -)
+  Returns the negative of the operand, converted to a number.
+
+Logical Complement (not)
+  Returns the logical complement of the operand, converted to a Boolean.
+
+Multiplication (*)
+  Returns the product of the operands, converted to numbers.
+
+Division (/)
+  Returns the ratio of the operands, converted to numbers.
+
+Integer Division (div)
+  Returns the quotient from a truncating division of the operands, converted
+  to numbers.
+
+Modulus (mod)
+  Returns the remainder from a truncating division of the operands, converted
+  to numbers.
+
+Addition (+)
+  Returns the sum of the operands, converted to numbers.
+
+Subtraction (-)
+  Returns the difference of the operands, converted to numbers.
+
+Concatenation (&)
+  Returns the concatenation of the operands, converted to strings.
+
+Relational Operators (=, <, <=, >, >=, <>, !=)
+  Returns true if the given relationship holds between the operands. If both
+  operands are strings then they are compared as strings, otherwise they are
+  compared as numbers. The inequality operators <> and != are interchangeable.
+  String comparison is case-sensitive.
+
+Logical AND (and)
+  Returns true if both of the operands, converted to Booleans, are true.
+
+Logical OR (or)
+  Returns true if either of the operands, converted to Booleans, are true.
+
+
+Functions
+---------
+
+LiteStep supports a small set of builtin functions that you can use in
+expressions. These functions are listed below in alphabetical order, with a
+short description.
+
+abs(number)
+  Returns the absolute value of the argument, converted to a number.
+
+boolean(value)
+  Returns its argument, converted to a Boolean. Zero, Not a Number (NaN), and
+  the empty string map to false. All other values map to true.
+
+ceil(number)
+  Returns the ceiling (least greater integer) of the argument, converted to a
+  number.
+
+contains(string, string)
+  Returns true if the second argument, converted to a string, is a subtring of
+  the first argument, converted to a string.
+
+endsWith(string, string)
+  Returns true if the second argument, converted to a string, is a suffix of
+  the first argument, converted to a string.
+
+floor(number)
+  Returns the floor (greatest lesser integer) of the argument, converted to a
+  number.
+
+if(condition, then, else)
+  Converts its first argument to a Boolean. If its true, returns the second
+  argument (then). If its false, returns the third argument (else). This 
+  function lets you do simple conditionals in an inline expression.
+
+integer(value)
+  Returns the argument, converted to an integer. Conversion to integer is the
+  same as conversion to number, except that infinites and NaNs become zero.
+
+length(string)
+  Returns the length of the argument, converted to a string.
+
+lowerCase(string)
+  Returns the argument, converted to a string, in lower case.
+
+max(number, number)
+  Returns the larger of its arguments, converted to numbers.
+
+min(number, number)
+  Returns the smaller of its arguments, converted to numbers.
+
+number(value)
+  Returns its argument, converted to a number. For Booleans, true maps to 1
+  and false maps to 0. A string is parsed as a numeric literal; if parsing
+  fails, the string is mapped to NaN.
+
+pow(number, number)
+  Returns the first argument, converted to a number, raised to the power of
+  the second argument, converted to a number.
+
+round(number)
+  Returns the argument, converted to a number, rounded to the nearest integer.
+
+startsWith(string, string)
+  Returns true if the second argument, converted to a string, is a prefix of
+  the first argument, converted to a string.
+
+string(value)
+  Returns the argument, converted to a string. For Booleans, true maps to
+  "true" and false maps to "false". Numbers are formatted as strings in the
+  standard way.
+
+sqrt(number)
+  Returns the square root of the argument, converted to a number.
+
+upperCase(string)
+  Returns the argument, converted to a string, in upper case.

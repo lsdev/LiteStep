@@ -21,6 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "SettingsManager.h"
 #include "SettingsFileParser.h"
+#include "MathEvaluate.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
@@ -415,6 +416,20 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                         {
                             bSucceeded = true;
                         }
+#ifdef LS_COMPAT_MATH
+                        else
+                        {
+                            string result;
+                            
+                            if (MathEvaluateString(m_SettingsMap, szVariable,
+                                result, recursiveVarSet,
+                                MATH_EXCEPTION_ON_UNDEFINED|MATH_VALUE_TO_COMPATIBLE_STRING))
+                            {
+                                StringCchCopy(pszTempExpandedString, stWorkLength, result.c_str());
+                                bSucceeded = true;
+                            }
+                        }
+#endif // LS_COMPAT_MATH
                     }
                 }
                 

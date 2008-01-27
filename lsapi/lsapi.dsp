@@ -133,15 +133,31 @@ SOURCE=.\match.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\MathEvaluate.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathParser.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathScanner.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathToken.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathValue.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\png_support.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\settings.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\SettingsEvalParser.cpp
 # End Source File
 # Begin Source File
 
@@ -193,6 +209,30 @@ SOURCE=.\lsMultiMon.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\MathEvaluate.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathException.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathParser.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathScanner.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathToken.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathValue.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\png_support.h
 # End Source File
 # Begin Source File
@@ -202,10 +242,6 @@ SOURCE=.\resource.h
 # Begin Source File
 
 SOURCE=.\SettingsDefines.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\SettingsEvalParser.h
 # End Source File
 # Begin Source File
 

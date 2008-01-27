@@ -23,7 +23,6 @@
 #define SETTINGSFILEPARSER_H
 
 #include "../utility/common.h"
-#include "settingsevalparser.h"
 #include "settingsdefines.h"
 
 
@@ -61,9 +60,6 @@ private:
     
     /** Handle to current file */
     FILE* m_phFile;
-    
-    /** Conditional expression parser */
-    EvalParser* m_pEvalParser;
     
     /** Current Line Number */
     unsigned int m_uLineNumber;

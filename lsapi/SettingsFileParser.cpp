@@ -21,6 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "SettingsFileParser.h"
 #include "../utility/core.hpp"
+#include "MathEvaluate.h"
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -28,7 +29,7 @@
 // FileParser constructor
 //
 FileParser::FileParser(SettingsMap* pSettingsMap) :
-    m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_pEvalParser(NULL)
+    m_pSettingsMap(pSettingsMap), m_phFile(NULL)
 {
     ASSERT(NULL != m_pSettingsMap);
 }
@@ -40,10 +41,6 @@ FileParser::FileParser(SettingsMap* pSettingsMap) :
 //
 FileParser::~FileParser()
 {
-    if(NULL != m_pEvalParser)
-    {
-        delete m_pEvalParser;
-    }
 }
 
 
@@ -379,16 +376,9 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     ASSERT(NULL != m_pSettingsMap);
     ASSERT(NULL != ptzExpression);
     
-    BOOL result = FALSE;
+    bool result = false;
     
-    if (NULL == m_pEvalParser)
-    {
-        // Don't create it until the first time conditionals are used.  No reason
-        // to penalize people who don't use them.
-        m_pEvalParser = new EvalParser();
-    }
-    
-    if (NULL == m_pEvalParser || !m_pEvalParser->evaluate(ptzExpression, &result))
+    if (!MathEvaluateBool(*m_pSettingsMap, ptzExpression, result))
     {
         TRACE("Error parsing expression \"%s\" (%s, line %d)",
             ptzExpression, m_tzFullPath, m_uLineNumber);

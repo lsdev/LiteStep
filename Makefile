@@ -105,10 +105,14 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/lsapiInit.o \
 	$(OUTPUT)/lsmultimon.o \
 	$(OUTPUT)/match.o \
+	$(OUTPUT)/MathEvaluate.o \
+	$(OUTPUT)/MathParser.o \
+	$(OUTPUT)/MathScanner.o \
+	$(OUTPUT)/MathToken.o \
+	$(OUTPUT)/MathValue.o \
 	$(OUTPUT)/png_support.o \
 	$(OUTPUT)/safeptr.o \
 	$(OUTPUT)/settings.o \
-	$(OUTPUT)/SettingsEvalParser.o \
 	$(OUTPUT)/SettingsFileParser.o \
 	$(OUTPUT)/SettingsIterator.o \
 	$(OUTPUT)/SettingsManager.o \
@@ -467,6 +471,40 @@ $(OUTPUT)/match.o: lsapi/match.cpp \
 	utility/common.h \
 	utility/debug.hpp
 
+$(OUTPUT)/MathParser.o: lsapi/MathParser.cpp \
+	litestep/BangManager.h \
+	litestep/buildoptions.h \
+	lsapi/BangCommand.h \
+	lsapi/lsapi.h \
+	lsapi/lsapidefines.h \
+	lsapi/lsapiInit.h \
+	lsapi/lsmultimon.h \
+	lsapi/MathEvaluate.h \
+	lsapi/MathException.h \
+	lsapi/MathParser.h \
+	lsapi/MathScanner.h \
+	lsapi/MathToken.h \
+	lsapi/MathValue.h \
+	lsapi/SettingsDefines.h \
+	lsapi/SettingsIterator.h \
+	lsapi/SettingsManager.h \
+	utility/Base.h \
+	utility/common.h \
+	utility/CriticalSection.h \
+	utility/debug.hpp \
+	utility/stringutility.h
+
+$(OUTPUT)/MathScanner.o: lsapi/MathScanner.cpp \
+	lsapi/MathException.h \
+	lsapi/MathScanner.h \
+	lsapi/MathToken.h
+
+$(OUTPUT)/MathToken.o: lsapi/MathToken.cpp \
+	lsapi/MathToken.h
+
+$(OUTPUT)/MathValue.o: lsapi/MathValue.cpp \
+	lsapi/MathValue.h
+
 $(OUTPUT)/png_support.o: lsapi/png_support.cpp \
 	litestep/buildoptions.h \
 	lsapi/lsapidefines.h \
@@ -497,23 +535,14 @@ $(OUTPUT)/settings.o: lsapi/settings.cpp \
 	utility/safestr.h \
 	utility/stringutility.h
 
-$(OUTPUT)/SettingsEvalParser.o: lsapi/SettingsEvalParser.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/SettingsEvalParser.h \
-	utility/common.h \
-	utility/debug.hpp \
-
 $(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
 	litestep/buildoptions.h \
 	litestep/resource.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsmultimon.h \
+	lsapi/MathEvaluate.h \
 	lsapi/SettingsDefines.h \
-	lsapi/SettingsEvalParser.h \
 	lsapi/SettingsFileParser.h \
 	utility/common.h \
 	utility/core.hpp \
@@ -547,8 +576,8 @@ $(OUTPUT)/SettingsManager.o: lsapi/SettingsManager.cpp \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsmultimon.h \
+	lsapi/MathEvaluate.h \
 	lsapi/SettingsDefines.h \
-	lsapi/SettingsEvalParser.h \
 	lsapi/SettingsFileParser.h \
 	lsapi/SettingsIterator.h \
 	lsapi/SettingsManager.h \

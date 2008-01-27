@@ -33,14 +33,18 @@
 // hacks are scheduled to be taken out in the next LiteStep version.
 // 
 
+// Enables Indie LS-like math evaluation in VarExpansion(Ex).
+// 0.24.8 default: ENABLED
+#define LS_COMPAT_MATH
+
 // "Unoptimizes" BitmapToRegion to make it work the 0.24.6 way. It enables the
 // clrTolerance parameter, which can be used to interpret e.g. FE00FE as Magic
 // Pink.
-// 0.24.7 default: ENABLED
+// 0.24.8 default: ENABLED
 #define LS_COMPAT_TRANSPTOL
 
 // Adds basic logging functions to lsapi. LSLogFile and LSLogLevel are supported.
-// 0.24.7 default: ENABLED
+// 0.24.8 default: ENABLED
 #define LS_COMPAT_LOGGING
 
 // Adds support for IncludeFolder Directive (all .rc files in specified folder
