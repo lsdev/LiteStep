@@ -39,7 +39,7 @@
 //
 // The persistent volatile members are:
 //
-// uFlags, uCallbackMessage, hIcon, szTip, dwState and dwStateMask
+// uFlags, uCallbackMessage, hIcon, szTip, dwState
 //
 // The only required valid member is hIcon.  The Notification Icon will
 // not be displayed until hIcon has been populated.  However, the calling
@@ -62,7 +62,6 @@ NotifyIcon::NotifyIcon(const NID_XX& nidSource)
     ,m_uCallbackMessage(0)
     ,m_hIcon(NULL)
     ,m_dwState(0)
-    ,m_dwStateMask(0)
 {
     m_szTip[0] = 0;
     Update(nidSource);
@@ -246,9 +245,15 @@ void NotifyIcon::update_state(DWORD dwState, DWORD dwMask)
         | (dwState & dwMask);
 
     m_dwState = dwTemp;
-    m_dwStateMask |= dwMask;
 
-    m_uFlags |= NIF_STATE;
+    if(0 != m_dwState)
+    {
+        m_uFlags |= NIF_STATE;
+    }
+    else
+    {
+        m_uFlags &= ~NIF_STATE;
+    }
 }
 
 void NotifyIcon::CopyLSNID(LSNOTIFYICONDATA * plsnid, UINT uFlagMask) const

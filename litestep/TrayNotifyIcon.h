@@ -47,7 +47,7 @@ typedef struct
 
     // new in 2K:
     DWORD dwState;                               /* persistent &     volatile */
-    DWORD dwStateMask;                           /* accumlative &    volatile */
+    DWORD dwStateMask;                           /* arbitrary  &     volatile */
     CHAR szInfo[TRAY_MAX_INFO_LENGTH];           /* arbitrary  &     volatile */
     union
     {
@@ -252,14 +252,12 @@ public:
 
     inline bool IsHidden() const
     {
-        return ((NIF_STATE & m_uFlags) &&
-                (NIS_HIDDEN & m_dwState & m_dwStateMask));
+        return ((NIF_STATE & m_uFlags) && (NIS_HIDDEN & m_dwState));
     }
 
     inline bool IsShared() const
     {
-        return ((NIF_STATE & m_uFlags) &&
-                (NIS_SHAREDICON & m_dwState & m_dwStateMask));
+        return ((NIF_STATE & m_uFlags) && (NIS_SHAREDICON & m_dwState));
     }
 
     inline bool IsValid() const
@@ -305,7 +303,6 @@ private:
     CHAR  m_szTip[TRAY_MAX_TIP_LENGTH];          /* persistent &     volatile */
 
     DWORD m_dwState;                             /* persistent &     volatile */
-    DWORD m_dwStateMask;                         /* accumlative &    volatile */
 };
 
 
