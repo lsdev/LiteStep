@@ -23,8 +23,6 @@
 #define TRAYNOTIFYICON_H
 
 #include "../utility/common.h"
-#include "../utility/IService.h"
-#include "../utility/safestr.h"
 #include <shellapi.h>
 
 #define TRAY_MAX_TIP_LENGTH       128

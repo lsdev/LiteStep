@@ -23,7 +23,6 @@
 #define BANGCOMMAND_H
 
 #include "../utility/common.h"
-#include "lsapidefines.h"
 #include "../utility/base.h"
 #include <string>
 

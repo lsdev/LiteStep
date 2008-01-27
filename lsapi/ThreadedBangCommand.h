@@ -22,8 +22,11 @@
 #if !defined(THREADEDBANGCOMMAND_H)
 #define THREADEDBANGCOMMAND_H
 
-#include "bangcommand.h"
-#include "../utility/core.hpp"
+#include "../utility/common.h"
+#include "../utility/base.h"
+#include "../utility/safestr.h"
+#include "lsapi.h"
+
 
 class ThreadedBangCommand : public CountedBase
 {

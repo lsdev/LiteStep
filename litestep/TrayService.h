@@ -26,7 +26,6 @@
 #include "TrayAppBar.h"
 #include "../utility/common.h"
 #include "../utility/IService.h"
-#include "../utility/safestr.h"
 #include <shellapi.h>
 #include <vector>
 
