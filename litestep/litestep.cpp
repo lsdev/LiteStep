@@ -56,6 +56,34 @@ using std::mem_fun;
 CLiteStep gLiteStep;
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// GetAppPath
+//
+HRESULT GetAppPath(LPTSTR pszAppPath, SIZE_T cchAppPath)
+{
+    HRESULT hr = E_FAIL;
+
+#ifdef _DEBUG
+    // In debug builds use the current directory as base path
+    if (GetCurrentDirectory(cchAppPath, pszAppPath))
+    {
+        hr = S_OK;
+    }
+#else
+    // In release builds use litestep.exe's location as base path
+    hr = LSGetModuleFileName(NULL, pszAppPath, cchAppPath);
+
+    if (SUCCEEDED(hr))
+    {
+        PathRemoveFileSpec(pszAppPath);
+    }
+#endif
+
+    return hr;
+}
+
+
 //
 //
 //
@@ -64,14 +92,8 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     TCHAR szAppPath[MAX_PATH] = { 0 };
     TCHAR szRcPath[MAX_PATH] = { 0 };
 
-    // Determine our application's path
-    if (LSGetModuleFileName(hInst, szAppPath, COUNTOF(szAppPath)))
+    if (FAILED(GetAppPath(szAppPath, COUNTOF(szAppPath))))
     {
-        PathRemoveFileSpec(szAppPath);
-        PathAddBackslashEx(szAppPath, MAX_PATH);
-    }
-    else 
-    { 
         // something really crappy is going on. 
         return -1; 
     }
@@ -120,7 +142,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
             "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
 
         return 3;
-    } 
+    }
 
     HRESULT hr = gLiteStep.Start(hInst, wStartFlags);
 

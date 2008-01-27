@@ -170,10 +170,11 @@ void LSAPIInit::setLitestepVars()
     // Set the variable "litestepdir" since it was never set
     if (SUCCEEDED(StringCchCopy(szTemp, MAX_PATH, m_szLitestepPath)))
     {
+        PathAddBackslashEx(szTemp, MAX_PATH);
         PathQuoteSpaces(szTemp);
         pSM->SetVariable("litestepdir", szTemp);
     }
-    
+
     if (GetWindowsDirectory(szTemp, MAX_PATH))
     {
         PathAddBackslashEx(szTemp, MAX_PATH);
