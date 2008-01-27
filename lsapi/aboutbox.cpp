@@ -38,7 +38,7 @@ void AboutSysInfo(HWND hListView);
 //
 // misc functions
 //
-BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
 int GetClientWidth(HWND hWnd);
@@ -119,7 +119,7 @@ const char * lsLicense = \
 //
 // AboutBox Dialog Procedure
 //
-BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -222,7 +222,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 				hbReturn = GetSysColorBrush(COLOR_WINDOW);
 			}
 
-			return (BOOL)hbReturn;
+			return (INT_PTR)hbReturn;
 		}
 
 		case WM_INITDIALOG:
@@ -318,7 +318,7 @@ ULONG WINAPI AboutBoxThread(void *)
 	if (!g_hAboutbox)
 	{
 		DialogBox(GetModuleHandle(NULL),
-			MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, (DLGPROC)AboutBoxProcedure);
+            MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, AboutBoxProcedure);
 
 		g_hAboutbox = NULL;
 	}
@@ -407,7 +407,7 @@ void AboutDevTeam(HWND hListView)
 // Show License Notice... Nothing to do
 //
 
-void AboutLicense(HWND hEdit)
+void AboutLicense(HWND /* hEdit */)
 {
 	//SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
 }
