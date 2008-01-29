@@ -111,7 +111,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
                         ++ptzEnd;
                     }
                     
-                    ASSERT((ptzEnd - ptzPath) < cchPath);
+                    ASSERT((size_t)(ptzEnd - ptzPath) < cchPath);
                     *(ptzEnd+1) = _T('\0');
                     
                     hr = S_OK;
