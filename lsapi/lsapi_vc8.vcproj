@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="lsapi"
 	ProjectGUID="{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}"
 	RootNamespace="lsapi"
