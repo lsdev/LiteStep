@@ -70,15 +70,15 @@ WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, size_t cchFile)
     {
         if (szToken[0] == '-')
         {
-            if (!stricmp(szToken, "-nostartup"))
+            if (!_stricmp(szToken, "-nostartup"))
             {
                 wStartFlags &= ~LSF_RUN_STARTUPAPPS;
             }
-            else if (!stricmp(szToken, "-startup"))
+            else if (!_stricmp(szToken, "-startup"))
             {
                 wStartFlags |= LSF_FORCE_STARTUPAPPS;
             }
-            else if (!stricmp(szToken, "-explorer"))
+            else if (!_stricmp(szToken, "-explorer"))
             {
                 wStartFlags &= ~LSF_RUN_LITESTEP;
                 wStartFlags |= LSF_RUN_EXPLORER;

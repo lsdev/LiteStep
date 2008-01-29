@@ -136,7 +136,7 @@ MathToken MathScanner::CheckReservedWord(const string& identifier)
 {
     for (int i = 0; i < gNumReservedWords; i++)
     {
-        if (stricmp(identifier.c_str(), gReservedWords[i].str) == 0)
+        if (_stricmp(identifier.c_str(), gReservedWords[i].str) == 0)
         {
             // It's a reserved word
             return MathToken(gReservedWords[i].type);

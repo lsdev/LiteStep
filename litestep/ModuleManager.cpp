@@ -133,7 +133,7 @@ UINT ModuleManager::_LoadModules()
             {
                 DWORD dwFlags = 0;
                 
-                if (stricmp(szToken2, "threaded") == 0)
+                if (_stricmp(szToken2, "threaded") == 0)
                 {
                     dwFlags |= LS_MODULE_THREADED;
                 }

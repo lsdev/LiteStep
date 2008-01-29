@@ -179,7 +179,7 @@ MathValue MathParser::CallFunction(const string& name, const MathValueList& argL
 {
     for (int i = 0; i < gNumFunctions; i++)
     {
-        if (stricmp(name.c_str(), gFunctions[i].name) == 0)
+        if (_stricmp(name.c_str(), gFunctions[i].name) == 0)
         {
             if (static_cast<int>(argList.size()) != gFunctions[i].numArgs)
             {
@@ -229,12 +229,12 @@ MathValue MathParser::GetVariable(const string& name) const
     char value[MAX_LINE_LENGTH];
     g_LSAPIManager.GetSettingsManager()->VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
     
-    if (stricmp(value, "false") == 0 || stricmp(value, "off") == 0 || stricmp(value, "no") == 0)
+    if (_stricmp(value, "false") == 0 || _stricmp(value, "off") == 0 || _stricmp(value, "no") == 0)
     {
         // False
         return false;
     }
-    else if (stricmp(value, "true") == 0 || stricmp(value, "on") == 0 || stricmp(value, "yes") == 0)
+    else if (_stricmp(value, "true") == 0 || _stricmp(value, "on") == 0 || _stricmp(value, "yes") == 0)
     {
         // True
         return true;

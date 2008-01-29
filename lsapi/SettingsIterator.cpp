@@ -88,7 +88,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
             // No, so find the first item with a key of pszConfig
             itSettings = m_pSettingsMap->lower_bound(pszConfig);
             
-            if (stricmp(itSettings->first.c_str(), pszConfig) == 0) // != m_pSettingsManager->end())
+            if (_stricmp(itSettings->first.c_str(), pszConfig) == 0) // != m_pSettingsManager->end())
             {
                 // Save the iterator for future use and return the value
                 it = (m_Iterators.insert(IteratorMap::value_type(pszConfig, itSettings))).first;
@@ -107,7 +107,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
             {
                 it->second++;
             }
-            while ((stricmp(pszConfig, it->first.c_str()) != 0) &&
+            while ((_stricmp(pszConfig, it->first.c_str()) != 0) &&
                     (it->second != itSettings));
             
             // If we found a valid item, return it

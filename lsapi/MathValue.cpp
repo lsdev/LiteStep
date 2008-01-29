@@ -152,7 +152,7 @@ bool MathValue::ToBoolean() const
         return (mNumber != 0.0 && !_isnan(mNumber));
         
     case STRING:
-        return (!mString.empty() && stricmp(mString.c_str(), "false") != 0);
+        return (!mString.empty() && _stricmp(mString.c_str(), "false") != 0);
     }
     
     // Should never happen
@@ -553,12 +553,12 @@ double MathStringToNumber(const string& str)
         // Number
         return number;
     }
-    else if (stricmp(str.c_str(), "Infinity") == 0)
+    else if (_stricmp(str.c_str(), "Infinity") == 0)
     {
         // Positive infinity
         return numeric_limits<double>::infinity();
     }
-    else if (stricmp(str.c_str(), "-Infinity") == 0)
+    else if (_stricmp(str.c_str(), "-Infinity") == 0)
     {
         // Negative infinity
         return -numeric_limits<double>::infinity();
