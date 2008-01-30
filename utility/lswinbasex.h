@@ -788,7 +788,7 @@ protected:
 	DWORD GetHotKey() const
 	{
 		ASSERT(::IsWindow(hWnd));
-		return static_cast<DWORD>(::SendMessage(hWnd, WM_GETHOTKEY, 0, 0));
+		return (DWORD)::SendMessage(hWnd, WM_GETHOTKEY, 0, 0);
 	}
 
 protected:

@@ -30,7 +30,7 @@ public:
     StartupRunner();
     virtual ~StartupRunner();
     
-    static DWORD WINAPI Run(void* pvVoid);
+    static DWORD WINAPI Run(LPVOID lpData);
     
 private:
     static bool _IsFirstRunThisSession();

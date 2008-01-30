@@ -173,9 +173,9 @@ void Localization::LoadString(UINT uID, LPTSTR ptzBuffer, size_t cchMax)
 {
 	if (IsValidStringPtr(ptzBuffer, cchMax))
 	{
-		if (::LoadString(m_hRes, uID, ptzBuffer, cchMax) == 0)
+		if (::LoadString(m_hRes, uID, ptzBuffer, (int)cchMax) == 0)
 		{
-			if (::LoadString(GetModuleHandle(NULL), uID, ptzBuffer, cchMax) == 0)
+			if (::LoadString(GetModuleHandle(NULL), uID, ptzBuffer, (int)cchMax) == 0)
 			{
 				ptzBuffer[0] = _T('\0');
 			}
@@ -211,7 +211,7 @@ static void GetString(UINT uId, TCHAR* ptzBuffer, size_t cchBuffer,
     ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
     ASSERT(NULL != ptzDefault);
     
-    if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, cchBuffer) == 0)
+    if (LoadString(GetModuleHandle(NULL), uId, ptzBuffer, (int)cchBuffer) == 0)
     {
         HRESULT hr = StringCchCopy(ptzBuffer, cchBuffer, ptzDefault);
         

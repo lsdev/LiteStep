@@ -60,7 +60,7 @@ CLiteStep gLiteStep;
 //
 // GetAppPath
 //
-HRESULT GetAppPath(LPTSTR pszAppPath, SIZE_T cchAppPath)
+static HRESULT GetAppPath(LPTSTR pszAppPath, size_t cchAppPath)
 {
     HRESULT hr = E_FAIL;
 
@@ -192,7 +192,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     // before anything else, start the recovery menu thread
     DWORD dwRecoveryThreadID;
     HANDLE hRecoveryThread = CreateThread(NULL, 0, RecoveryThreadProc,
-        (void*)m_hInstance, 0, &dwRecoveryThreadID);
+        (LPVOID)m_hInstance, 0, &dwRecoveryThreadID);
     
     // configure the Win32 window manager to hide windows when they are minimized
     MINIMIZEDMETRICS mm = { 0 };
@@ -334,7 +334,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
 
             CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
-                (void*)bForceStartup, 0, &dwThread));
+                (LPVOID)bForceStartup, 0, &dwThread));
         }
         
         // Undocumented call: Shell Loading Finished

@@ -196,7 +196,7 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 #else // UNICODE
         
         int nReturn = WideCharToMultiByte(CP_ACP, 0, pOleString,
-            wcslen(pOleString), ptzBuffer, cchBuffer, NULL, NULL);
+            (int)wcslen(pOleString), ptzBuffer, (int)cchBuffer, NULL, NULL);
         
         if (nReturn == 0)
         {

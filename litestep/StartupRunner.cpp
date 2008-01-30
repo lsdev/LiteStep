@@ -47,10 +47,10 @@ StartupRunner::StartupRunner()
 StartupRunner::~StartupRunner()
 {}
 
-DWORD StartupRunner::Run(void* pvVoid)
+DWORD StartupRunner::Run(LPVOID lpData)
 {
     bool bRunStartup = _IsFirstRunThisSession();
-    BOOL bForceStartup = (BOOL)pvVoid;
+    BOOL bForceStartup = (BOOL)lpData;
     
     // by keeping the call to _IsFirstRunThisSession() above we make sure the
     // regkey is created even if we're in "force startup" mode

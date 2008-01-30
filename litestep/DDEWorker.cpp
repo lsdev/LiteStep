@@ -468,7 +468,7 @@ BOOL DDEWorker::_ListGroupsHelper(HANDLE hHeap, char* szPath, LPVOID& pGroupList
 		{
 			if (*(FindData.cFileName) != '.' && (FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
 			{
-				int stLen = strlen(FindData.cFileName);
+				size_t stLen = strlen(FindData.cFileName);
 
 				pszTemp = (char*) HeapReAlloc(hHeap, HEAP_ZERO_MEMORY, pGroupList, ulSize + stLen + 2);
 				if (pszTemp != NULL)
@@ -476,7 +476,7 @@ BOOL DDEWorker::_ListGroupsHelper(HANDLE hHeap, char* szPath, LPVOID& pGroupList
 					CopyMemory(&pszTemp[ulSize], FindData.cFileName, stLen);
 					CopyMemory(&pszTemp[ulSize + stLen], "\r\n", 2);
 					pGroupList = (LPVOID) pszTemp;
-					ulSize += (stLen + 2);
+					ulSize += stLen + 2;
 					bReturn = TRUE;
 				}
 				else

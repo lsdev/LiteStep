@@ -132,27 +132,29 @@ static MathValue Math_sqrt(const MathValueList& argList);
 static MathValue Math_upperCase(const MathValueList& argList);
 
 // Mapping of names to predefined functions
-struct { const char *name; MathFunction function; int numArgs; } gFunctions[] =
+struct
 {
-    { "abs",        Math_abs,        1 },
-    { "boolean",    Math_boolean,    1 },
-    { "ceil",       Math_ceil,       1 },
-    { "contains",   Math_contains,   2 },
-    { "endsWith",   Math_endsWith,   2 },
-    { "floor",      Math_floor,      1 },
-    { "if",         Math_if,         3 },
-    { "integer",    Math_integer,    1 },
-    { "length",     Math_length,     1 },
-    { "lowerCase",  Math_lowerCase,  1 },
-    { "max",        Math_max,        2 },
-    { "min",        Math_min,        2 },
-    { "number",     Math_number,     1 },
-    { "pow",        Math_pow,        2 },
-    { "round",      Math_round,      1 },
-    { "startsWith", Math_startsWith, 2 },
-    { "string",     Math_string,     1 },
-    { "sqrt",       Math_sqrt,       1 },
-    { "upperCase",  Math_upperCase,  1 }
+    const char *name; MathFunction function; unsigned int numArgs;
+} gFunctions[] = {
+    { "abs",          Math_abs,              1 },
+    { "boolean",      Math_boolean,          1 },
+    { "ceil",         Math_ceil,             1 },
+    { "contains",     Math_contains,         2 },
+    { "endsWith",     Math_endsWith,         2 },
+    { "floor",        Math_floor,            1 },
+    { "if",           Math_if,               3 },
+    { "integer",      Math_integer,          1 },
+    { "length",       Math_length,           1 },
+    { "lowerCase",    Math_lowerCase,        1 },
+    { "max",          Math_max,              2 },
+    { "min",          Math_min,              2 },
+    { "number",       Math_number,           1 },
+    { "pow",          Math_pow,              2 },
+    { "round",        Math_round,            1 },
+    { "startsWith",   Math_startsWith,       2 },
+    { "string",       Math_string,           1 },
+    { "sqrt",         Math_sqrt,             1 },
+    { "upperCase",    Math_upperCase,        1 }
 };
 
 const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
@@ -181,7 +183,7 @@ MathValue MathParser::CallFunction(const string& name, const MathValueList& argL
     {
         if (_stricmp(name.c_str(), gFunctions[i].name) == 0)
         {
-            if (static_cast<int>(argList.size()) != gFunctions[i].numArgs)
+            if (argList.size() != gFunctions[i].numArgs)
             {
                 // Incorrect number of arguments
                 ostringstream message;

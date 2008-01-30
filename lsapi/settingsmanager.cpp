@@ -412,7 +412,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             bSucceeded = true;
                         }
                         else if (GetEnvironmentVariable(szVariable,
-                            pszTempExpandedString, static_cast<DWORD>(stWorkLength)))
+                            pszTempExpandedString, stWorkLength))
                         {
                             bSucceeded = true;
                         }

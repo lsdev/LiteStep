@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.26 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.26 2007/07/26 21:53:13 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.27 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.27 2008/01/30 01:59:28 jugg Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -301,7 +301,7 @@ void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText,
 {
 	if (IsValidStringPtr(pszText, cchText))
 	{
-		if (LoadString(hInstance, uIDText, pszText, cchText) == 0)
+		if (LoadString(hInstance, uIDText, pszText, (int)cchText) == 0)
 		{
 			StringCchCopy(pszText, cchText, pszDefText);
 		}
@@ -338,7 +338,7 @@ BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
     if (IsValidStringPtr(pszPath, cchPath)) 
     { 
         // Default to user defined variable 
-        if (GetRCString("litestepdir", pszPath, NULL, cchPath)) 
+        if (GetRCString("litestepdir", pszPath, NULL, (int)cchPath)) 
         { 
             bReturn = TRUE; 
         } 
@@ -357,7 +357,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 
 	if (IsValidStringPtr(pszPath, cchPath))
 	{
-		if (GetRCString("LSImageFolder", pszPath, NULL, cchPath))
+		if (GetRCString("LSImageFolder", pszPath, NULL, (int)cchPath))
 		{
 			bReturn = SUCCEEDED(PathAddBackslashEx(pszPath, cchPath));
 		}
