@@ -60,7 +60,7 @@ CLiteStep gLiteStep;
 //
 // GetAppPath
 //
-static HRESULT GetAppPath(LPTSTR pszAppPath, size_t cchAppPath)
+static HRESULT GetAppPath(LPTSTR pszAppPath, DWORD cchAppPath)
 {
     HRESULT hr = E_FAIL;
 
@@ -334,7 +334,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
 
             CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
-                (LPVOID)bForceStartup, 0, &dwThread));
+                (LPVOID)(INT_PTR)bForceStartup, 0, &dwThread));
         }
         
         // Undocumented call: Shell Loading Finished

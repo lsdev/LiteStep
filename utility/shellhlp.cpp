@@ -35,6 +35,7 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
     ASSERT(cchPath >= MAX_PATH);
     ASSERT(NULL != ptzPath);
+    UNREFERENCED_PARAMETER(cchPath);
 
     IMalloc* pMalloc;
     bool bReturn = false;
@@ -129,7 +130,7 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 //
 // GetSystemString
 //
-bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer)
+bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer)
 {
     ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
     

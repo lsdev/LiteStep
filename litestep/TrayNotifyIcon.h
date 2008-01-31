@@ -314,6 +314,10 @@ private:
     CHAR  m_szTip[TRAY_MAX_TIP_LENGTH];          /* persistent &     volatile */
 
     DWORD m_dwState;                             /* persistent &     volatile */
+
+    // not implemented
+    NotifyIcon(const NotifyIcon& rhs);
+    NotifyIcon& operator=(const NotifyIcon& rhs);
 };
 
 #endif //!defined(TRAYNOTIFYICON_H)

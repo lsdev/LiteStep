@@ -69,6 +69,7 @@ protected:
 	CriticalSection& m_cs;
 
 private:
+    // not implemented
     Lock(const Lock& rhs);
     Lock& operator=(const Lock& rhs);
 };
@@ -90,6 +91,10 @@ public:
 	}
 private:
 	UINT& m_Count;
+
+    // not implemented
+    Block(const Block& rhs);
+    Block& operator=(const Block& rhs);
 };
 
 

@@ -146,6 +146,10 @@ private:
     LPARAM m_lParam;
     RECT   m_rc;
     UINT   m_uEdge;
+
+    // not implemented
+    AppBar(const AppBar& rhs);
+    AppBar& operator=(const AppBar& rhs);
 };
 
 #endif /* !defined(TRAYAPPBAR_H) */

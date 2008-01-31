@@ -78,11 +78,12 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
         st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute, st.wSecond,
         rszLevel[nLevel-1], pszModule, pszMessage)))
     {
-        DWORD cbToWrite = cbLine - cbRemaining;
-        
+        size_t cbToWrite = cbLine - cbRemaining;
+        ASSERT(cbToWrite <= MAXDWORD);
+
         // Write it to the log file
         DWORD dwCount = 0;
-        WriteFile(hLogFile, szLine, cbToWrite, &dwCount, NULL);
+        WriteFile(hLogFile, szLine, (DWORD)cbToWrite, &dwCount, NULL);
     }
     
     // Close the log

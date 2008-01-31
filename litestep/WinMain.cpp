@@ -56,7 +56,7 @@ bool IsOtherInstanceRunning(LPHANDLE phMutex)
 // ParseCommandLine
 // Converts command line parameters to start flags
 //
-WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, size_t cchFile)
+WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, DWORD cchFile)
 {
     ASSERT(pszCommandLine);
     

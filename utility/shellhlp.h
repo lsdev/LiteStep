@@ -26,7 +26,7 @@
 #include <shlobj.h>
 
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
-bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer);
+bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer);
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer);
 bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer);
