@@ -65,19 +65,27 @@ static HRESULT GetAppPath(LPTSTR pszAppPath, DWORD cchAppPath)
     HRESULT hr = E_FAIL;
 
 #ifdef _DEBUG
-    // In debug builds use the current directory as base path
-    if (GetCurrentDirectory(cchAppPath, pszAppPath))
+    typedef BOOL (WINAPI* IsDebuggerPresentProc)();
+
+    IsDebuggerPresentProc fnIsDebuggerPresent = (IsDebuggerPresentProc)
+        GetProcAddress(GetModuleHandle(_T("kernel32")), "IsDebuggerPresent");
+
+    // If a debugger is attached use the current directory as base path
+    if (fnIsDebuggerPresent && fnIsDebuggerPresent())
     {
-        hr = S_OK;
+        if (GetCurrentDirectory(cchAppPath, pszAppPath))
+        {
+            hr = S_OK;
+        }
     }
-#else
-    // In release builds use litestep.exe's location as base path
+    else
+#endif
+    // Otherwise use litestep.exe's location as base path
     if (LSGetModuleFileName(NULL, pszAppPath, cchAppPath))
     {
         PathRemoveFileSpec(pszAppPath);
         hr = S_OK;
     }
-#endif
 
     return hr;
 }
