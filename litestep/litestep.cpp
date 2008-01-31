@@ -143,6 +143,9 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
         return 3;
     }
 
+    // All child processes get this variable
+    VERIFY(SetEnvironmentVariable(_T("LitestepDir"), szAppPath));
+
     HRESULT hr = gLiteStep.Start(hInst, wStartFlags);
 
     return HRESULT_CODE(hr);
