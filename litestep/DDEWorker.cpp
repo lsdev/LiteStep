@@ -163,7 +163,6 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 			//HotKey[,fMinimize[fSeparateMemSpace] ] ] ] ] ] ]) : applies to current group
 			case DDE_REQUEST_ADDITEM:
 			{
-				BOOL bSepMemSpace = FALSE;
 				BOOL bMinimize = FALSE;
 				WORD dwHotKey = 0;
 				LPCSTR pszDefDir = NULL;
@@ -204,11 +203,11 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 					default:
 					break;
 				}
-				bReturn = _AddItem(pszParamList[0], pszDescription, pszIconPath, nIconIndex, pszDefDir, dwHotKey, bMinimize, bSepMemSpace);
+				bReturn = _AddItem(pszParamList[0], pszDescription, pszIconPath, nIconIndex, pszDefDir, dwHotKey, bMinimize);
 			}
 			break;
 			
-            default:
+			default:
 			break;
 		}
 	}
@@ -410,7 +409,7 @@ BOOL DDEWorker::_DeleteGroup(LPCTSTR strGroupName, BOOL bCommon)
 	// Get the program group path
 	if (GetShellFolderPath(bCommon ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, szPath, MAX_PATH))
 	{
-        // Append \*.* for FindFirstFile
+		// Append \*.* for FindFirstFile
 		StringCchCopy(szTemp, MAX_PATH, "\\");
 		StringCchCat(szTemp, MAX_PATH, strGroupName);
 		StringCchCat(szPath, MAX_PATH, szTemp);
@@ -514,7 +513,7 @@ BOOL DDEWorker::_DeleteItem(LPCTSTR strItem)
 }
 
 // Add an item
-BOOL DDEWorker::_AddItem(LPCTSTR strCmdLine, LPCTSTR strDescription, LPCTSTR strIconPath, int nIconIndex, LPCTSTR strDefDir, WORD dwHotKey, BOOL bMinimize, BOOL bSepMemSpace)
+BOOL DDEWorker::_AddItem(LPCTSTR strCmdLine, LPCTSTR strDescription, LPCTSTR strIconPath, int nIconIndex, LPCTSTR strDefDir, WORD dwHotKey, BOOL bMinimize)
 {
 	char szPath[MAX_PATH];
 	HRESULT hr;
