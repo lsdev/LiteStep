@@ -20,8 +20,10 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "../utility/common.h"
+#include "../utility/macros.h"
 #include <commctrl.h>
 #include <math.h>
+#include <time.h>
 #include "../utility/core.hpp"
 
 extern const char rcsRevision[];
@@ -44,7 +46,10 @@ HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
 int GetClientWidth(HWND hWnd);
 void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
-
+void SetCompileTime(HWND hWnd, int nItem);
+ 
+// Pointer macro used by GetCompileTime
+#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
 
 // Global handle to the running AboutBox instance (if any)
 HWND g_hAboutbox = NULL;
@@ -85,8 +90,8 @@ struct
 	,{"Sci", "Erik Christiansson"}
 };
 
-const unsigned int aboutOptionsCount = sizeof(aboutOptions) / sizeof(aboutOptions[0]);
-const unsigned int theDevTeamCount = sizeof(theDevTeam) / sizeof(theDevTeam[0]);
+const unsigned int aboutOptionsCount = COUNTOF(aboutOptions);
+const unsigned int theDevTeamCount = COUNTOF(theDevTeam);
 
 struct CallbackInfo
 {
@@ -259,11 +264,7 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			SetDlgItemText(hWnd, IDC_THEME_INFO, themeOut);
 
 			// set compile time
-			char compileTime[64] = { 0 };
-			StringCchPrintf(compileTime, 64,
-				"Compiled on %s at %s", __DATE__, __TIME__);
-
-			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
+			SetCompileTime(hWnd, IDC_COMPILETIME);
 
 			// set the License Notice text
 			SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
@@ -312,7 +313,6 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
 // AboutBox Thread Procedure
 //
-
 ULONG WINAPI AboutBoxThread(void *)
 {
 	if (!g_hAboutbox)
@@ -333,7 +333,6 @@ ULONG WINAPI AboutBoxThread(void *)
 
 // Fill listview with bang command information
 //
-
 BOOL __stdcall BangCallback(LPCSTR pszName, LPARAM lParam)
 {
 	CallbackInfo* pCi = (CallbackInfo*)lParam;
@@ -406,7 +405,6 @@ void AboutDevTeam(HWND hListView)
 
 // Show License Notice... Nothing to do
 //
-
 void AboutLicense(HWND /* hEdit */)
 {
 	//SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
@@ -415,7 +413,6 @@ void AboutLicense(HWND /* hEdit */)
 
 // Fill listview with module information
 //
-
 BOOL __stdcall ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
 {
 	CallbackInfo* pCi = (CallbackInfo*)lParam;
@@ -453,7 +450,6 @@ void AboutModules(HWND hListView)
 
 // Fill listview with revision ID (LM_GETREVID) information
 //
-
 BOOL __stdcall RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 {
 	CallbackInfo* pCi = (CallbackInfo*)lParam;
@@ -507,7 +503,6 @@ void AboutRevIDs(HWND hListView)
 
 // Fill listview with system information
 //
-
 void AboutSysInfo(HWND hListView)
 {
 	LVCOLUMN columnInfo;
@@ -639,7 +634,6 @@ void AboutSysInfo(HWND hListView)
 
 // Simplified version of CreateFont
 //
-
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
 {
 	ASSERT(NULL != pszName); ASSERT(nSizeInPoints > 0);
@@ -664,7 +658,6 @@ HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
 
 // Return the width of the window's client area
 //
-
 int GetClientWidth(HWND hWnd)
 {
 	RECT r;
@@ -705,7 +698,7 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 	double dValue = (double)stBytes;
 	unsigned int uUnit = 0;
 
-	while ((dValue >= 1024) && (uUnit < (sizeof(units)/sizeof(units[0]) - 1)))
+	while ((dValue >= 1024) && (uUnit < COUNTOF(units) - 1))
 	{
 		dValue /= 1024;
 		++uUnit;
@@ -713,4 +706,28 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 
 	StringCchPrintf(pszBuffer, cchBuffer,
 		"%d %s", (int)floor(dValue + 0.5), units[uUnit]);
+}
+
+// Gets the compiletime/date from the PE header and sets a DlgItem
+//
+void SetCompileTime(HWND hWnd, int nItem)
+{
+	IMAGE_DOS_HEADER* dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
+	ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
+	IMAGE_NT_HEADERS* ntheader = MakePtr(IMAGE_NT_HEADERS*,
+		dosheader, dosheader->e_lfanew);
+
+	// Subtract 21600 (=60*60*6) seconds for CST (CVS server time)
+	time_t time = time_t(ntheader->FileHeader.TimeDateStamp) - 21600;
+	tm* timeStruct = gmtime(&time);
+
+	if (timeStruct)
+	{
+		TCHAR timeBuf[40] = { 0 };
+		if(_tcsftime(timeBuf, COUNTOF(timeBuf),
+			_T("Compiled on %b %d %Y at %H:%M:%S CST"), timeStruct) == 39)
+		{
+			SetDlgItemText(hWnd, nItem, timeBuf);
+		}
+	}
 }
