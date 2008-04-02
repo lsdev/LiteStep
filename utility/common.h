@@ -26,8 +26,10 @@
 #include "../litestep/buildoptions.h"
 
 #ifdef _MSC_VER
+#if _MSC_VER == 1200 // VC 6.0
 #  pragma warning(disable: 4786) // STL naming warnings
 #  pragma warning(disable: 4503) // STL naming warnings
+#endif
 #endif
 
 #if !defined(_WIN32_IE)
