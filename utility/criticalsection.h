@@ -55,19 +55,19 @@ public:
 class Lock
 {
 public:
-	Lock(CriticalSection& cs) : m_cs(cs)
-	{
-		m_cs.Acquire();
-	}
-
-	~Lock()
-	{
-		m_cs.Release();
-	}
-
+    Lock(CriticalSection& cs) : m_cs(cs)
+    {
+        m_cs.Acquire();
+    }
+    
+    ~Lock()
+    {
+        m_cs.Release();
+    }
+    
 protected:
-	CriticalSection& m_cs;
-
+    CriticalSection& m_cs;
+    
 private:
     // not implemented
     Lock(const Lock& rhs);
@@ -77,21 +77,23 @@ private:
 class Block
 {
 public:
-	Block(UINT& cnt) : m_Count(cnt)
-	{
-		m_Count++;
-	}
-	~Block()
-	{
-		m_Count--;
-	}
-	bool IsBlocked()
-	{
-		return m_Count > 1;
-	}
+    Block(UINT& cnt) : m_Count(cnt)
+    {
+        m_Count++;
+    }
+    ~Block()
+    {
+        m_Count--;
+    }
+    bool IsBlocked()
+    {
+        return m_Count > 1;
+    }
+    
+protected:
+    UINT& m_Count;
+    
 private:
-	UINT& m_Count;
-
     // not implemented
     Block(const Block& rhs);
     Block& operator=(const Block& rhs);
