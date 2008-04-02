@@ -44,7 +44,11 @@ private:
     
     /** Critical section for serializing access to data members */
     mutable CriticalSection m_cs;
-
+    
+    // Not implemented
+    BangManager(const BangManager& rhs);
+    BangManager& operator=(const BangManager& rhs);
+    
 public:
 
     /** Constructor */

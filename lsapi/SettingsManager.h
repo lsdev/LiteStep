@@ -70,7 +70,11 @@ class SettingsManager
     
     /** Critical section for serializing access to members */
     CriticalSection m_CritSection;
-
+    
+    // Not implemented
+    SettingsManager(const SettingsManager&);
+    SettingsManager& operator=(const SettingsManager&);
+    
 protected:
 
     /**

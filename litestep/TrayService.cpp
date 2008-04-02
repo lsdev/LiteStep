@@ -1389,8 +1389,8 @@ void TrayService::ABUnLock(PAPPBARDATAV1 pabd)
 //
 struct FindAppBarPredicate_hWnd
 {
-    FindAppBarPredicate_hWnd(HWND hWnd) : m_hWnd(hWnd)
-    {}
+    FindAppBarPredicate_hWnd(HWND hWnd) : m_hWnd(hWnd) {}
+    FindAppBarPredicate_hWnd(const FindAppBarPredicate_hWnd& copy) : m_hWnd(copy.m_hWnd) {}
     
     bool operator() (const AppBar* pab) const
     {
@@ -1399,6 +1399,10 @@ struct FindAppBarPredicate_hWnd
     
 private:
     const HWND m_hWnd;
+    
+private:
+    // Not implemented
+    FindAppBarPredicate_hWnd& operator=(const FindAppBarPredicate_hWnd&);
 };
 
 
@@ -1413,8 +1417,8 @@ private:
 //
 struct FindAppBarPredicate_MatchLParam
 {
-    FindAppBarPredicate_MatchLParam(UINT uEdge, LPARAM lParam) : m_uEdge(uEdge), m_lParam(lParam)
-    {}
+    FindAppBarPredicate_MatchLParam(UINT uEdge, LPARAM lParam) : m_uEdge(uEdge), m_lParam(lParam) {}
+    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) : m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam) {}
     
     bool operator() (const AppBar* pab) const
     {
@@ -1424,6 +1428,10 @@ struct FindAppBarPredicate_MatchLParam
 private:
     const UINT m_uEdge;
     const LPARAM m_lParam;
+    
+private:
+    // Not implemented
+    FindAppBarPredicate_MatchLParam& operator=(const FindAppBarPredicate_MatchLParam&);
 };
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1940,6 +1948,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
 struct FindIconPredicate
 {
     FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID) {}
+    FindIconPredicate(const FindIconPredicate& copy) : m_hWnd(copy.m_hWnd), m_uID(copy.m_uID) {}
     
     bool operator() (const NotifyIcon* pni) const
     {
@@ -1949,6 +1958,10 @@ struct FindIconPredicate
 private:
     const HWND m_hWnd;
     const UINT m_uID;
+    
+private:
+    // Not implemented
+    FindIconPredicate& operator=(const FindIconPredicate&);
 };
 
 

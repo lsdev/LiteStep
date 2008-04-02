@@ -54,13 +54,18 @@ typedef struct _SHELLTRAYDATA
 typedef struct _SHELLAPPBARDATA
 {
     _SHELLAPPBARDATA(APPBARDATAV1& abdsrc):abd(abdsrc) {}
-
+    
     const APPBARDATAV1& abd;
     /**/
     DWORD  dwMessage;
     HANDLE hSharedMemory;
     DWORD  dwSourceProcessId;
     /**/
+    
+private:
+    // Not implemented
+    _SHELLAPPBARDATA(const _SHELLAPPBARDATA&);
+    _SHELLAPPBARDATA& operator=(const _SHELLAPPBARDATA&);
 } SHELLAPPBARDATA, *PSHELLAPPBARDATA;
 
 typedef std::vector<NotifyIcon*> IconVector;
