@@ -1340,7 +1340,13 @@ void TrayService::adjustWorkArea()
          SPI_SETWORKAREA
         ,1 // readjust maximized windows
         ,&rcWorker
-        ,SPIF_SENDCHANGE
+        ,0 // SPIF_SENDCHANGE - see below
+    );
+    SendNotifyMessage(    // used in place of SPIF_SENDCHANGE above to avoid lockups
+         HWND_BROADCAST   // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
+        ,WM_SETTINGCHANGE
+        ,SPI_SETWORKAREA
+        ,0
     );
     m_bWorkAreaDirty = false;
     
