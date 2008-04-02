@@ -135,7 +135,7 @@ void NotifyIcon::copy_icon(PCNID_XX pnidSource)
                 if(p->m_hOriginalIcon == pnidSource->hIcon)
                 {
                     m_hSharedWnd = (HANDLE)p->m_hWnd;
-                    m_hSharedID = (HANDLE)p->m_uID;
+                    m_uSharedID = p->m_uID;
                     hNewIcon = CopyIcon(p->m_hIcon);
                     break;
                 }

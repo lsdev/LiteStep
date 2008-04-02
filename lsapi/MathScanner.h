@@ -106,7 +106,7 @@ private:
     enum { LOOKAHEAD = 2 };
     
     /** Character buffer */
-    int mLookahead[LOOKAHEAD];
+    char mLookahead[LOOKAHEAD];
     
     /** Input stream */
     std::istringstream mStream;

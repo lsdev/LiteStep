@@ -182,7 +182,7 @@ private:
      * @param  pHandles  array of event handles
      * @param  dwCount   number of handles in the array
      */
-    void _WaitForModules(const HANDLE* pHandles, DWORD dwCount) const;
+    void _WaitForModules(const HANDLE* pHandles, size_t stCount) const;
     
     /** List of loaded modules */
     ModuleQueue m_ModuleQueue;

@@ -302,7 +302,7 @@ private:
     // Internal tracking
     HANDLE m_hOriginalIcon;
     HANDLE m_hSharedWnd;
-    HANDLE m_hSharedID;
+    UINT   m_uSharedID;
 
     // Preserved Notify Icon Data members
     const HWND  m_hWnd;                          /* persistent & non volatile */

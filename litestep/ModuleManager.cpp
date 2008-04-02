@@ -375,9 +375,9 @@ ModuleQueue::iterator ModuleManager::_FindModule(HINSTANCE hModule)
 }
 
 
-void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
+void ModuleManager::_WaitForModules(const HANDLE* pHandles, size_t stCount) const
 {
-    std::vector<HANDLE> vWait(pHandles, pHandles+dwCount);
+    std::vector<HANDLE> vWait(pHandles, pHandles+stCount);
     
     /* Loop for as long as we have an object whose state is not signaled. */ 
     while (vWait.size())
@@ -398,7 +398,7 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, DWORD dwCount) const
         
         /* Wait for a new message to come in, or for one of our objects 
         * to become signaled. */ 
-        DWORD dwWaitStatus = MsgWaitForMultipleObjects(vWait.size(), &vWait[0],
+        DWORD dwWaitStatus = MsgWaitForMultipleObjects((DWORD)vWait.size(), &vWait[0],
             FALSE, INFINITE, QS_ALLINPUT);
         
         /* Recreate the pObject list, in case any of the objects do not auto 
