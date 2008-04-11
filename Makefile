@@ -63,7 +63,7 @@ EXE = $(OUTPUT)/litestep.exe
 EXELIBS = -L$(OUTPUT) -llsapi -lole32 -lshlwapi -luuid
 
 # Object files for litestep.exe
-EXEOBJS = $(OUTPUT)/BangCommand.o \
+EXEOBJS = \
 	$(OUTPUT)/DataStore.o \
 	$(OUTPUT)/DDEService.o \
 	$(OUTPUT)/DDEStub.o \
@@ -94,7 +94,8 @@ DLLIMPLIB = $(OUTPUT)/liblsapi.a
 DLLLIBS = -lole32 -lpng -lshlwapi -lz
 
 # Object files for lsapi.dll
-DLLOBJS = $(OUTPUT)/aboutbox.o \
+DLLOBJS = \
+	$(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/BangCommand.o \
 	$(OUTPUT)/BangManager.o \
 	$(OUTPUT)/bangs.o \
@@ -123,19 +124,28 @@ DLLOBJS = $(OUTPUT)/aboutbox.o \
 # Rules
 #-----------------------------------------------------------------------------
 
+# all targets
+.PHONY: all
+all: setup $(DLL) $(HOOKDLL) $(EXE)
+
 # litestep.exe
-$(EXE): $(EXEOBJS) $(DLL)
+$(EXE): setup $(EXEOBJS)
 	$(CXX) -o $(EXE) $(LDFLAGS) $(EXEOBJS) $(EXELIBS)
 ifndef DEBUG
 	$(STRIP) $(EXE)
 endif
 
 # lsapi.dll
-$(DLL): $(DLLOBJS) $(DLLDEF)
+$(DLL): setup $(DLLOBJS) $(DLLDEF)
 	$(DLLWRAP) --driver-name $(CXX) --def $(DLLDEF) --implib $(DLLIMPLIB) -o $(DLL) $(LDFLAGS) $(DLLOBJS) $(DLLLIBS)
 ifndef DEBUG
 	$(STRIP) $(DLL)
 endif
+
+# Setup environment
+.PHONY: setup
+setup:
+	-mkdir $(OUTPUT)
 
 # Remove output files
 .PHONY: clean
@@ -470,6 +480,8 @@ $(OUTPUT)/match.o: lsapi/match.cpp \
 	lsapi/lsmultimon.h \
 	utility/common.h \
 	utility/debug.hpp
+
+$(OUTPUT)/MathEvaluate.o: lsapi/MathEvaluate.cpp
 
 $(OUTPUT)/MathParser.o: lsapi/MathParser.cpp \
 	litestep/BangManager.h \
