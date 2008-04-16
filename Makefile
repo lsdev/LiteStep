@@ -126,7 +126,7 @@ DLLOBJS = \
 
 # all targets
 .PHONY: all
-all: setup $(DLL) $(HOOKDLL) $(EXE)
+all: setup $(DLL) $(EXE)
 
 # litestep.exe
 $(EXE): setup $(EXEOBJS)
