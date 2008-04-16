@@ -83,9 +83,11 @@ struct
 	const char *nick;
 	const char *realName;
 } theDevTeam[] = {
-	{"Acidfire", "Alexander Vermaat"}
-	,{"ilmcuts",  "Simon"}
-	,{"jugg",     "Chris Rempel"}
+	 {"Acidfire", "Alexander Vermaat"}
+	,{"ilmcuts", "Simon"}
+	,{"jugg",    "Chris Rempel"}
+	,{"Maduin",  "Kevin Schaffer"}
+	,{"RabidCow", "Joshua Seagoe"}
 	,{"Tobbe",    "Tobbe Lundberg"}
 	,{"Xjill",    ""}
 };
