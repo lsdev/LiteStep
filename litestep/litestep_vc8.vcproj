@@ -66,10 +66,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib shlwapi.lib"
+				AdditionalDependencies="ole32.lib uuid.lib shlwapi.lib advapi32.lib gdi32.lib shell32.lib user32.lib msvcrtd.lib msvcprtd.lib"
 				OutputFile="$(OutDir)/litestep.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				IgnoreAllDefaultLibraries="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/litestep.pdb"
 				SubSystem="2"
@@ -159,11 +160,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib shlwapi.lib"
+				AdditionalDependencies="ole32.lib uuid.lib shlwapi.lib advapi32.lib gdi32.lib shell32.lib user32.lib msvcrt.lib msvcprt.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/litestep.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				IgnoreAllDefaultLibraries="true"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
