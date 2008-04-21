@@ -460,6 +460,6 @@ void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 void BangToggleModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
 	HDWP hDwp = BeginDeferWindowPos(5);
-	EnumWindows(EnumToggleModulesProc, EMP_TOGGLE);
+	EnumWindows(EnumToggleModulesProc, (LPARAM)hDwp);
 	EndDeferWindowPos(hDwp);
 }
