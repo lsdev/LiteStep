@@ -143,6 +143,9 @@ private:
     void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void adjustWorkArea();
     
+    // Remove any "dead" appbars
+    void removeDeadAppBars();
+    
     //
     // AppBar Un/Lock handlers for shared data
     //
