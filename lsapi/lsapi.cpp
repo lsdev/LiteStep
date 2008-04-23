@@ -28,51 +28,51 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.27 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.27 2008/01/30 01:59:28 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.28 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.28 2008/04/23 19:00:31 jugg Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
 {
-    try
-    {
-        g_LSAPIManager.Initialize(pszLitestepPath, pszRcPath);
-    }
-    catch(LSAPIException& lse)
-    {
-        lse.Type();
-    }
+	try
+	{
+		g_LSAPIManager.Initialize(pszLitestepPath, pszRcPath);
+	}
+	catch(LSAPIException& lse)
+	{
+		lse.Type();
+	}
 
-    return g_LSAPIManager.IsInitialized() ? TRUE:FALSE;
+	return g_LSAPIManager.IsInitialized() ? TRUE:FALSE;
 }
 
 void LSAPIReloadBangs(VOID)
 {
-    try
-    {
-        g_LSAPIManager.ReloadBangs();
-    }
-    catch(LSAPIException& lse)
-    {
-        lse.Type();
-    }
+	try
+	{
+		g_LSAPIManager.ReloadBangs();
+	}
+	catch(LSAPIException& lse)
+	{
+		lse.Type();
+	}
 }
 
 void LSAPIReloadSettings(VOID)
 {
-    try
-    {
-        g_LSAPIManager.ReloadSettings();
-    }
-    catch(LSAPIException& lse)
-    {
-        lse.Type();
-    }
+	try
+	{
+		g_LSAPIManager.ReloadSettings();
+	}
+	catch(LSAPIException& lse)
+	{
+		lse.Type();
+	}
 }
 
 void LSAPISetLitestepWindow(HWND hLitestepWnd)
 {
-    g_LSAPIManager.SetLitestepWindow(hLitestepWnd);
+	g_LSAPIManager.SetLitestepWindow(hLitestepWnd);
 }
 
 
@@ -333,18 +333,18 @@ void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchTex
 //
 BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
 {
-    BOOL bReturn = FALSE; 
+	BOOL bReturn = FALSE;
 
-    if (IsValidStringPtr(pszPath, cchPath)) 
-    { 
-        // Default to user defined variable 
-        if (GetRCString("litestepdir", pszPath, NULL, (int)cchPath)) 
-        { 
-            bReturn = TRUE; 
-        } 
-    } 
+	if (IsValidStringPtr(pszPath, cchPath))
+	{
+		// Default to user defined variable
+		if (GetRCString("litestepdir", pszPath, NULL, (int)cchPath))
+		{
+			bReturn = TRUE;
+		}
+	}
 
-    return bReturn; 
+	return bReturn;
 }
 
 
@@ -588,10 +588,9 @@ void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpan
 	if (IsValidStringPtr(pszExpandedString, cchExpandedString) &&
 	    IsValidStringPtr(pszTemplate))
 	{
-        if(g_LSAPIManager.IsInitialized()) 
-        {
-            g_LSAPIManager.GetSettingsManager()->VarExpansionEx(
-                pszExpandedString, pszTemplate, cchExpandedString); 
+		if(g_LSAPIManager.IsInitialized())
+		{
+			g_LSAPIManager.GetSettingsManager()->VarExpansionEx(pszExpandedString, pszTemplate, cchExpandedString);
 		}
 		else
 		{

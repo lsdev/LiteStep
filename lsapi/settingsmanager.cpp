@@ -25,16 +25,6 @@
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
-#include <string>
-
-using std::string;
-
-#if !defined(CSIDL_COMMON_ADMINTOOLS)
-#  define CSIDL_COMMON_ADMINTOOLS 0x002F
-#  define CSIDL_ADMINTOOLS 0x0030
-#endif
-
-
 SettingsManager::SettingsManager()
 {
 }
@@ -337,10 +327,9 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 {
     char szTempExpandedString[MAX_LINE_LENGTH] = { 0 };
     LPSTR pszTempExpandedString = szTempExpandedString;
-
     // available working length in szTempExpandedString
     DWORD cchTempExpanded = MAX_LINE_LENGTH;
-
+    
     if ((pszTemplate != NULL) && (pszExpandedString != NULL) &&
         (cchTempExpanded > 0))
     {
@@ -409,10 +398,10 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                             // FIXME: Should we call GetToken here?!
                             TCHAR szTemp[MAX_LINE_LENGTH];
                             GetToken(it->second.c_str(), szTemp, NULL, FALSE);
-
+                            
                             VarExpansionEx(pszTempExpandedString, szTemp,
                                 (size_t)cchTempExpanded, newRecursiveVarSet);
-
+                            
                             bSucceeded = true;
                         }
                         else if (GetEnvironmentVariable(szVariable,
@@ -445,13 +434,13 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                 if (bSucceeded)
                 {
                     size_t stTempLen = strlen(pszTempExpandedString);
-
+                    
                     // safe operation and cast because
                     // stTempLen < cchTempExpanded
                     cchTempExpanded -= (DWORD)stTempLen;
                     pszTempExpandedString += stTempLen;
                 }
-
+                
                 //
                 // Move to the next character if we didn't run out of space:
                 //

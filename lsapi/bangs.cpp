@@ -237,7 +237,7 @@ void BangRefresh(HWND hCaller, LPCSTR pszArgs)
 
 void BangReload(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    LSAPIReloadSettings();
+	LSAPIReloadSettings();
 }
 
 

@@ -120,11 +120,11 @@ extern "C"
 	LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
 
 #ifdef LSAPI_PRIVATE
-    LSAPI BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath);
-    LSAPI void LSAPIReloadBangs(void);
-    LSAPI void LSAPIReloadSettings(void);
-    LSAPI void LSAPISetLitestepWindow(HWND hLitestepWnd);
-    LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
+	LSAPI BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath);
+	LSAPI void LSAPIReloadBangs(void);
+	LSAPI void LSAPIReloadSettings(void);
+	LSAPI void LSAPISetLitestepWindow(HWND hLitestepWnd);
+	LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
 #endif /* LSAPI_PRIVATE */
 
 #ifdef  __cplusplus

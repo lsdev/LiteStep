@@ -174,7 +174,7 @@ void LSAPIInit::setLitestepVars()
         PathQuoteSpaces(szTemp);
         pSM->SetVariable("litestepdir", szTemp);
     }
-
+    
     if (GetWindowsDirectory(szTemp, MAX_PATH))
     {
         PathAddBackslashEx(szTemp, MAX_PATH);
@@ -191,7 +191,7 @@ void LSAPIInit::setLitestepVars()
     {
         PathAppend(szTemp, "Microsoft\\Internet Explorer\\Quick Launch\\");
         PathQuoteSpaces(szTemp);
-
+        
         pSM->SetVariable("quicklaunch", szTemp);
     }
     
@@ -315,9 +315,9 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
     {
         PathAddBackslashEx(szPath, MAX_PATH);
         PathQuoteSpaces(szPath);
-
+        
         m_smSettingsManager->SetVariable(pszVariable, szPath);
     }
     
-    return bReturn;    
+    return bReturn;
 }

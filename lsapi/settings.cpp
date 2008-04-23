@@ -21,7 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "settingsmanager.h"
 #include "../utility/core.hpp"
-#include "lsapiinit.h"
+#include "lsapiInit.h"
 
 FILE* LCOpen(LPCSTR pszPath)
 {
@@ -51,12 +51,12 @@ BOOL LCClose(FILE *pFile)
 	BOOL bReturn = FALSE;
 
 	if (g_LSAPIManager.IsInitialized())
-    {
-        if (pFile != NULL)
-        {
-            bReturn = g_LSAPIManager.GetSettingsManager()->LCClose(pFile);
-        }
-    }
+	{
+		if (pFile != NULL)
+		{
+			bReturn = g_LSAPIManager.GetSettingsManager()->LCClose(pFile);
+		}
+	}
 
 	return bReturn;
 }
@@ -66,13 +66,13 @@ BOOL LCReadNextCommand(FILE *pFile, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
 
-    if (g_LSAPIManager.IsInitialized())
-    {
-        if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
-        {
-            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
-        }
-    }
+	if (g_LSAPIManager.IsInitialized())
+	{
+		if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
+		{
+			bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
+		}
+	}
 
 	return bReturn;
 }
@@ -82,14 +82,14 @@ BOOL LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchV
 {
 	BOOL bReturn = FALSE;
 
-    if (g_LSAPIManager.IsInitialized())
-    {
-        if ((pFile != NULL) && IsValidStringPtr(pszConfig) &&
-	        IsValidStringPtr(pszValue, cchValue))
-        {
-            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextConfig(pFile, pszConfig, pszValue, cchValue);
-        }
-    }
+	if (g_LSAPIManager.IsInitialized())
+	{
+		if ((pFile != NULL) && IsValidStringPtr(pszConfig) &&
+		    IsValidStringPtr(pszValue, cchValue))
+		{
+			bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextConfig(pFile, pszConfig, pszValue, cchValue);
+		}
+	}
 
 	return bReturn;
 }
@@ -99,13 +99,13 @@ BOOL LCReadNextLine(FILE *pFile, LPSTR pszValue, size_t cchValue)
 {
 	BOOL bReturn = FALSE;
 
-    if (g_LSAPIManager.IsInitialized())
-    {
-    	if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
-	    {
-    		bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
-	    }
-    }
+	if (g_LSAPIManager.IsInitialized())
+	{
+		if ((pFile != NULL) && IsValidStringPtr(pszValue, cchValue))
+		{
+			bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(pFile, pszValue, cchValue);
+		}
+	}
 
 	return bReturn;
 }
