@@ -13,8 +13,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="../Debug_VC71"
+			IntermediateDirectory="Debug_VC71"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -36,7 +36,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib libpng13.lib"
-				OutputFile="../litestep/Debug/lsapi.dll"
+				OutputFile="$(OutDir)/lsapi.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
@@ -67,8 +67,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="../Release_VC71"
+			IntermediateDirectory="Release_VC71"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="TRUE">
@@ -101,7 +101,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib libpng13.lib"
-				OutputFile="../litestep/Release/lsapi.dll"
+				OutputFile="$(OutDir)/lsapi.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="FALSE"
