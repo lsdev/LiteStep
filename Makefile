@@ -43,6 +43,12 @@ DLLWRAP = dllwrap
 # rm
 RM = rm -f
 
+ifeq ($(OS), Windows_NT)
+NULL = 
+else
+NULL = nul
+endif
+
 #-----------------------------------------------------------------------------
 # Files and Paths
 #-----------------------------------------------------------------------------
@@ -140,7 +146,7 @@ $(DLL): setup $(DLLOBJS) $(DLLDEF)
 # Setup environment
 .PHONY: setup
 setup:
-	-mkdir $(OUTPUT)
+	-@if not exist $(OUTPUT)/$(NULL) mkdir $(OUTPUT)
 
 # Remove output files
 .PHONY: clean
