@@ -25,7 +25,11 @@ CXXFLAGS = -Wall -DLSAPI_PRIVATE -DNDEBUG
 endif
 
 # Linker flags
+ifdef DEBUG
 LDFLAGS = -mwindows
+else
+LDFLAGS = -mwindows -s
+endif
 
 # Resource compiler
 RC = windres
@@ -35,9 +39,6 @@ RCFLAGS = -O coff
 
 # dllwrap
 DLLWRAP = dllwrap
-
-# strip
-STRIP = strip
 
 # rm
 RM = rm -f
@@ -131,16 +132,10 @@ all: setup $(DLL) $(EXE)
 # litestep.exe
 $(EXE): setup $(EXEOBJS)
 	$(CXX) -o $(EXE) $(LDFLAGS) $(EXEOBJS) $(EXELIBS)
-ifndef DEBUG
-	$(STRIP) $(EXE)
-endif
 
 # lsapi.dll
 $(DLL): setup $(DLLOBJS) $(DLLDEF)
 	$(DLLWRAP) --driver-name $(CXX) --def $(DLLDEF) --implib $(DLLIMPLIB) -o $(DLL) $(LDFLAGS) $(DLLOBJS) $(DLLLIBS)
-ifndef DEBUG
-	$(STRIP) $(DLL)
-endif
 
 # Setup environment
 .PHONY: setup
