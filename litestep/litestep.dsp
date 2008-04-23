@@ -38,8 +38,8 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Output_Dir "../Release_VC6"
+# PROP Intermediate_Dir "Release_VC6"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 ..\lsapi\release\lsapi.lib ole32.lib oleaut32.lib uuid.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib /nologo /subsystem:windows /pdb:none /map /machine:I386 /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 ..\Release_VC6\lsapi.lib ole32.lib oleaut32.lib uuid.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib /nologo /subsystem:windows /pdb:none /map /machine:I386 /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
 
@@ -66,8 +66,8 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
+# PROP Output_Dir "../Debug_VC6"
+# PROP Intermediate_Dir "Debug_VC6"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
@@ -83,7 +83,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\lsapi\debug\lsapi.lib ole32.lib oleaut32.lib uuid.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib
+# ADD LINK32 ..\Debug_VC6\lsapi.lib ole32.lib oleaut32.lib uuid.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib
 # SUBTRACT LINK32 /profile
 
 !ENDIF 
