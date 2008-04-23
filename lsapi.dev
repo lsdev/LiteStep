@@ -40,7 +40,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit2]
-FileName=litestep\BangManager.cpp
+FileName=lsapi\BangManager.cpp
 Folder=Source
 Compile=1
 CompileCpp=1
@@ -180,7 +180,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit16]
-FileName=litestep\BangManager.h
+FileName=lsapi\BangManager.h
 Folder=Headers
 Compile=1
 CompileCpp=1

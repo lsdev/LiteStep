@@ -1,7 +1,7 @@
 [Project]
 FileName=litestep.dev
 Name=litestep
-UnitCount=27
+UnitCount=25
 Type=0
 Ver=1
 ObjFiles=
@@ -40,16 +40,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit2]
-FileName=litestep\BangManager.cpp
-CompileCpp=1
-Folder=Source
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit3]
 FileName=litestep\DataStore.cpp
 CompileCpp=1
 Folder=Source
@@ -59,7 +49,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit4]
+[Unit3]
 FileName=litestep\DDEService.cpp
 CompileCpp=1
 Folder=Source
@@ -69,7 +59,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit5]
+[Unit4]
 FileName=litestep\DDEStub.cpp
 CompileCpp=1
 Folder=Source
@@ -79,7 +69,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit6]
+[Unit5]
 FileName=litestep\DDEWorker.cpp
 CompileCpp=1
 Folder=Source
@@ -89,7 +79,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit7]
+[Unit6]
 FileName=litestep\litestep.cpp
 CompileCpp=1
 Folder=Source
@@ -99,7 +89,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit8]
+[Unit7]
 FileName=litestep\MessageManager.cpp
 CompileCpp=1
 Folder=Source
@@ -109,7 +99,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit9]
+[Unit8]
 FileName=litestep\Module.cpp
 CompileCpp=1
 Folder=Source
@@ -119,7 +109,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
+[Unit9]
 FileName=litestep\ModuleManager.cpp
 CompileCpp=1
 Folder=Source
@@ -129,7 +119,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
+[Unit10]
 FileName=litestep\RecoveryMenu.cpp
 CompileCpp=1
 Folder=Source
@@ -139,7 +129,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit12]
+[Unit11]
 FileName=litestep\StartupRunner.cpp
 CompileCpp=1
 Folder=Source
@@ -149,7 +139,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit13]
+[Unit12]
 FileName=litestep\TrayService.h
 CompileCpp=1
 Folder=Headers
@@ -159,17 +149,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit14]
-FileName=litestep\BangManager.h
-CompileCpp=1
-Folder=Headers
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit15]
+[Unit13]
 FileName=litestep\buildoptions.h
 CompileCpp=1
 Folder=Headers
@@ -179,7 +159,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit16]
+[Unit14]
 FileName=litestep\DataStore.h
 CompileCpp=1
 Folder=Headers
@@ -189,7 +169,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit17]
+[Unit15]
 FileName=litestep\DDEService.h
 CompileCpp=1
 Folder=Headers
@@ -199,7 +179,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit18]
+[Unit16]
 FileName=litestep\DDEStub.h
 CompileCpp=1
 Folder=Headers
@@ -209,7 +189,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit19]
+[Unit17]
 FileName=litestep\DDEWorker.h
 CompileCpp=1
 Folder=Headers
@@ -219,7 +199,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit20]
+[Unit18]
 FileName=litestep\litestep.h
 CompileCpp=1
 Folder=Headers
@@ -229,7 +209,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit21]
+[Unit19]
 FileName=litestep\MessageManager.h
 CompileCpp=1
 Folder=Headers
@@ -239,7 +219,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit22]
+[Unit20]
 FileName=litestep\Module.h
 CompileCpp=1
 Folder=Headers
@@ -249,7 +229,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit23]
+[Unit21]
 FileName=litestep\ModuleManager.h
 CompileCpp=1
 Folder=Headers
@@ -259,7 +239,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit24]
+[Unit22]
 FileName=litestep\RecoveryMenu.h
 CompileCpp=1
 Folder=Headers
@@ -269,7 +249,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit25]
+[Unit23]
 FileName=litestep\resource.h
 CompileCpp=1
 Folder=Headers
@@ -279,7 +259,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit26]
+[Unit24]
 FileName=litestep\StartupRunner.h
 CompileCpp=1
 Folder=Headers
@@ -289,7 +269,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit27]
+[Unit25]
 FileName=lsapi\BangCommand.cpp
 CompileCpp=1
 Folder=Source

@@ -105,7 +105,7 @@ SOURCE=.\BangCommand.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\litestep\BangManager.cpp
+SOURCE=.\BangManager.cpp
 # End Source File
 # Begin Source File
 
@@ -185,7 +185,7 @@ SOURCE=.\BangCommand.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\litestep\BangManager.h
+SOURCE=.\BangManager.h
 # End Source File
 # Begin Source File
 

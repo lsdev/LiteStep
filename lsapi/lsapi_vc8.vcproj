@@ -214,7 +214,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\litestep\BangManager.cpp"
+				RelativePath=".\BangManager.cpp"
 				>
 			</File>
 			<File
@@ -312,7 +312,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\litestep\BangManager.h"
+				RelativePath=".\BangManager.h"
 				>
 			</File>
 			<File

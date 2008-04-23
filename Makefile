@@ -173,17 +173,6 @@ $(OUTPUT)/%.o: %.cpp
 # Dependencies
 #-----------------------------------------------------------------------------
 
-$(OUTPUT)/BangManager.o: litestep/BangManager.cpp \
-	litestep/BangManager.h \
-	litestep/buildoptions.h \
-	lsapi/BangCommand.h \
-	lsapi/lsapidefines.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/stringutility.h
-
 $(OUTPUT)/DataStore.o: litestep/DataStore.cpp \
 	litestep/DataStore.h \
 	litestep/buildoptions.h \
@@ -394,6 +383,17 @@ $(OUTPUT)/BangCommand.o: lsapi/BangCommand.cpp \
 	utility/safeptr.h \
 	utility/safestr.h
 
+$(OUTPUT)/BangManager.o: lsapi/BangManager.cpp \
+	litestep/buildoptions.h \
+	lsapi/BangCommand.h \
+	lsapi/BangManager.h \
+	lsapi/lsapidefines.h \
+	utility/Base.h \
+	utility/common.h \
+	utility/CriticalSection.h \
+	utility/debug.hpp \
+	utility/stringutility.h
+
 $(OUTPUT)/bangs.o: lsapi/bangs.cpp \
 	litestep/buildoptions.h \
 	litestep/resource.h \
@@ -423,10 +423,10 @@ $(OUTPUT)/graphics.o: lsapi/graphics.cpp \
 	utility/safestr.h
 
 $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
-	litestep/BangManager.h \
 	litestep/buildoptions.h \
 	litestep/resource.h \
 	lsapi/BangCommand.h \
+	lsapi/BangManager.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsapiInit.h \
@@ -446,10 +446,10 @@ $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
 	utility/stringutility.h
 
 $(OUTPUT)/lsapiInit.o: lsapi/lsapiInit.cpp \
-	litestep/BangManager.h \
 	litestep/buildoptions.h \
 	litestep/resource.h \
 	lsapi/BangCommand.h \
+	lsapi/BangManager.h \
 	lsapi/bangs.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsapi.h \
@@ -485,9 +485,9 @@ $(OUTPUT)/match.o: lsapi/match.cpp \
 $(OUTPUT)/MathEvaluate.o: lsapi/MathEvaluate.cpp
 
 $(OUTPUT)/MathParser.o: lsapi/MathParser.cpp \
-	litestep/BangManager.h \
 	litestep/buildoptions.h \
 	lsapi/BangCommand.h \
+	lsapi/BangManager.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsapiInit.h \
@@ -527,10 +527,10 @@ $(OUTPUT)/png_support.o: lsapi/png_support.cpp \
 	utility/safeptr.h
 
 $(OUTPUT)/settings.o: lsapi/settings.cpp \
-	litestep/BangManager.h \
 	litestep/buildoptions.h \
 	litestep/resource.h \
 	lsapi/BangCommand.h \
+	lsapi/BangManager.h \
 	lsapi/lsapi.h \
 	lsapi/lsapidefines.h \
 	lsapi/lsapiInit.h \

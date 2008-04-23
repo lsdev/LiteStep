@@ -23,7 +23,7 @@
 #define LSAPIINIT_H
 
 #include "../utility/common.h"
-#include "../litestep/BangManager.h"
+#include "BangManager.h"
 #include "SettingsManager.h"
 
 enum ErrorType
