@@ -172,6 +172,7 @@ void LSAPIInit::setLitestepVars()
     // Set the variable "litestepdir" since it was never set
     if (SUCCEEDED(StringCchCopy(szTemp, MAX_PATH, m_szLitestepPath)))
     {
+        PathAddBackslashEx(szTemp, MAX_PATH);
         PathQuoteSpaces(szTemp);
         pSM->SetVariable("litestepdir", szTemp);
     }
@@ -190,10 +191,9 @@ void LSAPIInit::setLitestepVars()
     
     if (GetShellFolderPath(CSIDL_APPDATA, szTemp, MAX_PATH))
     {
-        StringCchCat(szTemp, MAX_PATH,
-            "Microsoft\\Internet Explorer\\Quick Launch\\");
-        
+        PathAppend(szTemp, "Microsoft\\Internet Explorer\\Quick Launch\\");
         PathQuoteSpaces(szTemp);
+        
         pSM->SetVariable("quicklaunch", szTemp);
     }
     
@@ -315,10 +315,11 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
     
     if (bReturn)
     {
+        PathAddBackslashEx(szPath, MAX_PATH);
         PathQuoteSpaces(szPath);
+        
         m_smSettingsManager->SetVariable(pszVariable, szPath);
     }
     
     return bReturn;    
 }
-

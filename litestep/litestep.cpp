@@ -213,7 +213,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 		// something really crappy is going on.
 		return -1;
 	}
-	PathAddBackslashEx(szAppPath, MAX_PATH);
 	PathCombine(szRcPath, szAppPath, "step.rc");
 
 	// Parse command line, setting appropriate variables

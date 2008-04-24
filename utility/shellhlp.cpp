@@ -49,11 +49,6 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
         {
             bReturn = SHGetPathFromIDList(pidl, ptzPath) ? true : false;
             
-            if (bReturn)
-            {
-                PathAddBackslashEx(ptzPath, cchPath);
-            }
-            
             pMalloc->Free(pidl);
         }
 
