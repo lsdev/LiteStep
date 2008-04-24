@@ -48,7 +48,7 @@ void SetupBangs()
 	AddBangCommand("!SwitchUser", BangSwitchUser);
 	AddBangCommand("!TileWindowsH", BangTileWindowsH);
 	AddBangCommand("!TileWindowsV", BangTileWindowsV);
-    AddBangCommand("!ToggleModules", BangToggleModules);
+	AddBangCommand("!ToggleModules", BangToggleModules);
 	AddBangCommand("!UnloadModule", BangUnloadModule);
 }
 
@@ -350,7 +350,7 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 	if (hLiteStep)
 	{
 		LPCSTR pszNextToken = pszArgs;
-        char szPath[MAX_LINE_LENGTH] = { 0 };
+		char szPath[MAX_LINE_LENGTH] = { 0 };
 
 		while (GetToken(pszNextToken, szPath, &pszNextToken, TRUE))
 		{
@@ -364,30 +364,72 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 #define EMP_SHOW   1
 #define EMP_TOGGLE 2
 
-//
-// CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
-//
-BOOL CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
+static void EMPHandler(HDWP hDwp, HWND hWnd, UINT uMode)
 {
-    if (IsWindow(hWnd))
-    {
-        long lUserData = GetWindowLong(hWnd, GWL_USERDATA);
+// note: must NOT use SWP_NOSENDCHANGING, as it will not show/hide then.
+#define DEFAULT_FLAGS (SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOMOVE)
 
-        if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
-            (lParam == EMP_HIDE || lParam == EMP_TOGGLE))
-        {
-            SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
-            ShowWindow(hWnd, SW_HIDE);
-        }
-        else if ((lUserData == HIDEmagicDWord) &&
-            (lParam == EMP_SHOW || lParam == EMP_TOGGLE))
-        {
-            SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
-            ShowWindow(hWnd, SW_SHOW);
-        }
-    }
+	if (IsWindow(hWnd))
+	{
+		long lUserData = GetWindowLong(hWnd, GWL_USERDATA);
 
-    return TRUE;
+		if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
+		    (uMode == EMP_HIDE || uMode == EMP_TOGGLE))
+		{
+			SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
+			hDwp = DeferWindowPos(
+				 hDwp
+				,hWnd
+				,NULL
+				,0 ,0
+				,0 ,0
+				,SWP_HIDEWINDOW|DEFAULT_FLAGS
+			);
+		}
+		else if ((lUserData == HIDEmagicDWord) &&
+		         (uMode == EMP_SHOW || uMode == EMP_TOGGLE))
+		{
+			SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
+			hDwp = DeferWindowPos(
+				 hDwp
+				,hWnd
+				,NULL
+				,0 ,0
+				,0 ,0
+				,SWP_SHOWWINDOW|DEFAULT_FLAGS
+			);
+		}
+	}
+}
+
+
+//
+// CALLBACK EnumHideModulesProc(HWND hWnd, LPARAM lParam)
+//
+static BOOL CALLBACK EnumHideModulesProc(HWND hWnd, LPARAM lParam)
+{
+	EMPHandler((HDWP)lParam, hWnd, EMP_HIDE);
+	return TRUE;
+}
+
+
+//
+// CALLBACK EnumShowModulesProc(HWND hWnd, LPARAM lParam)
+//
+static BOOL CALLBACK EnumShowModulesProc(HWND hWnd, LPARAM lParam)
+{
+	EMPHandler((HDWP)lParam, hWnd, EMP_SHOW);
+	return TRUE;
+}
+
+
+//
+// CALLBACK EnumToggleModulesProc(HWND hWnd, LPARAM lParam)
+//
+static BOOL CALLBACK EnumToggleModulesProc(HWND hWnd, LPARAM lParam)
+{
+	EMPHandler((HDWP)lParam, hWnd, EMP_TOGGLE);
+	return TRUE;
 }
 
 
@@ -396,7 +438,9 @@ BOOL CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
 //
 void BangHideModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	EnumWindows(EnumModulesProc, EMP_HIDE);
+	HDWP hDwp = BeginDeferWindowPos(5);
+	EnumWindows(EnumHideModulesProc, (LPARAM)hDwp);
+	EndDeferWindowPos(hDwp);
 }
 
 
@@ -405,7 +449,9 @@ void BangHideModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	EnumWindows(EnumModulesProc, EMP_SHOW);
+	HDWP hDwp = BeginDeferWindowPos(5);
+	EnumWindows(EnumShowModulesProc, (LPARAM)hDwp);
+	EndDeferWindowPos(hDwp);
 }
 
 
@@ -414,5 +460,7 @@ void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangToggleModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-    EnumWindows(EnumModulesProc, EMP_TOGGLE);
+	HDWP hDwp = BeginDeferWindowPos(5);
+	EnumWindows(EnumToggleModulesProc, (LPARAM)hDwp);
+	EndDeferWindowPos(hDwp);
 }
