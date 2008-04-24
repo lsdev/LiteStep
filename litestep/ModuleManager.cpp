@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "ModuleManager.h"
-#include "../utility/macros.h"
 #include <algorithm>
 #include <vector>
 #include "../utility/core.hpp"
