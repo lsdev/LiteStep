@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LSAPIINIT_H
 
 #include "../utility/common.h"
-#include "../litestep/BangManager.h"
+#include "BangManager.h"
 #include "SettingsManager.h"
 
 enum ErrorType
