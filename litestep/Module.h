@@ -32,12 +32,10 @@ private:
 	HINSTANCE m_hInstance;
 	HANDLE m_hThread;
 	HWND m_hMainWindow;
-	HWND m_hThreadWnd;
 	DWORD m_dwThreadID;
 
     std::basic_string<TCHAR> m_tzLocation;
     std::basic_string<TCHAR> m_tzAppPath;
-
 
 	ModuleInitExFunc m_pInitEx;
 	ModuleQuitFunc m_pQuit;
