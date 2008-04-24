@@ -118,17 +118,15 @@ UINT ModuleManager::_LoadModules()
 		{
             char szToken1[MAX_LINE_LENGTH] = { 0 };
             char szToken2[MAX_LINE_LENGTH] = { 0 };
-			char szToken3[MAX_LINE_LENGTH] = { 0 };
 
             // first buffer takes the "LoadModule" token
-            LPSTR lpszBuffers[] = { NULL, szToken1, szToken2, szToken3 };
+            LPSTR lpszBuffers[] = { NULL, szToken1, szToken2 };
             
-			if (LCTokenize(szLine, lpszBuffers, 4, NULL) >= 2)
+			if (LCTokenize(szLine, lpszBuffers, 3, NULL) >= 2)
 			{
 				DWORD dwFlags = 0;
 
-				if ((stricmp(szToken2, "threaded") == 0) ||
-                    (stricmp(szToken3, "threaded") == 0))
+				if (stricmp(szToken2, "threaded") == 0)
 				{
 					dwFlags |= LS_MODULE_THREADED;
 				}
