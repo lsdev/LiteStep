@@ -1134,6 +1134,7 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
 LRESULT TrayService::barSetTaskBarState(const APPBARDATAV1& abd)
 {
     return 0;
+    UNREFERENCED_PARAMETER(abd);
 }
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

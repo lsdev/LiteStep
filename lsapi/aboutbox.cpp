@@ -408,6 +408,7 @@ void AboutDevTeam(HWND hListView)
 
 void AboutLicense(HWND hEdit)
 {
+    UNREFERENCED_PARAMETER(hEdit);
 }
 
 
