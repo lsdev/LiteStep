@@ -187,17 +187,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 {
     HRESULT hr = S_OK;
     
+#ifdef _DEBUG
+    typedef BOOL (WINAPI* IsDebuggerPresentProc)();
+
+    IsDebuggerPresentProc fnIsDebuggerPresent = (IsDebuggerPresentProc)
+        GetProcAddress(GetModuleHandle(_T("kernel32")), "IsDebuggerPresent");
+
+    // If a debugger is attached use the current directory as base path
+    if (fnIsDebuggerPresent && fnIsDebuggerPresent())
+    {
+        if (GetCurrentDirectory(sizeof(szAppPath), szAppPath))
+        {
+            hr = S_OK;
+        }
+    }
+    else
+#endif
     // Determine our application's path
 	if (LSGetModuleFileName(hInstance, szAppPath, sizeof(szAppPath)))
 	{
 		PathRemoveFileSpec(szAppPath);
-		PathAddBackslashEx(szAppPath, MAX_PATH);
 	}
 	else
 	{
 		// something really crappy is going on.
 		return -1;
 	}
+	PathAddBackslashEx(szAppPath, MAX_PATH);
 	PathCombine(szRcPath, szAppPath, "step.rc");
 
 	// Parse command line, setting appropriate variables
