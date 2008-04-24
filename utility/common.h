@@ -26,9 +26,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../litestep/buildoptions.h"
 
 #ifdef _MSC_VER
+#if _MSC_VER == 1200 // VC 6.0
 #  pragma warning(disable: 4786) // STL naming warnings
 #  pragma warning(disable: 4503) // STL naming warnings
-#endif
+#endif // _MSC_VER == 1200
+#endif // _MSC_VER
 
 #if !defined(_WIN32_IE)
 #define _WIN32_IE 0x600
