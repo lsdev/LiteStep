@@ -78,14 +78,14 @@ typedef const APPBARMSGDATAV1 * PCAPPBARMSGDATAV1;
 class AppBar
 {
 public:
-    AppBar::AppBar(HWND hWnd, UINT uMsg)
+    AppBar(HWND hWnd, UINT uMsg)
         :m_hWnd(hWnd)
         ,m_uCallbackMessage(uMsg)
         ,m_lParam(0)
         ,m_uEdge((UINT)-1)
     {
     }
-    AppBar::~AppBar()
+    ~AppBar()
     {
     }
 
