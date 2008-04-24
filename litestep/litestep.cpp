@@ -138,11 +138,11 @@ bool ParseCmdLine(LPCSTR pszCmdLine)
 			{
 				case '-':
 				{
-					if (!stricmp(szToken, "-nostartup"))
+					if (!_stricmp(szToken, "-nostartup"))
 					{
 						g_nStartupMode = STARTUP_DONT_RUN;
 					}
-                    else if (!stricmp(szToken, "-startup"))
+                    else if (!_stricmp(szToken, "-startup"))
                     {
                         g_nStartupMode = STARTUP_FORCE_RUN;
                     }                    

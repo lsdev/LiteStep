@@ -208,7 +208,7 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 
 	if (IsValidStringPtr(pszImage))
 	{
-		if (stricmp(pszImage, ".none") != 0)
+		if (_stricmp(pszImage, ".none") != 0)
 		{
 			char szImage[MAX_PATH];
 			StringCchCopy(szImage, MAX_PATH, pszImage);
@@ -309,7 +309,7 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 			}
 			else
 			{
-				if (!strnicmp(szImage, ".extract", 8 /*strlen(".extract")*/))
+				if (!_strnicmp(szImage, ".extract", 8 /*strlen(".extract")*/))
 				{
 					HICON hIcon = NULL;
 
@@ -409,7 +409,7 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 
 	if (IsValidStringPtr(pszIconPath))
 	{
-		if (stricmp(pszIconPath, ".none") != 0)
+		if (_stricmp(pszIconPath, ".none") != 0)
 		{
 			char szIconPath[MAX_PATH];
 			char szIconLSImagePath[MAX_PATH];
@@ -421,11 +421,11 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 
 			// if .extract but nothing else is there...
 			// then take the file specified as an icon (could probably be done earlier, but anyhow)
-			if (stricmp(pszIconPath, ".extract") == 0)
+			if (_stricmp(pszIconPath, ".extract") == 0)
 			{
 				pszIconFile = (LPSTR)pszFile;
 			}
-			else if (strnicmp(pszIconPath, ".extract=", 9) == 0)
+			else if (_strnicmp(pszIconPath, ".extract=", 9) == 0)
 			{
 				// remove ".extract=" (as we won't use it anyway)
 				pszIconFile = (LPSTR)pszIconPath + 9;

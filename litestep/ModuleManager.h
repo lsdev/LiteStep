@@ -75,7 +75,7 @@ private:
         
         bool operator() (const Module* pModule) const
         {
-            return (stricmp(m_pszLocation, pModule->GetLocation()) == 0);
+            return (_stricmp(m_pszLocation, pModule->GetLocation()) == 0);
         }
         
     private:

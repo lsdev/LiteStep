@@ -83,7 +83,7 @@ BOOL SettingsManager::_FindLine(LPCSTR pszName, SettingsMap::iterator &it)
     // first appearance of a setting takes effect
     it = m_SettingsMap.lower_bound(pszName);
     
-    if (it != m_SettingsMap.end() && stricmp(pszName, it->first.c_str()) == 0)
+    if (it != m_SettingsMap.end() && _stricmp(pszName, it->first.c_str()) == 0)
 	{
 		bReturn = TRUE;
 	}
@@ -185,9 +185,9 @@ BOOL SettingsManager::GetRCBool(LPCSTR pszKeyName, BOOL bIfFound)
 
 		if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
-			if (stricmp(szToken, "off") &&
-                stricmp(szToken, "false") &&
-                stricmp(szToken, "no")) 
+			if (_stricmp(szToken, "off") &&
+                _stricmp(szToken, "false") &&
+                _stricmp(szToken, "no")) 
 			{
 				return bIfFound;
 			}
@@ -217,9 +217,9 @@ BOOL SettingsManager::GetRCBoolDef(LPCSTR pszKeyName, BOOL bDefault)
 		
         if (GetToken(szExpanded, szToken, NULL, FALSE))
 		{
-			if ((stricmp(szToken, "off") == 0) ||
-                (stricmp(szToken, "false") == 0) ||
-                (stricmp(szToken, "no") == 0))
+			if ((_stricmp(szToken, "off") == 0) ||
+                (_stricmp(szToken, "false") == 0) ||
+                (_stricmp(szToken, "no") == 0))
 			{
 				return FALSE;
 			}
