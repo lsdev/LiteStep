@@ -28,12 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string>
 
 using std::string;
-
-#if !defined(CSIDL_COMMON_ADMINTOOLS)
-#  define CSIDL_COMMON_ADMINTOOLS 0x002F
-#  define CSIDL_ADMINTOOLS 0x0030
-#endif
-
 SettingsManager::SettingsManager()
 {
 }
