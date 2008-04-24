@@ -183,8 +183,9 @@ private:
     //
     //
     bool m_bWin2000;
-    bool m_bWorkAreaDirty;
-    RECT m_rWorkArea;
+    UINT m_uWorkAreaDirty;
+    RECT m_rWorkAreaDef; // The Working Area without any appbars.
+    RECT m_rWorkAreaCur; // The Working Area with the appbars.
     HWND m_hNotifyWnd;
     HWND m_hTrayWnd;
     HWND m_hLiteStep;
