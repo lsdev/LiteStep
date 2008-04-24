@@ -78,10 +78,13 @@ struct
 	const char *nick;
 	const char *realName;
 } theDevTeam[] = {
-	 {"ilmcuts", "Simon"}
-	,{"jugg",    "Chris Rempel"}
-	,{"Maduin",  "Kevin Schaffer"}
-	,{"Message", "Bobby G. Vinyard"}
+	 {"Acidfire", "Alexander Vermaat"}
+	,{"ilmcuts",  "Simon"}
+	,{"jugg",     "Chris Rempel"}
+	,{"Maduin",   "Kevin Schaffer"}
+	,{"RabidCow", "Joshua Seagoe"}
+	,{"Tobbe",    "Tobbe Lundberg"}
+	,{"Xjill",    ""}
 };
 
 const unsigned int aboutOptionsCount = sizeof(aboutOptions) / sizeof(aboutOptions[0]);
