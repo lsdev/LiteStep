@@ -42,6 +42,12 @@ STRIP = strip
 # rm
 RM = rm -f
 
+ifeq ($(OS), Windows_NT)
+NULL = 
+else
+NULL = nul
+endif
+
 #-----------------------------------------------------------------------------
 # Files and Paths
 #-----------------------------------------------------------------------------
@@ -139,26 +145,35 @@ HOOKDLLOBJS = $(OUTPUT)/hook.o
 # Rules
 #-----------------------------------------------------------------------------
 
+# all targets
+.PHONY: all
+all: setup $(DLL) $(HOOKDLL) $(EXE)
+
 # litestep.exe
-$(EXE): $(EXEOBJS) $(DLL) $(HOOKDLL)
+$(EXE): setup $(EXEOBJS)
 	$(CXX) -o $(EXE) $(LDFLAGS) $(EXEOBJS) $(EXELIBS)
 ifndef DEBUG
 	$(STRIP) $(EXE)
 endif
 
 # lsapi.dll
-$(DLL): $(DLLOBJS) $(DLLDEF)
+$(DLL): setup $(DLLOBJS) $(DLLDEF)
 	$(DLLWRAP) --driver-name $(CXX) --def $(DLLDEF) --implib $(DLLIMPLIB) -o $(DLL) $(LDFLAGS) $(DLLOBJS) $(DLLLIBS)
 ifndef DEBUG
 	$(STRIP) $(DLL)
 endif
 
 # hook.dll
-$(HOOKDLL): $(HOOKDLLOBJS) $(HOOKDLLDEF)
+$(HOOKDLL): setup $(HOOKDLLOBJS) $(HOOKDLLDEF)
 	$(DLLWRAP) --driver-name $(CXX) --def $(HOOKDLLDEF) --implib $(HOOKDLLIMPLIB) -o $(HOOKDLL) $(LDFLAGS) $(HOOKDLLOBJS) $(HOOKDLLLIBS)
 ifndef DEBUG
 	$(STRIP) $(HOOKDLL)
 endif
+
+# Setup environment
+.PHONY: setup
+setup:
+	-@if not exist $(OUTPUT)/$(NULL) mkdir $(OUTPUT)
 
 # Remove output files
 .PHONY: clean
