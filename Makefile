@@ -69,7 +69,7 @@ EXE = $(OUTPUT)/litestep.exe
 EXELIBS = -L$(OUTPUT) -lhook -llsapi -lole32 -lshlwapi -luuid
 
 # Object files for litestep.exe
-EXEOBJS = $(OUTPUT)/BangCommand.o \
+EXEOBJS = \
 	$(OUTPUT)/DataStore.o \
 	$(OUTPUT)/DDEService.o \
 	$(OUTPUT)/DDEStub.o \
@@ -101,7 +101,8 @@ DLLIMPLIB = $(OUTPUT)/liblsapi.a
 DLLLIBS = -lole32 -lpng -lshlwapi -lz
 
 # Object files for lsapi.dll
-DLLOBJS = $(OUTPUT)/aboutbox.o \
+DLLOBJS = \
+	$(OUTPUT)/aboutbox.o \
 	$(OUTPUT)/BangCommand.o \
 	$(OUTPUT)/BangManager.o \
 	$(OUTPUT)/bangs.o \
@@ -139,7 +140,8 @@ HOOKDLLIMPLIB = $(OUTPUT)/libhook.a
 HOOKDLLLIBS = 
 
 # Object files for hook.dll
-HOOKDLLOBJS = $(OUTPUT)/hook.o
+HOOKDLLOBJS = \
+	$(OUTPUT)/hook.o
 
 #-----------------------------------------------------------------------------
 # Rules
@@ -534,6 +536,8 @@ $(OUTPUT)/match.o: lsapi/match.cpp \
 	lsapi/lsmultimon.h \
 	utility/common.h \
 	utility/debug.hpp
+
+$(OUTPUT)/MathEvaluate.o: lsapi/MathEvaluate.cpp
 
 $(OUTPUT)/MathParser.o: lsapi/MathParser.cpp \
 	litestep/buildoptions.h \
