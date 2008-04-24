@@ -563,6 +563,9 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     // Only update the Default workarea when set externally.
                     CopyRect(&pTrayService->m_rWorkAreaDef, &rc);
                     
+                    // Clean up any dead app bars before repositioning
+                    pTrayService->removeDeadAppBars();
+                    
                     // Now reposition our appbars based on the new default workarea.
                     PostMessage(
                          pTrayService->m_hTrayWnd
@@ -604,6 +607,8 @@ LRESULT CALLBACK TrayService::WindowNotifyProc(HWND hWnd, UINT uMsg, WPARAM wPar
 LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
 {
     LRESULT lResult = 0;
+    
+    removeDeadAppBars();
     
     switch(psad->dwMessage)
     {
@@ -679,6 +684,34 @@ void TrayService::NotifyRudeApp(bool bIsFullScreen) const
         );
     }
 }
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// removeDeadAppBars
+//
+// Removes all "dead" appBars.  ie. Those that no longer have a valid HWND
+// associated with them.
+//
+void TrayService::removeDeadAppBars()
+{
+    BarVector::iterator it = m_abVector.begin();
+    
+    while(it != m_abVector.end())
+    {
+        if(IsWindow((*it)->hWnd()))
+        {
+            it++;
+            continue;
+        }
+        
+        delete *it;
+        it = m_abVector.erase(it);
+    }
+    
+    return;
+}
+
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
@@ -1286,6 +1319,8 @@ void TrayService::adjustWorkArea()
     )
     {
         AppBar* p = *it;
+        
+        if(!IsWindow(p->hWnd())) continue;
         
         if(p && !p->IsOverLap() && (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
         {
