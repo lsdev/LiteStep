@@ -25,6 +25,11 @@
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
+#ifdef LS_COMPAT_MATH
+#include <string>
+using std::string;
+#endif // LS_COMPAT_MATH
+
 SettingsManager::SettingsManager()
 {
 }
