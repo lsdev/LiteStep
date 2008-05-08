@@ -47,9 +47,6 @@ int GetClientWidth(HWND hWnd);
 void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
 void SetCompileTime(HWND hWnd, int nItem);
- 
-// Pointer macro used by GetCompileTime
-#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
 
 // Global handle to the running AboutBox instance (if any)
 HWND g_hAboutbox = NULL;
@@ -84,9 +81,9 @@ struct
 	const char *realName;
 } theDevTeam[] = {
 	 {"Acidfire", "Alexander Vermaat"}
-	,{"ilmcuts", "Simon"}
-	,{"jugg",    "Chris Rempel"}
-	,{"Maduin",  "Kevin Schaffer"}
+	,{"ilmcuts",  "Simon"}
+	,{"jugg",     "Chris Rempel"}
+	,{"Maduin",   "Kevin Schaffer"}
 	,{"RabidCow", "Joshua Seagoe"}
 	,{"Tobbe",    "Tobbe Lundberg"}
 	,{"Xjill",    ""}
@@ -712,22 +709,24 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 
 // Gets the compiletime/date from the PE header and sets a DlgItem
 //
+#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
 void SetCompileTime(HWND hWnd, int nItem)
 {
 	IMAGE_DOS_HEADER* dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
+	ASSERT(dosheader);
 	ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
 	IMAGE_NT_HEADERS* ntheader = MakePtr(IMAGE_NT_HEADERS*,
 		dosheader, dosheader->e_lfanew);
+	ASSERT(ntheader);
 
-	// Subtract 21600 (=60*60*6) seconds for CST (CVS server time)
-	time_t time = time_t(ntheader->FileHeader.TimeDateStamp) - 21600;
-	tm* timeStruct = gmtime(&time);
+	time_t compiletime = time_t(ntheader->FileHeader.TimeDateStamp);
+	tm* timeStruct = gmtime(&compiletime);
 
 	if (timeStruct)
 	{
 		TCHAR timeBuf[40] = { 0 };
 		if(_tcsftime(timeBuf, COUNTOF(timeBuf),
-			_T("Compiled on %b %d %Y at %H:%M:%S CST"), timeStruct) == 39)
+			_T("Compiled on %b %d %Y at %H:%M:%S UTC"), timeStruct) == 39)
 		{
 			SetDlgItemText(hWnd, nItem, timeBuf);
 		}
