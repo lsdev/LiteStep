@@ -891,43 +891,25 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                      * Note: The ShellHook will always set the HighBit when there
                      * is any full screen app on the desktop, even if it does not
                      * have focus.  Because of this, we have no easy way to tell
-                     * if the currently activated app is full screen or not. Thus
-                     * we will always hide our modules and appbars even when the
-                     * current application is not full screen but a full screen app
-                     * exists.  We could work around this by checking the window's
-                     * bounding RECT using GetWindowRect().  However, for now only
-                     * send notifications if the state has changed. (ie. when there
-                     * are no more full screen applications, or when the first full
-                     * screen app is displayed.  The correct behavior for this is
-                     * to hide when a full screen app is active, and to show when a
-                     * non full screen app is active. So, fix with a clean solution.
+                     * if the currently activated app is full screen or not.
+                     * This is worked around by checking the window's actual size
+                     * against the screen size.  The correct behavior for this is
+                     * to hide when a full screen app is active, and to show when
+                     * a non full screen app is active.
                      */
-                    if ((0 != lParam) && (m_bAppIsFullScreen == false))
+                    
+                    if (lParam != 0 && !m_bAppIsFullScreen)
                     {
-                        m_bAppIsFullScreen = true;
-
-                        if (m_pTrayService)
-                        {
-                            m_pTrayService->NotifyRudeApp(true);
-                        }
-
-                        if (m_bAutoHideModules)
-                        {
-                            ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
+                        if (_IsFullScreenActive())
+                        { 
+                            _HandleFullScreenApp(true);
                         }
                     }
-                    else if ((0 == lParam) && (m_bAppIsFullScreen == true))
+                    else if (m_bAppIsFullScreen)
                     {
-                        m_bAppIsFullScreen = false;
-
-                        if (m_bAutoHideModules)
+                        if (lParam == 0 || !_IsFullScreenActive())
                         {
-                            ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
-                        }
-
-                        if (m_pTrayService)
-                        {
-                            m_pTrayService->NotifyRudeApp(false);
+                            _HandleFullScreenApp(false);
                         }
                     }
                 }
@@ -1203,4 +1185,82 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
     }
 
     return hr;
+}
+
+bool CLiteStep::_IsFullScreenActive()
+{
+    /**
+     * When this function is called the window that is going fullscreen might
+     * not have finished resizing yet.  Calling GetForgroundWindow to get the 
+     * handle of the top most window and then calling GetWindowRect with that 
+     * handle will return the fullscreen size of that window most of the time
+     * but not always.  Using GetWindowPlacement and the rcNormalPosition you
+     * get from that works better than GetWindowRect, especially for the Remote
+     * Desktop program in WinXP SP2.  Not even that seems to be enough on some
+     * computers though.  The most reliable solution found this far is to call
+     * Sleep(1) at the beginning of the function to make sure the window that
+     * might be fullscreen has time to finish resizing.
+     */
+
+    Sleep(1); //Give the window some time to finish resizing
+
+    RECT rWnd, rScreen = {0};
+    HWND hWnd = GetForegroundWindow();
+
+    if (!IsWindow(hWnd)) {
+        return false;
+    }
+
+    rScreen.right = GetSystemMetrics(SM_CXSCREEN);
+    rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+
+    // A window might still not be in its full screen state when we
+    // get here (wp.showCmd is sometimes equal to SW_SHOWMINIMIZED),
+    // so calling GetWindowRect will not always give us the expected
+    // dimensions. Using GetWindowPlacement and its rcNormalPosition
+    // RECT will however. It gets us the size the window will have
+    // after it has finished resizing.
+
+    WINDOWPLACEMENT wp = {0};
+    wp.length = sizeof(WINDOWPLACEMENT);
+    ASSERT(GetWindowPlacement(hWnd, &wp));
+
+    CopyRect(&rWnd, &wp.rcNormalPosition);
+
+    // If the window does not have WS_EX_TOOLWINDOW set then the
+    // coordinates are workspace coordinates and we must fix this.
+    if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
+    {
+        RECT rWA = {0};
+        ASSERT(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0));
+
+        rWnd.left += rWA.left;
+        rWnd.right += rWA.left;
+        rWnd.top += rWA.top;
+        rWnd.bottom += rWA.top;
+    }
+
+    return FALSE != EqualRect(&rScreen, &rWnd);
+}
+
+void CLiteStep::_HandleFullScreenApp(bool isFullscreen)
+{
+    m_bAppIsFullScreen = isFullscreen;
+
+    if (m_pTrayService)
+    {
+        m_pTrayService->NotifyRudeApp(isFullscreen);
+    }
+
+    if (m_bAutoHideModules)
+    {
+        if (isFullscreen)
+        {
+            ParseBangCommand(m_hMainWindow, "!HIDEMODULES", NULL);
+        }
+        else
+        {
+            ParseBangCommand(m_hMainWindow, "!SHOWMODULES", NULL);
+        }
+    }
 }
