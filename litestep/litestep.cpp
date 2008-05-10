@@ -1071,7 +1071,8 @@ bool CLiteStep::_IsFullScreenActiveOnPrimaryMonitor()
 
         WINDOWPLACEMENT wp = {0};
         wp.length = sizeof(WINDOWPLACEMENT);
-        if (GetWindowPlacement(hWnd, &wp)) {
+        if (GetWindowPlacement(hWnd, &wp))
+        {
             CopyRect(&rWnd, &wp.rcNormalPosition);
 
             // If the window does not have WS_EX_TOOLWINDOW set then the
@@ -1088,7 +1089,8 @@ bool CLiteStep::_IsFullScreenActiveOnPrimaryMonitor()
             }
         }
 
-        if (EqualRect(&rScreen, &rWnd)) {
+        if (EqualRect(&rScreen, &rWnd))
+        {
             isFullScreen = true;
         }
     }
