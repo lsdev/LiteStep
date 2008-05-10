@@ -753,19 +753,15 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                      * a non full screen app is active.
                      */
 
-                    if (lParam != 0 && !m_bAppIsFullScreen)
+                    if (!m_bAppIsFullScreen && lParam != 0 && 
+                        _IsFullScreenActiveOnPrimaryMonitor())
                     {
-                        if (_IsFullScreenActive())
-                        {
-                            _HandleFullScreenApp(true);
-                        }
+                        _HandleFullScreenApp(true);
                     }
-                    else if (m_bAppIsFullScreen)
+                    else if (m_bAppIsFullScreen && 
+                        (lParam == 0 || !_IsFullScreenActiveOnPrimaryMonitor()))
                     {
-                        if (lParam == 0 || !_IsFullScreenActive())
-                        {
-                            _HandleFullScreenApp(false);
-                        }
+                        _HandleFullScreenApp(false);
                     }
                 }
             }
@@ -1030,7 +1026,7 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
     return hr;
 }
 
-bool CLiteStep::_IsFullScreenActive()
+bool CLiteStep::_IsFullScreenActiveOnPrimaryMonitor()
 {
     /**
      * When this function is called the window that is going fullscreen might
@@ -1047,43 +1043,57 @@ bool CLiteStep::_IsFullScreenActive()
 
     Sleep(1); //Give the window some time to finish resizing
 
-    RECT rWnd, rScreen = {0};
+    bool isFullScreen = false;
     HWND hWnd = GetForegroundWindow();
+    HMONITOR hmon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
+    POINT p = {0, 0};
 
-    if (!IsWindow(hWnd)) {
-        return false;
-    }
-
-    rScreen.right = GetSystemMetrics(SM_CXSCREEN);
-    rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-
-    // A window might still not be in its full screen state when we
-    // get here (wp.showCmd is sometimes equal to SW_SHOWMINIMIZED),
-    // so calling GetWindowRect will not always give us the expected
-    // dimensions. Using GetWindowPlacement and its rcNormalPosition
-    // RECT will however. It gets us the size the window will have
-    // after it has finished resizing.
-
-    WINDOWPLACEMENT wp = {0};
-    wp.length = sizeof(WINDOWPLACEMENT);
-    ASSERT(GetWindowPlacement(hWnd, &wp));
-
-    CopyRect(&rWnd, &wp.rcNormalPosition);
-
-    // If the window does not have WS_EX_TOOLWINDOW set then the
-    // coordinates are workspace coordinates and we must fix this.
-    if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
+    if (IsWindow(hWnd) && hmon == MonitorFromPoint(p, MONITOR_DEFAULTTONULL))
     {
-        RECT rWA = {0};
-        ASSERT(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0));
+        RECT rWnd, rScreen = {0};
+        MONITORINFO mi = {sizeof(mi)};
 
-        rWnd.left += rWA.left;
-        rWnd.right += rWA.left;
-        rWnd.top += rWA.top;
-        rWnd.bottom += rWA.top;
+        rScreen.right = GetSystemMetrics(SM_CXSCREEN);
+        rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+
+        if (GetMonitorInfo(hmon, &mi))
+        {
+            rScreen.right = mi.rcMonitor.right - mi.rcMonitor.left;
+            rScreen.bottom = mi.rcMonitor.bottom - mi.rcMonitor.top;
+        }
+
+        // A window might still not be in its full screen state when we
+        // get here (wp.showCmd is sometimes equal to SW_SHOWMINIMIZED),
+        // so calling GetWindowRect will not always give us the expected
+        // dimensions. Using GetWindowPlacement and its rcNormalPosition
+        // RECT will however. It gets us the size the window will have
+        // after it has finished resizing.
+
+        WINDOWPLACEMENT wp = {0};
+        wp.length = sizeof(WINDOWPLACEMENT);
+        if (GetWindowPlacement(hWnd, &wp)) {
+            CopyRect(&rWnd, &wp.rcNormalPosition);
+
+            // If the window does not have WS_EX_TOOLWINDOW set then the
+            // coordinates are workspace coordinates and we must fix this.
+            if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
+            {
+                RECT rWA = {0};
+                ASSERT(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0));
+
+                rWnd.left += rWA.left;
+                rWnd.right += rWA.left;
+                rWnd.top += rWA.top;
+                rWnd.bottom += rWA.top;
+            }
+        }
+
+        if (EqualRect(&rScreen, &rWnd)) {
+            isFullScreen = true;
+        }
     }
 
-    return FALSE != EqualRect(&rScreen, &rWnd);
+    return isFullScreen;
 }
 
 void CLiteStep::_HandleFullScreenApp(bool isFullscreen)
