@@ -85,6 +85,8 @@ private:
 
 	bool m_bAutoHideModules;
 	bool m_bAppIsFullScreen; // = false;
+	bool _IsFullScreenActive(); // LSAutoHideModules helper
+	void _HandleFullScreenApp(bool isFullscreen);
 
 	// Windows
 	HWND m_hMainWindow; // = NULL;
