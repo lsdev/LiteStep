@@ -1,7 +1,7 @@
 /*
 This is a part of the LiteStep Shell Source code.
 
-Copyright (C) 2001-2007 The LiteStep Development Team
+Copyright (C) 2001-2008 The LiteStep Development Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -84,9 +84,7 @@ struct
 	,{"ilmcuts",  "Simon"}
 	,{"jugg",     "Chris Rempel"}
 	,{"Maduin",   "Kevin Schaffer"}
-	,{"RabidCow", "Joshua Seagoe"}
 	,{"Tobbe",    "Tobbe Lundberg"}
-	,{"Xjill",    ""}
 };
 
 const unsigned int aboutOptionsCount = sizeof(aboutOptions) / sizeof(aboutOptions[0]);
@@ -103,7 +101,7 @@ const char * lsLicense = \
  "LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
  "\r\n"
  "Copyright (C) 1997-1998  Francis Gastellu\r\n"
- "Copyright (C) 1998-2007  Litestep Development Team\r\n"
+ "Copyright (C) 1998-2008  Litestep Development Team\r\n"
  "\r\n"
  "This program is free software; you can redistribute it and/or modify it under "
  "the terms of the GNU General Public License as published by the Free Software "
@@ -240,7 +238,7 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 (WPARAM)hTitleFont, FALSE);
 
 			// set title with LS version
-			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.8-pre");
+			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.24.8");
 
 			// set Theme info
             char themeAuthor[16] = { 0 };
