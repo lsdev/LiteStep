@@ -914,7 +914,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     }
                 }
             }
-
+            
             if (m_pMessageManager && m_pMessageManager->HandlerExists(uMsg))
 			{
                 lReturn = m_pMessageManager->SendMessage(uMsg, wParam, lParam);
@@ -1207,7 +1207,8 @@ bool CLiteStep::_IsFullScreenActive()
     RECT rWnd, rScreen = {0};
     HWND hWnd = GetForegroundWindow();
 
-    if (!IsWindow(hWnd)) {
+    if (!IsWindow(hWnd))
+    {
         return false;
     }
 
