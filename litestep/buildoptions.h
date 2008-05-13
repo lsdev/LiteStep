@@ -53,4 +53,7 @@
 // 0.24.8 default: DISABLED
 //#define LS_CUSTOM_INCLUDEFOLDER
 
+// Makes lsapi use picoPNG instead of zlib+libpng
+//#define LS_USE_PICOPNG
+
 #endif // BUILDOPTIONS_H

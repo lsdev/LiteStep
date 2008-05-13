@@ -23,6 +23,111 @@
 #include "png_support.h"
 #include "../utility/safeptr.h"
 
+#ifdef LS_USE_PICOPNG
+
+#include <vector>
+#include <fstream>
+#include "picopng.h"
+
+//designed for loading files from hard disk in an std::vector
+void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) 
+{
+	std::ifstream file(filename.c_str(), 
+		std::ios::in|std::ios::binary|std::ios::ate);
+
+	if (!file)
+	{
+		return;
+	}
+
+	//get file size
+	std::streamsize size = 0;
+	if (file.seekg(0, std::ios::end).good())
+	{
+		size = file.tellg();
+	}
+
+	if (file.seekg(0, std::ios::beg).good())
+	{
+		size -= file.tellg();
+	}
+
+	//read contents of the file into the vector
+	buffer.resize(static_cast<size_t>(size));
+	if (size > 0)
+	{
+		file.read(reinterpret_cast<char*>(&buffer[0]), size);
+	}
+}
+
+HBITMAP LoadFromPNG(LPCSTR pszFilename)
+{
+	if (pszFilename == NULL)
+	{
+		return NULL;
+	}
+
+	//load and decode
+	std::vector<unsigned char> buffer, image, palette;
+	loadFile(buffer, pszFilename);
+
+	if (buffer.empty())
+	{
+		return NULL;
+	}
+
+	unsigned long w, h;
+	int bpp;
+	int error = decodePNG(image, w, h, &buffer[0], 
+		static_cast<unsigned long>(buffer.size()));
+
+	if (error != 0)
+	{
+		return NULL;
+		//std::cout << "error: " << error << std::endl;
+	}
+
+	if (image.size() <= 4)
+	{
+		return NULL;
+	}
+
+	BITMAPINFO bmi = {0};
+	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.bmiHeader.biWidth = w;
+	bmi.bmiHeader.biHeight = h;
+	bmi.bmiHeader.biBitCount = 24;
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biCompression = BI_RGB;
+
+	unsigned char* bits;
+	HBITMAP hDibSection = CreateDIBSection(NULL, &bmi, 0, 
+		reinterpret_cast<LPVOID*>(&bits), NULL, 0);
+	std::vector<unsigned char> bgr;
+	for (int i = image.size() - 1; i >= 0; i -= 4)
+	{
+		bgr.push_back(image[i - 1]);
+		bgr.push_back(image[i - 2]);
+		bgr.push_back(image[i - 3]);
+
+		if ((i - 3) % (w * 4) == 0)
+		{
+			int s = bgr.size();
+			while ((s & 3) != 0)
+			{
+				// add padding
+				bgr.push_back(0);
+				s++;
+			}
+		}
+	}
+
+	memcpy(bits, &(bgr[0]), bgr.size());
+
+	return hDibSection;
+}
+
+#else
 
 typedef struct _PNGERROR
 {
@@ -44,7 +149,6 @@ void PNGErrorHandler(png_structp PngStruct, png_const_charp Message)
 	}
 }
 
-
 png_voidp ls_png_malloc(png_structp /* png_ptr */, png_size_t size)
 {
 	return malloc(size);
@@ -62,7 +166,6 @@ void ls_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
 	fread(data, 1, length, file);
 }
-
 
 //
 // In order to avoid CRT mismatches, we override all CRT functions libpng uses
@@ -153,9 +256,9 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 							bmi.bmiHeader.biPlanes = 1;
 							bmi.bmiHeader.biCompression = BI_RGB;
 
-							unsigned char* Bits;
-							hDibSection = CreateDIBSection(NULL, &bmi, 0, reinterpret_cast<LPVOID*>(&Bits), NULL, 0);
-							if (!Bits)
+							unsigned char* bits;
+							hDibSection = CreateDIBSection(NULL, &bmi, 0, reinterpret_cast<LPVOID*>(&bits), NULL, 0);
+							if (!bits)
 							{
 								longjmp(PngError.ErrorJump, 1);
 							}
@@ -166,7 +269,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 							{
 								for (int y = 0; y < -bmi.bmiHeader.biHeight; y++)
 								{
-									unsigned char* Scanline = reinterpret_cast<unsigned char*>(Bits + (y * dib_bytes_per_scanline));
+									unsigned char* Scanline = reinterpret_cast<unsigned char*>(bits + (y * dib_bytes_per_scanline));
 									png_read_row(Read, Scanline, NULL);
 								}
 							}
@@ -192,3 +295,5 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 
 	return hDibSection;
 }
+
+#endif
