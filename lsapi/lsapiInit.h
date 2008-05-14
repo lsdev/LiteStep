@@ -53,7 +53,7 @@ class LSAPIInit
 private:
     bool setShellFolderVariable(LPCSTR pszVariable, int nFolder);
     void setLitestepVars();
-	void GetCompileTime(LPTSTR ptzTemp);
+    void getCompileTime(LPSTR pszValue, size_t cchValue);
     
 public:
     LSAPIInit();
