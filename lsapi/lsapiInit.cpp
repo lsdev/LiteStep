@@ -300,7 +300,8 @@ void LSAPIInit::setLitestepVars()
     StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
     pSM->SetVariable("ResolutionY", szTemp);
     
-    GetCompileTime(szTemp);
+    // build date/time from PE headers
+    getCompileTime(szTemp, MAX_PATH);
     pSM->SetVariable("CompileDate", szTemp);
     
 #ifdef LS_CUSTOM_INCLUDEFOLDER
@@ -325,10 +326,10 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
     return bReturn;    
 }
 
-// Gets the compiletime/date from the PE header and sets a DlgItem
+// Gets the compiletime/date from the PE header
 //
 #define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
-void LSAPIInit::GetCompileTime(LPTSTR ptzTemp)
+void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
 {
     IMAGE_DOS_HEADER* dosheader;
     IMAGE_NT_HEADERS* ntheader;
@@ -368,11 +369,10 @@ void LSAPIInit::GetCompileTime(LPTSTR ptzTemp)
     
     if (timeStruct)
     {
-        _tcsftime(ptzTemp, MAX_PATH,
-            _T("Compiled on %b %d %Y at %H:%M:%S UTC"), timeStruct);
+        _tcsftime(pszValue, cchValue, _T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), timeStruct);
     }
-	else
-	{
-		StringCchPrintf(ptzTemp, MAX_PATH, "\"Compiled at an unknown time\"");
-	}
+    else
+    {
+        StringCchPrintf(pszValue, cchValue, "\"Compiled at an unknown time\"");
+    }
 }

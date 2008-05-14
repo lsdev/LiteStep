@@ -22,7 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include <commctrl.h>
 #include <math.h>
-#include <time.h>
 #include "../utility/core.hpp"
 
 extern const char rcsRevision[];
@@ -45,7 +44,6 @@ HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
 int GetClientWidth(HWND hWnd);
 void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
-void SetCompileTime(HWND hWnd, int nItem);
 
 
 // Global handle to the running AboutBox instance (if any)
