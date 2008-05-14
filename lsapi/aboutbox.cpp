@@ -23,7 +23,6 @@
 #include "../utility/macros.h"
 #include <commctrl.h>
 #include <math.h>
-#include <time.h>
 #include "../utility/core.hpp"
 
 extern const char rcsRevision[];
@@ -46,7 +45,6 @@ HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
 int GetClientWidth(HWND hWnd);
 void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
-void SetCompileTime(HWND hWnd, int nItem);
 
 // Global handle to the running AboutBox instance (if any)
 HWND g_hAboutbox = NULL;
@@ -263,7 +261,9 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			SetDlgItemText(hWnd, IDC_THEME_INFO, themeOut);
 
 			// set compile time
-			SetCompileTime(hWnd, IDC_COMPILETIME);
+			char compileTime[42] = {0};
+			LSGetVariableEx("CompileDate", compileTime, 42);
+			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
 
 			// set the License Notice text
 			SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
@@ -705,30 +705,4 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 
 	StringCchPrintf(pszBuffer, cchBuffer,
 		"%d %s", (int)floor(dValue + 0.5), units[uUnit]);
-}
-
-// Gets the compiletime/date from the PE header and sets a DlgItem
-//
-#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
-void SetCompileTime(HWND hWnd, int nItem)
-{
-	IMAGE_DOS_HEADER* dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
-	ASSERT(dosheader);
-	ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
-	IMAGE_NT_HEADERS* ntheader = MakePtr(IMAGE_NT_HEADERS*,
-		dosheader, dosheader->e_lfanew);
-	ASSERT(ntheader);
-
-	time_t compiletime = time_t(ntheader->FileHeader.TimeDateStamp);
-	tm* timeStruct = gmtime(&compiletime);
-
-	if (timeStruct)
-	{
-		TCHAR timeBuf[40] = { 0 };
-		if(_tcsftime(timeBuf, COUNTOF(timeBuf),
-			_T("Compiled on %b %d %Y at %H:%M:%S UTC"), timeStruct) == 39)
-		{
-			SetDlgItemText(hWnd, nItem, timeBuf);
-		}
-	}
 }

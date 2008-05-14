@@ -24,6 +24,7 @@
 #include "bangs.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
+#include <time.h>
 
 LSAPIInit g_LSAPIManager;
 
@@ -297,7 +298,7 @@ void LSAPIInit::setLitestepVars()
     StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
     pSM->SetVariable("ResolutionY", szTemp);
     
-    StringCchPrintf(szTemp, MAX_PATH, "\"%s\"", __DATE__);
+    GetCompileTime(szTemp);
     pSM->SetVariable("CompileDate", szTemp);
     
 #ifdef LS_CUSTOM_INCLUDEFOLDER
@@ -320,4 +321,30 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
     }
     
     return bReturn;
+}
+
+// Gets the compiletime/date from the PE header and sets a DlgItem
+//
+#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
+void LSAPIInit::GetCompileTime(LPTSTR ptzTemp)
+{
+	IMAGE_DOS_HEADER* dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
+	ASSERT(dosheader);
+	ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
+	IMAGE_NT_HEADERS* ntheader = MakePtr(IMAGE_NT_HEADERS*,
+		dosheader, dosheader->e_lfanew);
+	ASSERT(ntheader);
+
+	time_t compiletime = time_t(ntheader->FileHeader.TimeDateStamp);
+	tm* timeStruct = gmtime(&compiletime);
+
+	if (timeStruct)
+	{
+		_tcsftime(ptzTemp, MAX_PATH,
+			_T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), timeStruct);
+	}
+	else
+	{
+		StringCchPrintf(ptzTemp, MAX_PATH, "\"Compiled at an unknown time\"");
+	}
 }
