@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "bangs.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
+#include <time.h>
 
 LSAPIInit g_LSAPIManager;
 
@@ -299,7 +300,7 @@ void LSAPIInit::setLitestepVars()
     StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
     pSM->SetVariable("ResolutionY", szTemp);
     
-    StringCchPrintf(szTemp, MAX_PATH, "\"%s\"", __DATE__);
+    GetCompileTime(szTemp);
     pSM->SetVariable("CompileDate", szTemp);
     
 #ifdef LS_CUSTOM_INCLUDEFOLDER
@@ -322,4 +323,56 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
     }
     
     return bReturn;    
+}
+
+// Gets the compiletime/date from the PE header and sets a DlgItem
+//
+#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
+void LSAPIInit::GetCompileTime(LPTSTR ptzTemp)
+{
+    IMAGE_DOS_HEADER* dosheader;
+    IMAGE_NT_HEADERS* ntheader;
+    time_t lsexetime;
+    time_t lsapitime;
+    time_t hooktime = 0;
+    time_t compiletime;
+    
+    // Get the litestep.exe build time.
+    dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
+    ASSERT(dosheader);
+    ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
+    ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
+    ASSERT(ntheader);
+    lsexetime = (time_t)(ntheader->FileHeader.TimeDateStamp);
+    
+    // Get the lsapi.dll build time (TODO: don't hardcode "lsapi.dll")
+    dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(_T("lsapi.dll"));
+    ASSERT(dosheader);
+    ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
+    ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
+    ASSERT(ntheader);
+    lsapitime = (time_t)(ntheader->FileHeader.TimeDateStamp);
+    
+    // Get the hook.dll build time (TODO: don't hardcode "hook.dll")
+    dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(_T("hook.dll"));
+    if(dosheader)
+    {
+        ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
+        ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
+        ASSERT(ntheader);
+        hooktime = (time_t)(ntheader->FileHeader.TimeDateStamp);
+    }
+    
+    compiletime = max(lsexetime, max(lsapitime, hooktime));
+    tm* timeStruct = gmtime(&compiletime);
+    
+    if (timeStruct)
+    {
+        _tcsftime(ptzTemp, MAX_PATH,
+            _T("Compiled on %b %d %Y at %H:%M:%S UTC"), timeStruct);
+    }
+	else
+	{
+		StringCchPrintf(ptzTemp, MAX_PATH, "\"Compiled at an unknown time\"");
+	}
 }

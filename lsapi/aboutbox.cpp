@@ -261,7 +261,9 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			SetDlgItemText(hWnd, IDC_THEME_INFO, themeOut);
 
 			// set compile time
-			SetCompileTime(hWnd, IDC_COMPILETIME);
+			char compileTime[42] = {0};
+			LSGetVariableEx("CompileDate", compileTime, 42);
+			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
 
 			// set the License Notice text
 			SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
@@ -711,56 +713,4 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 
 	StringCchPrintf(pszBuffer, cchBuffer,
         "%d %s", (int)floor(dValue + 0.5), units[uUnit]);
-}
-
-// Gets the compiletime/date from the PE header and sets a DlgItem
-//
-#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
-void SetCompileTime(HWND hWnd, int nItem)
-{
-    IMAGE_DOS_HEADER* dosheader;
-    IMAGE_NT_HEADERS* ntheader;
-    time_t lsexetime;
-    time_t lsapitime;
-    time_t hooktime = 0;
-    time_t compiletime;
-    
-    // Get the litestep.exe build time.
-    dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
-    ASSERT(dosheader);
-    ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
-    ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
-    ASSERT(ntheader);
-    lsexetime = (time_t)(ntheader->FileHeader.TimeDateStamp);
-    
-    // Get the lsapi.dll build time (TODO: don't hardcode "lsapi.dll")
-    dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(_T("lsapi.dll"));
-    ASSERT(dosheader);
-    ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
-    ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
-    ASSERT(ntheader);
-    lsapitime = (time_t)(ntheader->FileHeader.TimeDateStamp);
-    
-    // Get the hook.dll build time (TODO: don't hardcode "hook.dll")
-    dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(_T("hook.dll"));
-    if(dosheader)
-    {
-        ASSERT(dosheader->e_magic == IMAGE_DOS_SIGNATURE);
-        ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
-        ASSERT(ntheader);
-        hooktime = (time_t)(ntheader->FileHeader.TimeDateStamp);
-    }
-    
-    compiletime = max(lsexetime, max(lsapitime, hooktime));
-    tm* timeStruct = gmtime(&compiletime);
-    
-    if (timeStruct)
-    {
-        TCHAR timeBuf[40] = { 0 };
-        if(_tcsftime(timeBuf, sizeof(timeBuf)/sizeof(TCHAR),
-            _T("Compiled on %b %d %Y at %H:%M:%S UTC"), timeStruct) == 39)
-        {
-            SetDlgItemText(hWnd, nItem, timeBuf);
-        }
-    }
 }
