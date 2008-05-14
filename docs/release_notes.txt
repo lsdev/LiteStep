@@ -925,8 +925,8 @@ LoadModule $LiteStepDir$popup2.dll    ; popup2-2.1.5.zip
 *Hotkey WIN+SHIFT  M   !RestoreWindows
 *Hotkey WIN        R   !run
 
-; NOTE: pressing CTRL+ESC or the Windows Key will display the popup menu.
-; The popup automatically configures those hotkeys.
+; NOTE: pressing CTRL+ESC or the Windows Key will display the Popup Menu.
+; The Hotkey module automatically configures those hotkeys by default.
 
 ; Next, we will configure a basic Popup Menu.
 HotlistName "LiteStep 0.24.8"
