@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "ModuleManager.h"
-#include "../utility/macros.h"
 #include <algorithm>
 #include <vector>
 #include "../utility/core.hpp"
