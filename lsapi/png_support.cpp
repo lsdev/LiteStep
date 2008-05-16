@@ -19,12 +19,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include <png.h>
 #include "png_support.h"
-#include "../utility/safeptr.h"
 
 #ifdef LS_USE_PICOPNG
-
 #include <vector>
 #include <fstream>
 #include "picopng.h"
@@ -77,7 +74,6 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	}
 
 	unsigned long w, h;
-	int bpp;
 	int error = decodePNG(image, w, h, &buffer[0], 
 		static_cast<unsigned long>(buffer.size()));
 
@@ -127,7 +123,10 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	return hDibSection;
 }
 
-#else
+#else // LS_USE_PICOPNG
+
+#include <png.h>
+#include "../utility/safeptr.h"
 
 typedef struct _PNGERROR
 {
@@ -296,4 +295,4 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	return hDibSection;
 }
 
-#endif
+#endif // LS_USE_PICOPNG
