@@ -939,7 +939,7 @@ PopupNoBevel
 *Popup "My Computer" !PopupMyComputer
 *Popup !Separator
 IF Win9x
-*Popup "Start Menu" !PopupDynamicfolder:$Startmenu$
+*Popup "Start Menu" !PopupDynamicfolder:"$Startmenu$"
 ENDIF
 IF WinNT
 *Popup "Start Menu" !PopupDynamicfolder:"$Startmenu$|$CommonStartMenu$"
