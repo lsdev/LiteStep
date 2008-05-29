@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -21,14 +21,15 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,24,7,0
- PRODUCTVERSION 0,24,7,0
+ FILEVERSION 0,24,8,0
+ PRODUCTVERSION 0,24,8,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -43,15 +44,16 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "Comments", "http://www.lsdev.org/"
-            VALUE "CompanyName", "Litestep Development Team"
-            VALUE "FileDescription", "Litestep Module API"
-            VALUE "FileVersion", "0, 24, 7, 0"
-            VALUE "InternalName", "LSAPI"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2005"
-            VALUE "OriginalFilename", "lsapi.dll"
-            VALUE "ProductName", "Litestep"
-            VALUE "ProductVersion", "0, 24, 7, 0"
+            VALUE "Comments", "http://www.lsdev.org/\0"
+            VALUE "CompanyName", "LiteStep Development Team\0"
+            VALUE "FileDescription", "LiteStep Module API\0"
+            VALUE "FileVersion", "0.24.8 RC1\0"
+            VALUE "InternalName", "LSAPI\0"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2008\0"
+            VALUE "OriginalFilename", "lsapi.dll\0"
+            VALUE "ProductName", "LiteStep\0"
+            VALUE "ProductVersion", "0.24.8 RC1\0"
+            VALUE "SpecialBuild", "Release Candidate 1\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -60,24 +62,27 @@ BEGIN
     END
 END
 
+#endif    // !_MAC
+
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "\r\n"
     "\0"

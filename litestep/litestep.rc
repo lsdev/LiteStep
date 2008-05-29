@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -26,7 +26,7 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_TITLE_WARNING "Warnung"
     IDS_LITESTEP_TITLE_ERROR "Fehler"
@@ -64,7 +64,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_LS                  ICON                    "litestep.ico"
+IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -72,18 +72,18 @@ IDI_LS                  ICON                    "litestep.ico"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "\r\n"
     "\0"
@@ -98,7 +98,7 @@ END
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 240, 185
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "About LiteStep..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -122,14 +122,15 @@ BEGIN
 END
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,24,7,0
- PRODUCTVERSION 0,24,7,0
+ FILEVERSION 0,24,8,0
+ PRODUCTVERSION 0,24,8,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -144,15 +145,16 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "Comments", "http://www.lsdev.org/"
-            VALUE "CompanyName", "Litestep Development Team"
-            VALUE "FileDescription", "An Alternative Win32 Shell"
-            VALUE "FileVersion", "0, 24, 7, 0"
-            VALUE "InternalName", "Litestep"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2005"
-            VALUE "OriginalFilename", "litestep.exe"
-            VALUE "ProductName", "Litestep"
-            VALUE "ProductVersion", "0, 24, 7, 0"
+            VALUE "Comments", "http://www.lsdev.org/\0"
+            VALUE "CompanyName", "LiteStep Development Team\0"
+            VALUE "FileDescription", "An Alternative Win32 Shell\0"
+            VALUE "FileVersion", "0.24.8 RC1\0"
+            VALUE "InternalName", "LiteStep\0"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2008\0"
+            VALUE "OriginalFilename", "litestep.exe\0"
+            VALUE "ProductName", "LiteStep\0"
+            VALUE "ProductVersion", "0.24.8 RC1\0"
+            VALUE "SpecialBuild", "Release Candidate 1\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -161,13 +163,15 @@ BEGIN
     END
 END
 
+#endif    // !_MAC
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_LS                  BITMAP                  "litestep.bmp"
+IDB_LS                  BITMAP  MOVEABLE PURE   "litestep.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -175,7 +179,7 @@ IDB_LS                  BITMAP                  "litestep.bmp"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO MOVEABLE PURE 
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -191,7 +195,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_TITLE_WARNING "Warning"
     IDS_LITESTEP_TITLE_ERROR "Error"
@@ -210,7 +214,7 @@ BEGIN
     IDS_MODULEQUIT_ERROR    "Exception while quitting module."
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_MODULENOTFOUND_ERROR 
                             "Error: Could not locate module.\nPlease check your configuration."
@@ -246,7 +250,7 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_TITLE_WARNING "Avertissement"
     IDS_LITESTEP_TITLE_ERROR "Erreur"
@@ -282,7 +286,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_TITLE_WARNING "Waarschuwing."
     IDS_LITESTEP_TITLE_ERROR "Fout"
@@ -318,7 +322,7 @@ LANGUAGE LANG_SWEDISH, SUBLANG_DEFAULT
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_LITESTEP_TITLE_WARNING "Varning"
     IDS_LITESTEP_TITLE_ERROR "Fel"
