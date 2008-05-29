@@ -18,9 +18,9 @@
  - New evaluation parser
 
    With the evaluation parser, both conditional expressions (If, ElseIf) and
-   inline expressions ($a + b$) now use the same syntax.  The new parser also
+   in-line expressions ($a + b$) now use the same syntax.  The new parser also
    adds some new capabilities that were previously unavailable such as strings
-   and builtin functions.
+   and built-in functions.
 
    The new syntax should be backwards compatible with existing files, but this
    is new code and there are bound to be bugs.  So, we're needing users to try
@@ -32,15 +32,15 @@
 
    We have added an implementation to support AppBars.  This is a feature found
    in the Explorer shell which some applications use to dock their window to the
-   edge of a screen (e.g the Explorer taskbar).  Some typical applications that
+   edge of a screen (e.g. the Explorer taskbar).  Some typical applications that
    use this feature are Trillian and various media players.
 
-   This also adds support for WorkArea updates when an AppBar is positioned or
+   This also adds support for WorkArea updates when an Appbar is positioned or
    removed.  Please test the interaction between AppBars adjusting the WorkArea
    and the Desktop modules adjusting the WorkArea.  Hopefully they will interact
    nicely.  What you should expect, is if the desktop module has changed the
-   WorkArea for a specific screen edge, then any AppBar placed on the same
-   screen edge will be positioned so that it does not overlap the old workarea.
+   WorkArea for a specific screen edge, then any Appbar placed on the same
+   screen edge will be positioned so that it does not overlap the old WorkArea.
    This implementation appears to work in practice in the limited testing we
    were able to do.  Please let us know if you find any odd or undesirable
    behavior in regards to the WorkArea and AppBars.
@@ -80,7 +80,7 @@
   - All currently loaded modules and their versions
   - Theme name and version (if applicable)
   - Your contact information (email address)
-  - A complete description of the issueand if possible a step-by-step procedure
+  - A complete description of the issue and if possible a step-by-step procedure
     to reproduce the bug.  If we can not reproduce the bug, we will not be able
     to fix it!  So, please do your best to help us help you.  Thanks!
 
