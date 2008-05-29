@@ -15,7 +15,7 @@
 
 -- CHANGES SINCE 0.24.7 --------------------------------------------------------
 
- - new evaluation parser
+ - New evaluation parser
 
    With the evaluation parser, both conditional expressions (If, ElseIf) and
    inline expressions ($a + b$) now use the same syntax.  The new parser also
@@ -28,7 +28,7 @@
    the new features and provide feedback on those as well.  The new syntax is
    documented in the "release_notes.txt".
 
- - appbar support
+ - Appbar support
 
    We have added an implementation to support AppBars.  This is a feature found
    in the Explorer shell which some applications use to dock their window to the
@@ -45,7 +45,7 @@
    were able to do.  Please let us know if you find any odd or undesirable
    behavior in regards to the WorkArea and AppBars.
 
- - icon notification tray (systray) service fixes
+ - Icon notification tray (systray) service fixes
 
    The Icon Notification Tray service has been updated to fix several issues.
    The most visible one being where old icons and sometimes balloon (info)
@@ -57,22 +57,7 @@
  - Removed !gather bang command proxy for VWM modules (all current VWM modules
    now implement that function internally).
 
- - Changed bang !alert messagebox caption to "!Alert Litestep" to make apparent
-   what generated the messagebox.
-
- - Default all platform variables (eg. "WinNT") to "false" prior to setting
-   conditional to "true".
-
- - Command line !bang handler now allows running LS instance to set foreground
-   window.
-
- - Fixed !about bang command from launching concurrent AboutBox instances.
-
- - Fixed LS logo not showing in about box. Moved logo to the left.
-
  - Improvements to LSAutoHideModules.
-
- - $CompileDate$ now has the full compileTime string as shown in the !about box.
 
 
 -- FINAL WORDS -----------------------------------------------------------------
