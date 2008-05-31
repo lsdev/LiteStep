@@ -27,10 +27,10 @@
 
  - Much improved initialization/recycle of LSAPI internals.
 
- - Added support for "AppBars". (Appbars are windows that dock to the side of
+ - Added support for "AppBars". Appbars are windows that dock to the side of
    the screen, some of which "autohide".  Typical uses are Media Player's
-   navigation bars, or Instant Messenger's contact list window. Appbars may
-   also cause the work area to be changed)
+   navigation bars, or Instant Messenger's contact list window.  Appbars may
+   also cause the work area to be changed.
 
  - Changed bang !alert messagebox caption to "!Alert Litestep" to make apparent
    what generated the messagebox.
@@ -59,7 +59,7 @@
 
  - Fixed LS logo not showing in about box. Moved logo to the left.
 
- - The Compile date is now fetched from PE header.
+ - The compile date is now fetched from PE header.
 
  - $CompileDate$ now has the full "Compiled on" string as shown in the !about
    box.
@@ -68,6 +68,9 @@
    allows for "apparent" instant showing/hiding of all module windows.
 
  - Improvements to LSAutoHideModules.
+
+ - Added a more specific error message when failing to load a module because of
+   unresolved dependencies.
 
  - Many other incremental fixes and code cleanup changes... Thanks for reading.
 
