@@ -166,7 +166,7 @@ static bool ParseCmdLine(LPCSTR pszCmdLine)
 						}
 						else
 						{
-							StringCchPrintfEx(szRcPath, MAX_PATH, NULL, NULL, STRSAFE_NULL_ON_FAILURE, "%s%s", szAppPath, szToken);
+							PathCombine(szRcPath, szAppPath, szToken);
 						}
 					}
 				}
