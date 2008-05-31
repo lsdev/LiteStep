@@ -72,6 +72,8 @@
  - Added a more specific error message when failing to load a module because of
    unresolved dependencies.
 
+ - Targeting libpng 1.2.29 and zlib 1.2.3.
+
  - Many other incremental fixes and code cleanup changes... Thanks for reading.
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
