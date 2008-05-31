@@ -55,12 +55,12 @@ using std::mem_fun;
 
 
 // Parse the command line
-bool ParseCmdLine(LPCSTR pszCmdLine);
-HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
+static bool ParseCmdLine(LPCSTR pszCmdLine);
+static HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs);
 
-CLiteStep gLiteStep;
-CHAR szAppPath[MAX_PATH];
-CHAR szRcPath[MAX_PATH];
+static CLiteStep gLiteStep;
+static CHAR szAppPath[MAX_PATH];
+static CHAR szRcPath[MAX_PATH];
 
 enum StartupMode
 {
@@ -69,13 +69,13 @@ enum StartupMode
     STARTUP_FORCE_RUN = TRUE
 };
 
-int g_nStartupMode = STARTUP_DEFAULT;
+static int g_nStartupMode = STARTUP_DEFAULT;
 
 
 //
 // ExecuteCmdLineBang
 //
-HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
+static HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
 {
     ASSERT_ISNOTNULL(pszCommand);
 
@@ -125,7 +125,7 @@ HRESULT ExecuteCmdLineBang(LPCSTR pszCommand, LPCSTR pszArgs)
 //
 // ParseCmdLine(LPCSTR pszCmdLine)
 //
-bool ParseCmdLine(LPCSTR pszCmdLine)
+static bool ParseCmdLine(LPCSTR pszCmdLine)
 {
 	if (IsValidStringPtr(pszCmdLine))
 	{
