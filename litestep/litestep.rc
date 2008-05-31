@@ -230,6 +230,8 @@ BEGIN
     IDS_LITESTEP_BANGEXCEPTION 
                             "Exception during bang command execution.\nPlease contact the module author.\n\nBang parameters: %s"
     IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."
+    IDS_MODULEDEPENDENCY_ERROR 
+                            "Error: Could not load module.\nThis is likely a case of a missing C Run-Time Library or other dependency."
 END
 
 #endif    // English (U.S.) resources

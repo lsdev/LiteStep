@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
+// Microsoft Developer Studio generated include file.
 // Used by litestep.rc
 //
 #define IDS_LITESTEP_TITLE_WARNING      1
@@ -26,6 +26,7 @@
 #define IDS_HOOKMGR_LOADHOOK_ERROR      22
 #define IDS_LITESTEP_BANGEXCEPTION      23
 #define IDS_LITESTEP_REGISTERCLASS_ERROR 24
+#define IDS_MODULEDEPENDENCY_ERROR      25
 #define IDI_LS                          101
 #define IDB_LS                          102
 #define IDD_ABOUTBOX                    103
