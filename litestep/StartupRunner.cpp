@@ -20,6 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "StartupRunner.h"
+#include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include <regstr.h>
 #include "../utility/core.hpp"
@@ -132,61 +133,66 @@ void StartupRunner::_RunRunOnceEx()
 
 void StartupRunner::_RunStartupMenu()
 {
-    const UINT STARTUPMENU_TABLE[] =
+    // Starting with Vista, the "ALT" CSIDLs are deprecated
+    // and are mapped to the regular non-ALT versions.
+    _RunShellFolderContents(CSIDL_COMMON_STARTUP);
+
+    if (!IsVistaOrAbove())
     {
-        CSIDL_COMMON_STARTUP,
-        CSIDL_COMMON_ALTSTARTUP,
-        CSIDL_STARTUP,
-        CSIDL_ALTSTARTUP
-    };
-    const ULONG STARTUPMENU_SIZE = sizeof(STARTUPMENU_TABLE) / sizeof(UINT);
-    
-    TCHAR tzPath[MAX_PATH];
-    
-    for (ULONG i = 0; i < STARTUPMENU_SIZE; i++)
+        _RunShellFolderContents(CSIDL_COMMON_ALTSTARTUP);
+    }
+
+    _RunShellFolderContents(CSIDL_STARTUP);
+
+    if (!IsVistaOrAbove())
     {
-        if (GetShellFolderPath(STARTUPMENU_TABLE[i], tzPath, MAX_PATH))
-        {
-            _RunFolderContents(tzPath);
-        }
+        _RunShellFolderContents(CSIDL_ALTSTARTUP);
     }
 }
 
-void StartupRunner::_RunFolderContents(LPCTSTR ptzPath)
+void StartupRunner::_RunShellFolderContents(int nFolder)
 {
-    TCHAR tzSearchPath[MAX_PATH];
-    WIN32_FIND_DATA findData;
-    HANDLE hSearch;
-    
-    if (IsValidStringPtr(ptzPath) && (ptzPath[0] != _T('\0')))
+    TCHAR tzPath[MAX_PATH] = { 0 };
+
+    if (GetShellFolderPath(nFolder, tzPath, COUNTOF(tzPath)))
     {
-        StringCchCopy(tzSearchPath, MAX_PATH, ptzPath);
-        PathAppend(tzSearchPath, _T("*.*"));
-        
-        hSearch = FindFirstFile(tzSearchPath, &findData);
-        while (hSearch != INVALID_HANDLE_VALUE)
+        if (tzPath[0])
         {
-            if (!PathIsDirectory(findData.cFileName) &&
-                !(findData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
-                !(findData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+            TCHAR tzSearchPath[MAX_PATH] = { 0 };
+            PathCombine(tzSearchPath, tzPath, _T("*.*"));
+
+            WIN32_FIND_DATA findData = { 0 };
+            HANDLE hSearch = FindFirstFile(tzSearchPath, &findData);
+
+            while (hSearch != INVALID_HANDLE_VALUE)
             {
-                SHELLEXECUTEINFO seiCommand = { 0 };
-                
-                seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
-                seiCommand.lpFile = findData.cFileName;
-                seiCommand.lpDirectory = ptzPath;
-                seiCommand.nShow = SW_SHOWNORMAL;
-                seiCommand.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
-                
-                ShellExecuteEx(&seiCommand);
-            }
-            
-            if (!FindNextFile(hSearch, &findData))
-            {
-                FindClose(hSearch);
-                hSearch = INVALID_HANDLE_VALUE;
+                if (!PathIsDirectory(findData.cFileName) &&
+                    !(findData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
+                    !(findData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+                {
+                    SHELLEXECUTEINFO seiCommand = { 0 };
+
+                    seiCommand.cbSize = sizeof(SHELLEXECUTEINFO);
+                    seiCommand.lpFile = findData.cFileName;
+                    seiCommand.lpDirectory = tzPath;
+                    seiCommand.nShow = SW_SHOWNORMAL;
+                    seiCommand.fMask =
+                        SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
+
+                    VERIFY(ShellExecuteEx(&seiCommand));
+                }
+
+                if (!FindNextFile(hSearch, &findData))
+                {
+                    FindClose(hSearch);
+                    hSearch = INVALID_HANDLE_VALUE;
+                }
             }
         }
+    }
+    else
+    {
+        TRACE("Failed to get full path to Startup folder %n", nFolder);
     }
 }
 
