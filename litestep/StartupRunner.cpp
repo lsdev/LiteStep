@@ -40,7 +40,10 @@ enum RESTRICTIONS
 #define ERK_DELETE              0x0002
 #define ERK_WAITFOR_QUIT        0x0004 // wait until process exits
 #define ERK_WAITFOR_IDLE        0x0008 // wait until process waits for input
-#define REGSTR_PATH_RUN_POLICY  REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
+
+#ifndef REGSTR_PATH_RUN_POLICY
+#  define REGSTR_PATH_RUN_POLICY  REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
+#endif
 
 StartupRunner::StartupRunner()
 {}
