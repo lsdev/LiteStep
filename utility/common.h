@@ -42,6 +42,14 @@
 #  define STRICT
 #  define NOCRYPT
 #  include <windows.h>
+
+// These GDI macros trigger "smaller type check" errors unless fixed like this
+#  undef GetRValue
+#  undef GetGValue
+#  undef GetBValue
+#  define GetRValue(rgb)    ((BYTE)( (rgb) & 0x0000FF))
+#  define GetGValue(rgb)    ((BYTE)(((rgb) & 0x00FF00) >> 8))
+#  define GetBValue(rgb)    ((BYTE)(((rgb) & 0xFF0000) >> 16))
 #endif // _WINDOWS_
 
 #include <stdlib.h>
