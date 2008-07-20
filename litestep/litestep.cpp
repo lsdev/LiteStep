@@ -1080,7 +1080,7 @@ bool CLiteStep::_IsFullScreenActiveOnPrimaryMonitor()
             if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
             {
                 RECT rWA = {0};
-                ASSERT(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0));
+                VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0));
 
                 rWnd.left += rWA.left;
                 rWnd.right += rWA.left;
