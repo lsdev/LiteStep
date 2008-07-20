@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.28 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.28 2008/04/23 19:00:31 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.29 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.29 2008/07/20 18:39:19 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -79,7 +79,7 @@ void LSAPISetLitestepWindow(HWND hLitestepWnd)
 template<typename T>
 BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
 {
-	BOOL bReturn = false;
+	BOOL bReturn = FALSE;
 
 	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
 	{
@@ -123,7 +123,15 @@ BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
 //
 BOOL RemoveBangCommand(LPCSTR pszCommand)
 {
-	return g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+    BOOL bResult = FALSE;
+
+    if (IsValidStringPtr(pszCommand))
+    {
+	    bResult =
+            g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+    }
+
+    return bResult;
 }
 
 

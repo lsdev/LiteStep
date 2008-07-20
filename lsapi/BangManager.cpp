@@ -58,6 +58,7 @@ BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
     Lock lock(m_cs);
     BOOL bReturn = FALSE;
     
+    ASSERT(pszName != NULL);
     BangMap::iterator iter = bang_map.find(pszName);
     
     if (iter != bang_map.end())
