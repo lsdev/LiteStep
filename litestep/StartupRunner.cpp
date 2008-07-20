@@ -201,78 +201,111 @@ void StartupRunner::_RunShellFolderContents(int nFolder)
 
 
 //
+// _CreateSessionInfoKey
+//
+// Note that unlike _IsFirstRunThisSession this function can be called
+// multiple times without side-effects.
+//
+HKEY StartupRunner::_CreateSessionInfoKey()
+{
+    HKEY hkSessionInfo = NULL;
+    HANDLE hToken = NULL;
+
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+    {
+        HRESULT hr = E_FAIL;
+
+        TCHAR tzSessionInfo[128] = { 0 };
+        DWORD dwOutSize = 0;
+
+        if (IsVistaOrAbove())
+        {
+            DWORD dwSessionId = 0;
+
+            // On Vista the subkey's name is the Session ID
+            if (GetTokenInformation(hToken, TokenSessionId,
+                &dwSessionId, sizeof(dwSessionId), &dwOutSize))
+            {
+                hr = StringCchPrintf(tzSessionInfo, COUNTOF(tzSessionInfo),
+                    REGSTR_PATH_EXPLORER _T("\\SessionInfo\\%u"), dwSessionId);
+            }
+        }
+        else
+        {
+            TOKEN_STATISTICS tsStats = { 0 };
+
+            // Prior to Vista the subkey's name is the AuthenticationId
+            if (GetTokenInformation(hToken, TokenStatistics,
+                &tsStats, sizeof(tsStats), &dwOutSize))
+            {
+                hr = StringCchPrintf(tzSessionInfo, COUNTOF(tzSessionInfo),
+                    REGSTR_PATH_EXPLORER _T("\\SessionInfo\\%08x%08x"),
+                    tsStats.AuthenticationId.HighPart,
+                    tsStats.AuthenticationId.LowPart);
+            }
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            // Finally open the SessionInfo key
+            LONG lResult = RegCreateKeyEx(
+                HKEY_CURRENT_USER, tzSessionInfo, 0, NULL,
+                REG_OPTION_VOLATILE, KEY_WRITE, NULL, &hkSessionInfo, NULL);
+
+            if (lResult != ERROR_SUCCESS)
+            {
+                hkSessionInfo = NULL;
+            }
+        }
+
+        CloseHandle(hToken);
+    }
+
+    return hkSessionInfo;
+}
+
+
+//
 // IsFirstRunThisSession()
 //
 bool StartupRunner::_IsFirstRunThisSession()
 {
     bool bReturn = false;
-    HKEY hkExplorer;
-    TCHAR tzSessionInfo[30];
-    
-    OSVERSIONINFO OsVersionInfo;
+
+    OSVERSIONINFO OsVersionInfo = { 0 };
     OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
-    GetVersionEx(&OsVersionInfo);
-    
-    // On NT systems, the SessionInfo subkey will be the AuthenticationID
+    VERIFY(GetVersionEx(&OsVersionInfo));
+
     if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
     {
-        HANDLE hToken;
-        if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken) != 0)
+        HKEY hkSessionInfo = _CreateSessionInfoKey();
+
+        if (hkSessionInfo != NULL)
         {
-            TOKEN_STATISTICS tsStats;
-            DWORD dwOutSize;
-            
-            if (GetTokenInformation(hToken, TokenStatistics,
-                &tsStats, sizeof(tsStats), &dwOutSize))
+            DWORD dwDisposition;
+            HKEY hkStartup;
+
+            LONG lResult = RegCreateKeyEx(hkSessionInfo,
+                _T("StartupHasBeenRun"), 0, NULL,
+                REG_OPTION_VOLATILE, KEY_WRITE, NULL,
+                &hkStartup, &dwDisposition);
+
+            RegCloseKey(hkStartup);
+
+            if (lResult == ERROR_SUCCESS &&
+                dwDisposition == REG_CREATED_NEW_KEY)
             {
-                StringCchPrintf(tzSessionInfo, 30, _T("SessionInfo\\%08x%08x"),
-                    tsStats.AuthenticationId.HighPart,
-                    tsStats.AuthenticationId.LowPart);
-                
-                // Create the SessionInfo and StartUpHasBeenRun keys
-                LONG lResult = RegCreateKeyEx(HKEY_CURRENT_USER,
-                    REGSTR_PATH_EXPLORER, 0, NULL, REG_OPTION_NON_VOLATILE,
-                    MAXIMUM_ALLOWED, NULL, &hkExplorer, NULL);
-                
-                if (lResult == ERROR_SUCCESS)
-                {
-                    HKEY hkSessionInfo;
-                    
-                    lResult = RegCreateKeyEx(hkExplorer, tzSessionInfo, 0, NULL,
-                        REG_OPTION_VOLATILE, KEY_WRITE, NULL, &hkSessionInfo,
-                        NULL);
-                    
-                    if (lResult == ERROR_SUCCESS)
-                    {
-                        DWORD dwDisposition;
-                        HKEY hkStartup;
-                        lResult = RegCreateKeyEx(hkSessionInfo,
-                            _T("StartupHasBeenRun"), 0, NULL,
-                            REG_OPTION_VOLATILE, KEY_WRITE, NULL,
-                            &hkStartup, &dwDisposition);
-                        
-                        RegCloseKey(hkStartup);
-                        
-                        if (dwDisposition == REG_CREATED_NEW_KEY)
-                        {
-                            bReturn = true;
-                        }
-                    }
-                    
-                    RegCloseKey(hkSessionInfo);
-                }
-                
-                RegCloseKey(hkExplorer);
+                bReturn = true;
             }
         }
-        
-        CloseHandle(hToken);
+
+        RegCloseKey(hkSessionInfo);
     }
     else
     {
         bReturn = true;
     }
-    
+
     return bReturn;
 }
 
