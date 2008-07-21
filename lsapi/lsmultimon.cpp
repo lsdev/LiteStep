@@ -21,52 +21,36 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "lsapi.h"
 #include "lsmultimon.h"
+#include "../utility/core.hpp"
 
-#if !defined(MULTIMON_FNS_DEFINED)
-#define MULTIMON_FNS_DEFINED
 int (WINAPI* g_pfnGetSystemMetrics)(int) = NULL;
 HMONITOR (WINAPI* g_pfnMonitorFromWindow)(HWND, DWORD) = NULL;
 HMONITOR (WINAPI* g_pfnMonitorFromRect)(LPCRECT, DWORD) = NULL;
 HMONITOR (WINAPI* g_pfnMonitorFromPoint)(POINT, DWORD) = NULL;
-BOOL (WINAPI* g_pfnGetMonitorInfo)(HMONITOR, LPMONITORINFO) = NULL;
+BOOL (WINAPI* g_pfnGetMonitorInfoA)(HMONITOR, LPMONITORINFO) = NULL;
 BOOL (WINAPI* g_pfnEnumDisplayMonitors)(HDC, LPCRECT, MONITORENUMPROC, LPARAM) = NULL;
-BOOL (WINAPI* g_pfnEnumDisplayDevices)(PVOID, DWORD, PDISPLAY_DEVICE, DWORD) = NULL;
-BOOL g_fMultiMonInitDone = FALSE;
-BOOL g_fMultimonPlatformNT = FALSE;
-#endif // MULTIMON_FNS_DEFINED
+BOOL (WINAPI* g_pfnEnumDisplayDevicesA)(PVOID, DWORD, PDISPLAY_DEVICEA, DWORD) = NULL;
 
-BOOL IsPlatformNT()
-{
-	OSVERSIONINFOA osvi = {0};
-	osvi.dwOSVersionInfoSize = sizeof(osvi);
-	GetVersionExA((OSVERSIONINFOA*) & osvi);
-	return (VER_PLATFORM_WIN32_NT == osvi.dwPlatformId);
-}
+BOOL g_fMultiMonInitDone = FALSE;
+
 
 BOOL InitMultipleMonitorStubs(void)
 {
-	HMODULE hUser32;
 	if (g_fMultiMonInitDone)
 	{
-		return g_pfnGetMonitorInfo != NULL;
+		return g_pfnGetMonitorInfoA != NULL;
 	}
 
-	g_fMultimonPlatformNT = IsPlatformNT();
-	hUser32 = GetModuleHandle("USER32");
+	HMODULE hUser32 = GetModuleHandle(_T("USER32"));
+
 	if (hUser32 &&
 	        (*(FARPROC*) & g_pfnGetSystemMetrics = GetProcAddress(hUser32, "GetSystemMetrics")) != NULL &&
 	        (*(FARPROC*) & g_pfnMonitorFromWindow = GetProcAddress(hUser32, "MonitorFromWindow")) != NULL &&
 	        (*(FARPROC*) & g_pfnMonitorFromRect = GetProcAddress(hUser32, "MonitorFromRect")) != NULL &&
 	        (*(FARPROC*) & g_pfnMonitorFromPoint = GetProcAddress(hUser32, "MonitorFromPoint")) != NULL &&
 	        (*(FARPROC*) & g_pfnEnumDisplayMonitors = GetProcAddress(hUser32, "EnumDisplayMonitors")) != NULL &&
-#ifdef UNICODE
-	        (*(FARPROC*) & g_pfnEnumDisplayDevices = GetProcAddress(hUser32, "EnumDisplayDevicesW")) != NULL &&
-	        (*(FARPROC*) & g_pfnGetMonitorInfo = g_fMultimonPlatformNT ? GetProcAddress(hUser32, "GetMonitorInfoW") :
-	                                             GetProcAddress(hUser32, "GetMonitorInfoA")) != NULL
-#else
-			(*(FARPROC*) & g_pfnGetMonitorInfo = GetProcAddress(hUser32, "GetMonitorInfoA")) != NULL &&
-			(*(FARPROC*) & g_pfnEnumDisplayDevices = GetProcAddress(hUser32, "EnumDisplayDevicesA")) != NULL
-#endif
+			(*(FARPROC*) & g_pfnGetMonitorInfoA = GetProcAddress(hUser32, "GetMonitorInfoA")) != NULL &&
+			(*(FARPROC*) & g_pfnEnumDisplayDevicesA = GetProcAddress(hUser32, "EnumDisplayDevicesA")) != NULL
 	   )
 	{
 		g_fMultiMonInitDone = TRUE;
@@ -78,9 +62,9 @@ BOOL InitMultipleMonitorStubs(void)
 		g_pfnMonitorFromWindow = NULL;
 		g_pfnMonitorFromRect = NULL;
 		g_pfnMonitorFromPoint = NULL;
-		g_pfnGetMonitorInfo = NULL;
+		g_pfnGetMonitorInfoA = NULL;
 		g_pfnEnumDisplayMonitors = NULL;
-		g_pfnEnumDisplayDevices = NULL;
+		g_pfnEnumDisplayDevicesA = NULL;
 
 		g_fMultiMonInitDone = TRUE;
 		return FALSE;
@@ -184,17 +168,7 @@ BOOL LSGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpMonitorInfo)
 
 	if (InitMultipleMonitorStubs())
 	{
-		BOOL f = g_pfnGetMonitorInfo(hMonitor, lpMonitorInfo);
-#ifdef UNICODE
-
-		if (f && !g_fMultimonPlatformNT && (lpMonitorInfo->cbSize >= sizeof(MONITORINFOEX)))
-		{
-			MultiByteToWideChar(CP_ACP, 0,
-			                    (LPSTR)((MONITORINFOEX*)lpMonitorInfo)->szDevice, -1,
-			                    ((MONITORINFOEX*)lpMonitorInfo)->szDevice, (sizeof(((MONITORINFOEX*)lpMonitorInfo)->szDevice) / sizeof(char)));
-		}
-#endif
-		return f;
+		return g_pfnGetMonitorInfoA(hMonitor, lpMonitorInfo);
 	}
 
 	if ((hMonitor == xPRIMARY_MONITOR) &&
@@ -209,16 +183,16 @@ BOOL LSGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpMonitorInfo)
 		lpMonitorInfo->rcWork = rcWork;
 		lpMonitorInfo->dwFlags = MONITORINFOF_PRIMARY;
 
-		if (lpMonitorInfo->cbSize >= sizeof(MONITORINFOEX))
-		{
-#ifdef UNICODE
-			MultiByteToWideChar(CP_ACP, 0, "DISPLAY", -1, ((MONITORINFOEX*)lpMonitorInfo)->szDevice, (sizeof(((MONITORINFOEX*)lpMonitorInfo)->szDevice) / sizeof(char)));
-#else // UNICODE
-
-			strcpy(((MONITORINFOEX*)lpMonitorInfo)->szDevice, "DISPLAY");
-#endif // UNICODE
-
-		}
+        if (lpMonitorInfo->cbSize == sizeof(MONITORINFOEXA))
+        {
+            StringCchCopyA(((MONITORINFOEXA*)lpMonitorInfo)->szDevice,
+                CCHDEVICENAME, "DISPLAY");
+        }
+        else if (lpMonitorInfo->cbSize == sizeof(MONITORINFOEXW))
+        {
+            StringCchCopyW(((MONITORINFOEXW*)lpMonitorInfo)->szDevice,
+                CCHDEVICENAME, L"DISPLAY");
+        }
 
 		return TRUE;
 	}
@@ -297,11 +271,11 @@ BOOL LSEnumDisplayMonitors(
 BOOL LSEnumDisplayDevices(
     PVOID Unused,
     DWORD iDevNum,
-    PDISPLAY_DEVICE lpDisplayDevice,
+    PDISPLAY_DEVICEA lpDisplayDevice,
     DWORD dwFlags)
 {
 	if (InitMultipleMonitorStubs())
-		return g_pfnEnumDisplayDevices(Unused, iDevNum, lpDisplayDevice, dwFlags);
+		return g_pfnEnumDisplayDevicesA(Unused, iDevNum, lpDisplayDevice, dwFlags);
 
 	if (Unused != NULL)
 		return FALSE;
@@ -309,18 +283,11 @@ BOOL LSEnumDisplayDevices(
 	if (iDevNum != 0)
 		return FALSE;
 
-	if (lpDisplayDevice == NULL || lpDisplayDevice->cb < sizeof(DISPLAY_DEVICE))
+	if (lpDisplayDevice == NULL || lpDisplayDevice->cb != sizeof(DISPLAY_DEVICEA))
 		return FALSE;
 
-#ifdef UNICODE
-
-	MultiByteToWideChar(CP_ACP, 0, "DISPLAY", -1, lpDisplayDevice->DeviceName, (sizeof(lpDisplayDevice->DeviceName) / sizeof(char)));
-	MultiByteToWideChar(CP_ACP, 0, "DISPLAY", -1, lpDisplayDevice->DeviceString, (sizeof(lpDisplayDevice->DeviceName) / sizeof(char)));
-#else // UNICODE
-
-	strcpy((LPSTR)lpDisplayDevice->DeviceName, "DISPLAY");
-	strcpy((LPSTR)lpDisplayDevice->DeviceString, "DISPLAY");
-#endif // UNICODE
+    StringCchCopyA(lpDisplayDevice->DeviceName, 32, "DISPLAY");
+    StringCchCopyA(lpDisplayDevice->DeviceString, 128, "DISPLAY");
 
 	lpDisplayDevice->StateFlags = DISPLAY_DEVICE_ATTACHED_TO_DESKTOP | DISPLAY_DEVICE_PRIMARY_DEVICE;
 
