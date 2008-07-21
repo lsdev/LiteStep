@@ -90,6 +90,11 @@ bool Module::_LoadDll()
                 bReturn = true;
             }
         }
+        else if(PathFileExists(m_tzLocation.c_str()))
+        {
+            RESOURCE_STR(NULL, IDS_MODULEDEPENDENCY_ERROR,
+                "Error: Could not load module.\nThis is likely a case of a missing C Run-Time Library or other dependency.");
+        }
         else
         {
             RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
