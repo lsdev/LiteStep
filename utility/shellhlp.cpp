@@ -163,68 +163,17 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
     {
 #ifdef UNICODE
         hr = StringCchCopy(ptzBuffer, cchBuffer, pOleString);
-        
-        switch (hr)
-        {
-            case S_OK:
-            break;
-            
-            case STRSAFE_E_INSUFFICIENT_BUFFER:
-            {
-                hr = E_OUTOFMEMORY;
-            }
-            break;
-            
-            case STRSAFE_E_INVALID_PARAMETER:
-            {
-                hr = E_INVALIDARG;
-            }
-            break;
-            
-            default:
-            {
-                ASSERT(false);
-                hr = E_UNEXPECTED;
-            }
-        }
-        
 #else // UNICODE
-        
         int nReturn = WideCharToMultiByte(CP_ACP, 0, pOleString,
             (int)wcslen(pOleString), ptzBuffer, (int)cchBuffer, NULL, NULL);
-        
+
         if (nReturn == 0)
         {
-            switch (GetLastError())
-            {
-                case ERROR_INSUFFICIENT_BUFFER:
-                {
-                    hr = E_OUTOFMEMORY;
-                }
-                break;
-                
-                case ERROR_INVALID_FLAGS:
-                case ERROR_INVALID_PARAMETER:
-                {
-                    hr = E_INVALIDARG;
-                }
-                break;
-                
-                default:
-                {
-                    ASSERT(false);
-                    hr = E_UNEXPECTED;
-                }
-                break;
-            }
-        }
-        else
-        {
-            hr = S_OK;
+            hr = HRESULT_FROM_WIN32(GetLastError());
         }
 #endif
     }
-    
+
     CoTaskMemFree(pOleString);
     
     return hr;
