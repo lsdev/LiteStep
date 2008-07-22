@@ -735,10 +735,16 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         {
             if (uMsg == WM_ShellHook)
             {
+                WORD wHookCode  = (LOWORD(wParam) & 0x00FF);
+                WORD wExtraBits = (LOWORD(wParam) & 0xFF00);
+
+                // most shell hook messages pass an HWND as lParam
                 HWND hWndMessage = (HWND)lParam;
-                uMsg = (LOWORD(wParam) & 0x00FF) + 9500;
-                lParam = (LOWORD(wParam) & 0xFF00);
+
+                // Convert to an LM_SHELLHOOK message
+                uMsg   = LM_SHELLHOOK + wHookCode;
                 wParam = (WPARAM)hWndMessage;
+                lParam = wExtraBits;
 
                 if (uMsg == LM_WINDOWACTIVATED)
                 {
