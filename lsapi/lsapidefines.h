@@ -175,16 +175,20 @@
 #define magicDWord 0x49474541
 #endif // magicDWord
 
+
+//---------------------------------------------------------
+// MODULE ENTRY POINTS DEFINES
+//---------------------------------------------------------
+typedef int (CDECL* ModuleInitExFunc)(HWND, HINSTANCE, LPCSTR);
+typedef int (CDECL* ModuleQuitFunc)(HINSTANCE);
+
+
 //---------------------------------------------------------
 // BANG COMMAND DEFINES
 //---------------------------------------------------------
-#ifdef __cplusplus
-typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
-#else  // __cplusplus
-typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
-#endif // __cplusplus
+typedef void (CDECL *BangCommand)  (HWND hSender, LPCSTR pszArgs);
+typedef void (CDECL *BangCommandEx)(HWND hSender, LPCSTR pszCommand,
+                                    LPCSTR pszArgs);
 
 typedef struct _LMBANGCOMMANDA
 {
@@ -244,10 +248,10 @@ LSDESKTOPINFO;
 //---------------------------------------------------------
 // LSLOG LOG LEVEL CONSTANTS
 //---------------------------------------------------------
-#define LOG_ERROR 1
+#define LOG_ERROR   1
 #define LOG_WARNING 2
-#define LOG_NOTICE 3
-#define LOG_DEBUG 4
+#define LOG_NOTICE  3
+#define LOG_DEBUG   4
 
 
 //---------------------------------------------------------
@@ -261,8 +265,8 @@ LSDESKTOPINFO;
 #define LS_MODULE_THREADED  0x0001
 //      LS_MODULE_NOTPUMPED 0x0002    no longer used
 
-typedef BOOL (__stdcall* LSENUMBANGSPROC)(LPCSTR, LPARAM);
-typedef BOOL (__stdcall* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
-typedef BOOL (__stdcall* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
+typedef BOOL (CALLBACK* LSENUMBANGSPROC)(LPCSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
 
 #endif // LSAPIDEFINES_H

@@ -28,14 +28,6 @@
 #include <list>
 
 
-// might want to move these to lsapidefines.h
-
-/** Pointer to <code>initModuleEx</code> function */
-typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
-
-/** Pointer to <code>quitModule</code> function */
-typedef int (*ModuleQuitFunc) (HINSTANCE);
-
 /** List of modules */
 typedef std::list<Module*> ModuleQueue;
 

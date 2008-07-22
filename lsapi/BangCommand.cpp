@@ -24,7 +24,7 @@
 #include "../utility/core.hpp"
 
 
-Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand) :
+Bang::Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand) :
     m_szCommand(pszCommand)
 {
     m_bEX = false;
@@ -33,7 +33,7 @@ Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand) :
 }
 
 
-Bang::Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand) :
+Bang::Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand) :
     m_szCommand(pszCommand)
 {
     m_bEX = true;

@@ -41,7 +41,7 @@ public:
      * @param  pfnBang     callback function
      * @param  pszCommand  bang command name
      */
-    Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand);
+    Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand);
     
     /**
      * Constructs a bang command whose callback function takes the bang
@@ -52,7 +52,7 @@ public:
      *                     name as a parameter
      * @param  pszCommand  bang command name
      */
-    Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand);
+    Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand);
     
     /**
      * Destructor.
@@ -79,10 +79,10 @@ private:
     bool m_bEX;
     
     /** Callback function */
-    BangCommand* m_bBang;
+    BangCommand m_bBang;
     
     /** Callback function that takes the bang command name as a parameter */
-    BangCommandEx* m_bBangEX;
+    BangCommandEx m_bBangEX;
     
     /** Name of this bang command */
     std::string m_szCommand;
