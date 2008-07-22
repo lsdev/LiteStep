@@ -772,11 +772,19 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 }
             }
 
-            if (m_pMessageManager && m_pMessageManager->HandlerExists(uMsg))
+            // WM_APP, LM_XYZ, and registered messages are all >= WM_USER
+            if (uMsg >= WM_USER)
             {
-                lReturn = m_pMessageManager->SendMessage(uMsg, wParam, lParam);
-                break;
+                if (m_pMessageManager &&
+                    m_pMessageManager->HandlerExists(uMsg))
+                {
+                    lReturn =
+                        m_pMessageManager->SendMessage(uMsg, wParam, lParam);
+                    
+                    break;
+                }
             }
+
             lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
         }
         break;
