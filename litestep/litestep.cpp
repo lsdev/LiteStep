@@ -315,7 +315,14 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
                 (LPVOID)(INT_PTR)bForceStartup, 0, &dwThread));
         }
-        
+
+        // On Vista, the shell is responsible for playing the startup sound
+        if (IsVistaOrAbove() && StartupRunner::IsFirstRunThisSession(
+            _T("LogonSoundHasBeenPlayed")))
+        {
+            LSPlaySystemSound(_T("WindowsLogon"));
+        }
+
         // Undocumented call: Shell Loading Finished
         SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
         

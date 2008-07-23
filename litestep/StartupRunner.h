@@ -31,10 +31,10 @@ public:
     virtual ~StartupRunner();
     
     static DWORD WINAPI Run(LPVOID lpData);
+    static bool IsFirstRunThisSession(LPCTSTR pszSubkey);
     
 private:
     static HKEY _CreateSessionInfoKey();
-    static bool _IsFirstRunThisSession();
     static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
     static void _RunRunOnceEx();
     static void _RunStartupMenu();

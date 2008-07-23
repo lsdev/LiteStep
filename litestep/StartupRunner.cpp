@@ -53,8 +53,15 @@ StartupRunner::~StartupRunner()
 
 DWORD StartupRunner::Run(LPVOID lpData)
 {
-    bool bRunStartup = _IsFirstRunThisSession();
+    bool bRunStartup = IsFirstRunThisSession(_T("StartupHasBeenRun"));
     BOOL bForceStartup = (lpData != 0);
+
+    if (IsVistaOrAbove())
+    {
+        // On Vista there's this additional subkey.
+        // Its meaning is currently unknown. We create but ignore it.
+        IsFirstRunThisSession(_T("RunStuffHasBeenRun"));
+    }
 
     // by keeping the call to _IsFirstRunThisSession() above we make sure the
     // regkey is created even if we're in "force startup" mode
@@ -110,7 +117,7 @@ DWORD StartupRunner::Run(LPVOID lpData)
                 (ERK_RUNSUBKEYS | ERK_DELETE));
         }
     }
-    
+
     return bRunStartup;
 }
 
@@ -268,7 +275,7 @@ HKEY StartupRunner::_CreateSessionInfoKey()
 //
 // IsFirstRunThisSession()
 //
-bool StartupRunner::_IsFirstRunThisSession()
+bool StartupRunner::IsFirstRunThisSession(LPCTSTR pszSubkey)
 {
     bool bReturn = false;
 
@@ -285,10 +292,9 @@ bool StartupRunner::_IsFirstRunThisSession()
             DWORD dwDisposition;
             HKEY hkStartup;
 
-            LONG lResult = RegCreateKeyEx(hkSessionInfo,
-                _T("StartupHasBeenRun"), 0, NULL,
-                REG_OPTION_VOLATILE, KEY_WRITE, NULL,
-                &hkStartup, &dwDisposition);
+            LONG lResult = RegCreateKeyEx(
+                hkSessionInfo, pszSubkey, 0, NULL, REG_OPTION_VOLATILE,
+                KEY_WRITE, NULL, &hkStartup, &dwDisposition);
 
             RegCloseKey(hkStartup);
 
