@@ -74,8 +74,11 @@ public:
 	int MessageHandler(MSG &message);
 
 private:
+    void _RegisterShellNotifications(HWND hWnd);
+    void _UnregisterShellNotifications(HWND hWnd);
 
-	LRESULT InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT _HandleSessionChange(DWORD dwCode, DWORD dwSession);
 
 	void _Recycle();
 	HRESULT _EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const;
@@ -92,6 +95,9 @@ private:
 	HWND m_hMainWindow; // = NULL;
 
 	// Shell hooks
+    typedef BOOL (WINAPI* RSHPROC)(HWND, DWORD);
+
+    RSHPROC m_pRegisterShellHook;
 	UINT WM_ShellHook; // = 0;
 
 	// Function blocks

@@ -164,6 +164,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 // CLiteStep()
 //
 CLiteStep::CLiteStep()
+: m_pRegisterShellHook(NULL)
 {
     m_hInstance = NULL;
     m_bAutoHideModules = false;
@@ -204,18 +205,6 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     DWORD dwRecoveryThreadID;
     HANDLE hRecoveryThread = CreateThread(NULL, 0, RecoveryThreadProc,
         (LPVOID)m_hInstance, 0, &dwRecoveryThreadID);
-    
-    // configure the Win32 window manager to hide windows when they are minimized
-    MINIMIZEDMETRICS mm = { 0 };
-    mm.cbSize = sizeof(MINIMIZEDMETRICS);
-    
-    SystemParametersInfo(SPI_GETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
-    
-    if (!(mm.iArrange & ARW_HIDE))
-    {
-        mm.iArrange |= ARW_HIDE;
-        SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0);
-    }
 
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
@@ -288,31 +277,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
         // Set our window in LSAPI 
         LSAPISetLitestepWindow(m_hMainWindow); 
 
-        FARPROC (__stdcall * RegisterShellHook)(HWND, DWORD) = \
-            (FARPROC (__stdcall *)(HWND, DWORD))GetProcAddress(
-                GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x00B5));
-        
-        WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
-        
-        if (RegisterShellHook)
-        {
-            RegisterShellHook(NULL, RSH_REGISTER);
-            
-            OSVERSIONINFO verInfo = { 0 };
-            verInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-            GetVersionEx(&verInfo);
-            
-            if (verInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-            {
-                // c0atzin's fix for 9x
-                RegisterShellHook(m_hMainWindow, RSH_REGISTER);
-            }
-            else
-            {
-                RegisterShellHook(m_hMainWindow, RSH_TASKMAN);
-            }
-        }
-        
+        _RegisterShellNotifications(m_hMainWindow);
+
         // Set Shell Window
         if (!bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
         {
@@ -362,11 +328,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             MessageHandler(message);
         }
         
-        if (RegisterShellHook)
-        {
-            RegisterShellHook(m_hMainWindow, RSH_UNREGISTER);
-        }
-        
+        _UnregisterShellNotifications(m_hMainWindow);
+
         _StopManagers();
         _CleanupManagers();
         
@@ -456,6 +419,66 @@ int CLiteStep::MessageHandler(MSG &message)
     
     return 0;
 }
+
+
+//
+// _RegisterShellNotifications
+//
+void CLiteStep::_RegisterShellNotifications(HWND hWnd)
+{
+    //
+    // Configure the Win32 window manager to hide minimized windows
+    // This is necessary to enable WH_SHELL-style hooks,
+    // including RegisterShellHook
+    //
+    MINIMIZEDMETRICS mm = { 0 };
+    mm.cbSize = sizeof(MINIMIZEDMETRICS);
+
+    VERIFY(SystemParametersInfo(SPI_GETMINIMIZEDMETRICS, mm.cbSize, &mm, 0));
+
+    if (!(mm.iArrange & ARW_HIDE))
+    {
+        mm.iArrange |= ARW_HIDE;
+        VERIFY(SystemParametersInfo(
+            SPI_SETMINIMIZEDMETRICS, mm.cbSize, &mm, 0));
+    }
+
+    //
+    // Register for shell hook notifications
+    //
+    WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
+
+    m_pRegisterShellHook = (RSHPROC)GetProcAddress(
+        GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x00B5));
+
+    if (m_pRegisterShellHook)
+    {
+        m_pRegisterShellHook(NULL, RSH_REGISTER);
+
+        if (IsOS(OS_WINDOWS))
+        {
+            // c0atzin's fix for 9x
+            m_pRegisterShellHook(hWnd, RSH_REGISTER);
+        }
+        else
+        {
+            m_pRegisterShellHook(hWnd, RSH_TASKMAN);
+        }
+    }
+}
+
+
+//
+// _UnregisterShellNotifications
+//
+void CLiteStep::_UnregisterShellNotifications(HWND hWnd)
+{
+    if (m_pRegisterShellHook)
+    {
+        m_pRegisterShellHook(hWnd, RSH_UNREGISTER);
+    }
+}
+
 
 //
 //
