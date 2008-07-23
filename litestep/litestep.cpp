@@ -20,6 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "litestep.h"
+#include <WtsApi32.h>
 
 // Misc Helpers
 #include "RecoveryMenu.h"
@@ -164,7 +165,8 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 // CLiteStep()
 //
 CLiteStep::CLiteStep()
-: m_pRegisterShellHook(NULL)
+: m_pRegisterShellHook(NULL),
+  m_hWtsDll(NULL)
 {
     m_hInstance = NULL;
     m_bAutoHideModules = false;
@@ -465,6 +467,35 @@ void CLiteStep::_RegisterShellNotifications(HWND hWnd)
             m_pRegisterShellHook(hWnd, RSH_TASKMAN);
         }
     }
+
+    //
+    // Register for session change notifications
+    //
+    if (IsOS(OS_XPORGREATER))
+    {
+        ASSERT(m_hWtsDll == NULL);
+        m_hWtsDll = LoadLibrary(_T("WtsApi32.dll"));
+
+        if (m_hWtsDll)
+        {
+            typedef BOOL (WINAPI* WTSRSNPROC)(HWND, DWORD);
+
+            WTSRSNPROC pWTSRegisterSessionNotification = (WTSRSNPROC)
+                GetProcAddress(m_hWtsDll, "WTSRegisterSessionNotification");
+
+            if (pWTSRegisterSessionNotification)
+            {
+                // This needs to be fixed: We should wait for
+                // Global\TermSrvReadyEvent before calling this.
+                VERIFY(pWTSRegisterSessionNotification(
+                    hWnd, NOTIFY_FOR_THIS_SESSION));
+            }
+        }
+        else
+        {
+            TRACE("Failed to load WtsApi32.dll");
+        }
+    }
 }
 
 
@@ -473,6 +504,22 @@ void CLiteStep::_RegisterShellNotifications(HWND hWnd)
 //
 void CLiteStep::_UnregisterShellNotifications(HWND hWnd)
 {
+    if (m_hWtsDll)
+    {
+        typedef BOOL (WINAPI* WTSURSNPROC)(HWND);
+
+        WTSURSNPROC pWTSUnRegisterSessionNotification = (WTSURSNPROC)
+            GetProcAddress(m_hWtsDll, "WTSUnRegisterSessionNotification");
+
+        if (pWTSUnRegisterSessionNotification)
+        {
+            VERIFY(pWTSUnRegisterSessionNotification(hWnd));
+        }
+
+        VERIFY(FreeLibrary(m_hWtsDll));
+        m_hWtsDll = NULL;
+    }
+
     if (m_pRegisterShellHook)
     {
         m_pRegisterShellHook(hWnd, RSH_UNREGISTER);
@@ -753,7 +800,13 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             }
         }
         break;
-        
+
+        case WM_WTSSESSION_CHANGE:
+        {
+            lReturn = _HandleSessionChange((DWORD)wParam, (DWORD)lParam);
+        }
+        break;
+
         default:
         {
             if (uMsg == WM_ShellHook)
@@ -814,6 +867,25 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     }
 
     return lReturn;
+}
+
+
+//
+// _HandleSessionChange
+// Handler for WM_WTSSESSION_CHANGE messages
+//
+LRESULT CLiteStep::_HandleSessionChange(DWORD dwCode, DWORD /* dwSession */)
+{
+    if (dwCode == WTS_SESSION_LOCK)
+    {
+        LSPlaySystemSound(_T("WindowsLogoff"));
+    }
+    else if (dwCode == WTS_SESSION_UNLOCK)
+    {
+        LSPlaySystemSound(_T("WindowsLogon"));
+    }
+
+    return 0;
 }
 
 

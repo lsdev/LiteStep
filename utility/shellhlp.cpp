@@ -21,6 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "shellhlp.h"
 #include "core.hpp"
+#include <MMSystem.h>
 
 //
 // GetShellFolderPath
@@ -302,4 +303,46 @@ void LSShutdownDialog(HWND hWnd)
             fnExitWindowsDialog(hWnd);
         }
     }
+}
+
+
+//
+// LSPlaySystemSound
+// Wrapper around PlaySound to play system event sounds
+//
+BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
+{
+    BOOL bResult = FALSE;
+
+    // We want to avoid linking to winmm.dll as long as it's used just here
+    HMODULE hWinMM = LoadLibrary(_T("winmm.dll"));
+
+    if (hWinMM)
+    {
+        typedef BOOL (WINAPI* PlaySoundProc)(LPCTSTR, HMODULE, DWORD);
+
+#ifdef UNICODE
+        PlaySoundProc fnPlaySound = (PlaySoundProc)
+            GetProcAddress(hWinMM, "PlaySoundW");
+#else
+        PlaySoundProc fnPlaySound = (PlaySoundProc)
+            GetProcAddress(hWinMM, "PlaySoundA");
+#endif
+
+        if (fnPlaySound)
+        {
+            DWORD dwFlags = SND_ALIAS;
+
+            if (IsVistaOrAbove())
+            {
+                dwFlags |= SND_SYSTEM;
+            }
+
+            bResult = fnPlaySound(pszSoundAlias, NULL, dwFlags);
+        }
+
+        VERIFY(FreeLibrary(hWinMM));
+    }
+
+    return bResult;
 }

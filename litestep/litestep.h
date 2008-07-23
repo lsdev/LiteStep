@@ -94,11 +94,12 @@ private:
 	// Windows
 	HWND m_hMainWindow; // = NULL;
 
-	// Shell hooks
+	// Notifications (Shell Hooks + WTS notifications)
     typedef BOOL (WINAPI* RSHPROC)(HWND, DWORD);
 
     RSHPROC m_pRegisterShellHook;
 	UINT WM_ShellHook; // = 0;
+    HMODULE m_hWtsDll;
 
 	// Function blocks
 	UINT m_BlockRecycle; // = 0

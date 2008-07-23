@@ -33,5 +33,6 @@ bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer);
 HRESULT TryAllowSetForegroundWindow(HWND hWnd);
 bool IsVistaOrAbove();
 void LSShutdownDialog(HWND hWnd);
+BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias);
 
 #endif // SHELLHLP_H
