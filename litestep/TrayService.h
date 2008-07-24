@@ -110,6 +110,7 @@ private:
     //
     // manage COM based shell services
     //
+    HRESULT loadShellServiceObject(REFCLSID rclsid);
     void loadShellServiceObjects();
     void unloadShellServiceObjects();
     

@@ -287,6 +287,30 @@ void TrayService::destroyWindows()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
+// loadShellServiceObject
+//
+HRESULT TrayService::loadShellServiceObject(REFCLSID rclsid)
+{
+    IOleCommandTarget* pCmdTarget = NULL;
+
+    HRESULT hr = CoCreateInstance(rclsid, NULL,
+        CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
+        IID_IOleCommandTarget, (void **)&pCmdTarget);
+
+    if (SUCCEEDED(hr))
+    {
+        hr = pCmdTarget->Exec(&CGID_ShellServiceObject, OLECMDID_NEW,
+            OLECMDEXECOPT_DODEFAULT, NULL, NULL);
+
+        m_ssoVector.push_back(pCmdTarget);
+    }
+
+    return hr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
 // loadShellServiceObjects
 //
 // Start the COM based shell services listed in the registry.
@@ -314,24 +338,12 @@ void TrayService::loadShellServiceObjects()
         if (lErrorCode == ERROR_SUCCESS)
         {
             WCHAR wszCLSID[40] = { 0 };
-            CLSID clsid;
-            IOleCommandTarget* pCmdTarget = NULL;
-            
+            CLSID clsid = CLSID_NULL;
+
             MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, 40);
-            
             CLSIDFromString(wszCLSID, &clsid);
-            
-            HRESULT hr = CoCreateInstance(clsid, NULL,
-                CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                IID_IOleCommandTarget, (void **)&pCmdTarget);
-            
-            if (SUCCEEDED(hr))
-            {
-                pCmdTarget->Exec(&CGID_ShellServiceObject, OLECMDID_NEW,
-                    OLECMDEXECOPT_DODEFAULT, NULL, NULL);
-                
-                m_ssoVector.push_back(pCmdTarget);
-            }
+
+            loadShellServiceObject(clsid);            
         }
         
         ++nCounter;
