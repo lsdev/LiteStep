@@ -396,7 +396,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
                     
                     if (dwFlags & ERK_DELETE)
                     {
-                        if (RegDeleteValue(hkSubKey, tzNameBuffer) ==
+                        if (RegDeleteKey(hkSubKey, tzNameBuffer) ==
                             ERROR_SUCCESS)
                         {
                             --dwLoop;
