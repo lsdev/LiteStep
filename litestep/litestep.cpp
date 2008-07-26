@@ -284,11 +284,15 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
         // Set Shell Window
         if (!bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
         {
-            FARPROC (__stdcall * SetShellWindow)(HWND) = NULL;
-            SetShellWindow = (FARPROC (__stdcall *)(HWND))GetProcAddress(GetModuleHandle("USER32.DLL"), "SetShellWindow");
-            if (SetShellWindow)
+            typedef BOOL (WINAPI* SETSHELLWINDOWPROC)(HWND);
+
+            SETSHELLWINDOWPROC fnSetShellWindow =
+                (SETSHELLWINDOWPROC)GetProcAddress(
+                    GetModuleHandle(_T("USER32.DLL")), "SetShellWindow");
+
+            if (fnSetShellWindow)
             {
-                SetShellWindow(m_hMainWindow);
+                fnSetShellWindow(m_hMainWindow);
             }
         }
         
