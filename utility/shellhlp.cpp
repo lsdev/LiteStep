@@ -335,6 +335,9 @@ BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
 
             if (IsVistaOrAbove())
             {
+                // Vista has a special volume slider for system sounds, ie. all
+                // those beeps etc. can be adjusted independently of all other
+                // sounds. SND_SYSTEM makes PlaySound use that slider.
                 dwFlags |= SND_SYSTEM;
             }
 
