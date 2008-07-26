@@ -274,8 +274,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     if (m_hMainWindow)
     {
         // Set magic DWORD to prevent VWM from seeing main window
-        SetWindowLong (m_hMainWindow, GWL_USERDATA, magicDWord);
-        
+        SetWindowLongPtr(m_hMainWindow, GWLP_USERDATA, magicDWord);
+
         // Set our window in LSAPI 
         LSAPISetLitestepWindow(m_hMainWindow); 
 

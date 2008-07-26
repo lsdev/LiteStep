@@ -101,9 +101,9 @@ HRESULT TrayService::Start()
         
         if (createWindows())
         {
-            SetWindowLong(m_hTrayWnd, GWL_USERDATA, magicDWord);
+            SetWindowLongPtr(m_hTrayWnd, GWLP_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG_PTR)this);
-            
+
             // http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=1427677&SiteID=1
             //
             // Re: TaskbarCreated message (not working in Vista)

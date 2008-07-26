@@ -170,7 +170,7 @@ BOOL CALLBACK WindowsEnumProc(HWND hWnd, LPARAM lParam)
 	/* Based off of Jugg's task.dll */
 	if (IsWindow(hWnd))
 	{
-		if ((GetWindowLong(hWnd, GWL_USERDATA) != magicDWord) &&
+		if ((GetWindowLongPtr(hWnd, GWLP_USERDATA) != magicDWord) &&
 		        (!(GetWindowLong(hWnd, GWL_STYLE) & WS_CHILD) &&
 		         (GetWindowLong(hWnd, GWL_STYLE) & WS_VISIBLE)) &&
 		        (!(GetWindowLong(hWnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW)))
@@ -370,12 +370,12 @@ static void EMPHandler(HDWP hDwp, HWND hWnd, UINT uMode)
 
 	if (IsWindow(hWnd))
 	{
-		long lUserData = GetWindowLong(hWnd, GWL_USERDATA);
+		LONG_PTR lUserData = GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 		if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
 		    (uMode == EMP_HIDE || uMode == EMP_TOGGLE))
 		{
-			SetWindowLong(hWnd, GWL_USERDATA, HIDEmagicDWord);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, HIDEmagicDWord);
 			hDwp = DeferWindowPos(
 				 hDwp
 				,hWnd
@@ -388,7 +388,7 @@ static void EMPHandler(HDWP hDwp, HWND hWnd, UINT uMode)
 		else if ((lUserData == HIDEmagicDWord) &&
 		         (uMode == EMP_SHOW || uMode == EMP_TOGGLE))
 		{
-			SetWindowLong(hWnd, GWL_USERDATA, magicDWord);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, magicDWord);
 			hDwp = DeferWindowPos(
 				 hDwp
 				,hWnd
