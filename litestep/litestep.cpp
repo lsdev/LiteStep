@@ -142,6 +142,16 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
         PathCombine(szRcPath, szAppPath, "step.rc");
     }
 
+    if (IsVistaOrAbove())
+    {
+        // Starting with Vista (or Aero?) the shell needs to set the wallpaper.
+        // Otherwise the background remains black and SPI_GETDESKWALLPAPER
+        // returns an empty string. SETWALLPAPER_DEFAULT apparently causes
+        // SystemParametersInfo to look up the wallpaper in the registry.
+        VERIFY(SystemParametersInfo(
+            SPI_SETDESKWALLPAPER, 0, SETWALLPAPER_DEFAULT, 0));
+    }
+
     //
     // Close the welcome screen (if required)
     // This has to be done before the first MessageBox call, otherwise
