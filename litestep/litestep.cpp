@@ -92,6 +92,33 @@ static HRESULT GetAppPath(LPTSTR pszAppPath, DWORD cchAppPath)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// SetWelcomeScreenEvent
+//
+void SetWelcomeScreenEvent()
+{
+    HANDLE hSwitchEvent = NULL;
+
+    if (IsVistaOrAbove())
+    {
+        hSwitchEvent = OpenEvent(
+            EVENT_MODIFY_STATE, FALSE, _T("ShellDesktopSwitchEvent"));
+    }
+    else
+    {
+        hSwitchEvent = OpenEvent(
+            EVENT_MODIFY_STATE, FALSE, _T("msgina: ShellReadyEvent"));
+    }
+
+    if (hSwitchEvent)
+    {
+        VERIFY(SetEvent(hSwitchEvent));
+        VERIFY(CloseHandle(hSwitchEvent));
+    }
+}
+
+
 //
 //
 //
@@ -115,17 +142,12 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
         PathCombine(szRcPath, szAppPath, "step.rc");
     }
 
-    // Tell the Welcome Screen to close
-    // This has to be done before the first MessageBox call in shell mode,
-    // else that box would pop up "under" the welcome screen
-    HANDLE hShellReadyEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE,
-        "msgina: ShellReadyEvent");
-
-    if (hShellReadyEvent != NULL)
-    {
-        SetEvent(hShellReadyEvent);
-        CloseHandle(hShellReadyEvent);
-    }
+    //
+    // Close the welcome screen (if required)
+    // This has to be done before the first MessageBox call, otherwise
+    // the box would pop up under that screen
+    //
+    SetWelcomeScreenEvent();
 
     // If we can't find "step.rc", there's no point in proceeding
     if (!PathFileExists(szRcPath))
