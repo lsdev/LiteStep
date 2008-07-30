@@ -1197,10 +1197,10 @@ bool CLiteStep::_IsFullScreenActiveOnPrimaryMonitor()
 
     bool isFullScreen = false;
     HWND hWnd = GetForegroundWindow();
-    HMONITOR hmon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
+    HMONITOR hmon = LSMonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
     POINT p = {0, 0};
 
-    if (IsWindow(hWnd) && hmon == MonitorFromPoint(p, MONITOR_DEFAULTTONULL))
+    if (IsWindow(hWnd) && hmon == LSMonitorFromPoint(p, MONITOR_DEFAULTTONULL))
     {
         RECT rWnd, rScreen = {0};
         MONITORINFO mi = {sizeof(mi)};
@@ -1208,7 +1208,7 @@ bool CLiteStep::_IsFullScreenActiveOnPrimaryMonitor()
         rScreen.right = GetSystemMetrics(SM_CXSCREEN);
         rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
 
-        if (GetMonitorInfo(hmon, &mi))
+        if (LSGetMonitorInfo(hmon, &mi))
         {
             rScreen.right = mi.rcMonitor.right - mi.rcMonitor.left;
             rScreen.bottom = mi.rcMonitor.bottom - mi.rcMonitor.top;
