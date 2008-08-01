@@ -27,12 +27,19 @@
 #endif // defined(_MFC_VER)
 
 #include <assert.h>
+
 #if defined(_DEBUG)
    // THIS IS BOGUS, WE NEED TO FIX OUR STRING FUNCTION USAGE!!!
 #  define STRSAFE_NO_DEPRECATE
 #  include "../utility/safestr.h"
 #  undef STRSAFE_NO_DEPRECATE
 #endif // defined(_DEBUG)
+
+
+// MSVC debug
+#if defined(_DEBUG) && defined (_MSC_VER)
+#  define MSVC_DEBUG
+#endif
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -242,6 +249,17 @@ namespace debug
 #define DBG(f)     (void)0
 
 #endif // !defined(_DEBUG)
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// DbgSetCurrentThreadName
+//
+#ifdef MSVC_DEBUG
+void DbgSetCurrentThreadName(LPCSTR pszThreadName);
+#else
+#define DbgSetCurrentThreadName(Name)  (void)0
+#endif
 
 
 #endif // DEBUG_HPP

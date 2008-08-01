@@ -124,6 +124,8 @@ void SetWelcomeScreenEvent()
 //
 int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 {
+    DbgSetCurrentThreadName("LS Main Thread");
+
     TCHAR szAppPath[MAX_PATH] = { 0 };
     TCHAR szRcPath[MAX_PATH] = { 0 };
 
@@ -237,8 +239,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     
     // before anything else, start the recovery menu thread
     DWORD dwRecoveryThreadID;
-    HANDLE hRecoveryThread = CreateThread(NULL, 0, RecoveryThreadProc,
-        (LPVOID)m_hInstance, 0, &dwRecoveryThreadID);
+    HANDLE hRecoveryThread = LSCreateThread("RecoveryThread",
+        RecoveryThreadProc, (LPVOID)m_hInstance, &dwRecoveryThreadID);
 
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
@@ -345,11 +347,10 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
         // Run startup items
         if (wStartFlags & LSF_RUN_STARTUPAPPS)
         {
-            DWORD dwThread;
             BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
 
-            CloseHandle(CreateThread(NULL, 0, StartupRunner::Run,
-                (LPVOID)(INT_PTR)bForceStartup, 0, &dwThread));
+            CloseHandle(LSCreateThread("StartupRunner",
+                StartupRunner::Run, (LPVOID)(INT_PTR)bForceStartup, NULL));
         }
 
         // On Vista, the shell is responsible for playing the startup sound

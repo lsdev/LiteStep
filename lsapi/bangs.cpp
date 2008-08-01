@@ -21,6 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "bangs.h"
 #include "../utility/core.hpp"
+#include "../utility/shellhlp.h"
 
 
 extern ULONG WINAPI AboutBoxThread(void *);
@@ -58,8 +59,7 @@ void SetupBangs()
 //
 void BangAbout(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	DWORD dwThread;
-	CloseHandle(CreateThread(NULL, 0, AboutBoxThread, NULL, 0, &dwThread));
+	CloseHandle(LSCreateThread("AboutBox Thread", AboutBoxThread, NULL, NULL));
 }
 
 

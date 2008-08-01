@@ -349,3 +349,79 @@ BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
 
     return bResult;
 }
+
+
+//
+// LS_THREAD_DATA
+// for use in LSCreateThread/LSThreadThunk
+//
+struct LS_THREAD_DATA
+{
+    HANDLE hEvent;
+    LPCSTR pszName;
+    LPTHREAD_START_ROUTINE fnOrigFunc;
+    LPVOID pOrigParam;
+};
+
+
+//
+// LSThreadThunk
+// for use LSCreateThread
+//
+DWORD WINAPI LSThreadThunk(LPVOID pParam)
+{
+    LS_THREAD_DATA* pData = (LS_THREAD_DATA*)pParam;
+    ASSERT(pData != NULL);
+
+    // create local copy
+    LS_THREAD_DATA data = *pData;
+
+    if (data.pszName)
+    {
+        DbgSetCurrentThreadName(data.pszName);
+    }
+
+    SetEvent(data.hEvent);
+    return data.fnOrigFunc(data.pOrigParam);
+}
+
+
+//
+// LSCreateThread
+// The name param is intentionally CHAR as the debugger doesn't handle WCHAR
+//
+HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
+                      LPVOID lpParameter, LPDWORD pdwThreadId)
+{
+    DWORD dwDummy = 0;
+
+    if (!pdwThreadId)
+    {
+        // On Win9x pdwThreadId must be valid
+        pdwThreadId = &dwDummy;
+    }
+
+#ifdef MSVC_DEBUG
+    LS_THREAD_DATA data = { 0 };
+    data.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    data.pszName = pszName;
+    data.fnOrigFunc = fnStartAddres;
+    data.pOrigParam = lpParameter;
+
+    // Should be fine to assert this since this is debug-mode only code
+    ASSERT(data.hEvent != NULL);
+
+    HANDLE hThread = CreateThread(
+        NULL, 0, LSThreadThunk, (LPVOID)&data, 0, pdwThreadId);
+
+    if (hThread != NULL && data.hEvent)
+    {
+        WaitForSingleObject(data.hEvent, INFINITE);
+    }
+
+    return hThread;
+#else
+    return CreateThread(NULL, 0, fnStartAddres, lpParameter, 0, pdwThreadId);
+    UNREFERENCED_PARAMETER(pszName);
+#endif
+}

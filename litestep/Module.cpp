@@ -264,6 +264,11 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
 {
     Module* dllMod = (Module*)dllModPtr;
     
+#ifdef MSVC_DEBUG
+    LPCTSTR pszFileName = PathFindFileName(dllMod->m_tzLocation.c_str());
+    DbgSetCurrentThreadName(pszFileName);
+#endif
+
     dllMod->CallInit();
     
     /* We must use a copy of our event, and hope no one 

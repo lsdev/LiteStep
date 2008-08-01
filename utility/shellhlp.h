@@ -34,5 +34,7 @@ HRESULT TryAllowSetForegroundWindow(HWND hWnd);
 bool IsVistaOrAbove();
 void LSShutdownDialog(HWND hWnd);
 BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias);
+HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
+                      LPVOID lpParameter, LPDWORD pdwThreadId);
 
 #endif // SHELLHLP_H
