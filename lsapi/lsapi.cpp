@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.29 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.29 2008/07/20 18:39:19 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.30 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.30 2008/08/01 13:58:31 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -211,10 +211,10 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 		}
 		else
 		{
-			DWORD dwType = GetFileAttributes(pszCommand);
-			if ((dwType & FILE_ATTRIBUTE_DIRECTORY) && (dwType != 0xFFFFFFFF))
+			if (PathIsDirectory(pszCommand))
 			{
-				hReturn = ShellExecute(hOwner, pszOperation, pszCommand, pszArgs, NULL, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
+				hReturn = ShellExecute(hOwner, pszOperation, pszCommand,
+                    pszArgs, NULL, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
 			}
 			else
 			{
@@ -253,7 +253,7 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 	{
 		VarExpansionEx(szExpandedCommand, pszCommand, MAX_LINE_LENGTH);
 
-		if (GetToken(szExpandedCommand, szCommand, &pszArgs, true))
+		if (GetToken(szExpandedCommand, szCommand, &pszArgs, TRUE))
 		{
 			if (pszArgs > (szExpandedCommand + strlen(szExpandedCommand)))
 			{
