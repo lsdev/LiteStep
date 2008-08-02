@@ -878,16 +878,12 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                      * to hide when a full screen app is active, and to show when
                      * a non full screen app is active.
                      */
+                    bool bFullScreenNow = (lParam & HSHELL_HIGHBIT) &&
+                        _IsFullScreenActiveOnPrimaryMonitor();
 
-                    if (!m_bAppIsFullScreen && lParam != 0 && 
-                        _IsFullScreenActiveOnPrimaryMonitor())
+                    if (m_bAppIsFullScreen != bFullScreenNow)
                     {
-                        _HandleFullScreenApp(true);
-                    }
-                    else if (m_bAppIsFullScreen && 
-                        (lParam == 0 || !_IsFullScreenActiveOnPrimaryMonitor()))
-                    {
-                        _HandleFullScreenApp(false);
+                        _HandleFullScreenApp(bFullScreenNow);
                     }
                 }
             }
