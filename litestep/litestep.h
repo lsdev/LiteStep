@@ -67,6 +67,9 @@ public:
 	~CLiteStep();
 
 	HRESULT Start(HINSTANCE hInstance, WORD wStartFlags);
+    HRESULT Stop();
+
+    int Run();
 
 	static LRESULT CALLBACK ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

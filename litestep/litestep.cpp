@@ -53,10 +53,6 @@ using std::for_each;
 using std::mem_fun;
 
 
-// Globals
-CLiteStep gLiteStep;
-
-
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // GetAppPath
@@ -189,7 +185,8 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     // All child processes get this variable
     VERIFY(SetEnvironmentVariable(_T("LitestepDir"), szAppPath));
 
-    HRESULT hr = gLiteStep.Start(hInst, wStartFlags);
+    CLiteStep liteStep;
+    HRESULT hr = liteStep.Start(hInst, wStartFlags);
 
     return HRESULT_CODE(hr);
 }
@@ -229,7 +226,7 @@ CLiteStep::~CLiteStep()
 //
 HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 {
-    HRESULT hr;
+    HRESULT hr = E_FAIL;
     bool bUnderExplorer = false;
     
     m_hInstance = hInstance;
@@ -362,30 +359,9 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 
         // Undocumented call: Shell Loading Finished
         SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
-        
-        // Main message pump
-        MSG message;
-        /* Note: check m_bSignalExit first, so that if MessageHandler()
-         * was called externally from a response to PeekMessage() we
-         * know right away if there was a WM_QUIT in the queue, and
-         * subsequently do not incorrectly call GetMessage() again. */
-        while (!m_bSignalExit && GetMessage(&message, 0, 0, 0) > 0)
-        {
-            MessageHandler(message);
-        }
-        
-        _UnregisterShellNotifications(m_hMainWindow);
 
-        _StopManagers();
-        _CleanupManagers();
-        
-        _StopServices();
-        _CleanupServices();
-        
-        // Destroy main window
-        DestroyWindow(m_hMainWindow);
-        m_hMainWindow = NULL;
-        LSAPISetLitestepWindow(NULL);
+        Run();
+        hr = Stop();
     }
     else
     {
@@ -393,12 +369,6 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
                           "Error creating Litestep main application window.",
                           IDS_LITESTEP_TITLE_ERROR, "Error");
     }
-    
-    // Unreg class
-    UnregisterClass(szMainWindowClass, m_hInstance);
-    
-    // Uninitialize OLE/COM
-    OleUninitialize();
     
     // close the recovery thread: tell the thread to quit
     PostThreadMessage(dwRecoveryThreadID, WM_QUIT, 0, 0);
@@ -410,8 +380,77 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     // close the thread handle
     CloseHandle(hRecoveryThread);
     
-    return S_OK;
+    return hr;
 }
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Stop
+//
+HRESULT CLiteStep::Stop()
+{
+    HRESULT hr = E_FAIL;
+
+    if (m_hMainWindow)
+    {
+        _UnregisterShellNotifications(m_hMainWindow);
+
+        _StopManagers();
+        _CleanupManagers();
+
+        _StopServices();
+        _CleanupServices();
+
+        LSAPISetLitestepWindow(NULL);
+
+        // Destroy main window
+        VERIFY(DestroyWindow(m_hMainWindow));
+        m_hMainWindow = NULL;
+        
+        hr = S_OK;
+    }
+    else
+    {
+        hr = S_FALSE;
+    }
+
+    UnregisterClass(szMainWindowClass, m_hInstance);
+
+    OleUninitialize();
+    return hr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Run
+// Main message pump
+//
+int CLiteStep::Run()
+{
+    int nReturn = 0;
+    MSG message = { 0 };
+
+    //
+    // Note: check m_bSignalExit first, so that if MessageHandler()
+    // was called externally from a response to PeekMessage() we
+    // know right away if there was a WM_QUIT in the queue, and
+    // subsequently do not incorrectly call GetMessage() again.
+    //
+    while (!m_bSignalExit && GetMessage(&message, 0, 0, 0) > 0)
+    {
+        MessageHandler(message);
+    }
+
+    if (message.message == WM_QUIT)
+    {
+        nReturn = (int)message.wParam;
+    }
+
+    return nReturn;
+}
+
 
 //
 //
@@ -548,6 +587,8 @@ void CLiteStep::_RegisterShellNotifications(HWND hWnd)
 //
 void CLiteStep::_UnregisterShellNotifications(HWND hWnd)
 {
+    ASSERT(IsWindow(hWnd));
+
     if (m_hWtsDll)
     {
         typedef BOOL (WINAPI* WTSURSNPROC)(HWND);
