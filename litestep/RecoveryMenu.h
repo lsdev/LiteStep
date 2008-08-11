@@ -23,16 +23,43 @@
 #define RECOVERYMENU_H
 
 #include "../utility/common.h"
+#include "../utility/IService.h"
 
-#define ID_HOTKEY 1
 
-#define ID_RECYCLE 1
-#define ID_QUIT 2
-#define ID_TERMINATE 3
-#define ID_RUN 4
-#define ID_SHUTDOWN 5
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// RecoveryMenu
+// Provides a recovery menu in a separate thread which can be accessed
+// in case the other threads are rendered unusable
+//
+class RecoveryMenu : public IService
+{
+    HINSTANCE m_hInstance;
+    
+    DWORD m_dwThreadId;
+    HANDLE m_hThread;
 
-LRESULT WINAPI RecoveryMenuWndProc(HWND, UINT, WPARAM, LPARAM);
-DWORD WINAPI RecoveryThreadProc(LPVOID);
+public:
+    RecoveryMenu(HINSTANCE hInstance);
+
+    //
+    // IService methods
+    //
+    HRESULT Start();
+    HRESULT Stop();
+
+private:
+    static DWORD WINAPI ThreadThunk(LPVOID pParam);
+    DWORD ThreadProc();
+
+    static LRESULT WINAPI WindowThunk(HWND hWnd, UINT uMsg,
+                                      WPARAM wParam, LPARAM lParam);
+
+    LRESULT WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    int ShowMenu(HWND hWnd) const;
+    void HandleMenuCommand(int nCommand) const;
+};
+
 
 #endif // RECOVERYMENU_H

@@ -233,12 +233,19 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     
     // Initialize OLE/COM
     OleInitialize(NULL);
-    
-    // before anything else, start the recovery menu thread
-    DWORD dwRecoveryThreadID;
-    HANDLE hRecoveryThread = LSCreateThread("RecoveryThread",
-        RecoveryThreadProc, (LPVOID)m_hInstance, &dwRecoveryThreadID);
 
+    // before anything else, start the recovery menu
+    IService* pRecoveryMenu = new RecoveryMenu(hInstance);
+
+    if (pRecoveryMenu)
+    {
+        hr = pRecoveryMenu->Start();
+    }
+    else
+    {
+        return E_OUTOFMEMORY;
+    }
+    
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
         GetRCBool("LSNoStartup", TRUE) &&
@@ -370,16 +377,11 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
                           IDS_LITESTEP_TITLE_ERROR, "Error");
     }
     
-    // close the recovery thread: tell the thread to quit
-    PostThreadMessage(dwRecoveryThreadID, WM_QUIT, 0, 0);
-    // wait until the thread is done quitting, at most three seconds though
-    if (WaitForSingleObject(hRecoveryThread, 3000) == WAIT_TIMEOUT)
+    if (pRecoveryMenu)
     {
-        TerminateThread(hRecoveryThread, 0);
+        pRecoveryMenu->Stop();
     }
-    // close the thread handle
-    CloseHandle(hRecoveryThread);
-    
+
     return hr;
 }
 
