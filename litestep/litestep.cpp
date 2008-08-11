@@ -185,10 +185,23 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     // All child processes get this variable
     VERIFY(SetEnvironmentVariable(_T("LitestepDir"), szAppPath));
 
+    int nReturn = 0;
+
     CLiteStep liteStep;
     HRESULT hr = liteStep.Start(hInst, wStartFlags);
 
-    return HRESULT_CODE(hr);
+    if (SUCCEEDED(hr))
+    {
+        nReturn = liteStep.Run();
+        hr = liteStep.Stop();
+    }
+
+    if (FAILED(hr))
+    {
+        nReturn = HRESULT_CODE(hr);
+    }
+
+    return nReturn;
 }
 
 
@@ -196,7 +209,8 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 // CLiteStep()
 //
 CLiteStep::CLiteStep()
-: m_pRegisterShellHook(NULL),
+: m_pRecoveryMenu(NULL),
+  m_pRegisterShellHook(NULL),
   m_hWtsDll(NULL)
 {
     m_hInstance = NULL;
@@ -227,25 +241,28 @@ CLiteStep::~CLiteStep()
 HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 {
     HRESULT hr = E_FAIL;
-    bool bUnderExplorer = false;
-    
+
     m_hInstance = hInstance;
-    
-    // Initialize OLE/COM
-    OleInitialize(NULL);
+    m_pRecoveryMenu = new RecoveryMenu(hInstance);
 
-    // before anything else, start the recovery menu
-    IService* pRecoveryMenu = new RecoveryMenu(hInstance);
-
-    if (pRecoveryMenu)
+    // Before anything else, start the recovery menu
+    if (m_pRecoveryMenu)
     {
-        hr = pRecoveryMenu->Start();
+        hr = m_pRecoveryMenu->Start();
     }
     else
     {
-        return E_OUTOFMEMORY;
+        hr = E_OUTOFMEMORY;
     }
-    
+
+    if (FAILED(hr))
+    {
+        return hr;
+    }
+
+    // Initialize OLE/COM
+    OleInitialize(NULL);
+
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
         GetRCBool("LSNoStartup", TRUE) &&
@@ -257,6 +274,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 
     m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
     
+    bool bUnderExplorer = false;
+
     // Check for explorer
     if (FindWindow("Shell_TrayWnd", NULL)) // Running under Exploder
     {
@@ -276,64 +295,26 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
                 "\n"
                 "Continue to load Litestep?\n");
             RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
-            if (MessageBox(NULL, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
+            
+            if (MessageBox(NULL, resourceTextBuffer, resourceTitleBuffer,
+                MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
             {
                 return E_ABORT;
             }
         }
+
         bUnderExplorer = true;
     }
 
-    // Register Window Class
-    WNDCLASSEX wc = { 0 };
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.lpfnWndProc = CLiteStep::ExternalWndProc;
-    wc.hInstance = m_hInstance;
-    wc.lpszClassName = szMainWindowClass;
+    bool bSetAsShell = (!bUnderExplorer && GetRCBool("LSSetAsShell", TRUE));
+
+    hr = CreateMainWindow(bSetAsShell);
     
-    if (!RegisterClassEx(&wc))
-    {
-        RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR4,
-                          "Error registering main Litestep window class.",
-                          IDS_LITESTEP_TITLE_ERROR, "Error");
-        
-        return E_FAIL;
-    }
-    
-    // Create our main window
-    m_hMainWindow = CreateWindowEx(WS_EX_TOOLWINDOW,
-        szMainWindowClass, szMainWindowTitle,
-        0, 0, 0, 0,
-        0, NULL, NULL,
-        m_hInstance,
-        (void*)this);
-    
+    //
     // Start up everything
-    if (m_hMainWindow)
+    //
+    if (SUCCEEDED(hr))
     {
-        // Set magic DWORD to prevent VWM from seeing main window
-        SetWindowLongPtr(m_hMainWindow, GWLP_USERDATA, magicDWord);
-
-        // Set our window in LSAPI 
-        LSAPISetLitestepWindow(m_hMainWindow); 
-
-        _RegisterShellNotifications(m_hMainWindow);
-
-        // Set Shell Window
-        if (!bUnderExplorer && (GetRCBool("LSSetAsShell", TRUE)))
-        {
-            typedef BOOL (WINAPI* SETSHELLWINDOWPROC)(HWND);
-
-            SETSHELLWINDOWPROC fnSetShellWindow =
-                (SETSHELLWINDOWPROC)GetProcAddress(
-                    GetModuleHandle(_T("USER32.DLL")), "SetShellWindow");
-
-            if (fnSetShellWindow)
-            {
-                fnSetShellWindow(m_hMainWindow);
-            }
-        }
-        
         hr = _InitServices();
         if (SUCCEEDED(hr))
         {
@@ -366,22 +347,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 
         // Undocumented call: Shell Loading Finished
         SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
-
-        Run();
-        hr = Stop();
-    }
-    else
-    {
-        RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR5,
-                          "Error creating Litestep main application window.",
-                          IDS_LITESTEP_TITLE_ERROR, "Error");
     }
     
-    if (pRecoveryMenu)
-    {
-        pRecoveryMenu->Stop();
-    }
-
     return hr;
 }
 
@@ -392,35 +359,25 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 //
 HRESULT CLiteStep::Stop()
 {
-    HRESULT hr = E_FAIL;
+    _StopManagers();
+    _CleanupManagers();
+
+    _StopServices();
+    _CleanupServices();
 
     if (m_hMainWindow)
     {
-        _UnregisterShellNotifications(m_hMainWindow);
-
-        _StopManagers();
-        _CleanupManagers();
-
-        _StopServices();
-        _CleanupServices();
-
-        LSAPISetLitestepWindow(NULL);
-
-        // Destroy main window
-        VERIFY(DestroyWindow(m_hMainWindow));
-        m_hMainWindow = NULL;
-        
-        hr = S_OK;
+        DestroyMainWindow();
     }
-    else
-    {
-        hr = S_FALSE;
-    }
-
-    UnregisterClass(szMainWindowClass, m_hInstance);
 
     OleUninitialize();
-    return hr;
+
+    if (m_pRecoveryMenu)
+    {
+        m_pRecoveryMenu->Stop();
+    }
+
+    return S_OK;
 }
 
 
@@ -451,6 +408,107 @@ int CLiteStep::Run()
     }
 
     return nReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// CreateMainWindow
+//
+HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
+{
+    HRESULT hr = E_FAIL;
+
+    //
+    // Register window class
+    //
+    WNDCLASSEX wc = { 0 };
+    wc.cbSize = sizeof(wc);
+    wc.lpfnWndProc = CLiteStep::ExternalWndProc;
+    wc.hInstance = m_hInstance;
+    wc.lpszClassName = szMainWindowClass;
+
+    if (!RegisterClassEx(&wc))
+    {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+
+        RESOURCE_MSGBOX_T(m_hInstance, IDS_LITESTEP_ERROR4,
+            "Error registering main Litestep window class.",
+            IDS_LITESTEP_TITLE_ERROR, "Error");
+
+        return hr;
+    }
+
+    //
+    // Create main window
+    //
+    m_hMainWindow = CreateWindowEx(WS_EX_TOOLWINDOW,
+        szMainWindowClass, szMainWindowTitle,
+        0, 0, 0, 0,
+        0, NULL, NULL,
+        m_hInstance,
+        (void*)this);
+
+    if (m_hMainWindow)
+    {
+        // Set magic DWORD to prevent VWM from seeing main window
+        SetWindowLongPtr(m_hMainWindow, GWLP_USERDATA, magicDWord);
+
+        // Set our window in LSAPI 
+        LSAPISetLitestepWindow(m_hMainWindow); 
+
+        _RegisterShellNotifications(m_hMainWindow);
+
+        // Set Shell Window
+        if (bSetAsShell)
+        {
+            typedef BOOL (WINAPI* SETSHELLWINDOWPROC)(HWND);
+
+            SETSHELLWINDOWPROC fnSetShellWindow =
+                (SETSHELLWINDOWPROC)GetProcAddress(
+                GetModuleHandle(_T("USER32.DLL")), "SetShellWindow");
+
+            if (fnSetShellWindow)
+            {
+                fnSetShellWindow(m_hMainWindow);
+            }
+            else
+            {
+                TRACE("SetShellWindow() not found");
+            }
+        }
+
+        hr = S_OK;
+    }
+    else
+    {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+
+        RESOURCE_MSGBOX_T(m_hInstance, IDS_LITESTEP_ERROR5,
+            "Error creating Litestep main application window.",
+            IDS_LITESTEP_TITLE_ERROR, "Error");
+    }
+
+    return hr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// DestroyMainWindow
+//
+HRESULT CLiteStep::DestroyMainWindow()
+{
+    ASSERT(m_hMainWindow != NULL);
+
+    _UnregisterShellNotifications(m_hMainWindow);
+    LSAPISetLitestepWindow(NULL);
+
+    VERIFY(DestroyWindow(m_hMainWindow));
+    m_hMainWindow = NULL;
+
+    UnregisterClass(szMainWindowClass, m_hInstance);
+    return S_OK;
 }
 
 

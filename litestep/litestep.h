@@ -77,6 +77,9 @@ public:
 	int MessageHandler(MSG &message);
 
 private:
+    HRESULT CreateMainWindow(bool bSetAsShell);
+    HRESULT DestroyMainWindow();
+
     void _RegisterShellNotifications(HWND hWnd);
     void _UnregisterShellNotifications(HWND hWnd);
 
@@ -88,6 +91,10 @@ private:
 
 	// Application instance
 	HINSTANCE m_hInstance;
+
+    // Recovery Menu
+    // This is a special service that is not kept in the services array
+    IService* m_pRecoveryMenu;
 
 	bool m_bAutoHideModules;
 	bool m_bAppIsFullScreen; // = false;
