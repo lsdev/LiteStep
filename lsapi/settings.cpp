@@ -151,7 +151,7 @@ BOOL GetRCString(LPCSTR szKeyName, LPSTR szValue, LPCSTR defStr, int maxLen)
 	}
 	else if (szValue && defStr)
 	{
-		strncpy(szValue, defStr, maxLen);
+        StringCchCopy(szValue, maxLen, defStr);
 	}
 	return FALSE;
 }
@@ -176,7 +176,7 @@ BOOL GetRCLine(LPCSTR szKeyName, LPSTR szBuffer, UINT nBufLen, LPCSTR szDefault)
 	}
 	else if(szBuffer && szDefault)
 	{
-		strncpy(szBuffer, szDefault, nBufLen);
+        StringCchCopy(szBuffer, nBufLen, szDefault);
 	}
 	return FALSE;
 }
