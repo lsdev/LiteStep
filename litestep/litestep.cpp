@@ -257,6 +257,9 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 
     if (FAILED(hr))
     {
+        delete m_pRecoveryMenu;
+        m_pRecoveryMenu = NULL;
+
         return hr;
     }
 
@@ -375,6 +378,9 @@ HRESULT CLiteStep::Stop()
     if (m_pRecoveryMenu)
     {
         m_pRecoveryMenu->Stop();
+        
+        delete m_pRecoveryMenu;
+        m_pRecoveryMenu = NULL;
     }
 
     return S_OK;
