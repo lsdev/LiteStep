@@ -476,6 +476,12 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     break;
                     
                 case SH_LOADPROC_DATA:
+                    {
+                        TRACE("SHLoadInProc message detected");
+                        lResult = E_NOTIMPL;
+                    }
+                    break;
+
                 default:
                     {
                         TRACE("Unsupported tray message: %u", pcds->dwData);
