@@ -415,7 +415,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 }
 
 
-bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
+void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
 {
     ASSERT(!(dwFlags & ERK_WAITFOR_QUIT && dwFlags & ERK_WAITFOR_IDLE));
     
@@ -461,8 +461,6 @@ bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     
         CloseHandle(hProcess);
     }
-    
-    return hProcess != INVALID_HANDLE_VALUE;
 }
 
 
