@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.30 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.30 2008/08/01 13:58:31 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.31 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.31 2008/08/15 21:42:35 jugg Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -184,7 +184,7 @@ void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size
 		{
 			VarExpansionEx(szCommand, pszCommand, MAX_LINE_LENGTH);
 
-			GetToken(szCommand, szTempCommand, &pszTempArgs, true);
+			GetToken(szCommand, szTempCommand, &pszTempArgs, TRUE);
 
 			StringCchCopy(pszOutCommand, cchOutCommand, szTempCommand);
 		}
