@@ -35,6 +35,7 @@ BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
 {
 	Lock lock(m_cs);
 
+	ASSERT(pszName);
 	BangMap::iterator iter = bang_map.find(pszName);
 
 	if (iter != bang_map.end())
@@ -55,6 +56,7 @@ BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 	Lock lock(m_cs);
 	BOOL bReturn = FALSE;
 
+	ASSERT(pszName);
 	BangMap::iterator iter = bang_map.find(pszName);
 
 	if (iter != bang_map.end())
@@ -77,6 +79,7 @@ BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszPar
     // Acquiring lock manually to allow manual release below
     m_cs.Acquire();
 
+    ASSERT(pszName);
     BangMap::const_iterator iter = bang_map.find(pszName);
 
 	if (iter != bang_map.end())

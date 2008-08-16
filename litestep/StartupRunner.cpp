@@ -348,7 +348,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 
 					if (dwFlags & ERK_DELETE)
 					{
-						if (RegDeleteValue(hkSubKey, tzNameBuffer) ==
+						if (RegDeleteKey(hkSubKey, tzNameBuffer) ==
                             ERROR_SUCCESS)
 						{
                             --dwLoop;
@@ -367,7 +367,7 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 }
 
 
-bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
+void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
 {
     ASSERT(!(dwFlags & ERK_WAITFOR_QUIT && dwFlags & ERK_WAITFOR_IDLE));
     
@@ -389,7 +389,7 @@ bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
 
     GetToken(ptzCommandLine, tzToken, &ptzArgs, FALSE);
 
-    HANDLE hProcess = INVALID_HANDLE_VALUE;
+    HANDLE hProcess;
 
     if (strchr(tzToken, _T('\\')) || strchr(tzToken, _T(':')))
     {
@@ -400,7 +400,7 @@ bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
         hProcess = _ShellExecuteEx(tzToken, ptzArgs);
     }
 
-    if (hProcess != INVALID_HANDLE_VALUE)
+    if (hProcess != NULL)
     {
         if (dwFlags & ERK_WAITFOR_QUIT)
         {
@@ -413,14 +413,12 @@ bool StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
 
         CloseHandle(hProcess);
     }
-
-    return hProcess != INVALID_HANDLE_VALUE;
 }
 
 
 HANDLE StartupRunner::_CreateProcess(LPTSTR ptzCommandLine)
 {
-    HANDLE hReturn = INVALID_HANDLE_VALUE;
+    HANDLE hReturn = NULL;
 
     STARTUPINFO suInfo = { 0 };
     PROCESS_INFORMATION procInfo = { 0 };
@@ -442,7 +440,7 @@ HANDLE StartupRunner::_CreateProcess(LPTSTR ptzCommandLine)
 
 HANDLE StartupRunner::_ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs)
 {
-    HANDLE hReturn = INVALID_HANDLE_VALUE;
+    HANDLE hReturn = NULL;
 
     SHELLEXECUTEINFO sei = { 0 };
     sei.cbSize = sizeof(sei);
@@ -450,7 +448,8 @@ HANDLE StartupRunner::_ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs)
     sei.lpFile = ptzExecutable;
     sei.lpParameters = ptzArgs;
     sei.nShow = SW_SHOWNORMAL;
-    sei.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
+    sei.fMask = \
+        SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
     
     if (ShellExecuteEx(&sei))
     {

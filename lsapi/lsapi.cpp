@@ -30,8 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.20.2.4 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.4 2006/11/01 04:20:46 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.20.2.5 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.20.2.5 2008/08/16 05:34:22 jugg Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -81,7 +81,7 @@ void LSAPISetLitestepWindow(HWND hLitestepWnd)
 template<typename T>
 BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
 {
-    BOOL bReturn = false;
+    BOOL bReturn = FALSE;
     
     if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
     {
@@ -125,7 +125,15 @@ BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
 //
 BOOL RemoveBangCommand(LPCSTR pszCommand)
 {
-    return g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+    BOOL bResult = FALSE;
+    
+    if (IsValidStringPtr(pszCommand))
+    {
+        bResult = \
+            g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+    }
+
+    return bResult;
 }
 
 
@@ -178,7 +186,7 @@ void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size
 		{
 			VarExpansionEx(szCommand, pszCommand, MAX_LINE_LENGTH);
 
-			GetToken(szCommand, szTempCommand, &pszTempArgs, true);
+			GetToken(szCommand, szTempCommand, &pszTempArgs, TRUE);
 
 			StringCchCopy(pszOutCommand, cchOutCommand, szTempCommand);
 		}
@@ -247,7 +255,7 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 	{
 		VarExpansionEx(szExpandedCommand, pszCommand, MAX_LINE_LENGTH);
 
-		if (GetToken(szExpandedCommand, szCommand, &pszArgs, true))
+		if (GetToken(szExpandedCommand, szCommand, &pszArgs, TRUE))
 		{
 			if (pszArgs > (szExpandedCommand + strlen(szExpandedCommand)))
 			{

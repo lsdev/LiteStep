@@ -36,7 +36,7 @@ private:
 	static void _RunRunOnceEx();
     static void _RunStartupMenu();
 	static void _RunFolderContents(LPCTSTR ptzPath);
-    static bool _SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags);
+    static void _SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags);
     static HANDLE _CreateProcess(LPTSTR ptzCommandLine);
     static HANDLE _ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs);
 };
