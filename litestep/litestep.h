@@ -40,6 +40,7 @@ class ModuleManager;
 #define RSH_PROGMAN		2
 #define RSH_TASKMAN		3
 
+#define LT_RUDEAPP   0xBEAF
 
 // Program Options
 const char szMainWindowClass[] = "TApplication";
@@ -71,9 +72,13 @@ private:
 	// Application instance
 	HINSTANCE m_hInstance;
 
+	// LSAutoHideModules helpers
+	bool m_bRudeAppBit;
 	bool m_bAutoHideModules;
-    bool m_bAppIsFullScreen; // = false;
-	bool _IsFullScreenActive(); // LSAutoHideModules helper
+	bool m_bAppIsFullScreen; // = false;
+	static bool _IsWindowFullScreen(HWND hWnd);
+	static BOOL CALLBACK _EnumThreadFSWnd(HWND hWnd, LPARAM lParam);
+	bool _IsFullScreenActive(HWND hWnd);
 	void _HandleFullScreenApp(bool isFullscreen);
 
 	// Windows
