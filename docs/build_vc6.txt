@@ -1,14 +1,14 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7
+    LiteStep 0.24.8
     Visual C++ 6.0 Developer Information
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
 -- BUILD REQUIREMENTS ----------------------------------------------------------
 
- - Visual C++ 6.0 with Service Pack 6 (www.microsoft.com)
+ - Visual C++ 6.0 with Service Pack 5 & 6 (www.microsoft.com)
  - Microsoft Platform SDK February 2003 Edition (www.microsoft.com)
- - libpng 1.2.8 (www.libpng.org)
+ - libpng 1.2.31 (www.libpng.org)
  - zlib 1.2.3 (www.zlib.net)
 
  This is the configuration used during 0.24.7 development, it is quite possible
@@ -18,28 +18,26 @@
 
 -- BUILD SETUP -----------------------------------------------------------------
 
- It is assumed that Visual C++ 6 and Service Pack 6 are already installed. If
- you don't have Service Pack 6 get it here:
+ It is required that Visual C++ 6 with Service Pack 5 and 6 are installed. You
+ may download the required Service Packs using the links below.
 
- http://msdn.microsoft.com/vstudio/downloads/updates/sp/vs6/sp6/default.aspx
+ Note: Before applying Service Pack 6, ensure that Service Pack 5 has been
+       installed, otherwise your setup will be broken.
+
+ Service Pack 5:
+ http://www.microsoft.com/downloads/details.aspx?FamilyID=e9411283-c8ad-4283-8d74-3d6efd917644
+
+ Service Pack 6:
+ http://www.microsoft.com/downloads/details.aspx?FamilyID=a8494edb-2e89-4676-a16a-5c5477cb9713
 
  A. Install The Platform SDK
  ---------------------------
 
-  1. Unfortunately the last version of the Platform SDK that is compatible with
-     Visual C++ 6 is no longer available for download.  You may order a free
-     copy (plus shipping) from:
+  1. Download the February 2003 Platfrom SDK from:
 
-     https://www.qdirect.net/qmsfp/Product5.aspx?Item=1748
+     http://www.microsoft.com/msdownload/platformsdk/sdkupdate/psdk-full.htm
 
-     We apologize for this.  We have started testing build files for both MinGW
-     (www.mingw.org) and Visual C++ 2003 which is compatible with current
-     Platform SDK versions.  However, neither build environment is currently
-     supported and all 0.24.x binary releases will be made with Visual C++ 6.
-
-     You may download the latest Platform SDK from:
-
-     http://www.microsoft.com/msdownload/platformsdk/sdkupdate/
+     (Note: To successfully install, IE must be set as your default web browser)
 
   2. Make sure MSVC is closed, then install the Platform SDK. The Platform SDK
      will create an entry in your start menu. In there you'll find a sub-entry
@@ -69,7 +67,7 @@
         includes png.h.
 
   1. Go to http://www.libpng.org/ and http://www.zlib.net/ and download the
-     respective source code (libpng-1.2.8-src.zip and zlib123.zip).
+     respective source code (lpng1231.zip and zlib123.zip).
 
   2. Extract the archives to two directories "libpng" and "zlib" in the same
      parent directory the LiteStep source resides in (make sure you extract zlib
