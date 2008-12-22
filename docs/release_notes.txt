@@ -56,6 +56,12 @@ Contents:
  - Community news.
  - Theme gallery.
 
+ http://www.ls-themes.org/
+ -------------------------
+  - Module downloads.
+  - Screenshot and theme repository.
+  - LiteStep IRC Logs
+
  http://wiki.litestep.com.ar/
  ----------------------------
  - A LiteStep community wiki with content based largely around the community
@@ -67,12 +73,8 @@ Contents:
  ------------------------------------------
  - Module downloads.
 
- http://www.litestep.de/
- -----------------------
- - German community website.
-
- http://www.liteste-france.net/
- ------------------------------
+ http://www.litestep-france.net/
+ -------------------------------
  - French community website.
 
 -- SYSTEM REQUIREMENTS ---------------------------------------------------------
