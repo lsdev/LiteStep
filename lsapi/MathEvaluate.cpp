@@ -21,11 +21,12 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include <sstream>
 #include <string>
-#include "../utility/localization.h"
 #include "MathEvaluate.h"
 #include "MathException.h"
 #include "MathParser.h"
 #include "SettingsDefines.h"
+#include "../litestep/resource.h"
+#include "../utility/macros.h"
 
 using namespace std;
 
@@ -41,16 +42,15 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
     }
     catch (const MathException& e)
     {
-        // FIXME: Localize this
-        ostringstream message;
-        
-        message << "Error in Expression:\n  "
-                << expression << "\n"
-                << "\n"
-                << "Description:\n  "
-                << e.what();
-        
-        Error(LOCALIZE_THIS, message.str().c_str());
+        RESOURCE_STREX(
+            GetModuleHandle(NULL), IDS_MATHEXCEPTION,
+            resourceTextBuffer, MAX_LINE_LENGTH,
+            "Error in Expression:\n  %s\n\nDescription:\n  %s",
+            expression.c_str(), e.what());
+
+        MessageBox(NULL, resourceTextBuffer, "LiteStep",
+            MB_OK | MB_ICONEXCLAMATION);
+
         return false;
     }
     
@@ -76,16 +76,15 @@ bool MathEvaluateString(const SettingsMap& context, const string& expression,
     }
     catch (const MathException& e)
     {
-        // FIXME: Localize this
-        ostringstream message;
-        
-        message << "Error in Expression:\n  "
-                << expression << "\n"
-                << "\n"
-                << "Description:\n  "
-                << e.what();
-        
-        Error(LOCALIZE_THIS, message.str().c_str());
+        RESOURCE_STREX(
+            GetModuleHandle(NULL), IDS_MATHEXCEPTION,
+            resourceTextBuffer, MAX_LINE_LENGTH,
+            "Error in Expression:\n  %s\n\nDescription:\n  %s",
+            expression.c_str(), e.what());
+
+        MessageBox(NULL, resourceTextBuffer, "LiteStep",
+            MB_OK | MB_ICONEXCLAMATION);
+
         return false;
     }
     

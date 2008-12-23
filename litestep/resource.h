@@ -25,6 +25,8 @@
 #define IDS_LITESTEP_BANGEXCEPTION      21
 #define IDS_LITESTEP_REGISTERCLASS_ERROR 22
 #define IDS_MODULEDEPENDENCY_ERROR      23
+#define IDS_RECURSIVEVAR                24
+#define IDS_MATHEXCEPTION               25
 #define IDI_LS                          101
 #define IDB_LS                          102
 #define IDD_ABOUTBOX                    103

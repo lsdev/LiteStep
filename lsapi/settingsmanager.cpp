@@ -22,6 +22,7 @@
 #include "SettingsManager.h"
 #include "SettingsFileParser.h"
 #include "MathEvaluate.h"
+#include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
@@ -383,9 +384,14 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                         // Check for recursive variable definitions
                         if (recursiveVarSet.count(szVariable) > 0)
                         {
-                            // Output an error message (localize this)
-                            Error(LOCALIZE_THIS, "Error: Variable \"%s\" is defined recursively.", szVariable);
-                            
+                            RESOURCE_STREX(
+                                GetModuleHandle(NULL), IDS_RECURSIVEVAR,
+                                resourceTextBuffer, MAX_LINE_LENGTH,
+                                "Error: Variable \"%s\" is defined recursively.", szVariable);
+
+                            MessageBox(NULL, resourceTextBuffer, "LiteStep",
+                                MB_OK | MB_ICONEXCLAMATION);
+
                             pszExpandedString[0] = '\0';
                             return;
                         }
