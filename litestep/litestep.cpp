@@ -529,45 +529,34 @@ int CLiteStep::MessageHandler(MSG &message)
         return 0;
     }
     
-#if !defined(LS_NO_EXCEPTION)
-    try
+    if (NULL == message.hwnd)
     {
-#endif /* LS_NO_EXCEPTION */
-        if (NULL == message.hwnd)
+        // Thread message
+        switch (message.message)
         {
-            // Thread message
-            switch (message.message)
+            case LM_THREAD_BANGCOMMAND:
             {
-                case LM_THREAD_BANGCOMMAND:
+                ThreadedBangCommand* pInfo = \
+                    (ThreadedBangCommand*)message.wParam;
+
+                if (NULL != pInfo)
                 {
-                    ThreadedBangCommand* pInfo = \
-                        (ThreadedBangCommand*)message.wParam;
-                    
-                    if (NULL != pInfo)
-                    {
-                        pInfo->Execute();
-                        pInfo->Release(); // check BangCommand.cpp for the reason
-                    }
+                    pInfo->Execute();
+                    pInfo->Release(); // check BangCommand.cpp for the reason
                 }
-                break;
-                
-                default:
-                break;
             }
+            break;
+
+        default:
+            break;
         }
-        else
-        {
-            TranslateMessage(&message);
-            DispatchMessage (&message);
-        }
-#if !defined(LS_NO_EXCEPTION)
     }
-    catch(...)
+    else
     {
-        // MessageBox(m_hMainWindow, "exception", "oops", MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION);
+        TranslateMessage(&message);
+        DispatchMessage (&message);
     }
-#endif /* LS_NO_EXCEPTION */
-    
+
     return 0;
 }
 
@@ -1250,33 +1239,22 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
     {
         hr = S_OK;
         
-#if !defined(LS_NO_EXCEPTION)
-        try
+        for (MessageManager::windowSetT::iterator iter = setWindows.begin();
+            iter != setWindows.end(); ++iter)
         {
-#endif /* LS_NO_EXCEPTION */
-            for (MessageManager::windowSetT::iterator iter = setWindows.begin();
-                 iter != setWindows.end(); ++iter)
+            // Using MAX_LINE_LENGTH to be on the safe side. Modules
+            // should assume a length of 64 or so.
+            char szBuffer[MAX_LINE_LENGTH] = { 0 };
+
+            if (SendMessage(*iter, LM_GETREVID, 0, (LPARAM)&szBuffer) > 0)
             {
-                // Using MAX_LINE_LENGTH to be on the safe side. Modules
-                // should assume a length of 64 or so.
-                char szBuffer[MAX_LINE_LENGTH] = { 0 };
-                
-                if (SendMessage(*iter, LM_GETREVID, 0, (LPARAM)&szBuffer) > 0)
+                if (!pfnCallback(szBuffer, lParam))
                 {
-                    if (!pfnCallback(szBuffer, lParam))
-                    {
-                        hr = S_FALSE;
-                        break;
-                    }
+                    hr = S_FALSE;
+                    break;
                 }
             }
-#if !defined(LS_NO_EXCEPTION)
         }
-        catch (...)
-        {
-            hr = E_UNEXPECTED;
-        }
-#endif /* LS_NO_EXCEPTION */
     }
     
     return hr;

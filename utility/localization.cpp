@@ -233,22 +233,8 @@ static void CheckedFormat(TCHAR* ptzBuffer, size_t cchBuffer,
     ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
     ASSERT(NULL != ptzFormat);
     
-    HRESULT hr = E_FAIL;
-    
-#if !defined(LS_NO_EXCEPTION)
-    try
-    {
-#endif /* LS_NO_EXCEPTION */
-        hr = StringCchVPrintf(ptzBuffer, cchBuffer, ptzFormat, vargs);
-#if !defined(LS_NO_EXCEPTION)
-    }
-    catch (...)
-    {
-        // Don't want exceptions during error reporting
-        ASSERT(false);
-    }
-#endif /* LS_NO_EXCEPTION */
-    
+    HRESULT hr = StringCchVPrintf(ptzBuffer, cchBuffer, ptzFormat, vargs);
+
     if (FAILED(hr) && (hr != STRSAFE_E_INSUFFICIENT_BUFFER))
     {
         StringCchCopy(ptzBuffer, cchBuffer, ptzFormat);

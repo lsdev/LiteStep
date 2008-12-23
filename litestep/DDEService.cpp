@@ -61,20 +61,9 @@ unsigned int __stdcall DDEService::_DDEThreadProc(void* pvService)
         MSG msg;
         while (GetMessage(&msg, 0, 0, 0))
         {
-#if !defined(LS_NO_EXCEPTION)
-            try
-            {
-#endif /* LS_NO_EXCEPTION */
-                // Window message
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-#if !defined(LS_NO_EXCEPTION)
-            }
-            catch (...)
-            {
-                // Quietly ignore exceptions?
-            }
-#endif /* LS_NO_EXCEPTION */
+            // Window message
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
     }
     

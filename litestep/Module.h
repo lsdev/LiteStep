@@ -183,16 +183,14 @@ private:
     bool _LoadDll();
     
     /**
-     * Calls this module's <code>initModuleEx</code> function and catches any exceptions
-     * that are thrown.
+     * Calls this module's <code>initModuleEx</code> function.
      *
      * @return return value from <code>initModuleEx</code>
      */
     int CallInit();
     
     /**
-     * Calls this module's <code>quitModule</code> function and catches any exception
-     * that are thrown.
+     * Calls this module's <code>quitModule</code> function.
      */
     void CallQuit();
 };
