@@ -44,10 +44,10 @@ private:
     
     bool _DoStart();
     void _DoStop();
+
+    static DWORD WINAPI _DDEThreadProc(LPVOID pvService);
     
-    static unsigned int __stdcall _DDEThreadProc(void* pvService);
-    
-    static unsigned int m_uThreadId;
+    static DWORD m_idThread;
     static HANDLE m_hThread;
     static HANDLE m_hStartEvent;
     

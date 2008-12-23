@@ -21,11 +21,10 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "DDEService.h"
 #include "../utility/shellhlp.h"
-#include "../lsapi/lsapi.h"
-#include <process.h>
-#include "../utility/safestr.h" // Always include last in cpp file
+#include "../utility/core.hpp"
 
-unsigned int DDEService::m_uThreadId;
+
+DWORD DDEService::m_idThread;
 HANDLE DDEService::m_hThread;
 HANDLE DDEService::m_hStartEvent;
 DDEWorker DDEService::m_DDEWorker;
@@ -48,7 +47,7 @@ DDEService::DDEService()
 DDEService::~DDEService()
 {}
 
-unsigned int __stdcall DDEService::_DDEThreadProc(void* pvService)
+DWORD WINAPI DDEService::_DDEThreadProc(LPVOID pvService)
 {
     DDEService* pService = (DDEService*)pvService;
 
@@ -83,9 +82,10 @@ HRESULT DDEService::Start()
         if (FindWindow(_T("Progman"), NULL) == NULL)
         {
             m_hStartEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-            m_hThread = (HANDLE)_beginthreadex(NULL, 0, _DDEThreadProc, this,
-                0, &m_uThreadId);
-            
+
+            m_hThread = LSCreateThread(
+                "DDEService", _DDEThreadProc, this, &m_idThread);
+
             WaitForSingleObject(m_hStartEvent, INFINITE);
             CloseHandle(m_hStartEvent);
             hr = S_OK;
@@ -107,7 +107,7 @@ HRESULT DDEService::Stop()
 
     if (m_hThread)
     {
-        PostThreadMessage(m_uThreadId, WM_QUIT, 0, 0);
+        PostThreadMessage(m_idThread, WM_QUIT, 0, 0);
         
         if (WaitForSingleObject(m_hThread, 3000) == WAIT_TIMEOUT)
         {
