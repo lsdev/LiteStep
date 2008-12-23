@@ -530,7 +530,7 @@ BOOL DDEWorker::_AddItem(LPCTSTR strCmdLine, LPCTSTR strDescription, LPCTSTR str
 
 		PathQuoteSpaces((char*)strCmdLine);
 
-		LPTSTR strArgs = PathGetArgs(strCmdLine);
+		LPCTSTR strArgs = PathGetArgs(strCmdLine);
 		if (strArgs)
 		{
 			StringCchCopy(szArgs, MAX_PATH, strArgs);
