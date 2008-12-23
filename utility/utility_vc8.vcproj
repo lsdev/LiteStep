@@ -174,10 +174,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\localization.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\lswinbase.cpp"
 				>
 				<FileConfiguration
@@ -261,10 +257,6 @@
 			</File>
 			<File
 				RelativePath=".\IService.h"
-				>
-			</File>
-			<File
-				RelativePath=".\localization.h"
 				>
 			</File>
 			<File
