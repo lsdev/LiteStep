@@ -145,13 +145,13 @@ BEGIN
         BLOCK "04090000"
         BEGIN
             VALUE "Comments", "http://www.lsdev.org/"
-            VALUE "CompanyName", "Litestep Development Team"
-            VALUE "FileDescription", "An Alternative Win32 Shell"
+            VALUE "CompanyName", "LiteStep Development Team"
+            VALUE "FileDescription", "LiteStep"
             VALUE "FileVersion", "0, 24, 7, 0"
-            VALUE "InternalName", "Litestep"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2005"
+            VALUE "InternalName", "LiteStep Core"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2008"
             VALUE "OriginalFilename", "litestep.exe"
-            VALUE "ProductName", "Litestep"
+            VALUE "ProductName", "LiteStep"
             VALUE "ProductVersion", "0, 24, 7, 0"
         END
     END
