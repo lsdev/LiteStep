@@ -19,7 +19,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include "../utility/common.h"
 #include <algorithm>
 #include <cctype>
 #include <cfloat>
@@ -35,9 +34,9 @@
 #include "MathScanner.h"
 #include "MathToken.h"
 #include "MathValue.h"
-#include "lsapi.h"
 #include "lsapiInit.h"
-#include "../utility/safestr.h"
+#include "../utility/core.hpp"
+
 
 using namespace std;
 

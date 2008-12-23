@@ -308,10 +308,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\safestr.h"
-				>
-			</File>
-			<File
 				RelativePath=".\shellhlp.h"
 				>
 			</File>

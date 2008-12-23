@@ -38,6 +38,8 @@
 #include "../litestep/resource.h"
 #include "../lsapi/lsapi.h"
 #include "safeptr.h"
-#include "safestr.h"
+
+#define STRSAFE_NO_DEPRECATE
+#include <strsafe.h>
 
 #endif // CORE_HPP

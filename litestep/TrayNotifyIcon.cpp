@@ -20,7 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "TrayNotifyIcon.h"
-#include "../utility/safestr.h"
+#include "../utility/core.hpp"
 
 NotifyIcon::IcVtr NotifyIcon::s_icVtr;
 

@@ -20,7 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "DDEStub.h"
-#include "../utility/safestr.h" // Always include last in cpp file
+
 
 HMODULE DDEStub::m_hShDocVw = NULL;
 DDEStub::ShellDDEFunc* DDEStub::m_pShellDDEInit = NULL;
