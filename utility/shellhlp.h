@@ -23,7 +23,7 @@
 #define SHELLHLP_H
 
 #include "common.h"
-#include <shlobj.h>
+
 
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer);

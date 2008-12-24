@@ -45,7 +45,7 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
     // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
     if (SUCCEEDED(SHGetMalloc(&pMalloc)))
     {
-        LPITEMIDLIST pidl;
+        PIDLIST_ABSOLUTE pidl;
         
         if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
         {

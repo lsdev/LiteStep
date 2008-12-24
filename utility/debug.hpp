@@ -26,6 +26,7 @@
 #  error This file is not meant to be used with MFC
 #endif // defined(_MFC_VER)
 
+#include "common.h"
 #include <assert.h>
 
 #if defined(_DEBUG)

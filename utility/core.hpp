@@ -31,6 +31,9 @@
 
 #include <shellapi.h>
 
+#define STRICT_TYPED_ITEMIDS
+#include <ShlObj.h>
+
 // mainly used for Path helper functions
 #define NO_SHLWAPI_STRFCNS
 #include <shlwapi.h>
