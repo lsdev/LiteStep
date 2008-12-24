@@ -373,12 +373,6 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, size_t stCount) cons
             m_pILiteStep->MessageHandler(message);
         }
         
-        /* Handle all messages posted to the current thread */ 
-        while (PeekMessage(&message, (HWND)INVALID_HANDLE_VALUE, 0, 0, PM_REMOVE)) 
-        { 
-            m_pILiteStep->MessageHandler(message); 
-        }
-        
         /* Wait for a new message to come in, or for one of our objects 
         * to become signaled. */ 
         DWORD dwWaitStatus = MsgWaitForMultipleObjects((DWORD)vWait.size(), &vWait[0],
