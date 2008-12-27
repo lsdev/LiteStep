@@ -170,7 +170,7 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 
         if (nReturn == 0)
         {
-            hr = HRESULT_FROM_WIN32(GetLastError());
+            hr = HrGetLastError();
         }
 #endif
     }
@@ -237,7 +237,7 @@ HRESULT TryAllowSetForegroundWindow(HWND hWnd)
         }
         else
         {
-            hr = HRESULT_FROM_WIN32(GetLastError());
+            hr = HrGetLastError();
         }
     }
     else

@@ -92,7 +92,7 @@ HRESULT RecoveryMenu::Start()
     }
     else
     {
-        hr = HRESULT_FROM_WIN32(GetLastError());
+        hr = HrGetLastError();
     }
 
     return hr;
@@ -124,7 +124,7 @@ HRESULT RecoveryMenu::Stop()
         }
         else if (dwWait == WAIT_FAILED)
         {
-            hr = HRESULT_FROM_WIN32(GetLastError());
+            hr = HrGetLastError();
         }
 
         VERIFY(CloseHandle(m_hThread));

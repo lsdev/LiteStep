@@ -25,6 +25,13 @@
 #include "common.h"
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Shell Helpers
+//
+// These are mostly small wrappers that work around inconveniences or even bugs
+// in some Windows APIs
+//
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer);
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
@@ -36,5 +43,16 @@ void LSShutdownDialog(HWND hWnd);
 BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias);
 HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
                       LPVOID lpParameter, LPDWORD pdwThreadId);
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// HrGetLastError
+// Convert GetLastError to HRESULT without an ugly macro
+//
+inline HRESULT HrGetLastError()
+{
+    return HRESULT_FROM_WIN32(GetLastError());
+}
 
 #endif // SHELLHLP_H

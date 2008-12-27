@@ -436,7 +436,7 @@ HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
 
     if (!RegisterClassEx(&wc))
     {
-        hr = HRESULT_FROM_WIN32(GetLastError());
+        hr = HrGetLastError();
 
         RESOURCE_MSGBOX_T(m_hInstance, IDS_LITESTEP_ERROR4,
             "Error registering main Litestep window class.",
@@ -488,7 +488,7 @@ HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
     }
     else
     {
-        hr = HRESULT_FROM_WIN32(GetLastError());
+        hr = HrGetLastError();
 
         RESOURCE_MSGBOX_T(m_hInstance, IDS_LITESTEP_ERROR5,
             "Error creating Litestep main application window.",
