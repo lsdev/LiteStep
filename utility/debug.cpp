@@ -20,6 +20,34 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "debug.hpp"
+#include "core.hpp"
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// DbgTraceMessage
+//
+void DbgTraceMessage(const char* pszFormat, ...)
+{
+    ASSERT(NULL != pszFormat);
+
+    va_list args;
+    va_start(args, pszFormat);
+
+    char szBuffer[512];
+    StringCchVPrintfExA(szBuffer, 512,
+        NULL, NULL, STRSAFE_NULL_ON_FAILURE,
+        pszFormat, args);
+
+    va_end(args);
+
+    OutputDebugStringA(szBuffer);
+
+#if !defined(__GNUC__)
+    // This just outputs a blank line in gdb
+    OutputDebugStringA("\n");
+#endif
+}
 
 
 #ifdef MSVC_DEBUG

@@ -25,14 +25,6 @@
 #include "common.h"
 #include <assert.h>
 
-#if defined(_DEBUG)
-   // THIS IS BOGUS, WE NEED TO FIX OUR STRING FUNCTION USAGE!!!
-#  define STRSAFE_NO_DEPRECATE
-#  include <strsafe.h>
-#  undef STRSAFE_NO_DEPRECATE
-#endif // defined(_DEBUG)
-
-
 // MSVC debug
 #if defined(_DEBUG) && defined (_MSC_VER)
 #  define MSVC_DEBUG
@@ -63,55 +55,18 @@
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
-// TRACE helper
-//
-#if defined(TRACE_ENABLED)
-namespace debug
-{
-    inline void Trace(const char* pszFormat, ...)
-    {
-        ASSERT(NULL != pszFormat);
-        
-        va_list args;
-        va_start(args, pszFormat);
-        
-        char szBuffer[512];
-        StringCchVPrintfExA(szBuffer, 512,
-            NULL, NULL, STRSAFE_NULL_ON_FAILURE,
-            pszFormat, args);
-
-        va_end(args);
-
-        OutputDebugStringA(szBuffer);
-        
-    #if !defined(__GNUC__)
-        // This just outputs a blank line in gdb
-        OutputDebugStringA("\n");
-    #endif
-    }
-}
-#endif // defined(TRACE_ENABLED)
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//
 // TRACE
 //
 // Sends a formatted (printf-style) message to the debug output window.
 // Automatically inserts \n at the end of the string.
 //
+void DbgTraceMessage(const char* pszFormat, ...);
+
 #if defined(TRACE_ENABLED)
-
-#define TRACE  debug::Trace
-
+#  define TRACE  DbgTraceMessage
 #else
-
-// dummy function, just needs the correct signature
-inline void TraceDummy(const char*, ...) {}
-
-#define TRACE  1 ? (void)0 : TraceDummy
-
-#endif // !defined(TRACE_ENABLED)
+#  define TRACE  1 ? (void)0 : DbgTraceMessage
+#endif
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
