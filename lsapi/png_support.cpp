@@ -126,6 +126,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 #else // LS_USE_PICOPNG
 
 #include <png.h>
+#include <stdlib.h>
 
 typedef struct _PNGERROR
 {

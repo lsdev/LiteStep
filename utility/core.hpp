@@ -35,12 +35,12 @@
 #include <ShlObj.h>
 
 // mainly used for Path helper functions
+#define STRICT_CONST
 #define NO_SHLWAPI_STRFCNS
 #include <shlwapi.h>
 
 #include "../lsapi/lsapi.h"
 
-#define STRSAFE_NO_DEPRECATE
 #include <strsafe.h>
 
 #endif // CORE_HPP

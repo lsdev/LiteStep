@@ -52,10 +52,7 @@
 #  define GetBValue(rgb)    ((BYTE)(((rgb) & 0xFF0000) >> 16))
 #endif // _WINDOWS_
 
-#include <stdlib.h>
 #include <tchar.h>
-
-#include <memory>
 
 #include "debug.hpp"
 #include "../lsapi/lsapidefines.h"
