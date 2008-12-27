@@ -61,16 +61,6 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
 
 #define RESOURCE_STREX GetResStrEx
 
-#define RESOURCE_DISPLAY_MSGBOX                   \
-    MessageBox( NULL                              \
-        ,resourceTextBuffer, resourceTitleBuffer  \
-        ,MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION )
-
-#define RESOURCE_YESNO_MSGBOX                    \
-    MessageBox( NULL                             \
-        ,resourceTextBuffer, resourceTitleBuffer \
-        ,MB_YESNO | MB_TOPMOST )
-
 #define RESOURCE_TITLE(instance, id, deftext) \
     GetResStr( (instance), (id)               \
         ,resourceTitleBuffer, MAX_LINE_LENGTH \
