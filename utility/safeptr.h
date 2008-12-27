@@ -88,18 +88,7 @@ BOOL IsValidStringReadPtrCchA(LPSTR lpsz, UINT_PTR ucchMax);
 //
 // Valid Pointer Functions
 //
-BOOL IsValidReadPtr(CONST VOID *lp);
-#ifdef __cplusplus
 BOOL IsValidReadPtr(CONST VOID *lp, UINT_PTR ucb);
-#else // __cplusplus
-BOOL IsValidReadPtrUcb(CONST VOID *lp, UINT_PTR ucb);
-#endif // __cplusplus
-BOOL IsValidWritePtr(LPVOID lp);
-#ifdef __cplusplus
 BOOL IsValidWritePtr(LPVOID lp, UINT_PTR ucb);
-#else // __cplusplus
-BOOL IsValidWritePtrUcb(LPVOID lp, UINT_PTR ucb);
-#endif // __cplusplus
-BOOL IsValidCodePtr(FARPROC lfpn);
 
 #endif // SAFEPTR_H

@@ -895,7 +895,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         {
             PLMBANGCOMMAND plmbc = (PLMBANGCOMMAND)lParam;
             
-            if (IsValidReadPtr(plmbc))
+            if (plmbc != NULL)
             {
                 if (plmbc->cbSize == sizeof(LMBANGCOMMAND))
                 {

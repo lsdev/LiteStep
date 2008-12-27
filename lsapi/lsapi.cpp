@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.31 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.31 2008/08/15 21:42:35 jugg Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.32 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.32 2008/12/27 12:52:30 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -81,13 +81,13 @@ BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
 {
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(pszCommand) && IsValidCodePtr((FARPROC)pfnBangCommand))
+	if (IsValidStringPtr(pszCommand) && pfnBangCommand != NULL)
 	{
 		DWORD dwCurrentThreadID = GetCurrentThreadId();
 
 		Bang* pBang = new Bang(dwCurrentThreadID, pfnBangCommand, pszCommand);
 
-		if (IsValidReadPtr(pBang))
+		if (pBang != NULL)
 		{
 			//bBang->AddRef();
 			g_LSAPIManager.GetBangManager()->AddBangCommand(pszCommand, pBang);

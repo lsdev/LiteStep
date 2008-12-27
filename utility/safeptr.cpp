@@ -79,33 +79,13 @@ BOOL IsValidStringWritePtrCchA(LPSTR lpsz, UINT_PTR ucchMax)
 	return ((ucchMax > 0) && (NULL != lpsz));
 }
 
-BOOL IsValidReadPtr(CONST VOID *lp)
-{
-	return (NULL != lp);
-}
-#ifdef __cplusplus
+
 BOOL IsValidReadPtr(CONST VOID *lp, UINT_PTR ucb)
-#else
-BOOL IsValidReadPtrUcb(CONST VOID *lp, UINT_PTR ucb)
-#endif
 {
 	return ((ucb > 0) && (NULL != lp));
 }
 
-BOOL IsValidWritePtr(LPVOID lp)
-{
-	return (NULL != lp);
-}
-#ifdef __cplusplus
 BOOL IsValidWritePtr(LPVOID lp, UINT_PTR ucb)
-#else
-BOOL IsValidWritePtrUcb(LPVOID lp, UINT_PTR ucb)
-#endif
 {
 	return ((ucb > 0) && (NULL != lp));
-}
-
-BOOL IsValidCodePtr(FARPROC lfpn)
-{
-	return (NULL != lfpn);
 }
