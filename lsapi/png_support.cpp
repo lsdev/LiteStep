@@ -176,7 +176,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 {
 	HBITMAP hDibSection = NULL;
 
-	if (IsValidStringPtr(pszFilename))
+	if (pszFilename != NULL)
 	{
 		FILE * hFile = fopen(pszFilename, "rb");
 		if (hFile)

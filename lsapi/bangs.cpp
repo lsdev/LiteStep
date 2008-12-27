@@ -100,33 +100,30 @@ void BangCascadeWindows(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 {
-	if (IsValidStringPtr(pszArgs))
-	{
-		char szFirst[MAX_LINE_LENGTH] = { 0 };
-		char szSecond[MAX_LINE_LENGTH] = { 0 };
-		char szThird[MAX_LINE_LENGTH] = { 0 };
-		char szFourth[MAX_LINE_LENGTH] = { 0 };
-		LPSTR aszTokens[] = { szFirst, szSecond, szThird, szFourth };
+    char szFirst[MAX_LINE_LENGTH] = { 0 };
+    char szSecond[MAX_LINE_LENGTH] = { 0 };
+    char szThird[MAX_LINE_LENGTH] = { 0 };
+    char szFourth[MAX_LINE_LENGTH] = { 0 };
+    LPSTR aszTokens[] = { szFirst, szSecond, szThird, szFourth };
 
-		int nTokenCount = CommandTokenize(pszArgs, aszTokens, 4, 0);
+    int nTokenCount = CommandTokenize(pszArgs, aszTokens, 4, 0);
 
-		if (nTokenCount >= 3)
-		{
-			if (nTokenCount == 3)
-			{
-				StringCchCopy(szFourth, MAX_LINE_LENGTH, "Litestep");
-			}
+    if (nTokenCount >= 3)
+    {
+        if (nTokenCount == 3)
+        {
+            StringCchCopy(szFourth, MAX_LINE_LENGTH, "Litestep");
+        }
 
-			if (MessageBox(hCaller, szFirst, (nTokenCount == 3) ? szFourth : szSecond, MB_YESNO | MB_TOPMOST | MB_SETFOREGROUND) == IDYES)
-			{
-				LSExecute(hCaller, (nTokenCount == 3) ? szSecond : szThird, SW_SHOWNORMAL);
-			}
-			else
-			{
-				LSExecute(hCaller, (nTokenCount == 3) ? szThird : szFourth, SW_SHOWNORMAL);
-			}
-		}
-	}
+        if (MessageBox(hCaller, szFirst, (nTokenCount == 3) ? szFourth : szSecond, MB_YESNO | MB_TOPMOST | MB_SETFOREGROUND) == IDYES)
+        {
+            LSExecute(hCaller, (nTokenCount == 3) ? szSecond : szThird, SW_SHOWNORMAL);
+        }
+        else
+        {
+            LSExecute(hCaller, (nTokenCount == 3) ? szThird : szFourth, SW_SHOWNORMAL);
+        }
+    }
 }
 
 
@@ -135,16 +132,13 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 //
 void BangExecute(HWND hCaller, LPCSTR pszArgs)
 {
-	if (IsValidStringPtr(pszArgs))
-	{
-		LPCSTR pszNextToken = pszArgs;
-		char szCommand[MAX_LINE_LENGTH];
+    LPCSTR pszNextToken = pszArgs;
+    char szCommand[MAX_LINE_LENGTH];
 
-		while (GetToken(pszNextToken, szCommand, &pszNextToken, TRUE))
-		{
-			LSExecute(hCaller, szCommand, SW_SHOWDEFAULT);
-		}
-	}
+    while (GetToken(pszNextToken, szCommand, &pszNextToken, TRUE))
+    {
+        LSExecute(hCaller, szCommand, SW_SHOWDEFAULT);
+    }
 }
 
 
@@ -246,21 +240,18 @@ void BangReload(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangReloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 {
-	if (IsValidStringPtr(pszArgs))
-	{
-		HWND hLiteStep = GetLitestepWnd();
+    HWND hLiteStep = GetLitestepWnd();
 
-		if (hLiteStep)
-		{
-			LPCSTR pszNextToken = pszArgs;
-			char szModuleString[MAX_LINE_LENGTH] = { 0 };
+    if (hLiteStep)
+    {
+        LPCSTR pszNextToken = pszArgs;
+        char szModuleString[MAX_LINE_LENGTH] = { 0 };
 
-			while (GetToken(pszNextToken, szModuleString, &pszNextToken, TRUE))
-			{
-				SendMessage(hLiteStep, LM_RELOADMODULE, (WPARAM)szModuleString, 0);
-			}
-		}
-	}
+        while (GetToken(pszNextToken, szModuleString, &pszNextToken, TRUE))
+        {
+            SendMessage(hLiteStep, LM_RELOADMODULE, (WPARAM)szModuleString, 0);
+        }
+    }
 }
 
 

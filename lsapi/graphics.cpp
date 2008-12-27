@@ -206,7 +206,7 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 {
 	HBITMAP hbmReturn = NULL;
 
-	if (IsValidStringPtr(pszImage))
+	if (pszImage != NULL)
 	{
 		if (_stricmp(pszImage, ".none") != 0)
 		{
@@ -407,7 +407,7 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
 {
 	HICON hIcon = NULL;
 
-	if (IsValidStringPtr(pszIconPath))
+	if (pszIconPath != NULL)
 	{
 		if (_stricmp(pszIconPath, ".none") != 0)
 		{

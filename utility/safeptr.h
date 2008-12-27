@@ -31,59 +31,22 @@
 //
 // Unicode
 //
-BOOL IsValidStringPtrW(LPCWSTR lpwz);
-#ifdef __cplusplus
 BOOL IsValidStringPtrW(LPCWSTR lpwz, UINT_PTR ucchMax);
-#else // __cplusplus
-BOOL IsValidStringPtrCchW(LPCWSTR lpwz, UINT_PTR ucchMax);
-#endif // __cplusplus
-#ifdef __cplusplus
-BOOL IsValidStringPtrW(LPWSTR lpwz);
-BOOL IsValidStringPtrW(LPWSTR lpwz, UINT_PTR ucchMax);
-#else
-BOOL IsValidStringReadPtrW(LPWSTR lpwz);
-BOOL IsValidStringReadPtrCchW(LPWSTR lpwz, UINT_PTR ucchMax);
-#endif // __cplusplus
 
 //
 // Ansi
 //
-BOOL IsValidStringPtrA(LPCSTR lpsz);
-#ifdef __cplusplus
 BOOL IsValidStringPtrA(LPCSTR lpsz, UINT_PTR ucchMax);
-#else // __cplusplus
-BOOL IsValidStringPtrCchA(LPCSTR lpsz, UINT_PTR ucchMax);
-#endif // __cplusplus
-#ifdef __cplusplus
-BOOL IsValidStringPtrA(LPSTR lpsz);
-BOOL IsValidStringPtrA(LPSTR lpsz, UINT_PTR ucchMax);
-#else // __cplusplus
-BOOL IsValidStringReadPtrA(LPSTR lpsz);
-BOOL IsValidStringReadPtrCchA(LPSTR lpsz, UINT_PTR ucchMax);
-#endif // __cplusplus
 
 //
 // TCHAR defines
 //
 #ifdef _UNICODE
-#ifdef __cplusplus
 #define IsValidStringPtr IsValidStringPtrW
-#else // __cplusplus
-#define IsValidStringPtr(lpwz) IsValidStringPtrW(lpwz)
-#define IsValidStringPtrCch(lpwz, ucchMax) IsValidStringPtrCchW(lpwz, ucchMax)
-#define IsValidStringReadPtr(lpwz) IsValidStringReadPtrW(lpwz)
-#define IsValidStringReadPtrCch(lpwz, ucchMax) IsValidStringReadPtrCchW(lpwz, ucchMax)
-#endif // _cplusplus
 #else // _UNICODE
-#ifdef __cplusplus
 #define IsValidStringPtr IsValidStringPtrA
-#else // __cplusplus
-#define IsValidStringPtr(lpsz) IsValidStringPtrA(lpsz)
-#define IsValidStringPtrCch(lpsz, ucchMax) IsValidStringPtrCchA(lpsz, ucchMax)
-#define IsValidStringReadPtr(lpsz) IsValidStringReadPtrA(lpsz)
-#define IsValidStringReadPtrCch(lpsz, ucchMax) IsValidStringReadPtrCchA(lpsz, ucchMax)
-#endif // _cplusplus
 #endif // _UNICODE
+
 
 //
 // Valid Pointer Functions

@@ -84,8 +84,8 @@ BOOL LCReadNextConfig(FILE *pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchV
 
 	if (g_LSAPIManager.IsInitialized())
 	{
-		if ((pFile != NULL) && IsValidStringPtr(pszConfig) &&
-		    IsValidStringPtr(pszValue, cchValue))
+		if (pFile != NULL && pszConfig != NULL &&
+            IsValidStringPtr(pszValue, cchValue))
 		{
 			bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextConfig(pFile, pszConfig, pszValue, cchValue);
 		}

@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.32 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.32 2008/12/27 12:52:30 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.33 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.33 2008/12/27 14:30:57 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -81,7 +81,7 @@ BOOL AddBangCommandWorker(LPCSTR pszCommand, T pfnBangCommand)
 {
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(pszCommand) && pfnBangCommand != NULL)
+	if (pszCommand != NULL && pfnBangCommand != NULL)
 	{
 		DWORD dwCurrentThreadID = GetCurrentThreadId();
 
@@ -125,7 +125,7 @@ BOOL RemoveBangCommand(LPCSTR pszCommand)
 {
     BOOL bResult = FALSE;
 
-    if (IsValidStringPtr(pszCommand))
+    if (pszCommand != NULL)
     {
 	    bResult =
             g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
@@ -154,9 +154,9 @@ BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 	char szExpandedArgs[MAX_LINE_LENGTH] = { 0 };
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(pszCommand))
+	if (pszCommand != NULL)
 	{
-		if (IsValidStringPtr(pszArgs))
+		if (pszArgs != NULL)
 		{
 			VarExpansionEx(szExpandedArgs, pszArgs, MAX_LINE_LENGTH);
 		}
@@ -178,7 +178,7 @@ void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size
 	char szTempCommand[MAX_LINE_LENGTH];
 	LPCSTR pszTempArgs = NULL;
 
-	if (IsValidStringPtr(pszCommand))
+	if (pszCommand != NULL)
 	{
 		if (IsValidStringPtr(pszOutCommand, cchOutCommand))
 		{
@@ -188,6 +188,7 @@ void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size
 
 			StringCchCopy(pszOutCommand, cchOutCommand, szTempCommand);
 		}
+
 		if (IsValidStringPtr(pszOutArgs, cchOutArgs))
 		{
 			StringCchCopy(pszOutArgs, cchOutArgs, pszTempArgs);
@@ -203,7 +204,7 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 {
 	HINSTANCE hReturn = HINSTANCE(32);
 
-	if (IsValidStringPtr(pszCommand))
+	if (pszCommand != NULL)
 	{
 		if (pszCommand[0] == '!')
 		{
@@ -249,7 +250,7 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
 	LPCSTR pszArgs;
 	HINSTANCE hResult = HINSTANCE(32);
 
-	if (IsValidStringPtr(pszCommand))
+	if (pszCommand != NULL)
 	{
 		VarExpansionEx(szExpandedCommand, pszCommand, MAX_LINE_LENGTH);
 
@@ -389,7 +390,7 @@ static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, L
 	LPCSTR pszNextToken;
 	DWORD dwTokens = 0;
 
-	if (IsValidStringPtr(pszString))
+	if (pszString != NULL)
 	{
 		pszNextToken = pszString;
 
@@ -399,7 +400,7 @@ static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, L
 			{
 				GetToken(pszNextToken, szBuffer, &pszNextToken, bUseBrackets);
 
-				if (IsValidStringPtr(lpszBuffers[dwTokens]))
+				if (lpszBuffers[dwTokens] != NULL)
 				{
 					StringCchCopy(lpszBuffers[dwTokens], strlen(szBuffer) + 1, szBuffer);
 				}
@@ -407,13 +408,13 @@ static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, L
 
 			for (DWORD dwClearTokens = dwTokens; dwClearTokens < dwNumBuffers; dwClearTokens++)
 			{
-				if (IsValidStringPtr(lpszBuffers[dwClearTokens]))
+				if (lpszBuffers[dwClearTokens] != NULL)
 				{
 					lpszBuffers[dwClearTokens][0] = '\0';
 				}
 			}
 
-			if (IsValidStringPtr(pszExtraParameters))
+			if (pszExtraParameters != NULL)
 			{
 				if (pszNextToken)
 				{
@@ -575,7 +576,7 @@ int CommandTokenize(LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPS
 //
 void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
 {
-	if (IsValidStringPtr(pszExpandedString) && IsValidStringPtr(pszTemplate))
+	if (pszExpandedString != NULL && pszTemplate != NULL)
 	{
 		char szTempBuffer[MAX_LINE_LENGTH];
 
@@ -594,7 +595,7 @@ void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
 void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString)
 {
 	if (IsValidStringPtr(pszExpandedString, cchExpandedString) &&
-	    IsValidStringPtr(pszTemplate))
+	    pszTemplate != NULL)
 	{
 		if(g_LSAPIManager.IsInitialized())
 		{

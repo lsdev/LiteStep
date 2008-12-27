@@ -860,7 +860,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     LPCSTR pszPath = (LPCSTR)wParam;
                     
-                    if (IsValidStringPtr(pszPath))
+                    if (pszPath != NULL)
                     {
                         m_pModuleManager->QuitModule(pszPath);
                         m_pModuleManager->LoadModule(pszPath, (DWORD)lParam);
@@ -882,7 +882,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     LPCSTR pszPath = (LPCSTR)wParam;
                     
-                    if (IsValidStringPtr(pszPath))
+                    if (pszPath != NULL)
                     {
                         m_pModuleManager->QuitModule(pszPath);
                     }

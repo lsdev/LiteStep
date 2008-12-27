@@ -21,60 +21,14 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "safeptr.h"
 
-BOOL IsValidStringPtrW(LPCWSTR lpwz)
-{
-	return (NULL != lpwz);
-}
-#ifdef __cplusplus
+
 BOOL IsValidStringPtrW(LPCWSTR lpwz, UINT_PTR ucchMax)
-#else
-BOOL IsValidStringPtrCchW(LPCWSTR lpwz, UINT_PTR ucchMax)
-#endif
-{
-	return ((ucchMax > 0) && (NULL != lpwz));
-}
-#ifdef __cplusplus
-BOOL IsValidStringPtrW(LPWSTR lpwz)
-#else
-BOOL IsValidStringWritePtrW(LPWSTR lpwz)
-#endif
-{
-	return (NULL != lpwz);
-}
-#ifdef __cplusplus
-BOOL IsValidStringPtrW(LPWSTR lpwz, UINT_PTR ucchMax)
-#else
-BOOL IsValidStringWritePtrCchW(LPWSTR lpwz, UINT_PTR ucchMax)
-#endif
 {
 	return ((ucchMax > 0) && (NULL != lpwz));
 }
 
-BOOL IsValidStringPtrA(LPCSTR lpsz)
-{
-	return (NULL != lpsz);
-}
-#ifdef __cplusplus
+
 BOOL IsValidStringPtrA(LPCSTR lpsz, UINT_PTR ucchMax)
-#else
-BOOL IsValidStringPtrCchA(LPCSTR lpsz, UINT_PTR ucchMax)
-#endif
-{
-	return ((ucchMax > 0) && (NULL != lpsz));
-}
-#ifdef __cplusplus
-BOOL IsValidStringPtrA(LPSTR lpsz)
-#else
-BOOL IsValidStringWritePtrA(LPSTR lpsz)
-#endif
-{
-	return (NULL != lpsz);
-}
-#ifdef __cplusplus
-BOOL IsValidStringPtrA(LPSTR lpsz, UINT_PTR ucchMax)
-#else
-BOOL IsValidStringWritePtrCchA(LPSTR lpsz, UINT_PTR ucchMax)
-#endif
 {
 	return ((ucchMax > 0) && (NULL != lpsz));
 }

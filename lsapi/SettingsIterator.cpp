@@ -74,7 +74,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
 {
     BOOL bReturn = FALSE;
     
-    if (IsValidStringPtr(pszValue, cchValue) && IsValidStringPtr(pszConfig))
+    if (IsValidStringPtr(pszValue, cchValue) && pszConfig != NULL)
     {
         SettingsMap::iterator itSettings;
         
