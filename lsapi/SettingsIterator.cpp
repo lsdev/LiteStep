@@ -45,8 +45,8 @@ SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, string szPath)
 BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
-    if (IsValidStringPtr(pszValue, cchValue))
+
+    if (pszValue != NULL && cchValue > 0)
     {
         if (m_pFileIterator != m_pSettingsMap->end())
         {
@@ -61,7 +61,7 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
             pszValue[0] = '\0';
         }
     }
-    
+
     return bReturn;
 }
 
@@ -74,7 +74,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
 {
     BOOL bReturn = FALSE;
     
-    if (IsValidStringPtr(pszValue, cchValue) && pszConfig != NULL)
+    if (pszValue != NULL && cchValue > 0 && pszConfig != NULL)
     {
         SettingsMap::iterator itSettings;
         

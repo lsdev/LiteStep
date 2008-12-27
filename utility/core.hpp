@@ -39,7 +39,6 @@
 #include <shlwapi.h>
 
 #include "../lsapi/lsapi.h"
-#include "safeptr.h"
 
 #define STRSAFE_NO_DEPRECATE
 #include <strsafe.h>

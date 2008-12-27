@@ -174,10 +174,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\safeptr.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\shellhlp.cpp"
 				>
 			</File>
@@ -221,10 +217,6 @@
 			</File>
 			<File
 				RelativePath=".\macros.h"
-				>
-			</File>
-			<File
-				RelativePath=".\safeptr.h"
 				>
 			</File>
 			<File

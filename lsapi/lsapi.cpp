@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.33 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.33 2008/12/27 14:30:57 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.34 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.34 2008/12/27 19:46:49 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -180,7 +180,7 @@ void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size
 
 	if (pszCommand != NULL)
 	{
-		if (IsValidStringPtr(pszOutCommand, cchOutCommand))
+		if (pszOutCommand != NULL && cchOutCommand > 0)
 		{
 			VarExpansionEx(szCommand, pszCommand, MAX_LINE_LENGTH);
 
@@ -189,7 +189,7 @@ void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size
 			StringCchCopy(pszOutCommand, cchOutCommand, szTempCommand);
 		}
 
-		if (IsValidStringPtr(pszOutArgs, cchOutArgs))
+		if (pszOutArgs != NULL && cchOutArgs > 0)
 		{
 			StringCchCopy(pszOutArgs, cchOutArgs, pszTempArgs);
 		}
@@ -308,7 +308,7 @@ HWND GetLitestepWnd()
 //
 void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText)
 {
-	if (IsValidStringPtr(pszText, cchText))
+	if (pszText != NULL && cchText > 0)
 	{
 		if (LoadString(hInstance, uIDText, pszText, (int)cchText) == 0)
 		{
@@ -326,7 +326,7 @@ void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchTex
 	char szFormat[MAX_LINE_LENGTH];
 	va_list vargs;
 
-	if (IsValidStringPtr(pszText, cchText))
+	if (pszText != NULL && cchText > 0)
 	{
 		GetResStr(hInstance, uIDText, szFormat, MAX_LINE_LENGTH, pszDefText);
 
@@ -344,7 +344,7 @@ BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
 {
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(pszPath, cchPath))
+	if (pszPath != NULL && cchPath > 0)
 	{
 		// Default to user defined variable
 		if (GetRCString("litestepdir", pszPath, NULL, (int)cchPath))
@@ -364,7 +364,7 @@ BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
 {
 	BOOL bReturn = FALSE;
 
-	if (IsValidStringPtr(pszPath, cchPath))
+	if (pszPath != NULL && cchPath > 0)
 	{
 		if (GetRCString("LSImageFolder", pszPath, NULL, (int)cchPath))
 		{
@@ -594,8 +594,8 @@ void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
 //
 void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString)
 {
-	if (IsValidStringPtr(pszExpandedString, cchExpandedString) &&
-	    pszTemplate != NULL)
+	if (pszExpandedString != NULL && cchExpandedString > 0 &&
+        pszTemplate != NULL)
 	{
 		if(g_LSAPIManager.IsInitialized())
 		{
