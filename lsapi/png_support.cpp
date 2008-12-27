@@ -126,7 +126,6 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 #else // LS_USE_PICOPNG
 
 #include <png.h>
-#include "../utility/safeptr.h"
 
 typedef struct _PNGERROR
 {
