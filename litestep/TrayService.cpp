@@ -98,8 +98,10 @@ HRESULT TrayService::Start()
             ,0
         );
         CopyRect(&m_rWorkAreaCur, &m_rWorkAreaDef);
+
+        hr = createWindows();
         
-        if (createWindows())
+        if (SUCCEEDED(hr))
         {
             SetWindowLongPtr(m_hTrayWnd, GWLP_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG_PTR)this);
@@ -128,11 +130,9 @@ HRESULT TrayService::Start()
             {
                 loadShellServiceObjects();
             }
-            
-            hr = S_OK;
         }
     }
-    
+
     return hr;
 }
 
@@ -181,9 +181,9 @@ HRESULT TrayService::Stop()
 //
 // createWindows
 //
-bool TrayService::createWindows()
+HRESULT TrayService::createWindows()
 {
-    bool bReturn = false;
+    HRESULT hr = E_FAIL;
     
     //
     // Register tray window class
@@ -198,8 +198,7 @@ bool TrayService::createWindows()
     
     if(!RegisterClassEx(&wc))
     {
-        RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_REGISTERCLASS_ERROR,
-            "Error registering window class.", szTrayClass);
+        hr = HrGetLastError();
     }
     else
     {
@@ -217,16 +216,14 @@ bool TrayService::createWindows()
         
         if(NULL == m_hTrayWnd)
         {
+            hr = HrGetLastError();
             UnregisterClass(szTrayClass, m_hInstance);
-            
-            RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
-                "Unable to create window.", szTrayTitle);
         }
         else
         {
             // Our main window is enough to start up, we can do without the
             // TrayNotifyWnd if necessary.
-            bReturn = true;
+            hr = S_OK;
             
             //
             // Register "TrayNotifyWnd" class and create window
@@ -257,7 +254,7 @@ bool TrayService::createWindows()
         }
     }
     
-    return bReturn;
+    return hr;
 }
 
 

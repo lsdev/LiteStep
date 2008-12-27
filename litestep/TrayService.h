@@ -104,7 +104,7 @@ public:
     static LRESULT CALLBACK WindowNotifyProc(HWND, UINT, WPARAM, LPARAM);
     
 private:
-    bool createWindows();
+    HRESULT createWindows();
     void destroyWindows();
 
     //
