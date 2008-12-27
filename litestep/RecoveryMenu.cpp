@@ -22,7 +22,6 @@
 #include "RecoveryMenu.h"
 #include "resource.h"
 #include "../lsapi/lsapi.h"
-#include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 
 

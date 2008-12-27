@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "StartupRunner.h"
-#include "../utility/macros.h"
 #include "../utility/shellhlp.h"
 #include <regstr.h>
 #include "../utility/core.hpp"

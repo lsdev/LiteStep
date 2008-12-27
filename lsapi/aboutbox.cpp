@@ -20,7 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "../utility/common.h"
-#include "../utility/macros.h"
+#include "../litestep/resource.h"
 #include <commctrl.h>
 #include <math.h>
 #include "../utility/core.hpp"

@@ -23,10 +23,8 @@
 #define MACROS_H
 
 #include "common.h"
-#include "..\lsapi\lsapi.h"
-
-// Count array elements
-#define COUNTOF(array)  (sizeof(array)/sizeof(array[0]))
+#include "../litestep/resource.h"
+#include "../lsapi/lsapi.h"
 
 // Macros for Resource strings and localization
 #if !defined(LSRESOURCEBUFFER)

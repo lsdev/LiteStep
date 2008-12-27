@@ -38,7 +38,6 @@
 #define NO_SHLWAPI_STRFCNS
 #include <shlwapi.h>
 
-#include "../litestep/resource.h"
 #include "../lsapi/lsapi.h"
 #include "safeptr.h"
 

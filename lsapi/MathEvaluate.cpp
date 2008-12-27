@@ -25,7 +25,6 @@
 #include "MathException.h"
 #include "MathParser.h"
 #include "SettingsDefines.h"
-#include "../litestep/resource.h"
 #include "../utility/macros.h"
 
 using namespace std;
