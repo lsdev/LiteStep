@@ -149,10 +149,10 @@ typedef LPDISPLAY_DEVICEA LPDISPLAY_DEVICE;
 
 // Converts coordinates properly, taking into account for negative values
 // that are relative to the right/bottom of the screen
-#define CONVERT_COORDINATE_WIDTH(x) ((x) + ((x) < 0 ? SCREEN_WIDTH : 0))
-#define CONVERT_COORDINATE_HEIGHT(y) ((y) + ((y) < 0 ? SCREEN_HEIGHT : 0))
-#define CONVERT_COORDINATE_X(x) (SCREEN_LEFT + CONVERT_COORDINATE_WIDTH((x)))
-#define CONVERT_COORDINATE_Y(y) (SCREEN_TOP + CONVERT_COORDINATE_HEIGHT((y)))
+#define CONVERT_COORDINATE_WIDTH(x) ((x) + ((x) < 0 ? LSGetSystemMetrics(SM_CXVIRTUALSCREEN) : 0))
+#define CONVERT_COORDINATE_HEIGHT(y) ((y) + ((y) < 0 ? LSGetSystemMetrics(SM_CYVIRTUALSCREEN) : 0))
+#define CONVERT_COORDINATE_X(x) (LSGetSystemMetrics(SM_XVIRTUALSCREEN) + CONVERT_COORDINATE_WIDTH((x)))
+#define CONVERT_COORDINATE_Y(y) (LSGetSystemMetrics(SM_YVIRTUALSCREEN) + CONVERT_COORDINATE_HEIGHT((y)))
 
 
 #endif // LSMULTIMON_H
