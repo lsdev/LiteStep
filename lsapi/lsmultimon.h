@@ -146,4 +146,13 @@ typedef LPDISPLAY_DEVICEA LPDISPLAY_DEVICE;
 #define DISPLAY_DEVICE_VGA_COMPATIBLE      0x00000010
 #endif // !defined(DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
 
+
+// Converts coordinates properly, taking into account for negative values
+// that are relative to the right/bottom of the screen
+#define CONVERT_COORDINATE_WIDTH(x) ((x) + ((x) < 0 ? SCREEN_WIDTH : 0))
+#define CONVERT_COORDINATE_HEIGHT(y) ((y) + ((y) < 0 ? SCREEN_HEIGHT : 0))
+#define CONVERT_COORDINATE_X(x) (SCREEN_LEFT + CONVERT_COORDINATE_WIDTH((x)))
+#define CONVERT_COORDINATE_Y(y) (SCREEN_TOP + CONVERT_COORDINATE_HEIGHT((y)))
+
+
 #endif // LSMULTIMON_H

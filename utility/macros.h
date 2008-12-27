@@ -26,7 +26,10 @@
 #include "../litestep/resource.h"
 #include "../lsapi/lsapi.h"
 
-// Macros for Resource strings and localization
+//
+// Macros for resource strings and localization
+//
+
 #if !defined(LSRESOURCEBUFFER)
 #define LSRESOURCEBUFFER
 static char resourceTextBuffer[MAX_LINE_LENGTH + 1];
@@ -64,18 +67,5 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
         ,resourceTitleBuffer, MAX_LINE_LENGTH \
         ,deftext )
 
-// Code for multimonitor systems
-#define SCREEN_LEFT GetSystemMetrics(SM_XVIRTUALSCREEN)
-#define SCREEN_TOP GetSystemMetrics(SM_YVIRTUALSCREEN)
-#define IS_MULTI_MON (GetSystemMetrics(SM_CMONITORS) > 1)
-#define SCREEN_WIDTH (IS_MULTI_MON ? GetSystemMetrics(SM_CXVIRTUALSCREEN) : GetSystemMetrics(SM_CXSCREEN))
-#define SCREEN_HEIGHT (IS_MULTI_MON ? GetSystemMetrics(SM_CYVIRTUALSCREEN) : GetSystemMetrics(SM_CYSCREEN))
-
-// Converts coordinates properly, taking into account for negative values
-// that are relative to the right/bottom of the screen
-#define CONVERT_COORDINATE_WIDTH(x) ((x) + ((x) < 0 ? SCREEN_WIDTH : 0))
-#define CONVERT_COORDINATE_HEIGHT(y) ((y) + ((y) < 0 ? SCREEN_HEIGHT : 0))
-#define CONVERT_COORDINATE_X(x) (SCREEN_LEFT + CONVERT_COORDINATE_WIDTH((x)))
-#define CONVERT_COORDINATE_Y(y) (SCREEN_TOP + CONVERT_COORDINATE_HEIGHT((y)))
 
 #endif // MACROS_H
