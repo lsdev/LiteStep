@@ -32,14 +32,3 @@ BOOL IsValidStringPtrA(LPCSTR lpsz, UINT_PTR ucchMax)
 {
 	return ((ucchMax > 0) && (NULL != lpsz));
 }
-
-
-BOOL IsValidReadPtr(CONST VOID *lp, UINT_PTR ucb)
-{
-	return ((ucb > 0) && (NULL != lp));
-}
-
-BOOL IsValidWritePtr(LPVOID lp, UINT_PTR ucb)
-{
-	return ((ucb > 0) && (NULL != lp));
-}

@@ -48,10 +48,4 @@ BOOL IsValidStringPtrA(LPCSTR lpsz, UINT_PTR ucchMax);
 #endif // _UNICODE
 
 
-//
-// Valid Pointer Functions
-//
-BOOL IsValidReadPtr(CONST VOID *lp, UINT_PTR ucb);
-BOOL IsValidWritePtr(LPVOID lp, UINT_PTR ucb);
-
 #endif // SAFEPTR_H

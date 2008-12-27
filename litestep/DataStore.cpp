@@ -56,17 +56,15 @@ size_t DataStore::Count()
 
 BOOL DataStore::StoreData(WORD wIdent, void *pvData, WORD wLength)
 {
-    DataHolderMap::iterator iter;
-    DataHolder *pdhData = NULL;
     BOOL bReturn = FALSE;
     
-    if (IsValidReadPtr(pvData, wLength))
+    if (pvData != NULL && wLength > 0)
     {
-        iter = m_dhmData.find(wIdent);
+        DataHolderMap::iterator iter = m_dhmData.find(wIdent);
         
         if (iter == m_dhmData.end())
         {
-            pdhData = new DataHolder(pvData, wLength);
+            DataHolder* pdhData = new DataHolder(pvData, wLength);
             
             if (pdhData != NULL)
             {
@@ -82,17 +80,15 @@ BOOL DataStore::StoreData(WORD wIdent, void *pvData, WORD wLength)
 
 BOOL DataStore::ReleaseData(WORD wIdent, void *pvData, WORD wLength)
 {
-    DataHolderMap::iterator iter;
-    DataHolder *pdhData = NULL;
     BOOL bReturn = FALSE;
     
-    if (IsValidWritePtr(pvData, wLength))
+    if (pvData != NULL && wLength > 0)
     {
-        iter = m_dhmData.find(wIdent);
-        
+        DataHolderMap::iterator iter = m_dhmData.find(wIdent);
+
         if (iter != m_dhmData.end())
         {
-            pdhData = iter->second;
+            DataHolder* pdhData = iter->second;
             
             if (pdhData != NULL)
             {
@@ -148,14 +144,14 @@ int DataHolder::GetData(void *pvData, WORD wLength)
 {
     int nReturn = 0;
     
-    if (IsValidReadPtr(m_pvData, m_wLength) &&
-            IsValidWritePtr(pvData, wLength))
+    if (pvData != NULL && wLength > 0 &&
+        m_pvData != NULL && m_wLength > 0)
     {
         if (wLength > m_wLength)
         {
             wLength = m_wLength;
         }
-        
+
         memcpy(pvData, m_pvData, wLength);
         nReturn = wLength;
     }
@@ -177,7 +173,7 @@ int DataHolder::SetData(void *pvData, WORD wLength)
             m_wLength = 0;
         }
     }
-    else if (IsValidReadPtr(pvData, wLength))
+    else if (pvData != NULL && wLength > 0)
     {
         if (m_pvData == NULL)
         {
