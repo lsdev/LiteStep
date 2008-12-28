@@ -24,9 +24,8 @@
 
 #include "common.h"
 #include "Base.h"
-#include <objbase.h>
 
-class ILiteStep: public CountedBase
+class ILiteStep : public CountedBase
 {
 public:
     virtual int MessageHandler(/*[in]*/ MSG &message) = 0;

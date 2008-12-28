@@ -22,7 +22,7 @@
 #if !defined(BASE_H)
 #define BASE_H
 
-#include "../utility/common.h"
+#include "common.h"
 
 class Base
 {

@@ -22,6 +22,13 @@
 #if !defined(CRITICALSECTION_H)
 #define CRITICALSECTION_H
 
+#include "common.h"
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// CriticalSection
+//
 class CriticalSection
 {
     CriticalSection(const CriticalSection& rhs);
@@ -52,6 +59,10 @@ public:
 };
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Lock
+//
 class Lock
 {
 public:
@@ -74,6 +85,11 @@ private:
     Lock& operator=(const Lock& rhs);
 };
 
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Block
+//
 class Block
 {
 public:
