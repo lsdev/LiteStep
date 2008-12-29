@@ -389,8 +389,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
                                 resourceTextBuffer, MAX_LINE_LENGTH,
                                 "Error: Variable \"%s\" is defined recursively.", szVariable);
 
-                            MessageBox(NULL, resourceTextBuffer, "LiteStep",
-                                MB_OK | MB_ICONEXCLAMATION);
+                            RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
 
                             pszExpandedString[0] = '\0';
                             return;

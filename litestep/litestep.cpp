@@ -165,8 +165,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
             "Unable to find the file \"%s\".\n"
             "Please verify the location of the file, and try again.", szRcPath);
 
-        MessageBox(NULL, resourceTextBuffer, "LiteStep",
-            MB_TOPMOST | MB_ICONEXCLAMATION);
+        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
 
         return 2;
     }
@@ -175,9 +174,8 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     // so they will be started at this point. 
     if (!LSAPIInitialize(szAppPath, szRcPath)) 
     { 
-        //TODO: Localize this. 
-        MessageBox(NULL, "Failed to initialize the LiteStep API.",
-            "LiteStep", MB_TOPMOST | MB_ICONEXCLAMATION);
+        RESOURCE_MSGBOX(hInst, IDS_LSAPI_INIT_ERROR,
+            "Failed to initialize the LiteStep API.", "LiteStep");
 
         return 3;
     }
@@ -297,10 +295,11 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
                 "your step.rc.\n"
                 "\n"
                 "Continue to load Litestep?\n");
+
             RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
-            
-            if (MessageBox(NULL, resourceTextBuffer, resourceTitleBuffer,
-                MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
+
+            if (RESOURCE_MSGBOX_F(
+                resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
             {
                 return E_ABORT;
             }

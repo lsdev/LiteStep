@@ -103,9 +103,8 @@ bool Module::_LoadDll()
         
         if (!bReturn)
         {
-            MessageBox(NULL, resourceTextBuffer, m_tzLocation.c_str(),
-                MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST | MB_SETFOREGROUND);
-            
+            RESOURCE_MSGBOX_F(m_tzLocation.c_str(), MB_ICONEXCLAMATION);
+
             if (m_hInstance)
             {
                 FreeLibrary(m_hInstance);
@@ -113,7 +112,7 @@ bool Module::_LoadDll()
             }
         }
     }
-    
+
     return bReturn;
 }
 

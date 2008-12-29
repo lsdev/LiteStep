@@ -47,8 +47,7 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
             "Error in Expression:\n  %s\n\nDescription:\n  %s",
             expression.c_str(), e.what());
 
-        MessageBox(NULL, resourceTextBuffer, "LiteStep",
-            MB_OK | MB_ICONEXCLAMATION);
+        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
 
         return false;
     }
@@ -81,11 +80,10 @@ bool MathEvaluateString(const SettingsMap& context, const string& expression,
             "Error in Expression:\n  %s\n\nDescription:\n  %s",
             expression.c_str(), e.what());
 
-        MessageBox(NULL, resourceTextBuffer, "LiteStep",
-            MB_OK | MB_ICONEXCLAMATION);
+        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
 
         return false;
     }
-    
+
     return true;
 }

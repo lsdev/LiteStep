@@ -309,8 +309,10 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
 
                 // Can show a MessageBox here since the other instance
                 // should have closed the welcome screen already
-                if (IDNO == MessageBox(NULL, resourceTextBuffer, "LiteStep",
-                    MB_TOPMOST | MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2))
+                INT idConfirm =  RESOURCE_MSGBOX_F(
+                    "LiteStep", MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2);
+
+                if (idConfirm == IDNO)
                 {
                     wStartFlags &= ~LSF_RUN_LITESTEP;
                 }

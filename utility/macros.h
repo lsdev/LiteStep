@@ -32,17 +32,19 @@
 
 #if !defined(LSRESOURCEBUFFER)
 #define LSRESOURCEBUFFER
-static char resourceTextBuffer[MAX_LINE_LENGTH + 1];
-static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
+static char resourceTextBuffer[MAX_LINE_LENGTH + 1] = { 0 };
+static char resourceTitleBuffer[MAX_LINE_LENGTH + 1] = { 0 };
 #endif // LSRESOURCEBUFFER
 
-#define RESOURCE_MSGBOX(instance, id, deftext, title) \
-    GetResStr( (instance), (id)                       \
-        ,resourceTextBuffer, MAX_LINE_LENGTH          \
-        ,deftext);                                    \
-    MessageBox( NULL                                  \
-        ,resourceTextBuffer, (title)                  \
-        ,MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION )
+#define RESOURCE_MSGBOX_F(title, extra_flags)                   \
+    MessageBox(NULL, resourceTextBuffer, title,                 \
+        MB_SETFOREGROUND | extra_flags)
+
+#define RESOURCE_MSGBOX(instance, id, deftext, title)           \
+    GetResStr( (instance), (id)                                 \
+        ,resourceTextBuffer, MAX_LINE_LENGTH                    \
+        ,deftext);                                              \
+    RESOURCE_MSGBOX_F(title, MB_OK | MB_ICONEXCLAMATION)
 
 #define RESOURCE_MSGBOX_T(instance, id, deftext, titleid, deftitle) \
     GetResStr( (instance), (id)                                     \
@@ -51,9 +53,7 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
     GetResStr( (instance), (titleid)                                \
         ,resourceTitleBuffer, MAX_LINE_LENGTH                       \
         ,deftitle );                                                \
-    MessageBox( NULL                                                \
-        ,resourceTextBuffer, resourceTitleBuffer                    \
-        ,MB_OK | MB_TOPMOST | MB_ICONEXCLAMATION )
+    RESOURCE_MSGBOX_F(resourceTitleBuffer, MB_OK | MB_ICONEXCLAMATION)
 
 #define RESOURCE_STR(instance, id, deftext)  \
     GetResStr( (instance), (id)              \
@@ -66,6 +66,5 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1];
     GetResStr( (instance), (id)               \
         ,resourceTitleBuffer, MAX_LINE_LENGTH \
         ,deftext )
-
 
 #endif // MACROS_H
