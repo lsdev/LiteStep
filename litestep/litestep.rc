@@ -35,7 +35,7 @@ BEGIN
     IDS_LITESTEP_ERROR3     "LiteStep kann nicht als die System-Shell geladen werden,\nda bereits eine andere Shell aktiv ist.\n\nFalls Sie mit dem Laden LiteSteps fortfahren, werden einige\nFunktionen deaktiviert, und einige Features werden nicht\nordnungsgemäß funktionieren, wie z.B. der System-Tray, der\nDesktop und einige Task-Manager.\n\nUm diesen Hinweis abzuschalten, fügen Sie 'LSNoShellWarning'\nin Ihre step.rc ein.\n\nSoll mit dem Laden LiteSteps fortgefahren werden?"
     IDS_LITESTEP_ERROR4     "Fehler beim Registrieren der LiteStep-Hauptfensterklasse."
     IDS_LITESTEP_ERROR5     "Fehler beim Erzeugen des LiteStep-Hauptfensters."
-    IDS_LITESTEP_ERROR6     "Recycle wurde pausiert. Drücken Sie OK um weiterzumachen."
+    IDS_LITESTEP_ERROR6     "Recycle wurde pausiert. Drücken Sie OK, um weiterzumachen."
     IDS_LITESTEP_ERROR7     "Konnte %s nicht laden."
     IDS_LITESTEP_RECYCLELS  "LiteStep &recyclen"
     IDS_LITESTEP_QUITLS     "LiteStep be&enden"
