@@ -56,7 +56,7 @@ private:
 	BOOL _CreateGroup(LPCTSTR strGroupName, BOOL bCommon);
 	BOOL _DeleteGroup(LPCTSTR strGroupName, BOOL bCommon);
 	BOOL _DeleteItem(LPCTSTR strItem);
-	BOOL _AddItem(LPCTSTR strCmdLine, LPCTSTR pszDescription, LPCTSTR pszIconPath, int nIconIndex, LPCTSTR pszDefDir, WORD dwHotKey, BOOL bMinimize, BOOL bSepMemSpace);
+	BOOL _AddItem(LPCTSTR strCmdLine, LPCTSTR pszDescription, LPCTSTR pszIconPath, int nIconIndex, LPCTSTR pszDefDir, WORD dwHotKey, BOOL bMinimize);
 	BOOL _ListGroupsHelper(HANDLE hHeap, char* szPath, LPVOID& pGroupList, UINT& ulSize);
 	DWORD _MatchRequest(LPCSTR pszCommand);
 

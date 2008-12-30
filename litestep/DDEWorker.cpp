@@ -165,7 +165,6 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 			//HotKey[,fMinimize[fSeparateMemSpace] ] ] ] ] ] ]) : applies to current group
 			case DDE_REQUEST_ADDITEM:
 			{
-				BOOL bSepMemSpace = FALSE;
 				BOOL bMinimize = FALSE;
 				WORD dwHotKey = 0;
 				LPCSTR pszDefDir = NULL;
@@ -206,7 +205,7 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 					default:
 					break;
 				}
-				bReturn = _AddItem(pszParamList[0], pszDescription, pszIconPath, nIconIndex, pszDefDir, dwHotKey, bMinimize, bSepMemSpace);
+				bReturn = _AddItem(pszParamList[0], pszDescription, pszIconPath, nIconIndex, pszDefDir, dwHotKey, bMinimize);
 			}
 			break;
 			
@@ -535,7 +534,7 @@ BOOL DDEWorker::_DeleteItem(LPCTSTR strItem)
 }
 
 // Add an item
-BOOL DDEWorker::_AddItem(LPCTSTR strCmdLine, LPCTSTR strDescription, LPCTSTR strIconPath, int nIconIndex, LPCTSTR strDefDir, WORD dwHotKey, BOOL bMinimize, BOOL bSepMemSpace)
+BOOL DDEWorker::_AddItem(LPCTSTR strCmdLine, LPCTSTR strDescription, LPCTSTR strIconPath, int nIconIndex, LPCTSTR strDefDir, WORD dwHotKey, BOOL bMinimize)
 {
 	char szPath[MAX_PATH];
 	HRESULT hr;
