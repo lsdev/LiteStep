@@ -28,6 +28,7 @@
 #define IDS_RECURSIVEVAR                24
 #define IDS_MATHEXCEPTION               25
 #define IDS_LSAPI_INIT_ERROR            26
+#define IDS_LITESTEP_INIT_ERROR         27
 #define IDI_LS                          101
 #define IDB_LS                          102
 #define IDD_ABOUTBOX                    103

@@ -83,6 +83,10 @@ static HRESULT GetAppPath(LPTSTR pszAppPath, DWORD cchAppPath)
         PathRemoveFileSpec(pszAppPath);
         hr = S_OK;
     }
+    else
+    {
+        hr = HrGetLastError();
+    }
 
     return hr;
 }
@@ -190,8 +194,22 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 
     if (SUCCEEDED(hr))
     {
-        nReturn = liteStep.Run();
-        hr = liteStep.Stop();
+        // if hr == S_FALSE the user aborted during startup
+        if (hr == S_OK)
+        {
+            nReturn = liteStep.Run();
+            hr = liteStep.Stop();
+        }
+    }
+    else
+    {
+        RESOURCE_STREX(hInst, IDS_LITESTEP_INIT_ERROR,
+            resourceTextBuffer, MAX_LINE_LENGTH,
+            "Failed to initialize LiteStep.\n"
+            "Please contact the LiteStep Development Team.\n\n"
+            "Error code: 0x%.8X", hr);
+
+        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
     }
 
     if (FAILED(hr))
@@ -262,7 +280,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     }
 
     // Initialize OLE/COM
-    OleInitialize(NULL);
+    hr = OleInitialize(NULL);
 
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
@@ -277,8 +295,10 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     
     bool bUnderExplorer = false;
 
-    // Check for explorer
-    if (FindWindow("Shell_TrayWnd", NULL)) // Running under Exploder
+    //
+    // Check for another shell
+    //
+    if (FindWindow("Shell_TrayWnd", NULL) != NULL)
     {
         if (GetRCBool("LSNoShellWarning", FALSE))
         {
@@ -301,54 +321,64 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             if (RESOURCE_MSGBOX_F(
                 resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
             {
-                return E_ABORT;
+                return S_FALSE;
             }
         }
 
         bUnderExplorer = true;
     }
 
-    bool bSetAsShell = (!bUnderExplorer && GetRCBool("LSSetAsShell", TRUE));
+    if (SUCCEEDED(hr))
+    {
+        bool bSetAsShell =
+            (!bUnderExplorer && GetRCBool("LSSetAsShell", TRUE));
 
-    hr = CreateMainWindow(bSetAsShell);
-    
+        hr = CreateMainWindow(bSetAsShell);
+    }
+
     //
     // Start up everything
     //
     if (SUCCEEDED(hr))
     {
         hr = _InitServices();
+        
         if (SUCCEEDED(hr))
         {
             hr = _StartServices();
-            // Quietly swallow service errors... in the future.. do something
+
+            if (SUCCEEDED(hr))
+            {
+                hr = _InitManagers();
+
+                if (SUCCEEDED(hr))
+                {
+                    hr = _StartManagers();
+                }
+            }
         }
-        
-        hr = _InitManagers();
+
         if (SUCCEEDED(hr))
         {
-            hr = _StartManagers();
-            // Quietly swallow manager errors... in the future.. do something
-        }
-        
-        // Run startup items
-        if (wStartFlags & LSF_RUN_STARTUPAPPS)
-        {
-            BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
+            // Run startup items
+            if (wStartFlags & LSF_RUN_STARTUPAPPS)
+            {
+                BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
 
-            CloseHandle(LSCreateThread("StartupRunner",
-                StartupRunner::Run, (LPVOID)(INT_PTR)bForceStartup, NULL));
-        }
+                CloseHandle(LSCreateThread("StartupRunner",
+                    StartupRunner::Run, (LPVOID)(INT_PTR)bForceStartup, NULL));
+            }
 
-        // On Vista, the shell is responsible for playing the startup sound
-        if (IsVistaOrAbove() && StartupRunner::IsFirstRunThisSession(
-            _T("LogonSoundHasBeenPlayed")))
-        {
-            LSPlaySystemSound(_T("WindowsLogon"));
-        }
+            // On Vista, the shell is responsible for playing the startup sound
+            if (IsVistaOrAbove() && StartupRunner::IsFirstRunThisSession(
+                _T("LogonSoundHasBeenPlayed")))
+            {
+                LSPlaySystemSound(_T("WindowsLogon"));
+            }
 
-        // Undocumented call: Shell Loading Finished
-        SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
+            // Undocumented call: Shell Loading Finished
+            SendMessage(GetDesktopWindow(), WM_USER, 0, 0);
+        }
     }
     
     return hr;
@@ -436,11 +466,6 @@ HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
     if (!RegisterClassEx(&wc))
     {
         hr = HrGetLastError();
-
-        RESOURCE_MSGBOX_T(m_hInstance, IDS_LITESTEP_ERROR4,
-            "Error registering main LiteStep window class.",
-            IDS_LITESTEP_TITLE_ERROR, "Error");
-
         return hr;
     }
 
@@ -488,10 +513,6 @@ HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
     else
     {
         hr = HrGetLastError();
-
-        RESOURCE_MSGBOX_T(m_hInstance, IDS_LITESTEP_ERROR5,
-            "Error creating LiteStep main application window.",
-            IDS_LITESTEP_TITLE_ERROR, "Error");
     }
 
     return hr;
