@@ -38,12 +38,23 @@ static const TCHAR szTrayClass[]   = _T("Shell_TrayWnd");
 static const TCHAR szTrayTitle[]   = _T("Litestep Tray Manager");
 static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 
+
+//
+// CLSID_SysTrayObject - {35CEC8A3-2BE6-11D2-8773-92E220524153}
+//
+// This appears to be the SSO responsible for starting up all other "approved"
+// SSOs on Vista. Name derived from "stobject.dll".
+// 
+const GUID CLSID_SysTrayObject =
+{0x35CEC8A3, 0x2BE6, 0x11D2, {0x87, 0x73, 0x92, 0xE2, 0x20, 0x52, 0x41, 0x53}};
+
+
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
 // TrayService
 //
 TrayService::TrayService() :
-m_bWin2000(false), m_uWorkAreaDirty(0), m_hNotifyWnd(NULL), m_hTrayWnd(NULL),
+m_uWorkAreaDirty(0), m_hNotifyWnd(NULL), m_hTrayWnd(NULL),
 m_hLiteStep(NULL), m_hInstance(NULL)
 {}
 
@@ -64,7 +75,7 @@ HRESULT TrayService::Start()
 {
     ASSERT(NULL == m_hTrayWnd);
     HRESULT hr = E_FAIL;
-    
+
     fpSHLockShared = (FUNC_PVOID__HANDLE_DWORD)GetProcAddress(
          GetModuleHandle(_T("SHELL32"))
         ,(LPCSTR)((long)0x0209)
@@ -79,17 +90,6 @@ HRESULT TrayService::Start()
     
     if (m_hLiteStep && m_hInstance)
     {
-        OSVERSIONINFO OsVersionInfo = { 0 };
-        OsVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-        
-        GetVersionEx(&OsVersionInfo);
-        
-        if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-            OsVersionInfo.dwMajorVersion >= 5)
-        {
-            m_bWin2000 = true;
-        }
-        
         SystemParametersInfo(
              SPI_GETWORKAREA
             ,0
@@ -124,9 +124,16 @@ HRESULT TrayService::Start()
             // tell apps to reregister their icons
             SendNotifyMessage(HWND_BROADCAST,
                 RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
-            
-            if (m_bWin2000)
+
+            if (IsVistaOrAbove())
             {
+                // On Vista and up there's a single SSO responsible for loading
+                // all the supported objects (volume icon, network icon, etc.)
+                loadShellServiceObject(CLSID_SysTrayObject);
+            }
+            else if (IsOS(OS_WIN2000ORGREATER))
+            {
+                // On previous versions the object list is in the registry
                 loadShellServiceObjects();
             }
         }
@@ -143,35 +150,30 @@ HRESULT TrayService::Start()
 HRESULT TrayService::Stop()
 {
     HRESULT hr = S_OK;
-    
-    if (m_bWin2000 && m_hTrayWnd)
-    {
-        unloadShellServiceObjects();
-    }
-    
+
+    unloadShellServiceObjects();
     destroyWindows();
-    
+
     while (!m_siVector.empty())
     {
         delete m_siVector.back();
         m_siVector.pop_back();
     }
-    
+
     while (!m_abVector.empty())
     {
         delete m_abVector.back();
         m_abVector.pop_back();
     }
-    
+
     // Restore the work area. (should we just clear the work area???)
     adjustWorkArea();
-    
-    m_bWin2000 = false;
+
     m_hLiteStep = NULL;
     m_hInstance = NULL;
     fpSHLockShared = NULL;
     fpSHUnlockShared = NULL;
-    
+
     return hr;
 }
 
@@ -1980,7 +1982,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
         
         bReturn = notify(NIM_SETVERSION, &lsnid);
     }
-    
+
     return bReturn;
 }
 

@@ -193,7 +193,6 @@ private:
     //
     //
     //
-    bool m_bWin2000;
     UINT m_uWorkAreaDirty;
     RECT m_rWorkAreaDef; // The Working Area without any appbars.
     RECT m_rWorkAreaCur; // The Working Area with the appbars.
