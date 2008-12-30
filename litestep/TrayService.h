@@ -29,9 +29,6 @@
 #include <shellapi.h>
 #include <vector>
 
-typedef PVOID (WINAPI *FUNC_PVOID__HANDLE_DWORD)(HANDLE, DWORD);
-typedef BOOL (WINAPI *FUNC_BOOL__PVOID)(PVOID);
-
 // shell copy data types
 #define SH_APPBAR_DATA    (0)
 #define SH_TRAY_DATA      (1)

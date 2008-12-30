@@ -27,9 +27,6 @@
 #include "../utility/core.hpp"
 #include <docobj.h>
 
-FUNC_PVOID__HANDLE_DWORD fpSHLockShared;
-FUNC_BOOL__PVOID fpSHUnlockShared;
-
 #if !defined(REGSTR_PATH_SHELLSERVICEOBJECTDELAYED)
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
 #endif
@@ -76,15 +73,6 @@ HRESULT TrayService::Start()
     ASSERT(NULL == m_hTrayWnd);
     HRESULT hr = E_FAIL;
 
-    fpSHLockShared = (FUNC_PVOID__HANDLE_DWORD)GetProcAddress(
-         GetModuleHandle(_T("SHELL32"))
-        ,(LPCSTR)((long)0x0209)
-    );
-    fpSHUnlockShared = (FUNC_BOOL__PVOID)GetProcAddress(
-         GetModuleHandle(_T("SHELL32"))
-        ,(LPCSTR)((long)0x020A)
-    );
-    
     m_hLiteStep = GetLitestepWnd();
     m_hInstance = GetModuleHandle(NULL);
     
@@ -171,8 +159,6 @@ HRESULT TrayService::Stop()
 
     m_hLiteStep = NULL;
     m_hInstance = NULL;
-    fpSHLockShared = NULL;
-    fpSHUnlockShared = NULL;
 
     return hr;
 }
@@ -1405,12 +1391,8 @@ void TrayService::adjustWorkArea()
 //
 PAPPBARDATAV1 TrayService::ABLock(PSHELLAPPBARDATA psad)
 {
-    if(NULL != fpSHLockShared && NULL != psad->hSharedMemory)
-    {
-        return (PAPPBARDATAV1)fpSHLockShared(psad->hSharedMemory, psad->dwSourceProcessId);
-    }
-    
-    return NULL;
+    return (PAPPBARDATAV1)SHLockShared(
+        psad->hSharedMemory, psad->dwSourceProcessId);
 }
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1421,10 +1403,7 @@ PAPPBARDATAV1 TrayService::ABLock(PSHELLAPPBARDATA psad)
 //
 void TrayService::ABUnLock(PAPPBARDATAV1 pabd)
 {
-    if(NULL != fpSHUnlockShared && NULL != pabd)
-    {
-        fpSHUnlockShared(pabd);
-    }
+    SHUnlockShared(pabd);
 }
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
