@@ -78,12 +78,12 @@ bool Module::_LoadDll()
             if (!m_pInitEx)
             {
                 RESOURCE_STR(NULL, IDS_INITMODULEEXNOTFOUND_ERROR,
-                    "Error: Could not find initModuleEx().\n\nPlease confirm that the dll is a Litestep module,\nand check with the author for updates.");
+                    "Error: Could not find initModuleEx().\n\nPlease confirm that the dll is a LiteStep module,\nand check with the author for updates.");
             }
             else if (!m_pQuit)
             {
                 RESOURCE_STR(NULL, IDS_QUITMODULENOTFOUND_ERROR,
-                    "Error: Could not find quitModule().\n\nPlease confirm that the dll is a Litestep module.");
+                    "Error: Could not find quitModule().\n\nPlease confirm that the dll is a LiteStep module.");
             }
             else
             {
