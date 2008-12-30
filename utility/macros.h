@@ -38,7 +38,7 @@ static char resourceTitleBuffer[MAX_LINE_LENGTH + 1] = { 0 };
 
 #define RESOURCE_MSGBOX_F(title, extra_flags)                   \
     MessageBox(NULL, resourceTextBuffer, title,                 \
-        MB_SETFOREGROUND | extra_flags)
+        MB_TOPMOST | extra_flags)
 
 #define RESOURCE_MSGBOX(instance, id, deftext, title)           \
     GetResStr( (instance), (id)                                 \

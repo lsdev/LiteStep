@@ -81,7 +81,7 @@ void BangAlert(HWND hCaller, LPCSTR pszArgs)
 			StringCchCopy(szTitle, MAX_PATH, "LiteStep !Alert");
 		}
 
-		MessageBox(hCaller, szMessage, szTitle, MB_OK | MB_SETFOREGROUND);
+		MessageBox(hCaller, szMessage, szTitle, MB_OK | MB_TOPMOST);
 	}
 }
 
@@ -118,7 +118,7 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
         LPCSTR pszTitle = (nTokenCount == 3) ? szFourth : szSecond;
 
         INT idConfirm = MessageBox(
-            hCaller, szFirst, pszTitle, MB_YESNO | MB_SETFOREGROUND);
+            hCaller, szFirst, pszTitle, MB_YESNO | MB_TOPMOST);
 
         if (idConfirm == IDYES)
         {

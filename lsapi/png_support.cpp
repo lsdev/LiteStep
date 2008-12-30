@@ -143,7 +143,9 @@ void PNGErrorHandler(png_structp PngStruct, png_const_charp Message)
 		throw Message;
 	else
 	{
-		MessageBox(PngError->Wnd, Message, "LiteStep::LoadFromPNG:PngError", MB_OK | MB_ICONERROR);
+		MessageBox(PngError->Wnd, Message, "LiteStep::LoadFromPNG:PngError",
+            MB_OK | MB_TOPMOST | MB_ICONERROR);
+
 		longjmp(PngError->ErrorJump, 1);
 	}
 }
