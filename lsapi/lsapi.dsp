@@ -83,7 +83,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 libpng13d.lib ole32.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib /delayload:"libpng13d.dll"
+# ADD LINK32 libpng13d.lib ole32.lib delayimp.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib /nologo /subsystem:windows /dll /map:"../Debug_VC6/lsapi.map" /debug /machine:I386 /nodefaultlib /delayload:"libpng13d.dll" /MAPINFO:LINES /MAPINFO:EXPORTS
 # SUBTRACT LINK32 /profile
 
 !ENDIF 
@@ -178,7 +178,7 @@ SOURCE=.\stubs.cpp
 # End Group
 # Begin Group "Headers"
 
-# PROP Default_Filter "*.h"
+# PROP Default_Filter "*.hpp;*.h"
 # Begin Source File
 
 SOURCE=.\BangCommand.h
@@ -262,7 +262,7 @@ SOURCE=.\ThreadedBangCommand.h
 # End Group
 # Begin Group "Resources"
 
-# PROP Default_Filter "*.rc;*.bmp;*.ico;*.h"
+# PROP Default_Filter "*.rc;*.bmp;*.ico"
 # Begin Source File
 
 SOURCE=.\lsapi.rc

@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 ..\Release_VC6\lsapi.lib ole32.lib oleaut32.lib uuid.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib /nologo /subsystem:windows /pdb:none /map /machine:I386 /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 ole32.lib oleaut32.lib uuid.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrt.lib msvcprt.lib ..\Release_VC6\lsapi.lib /nologo /subsystem:windows /pdb:none /map:"../Release_VC6/litestep.map" /machine:I386 /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
 
@@ -71,7 +71,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /D "LS_NO_EXCEPTION" /FR /FD /c
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "../lsapi" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LSAPI_PRIVATE" /D "LS_NO_EXCEPTION" /FR /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /o "NUL" /win32
@@ -83,7 +83,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\Debug_VC6\lsapi.lib ole32.lib oleaut32.lib uuid.lib shlwapi.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib
+# ADD LINK32 ole32.lib oleaut32.lib uuid.lib shlwapi.lib comdlg32.lib advapi32.lib gdi32.lib shell32.lib kernel32.lib user32.lib msvcrtd.lib msvcprtd.lib ..\Debug_VC6\lsapi.lib /nologo /subsystem:windows /map:"../Debug_VC6/litestep.map" /debug /machine:I386 /nodefaultlib /MAPINFO:LINES /MAPINFO:EXPORTS
 # SUBTRACT LINK32 /profile
 
 !ENDIF 
@@ -150,7 +150,7 @@ SOURCE=.\WinMain.cpp
 # End Group
 # Begin Group "Headers"
 
-# PROP Default_Filter "*.h"
+# PROP Default_Filter "*.hpp;*.h"
 # Begin Source File
 
 SOURCE=.\buildoptions.h
@@ -193,6 +193,10 @@ SOURCE=.\RecoveryMenu.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\resource.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\StartupRunner.h
 # End Source File
 # Begin Source File
@@ -210,7 +214,7 @@ SOURCE=.\TrayService.h
 # End Group
 # Begin Group "Resources"
 
-# PROP Default_Filter "*.rc;*.bmp;*.ico;*.h"
+# PROP Default_Filter "*.rc;*.bmp;*.ico"
 # Begin Source File
 
 SOURCE=.\litestep.bmp
@@ -221,11 +225,11 @@ SOURCE=.\litestep.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\litestep.rc
+SOURCE=.\litestep.manifest
 # End Source File
 # Begin Source File
 
-SOURCE=.\resource.h
+SOURCE=.\litestep.rc
 # End Source File
 # End Group
 # End Target

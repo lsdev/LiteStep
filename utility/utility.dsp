@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Output_Dir "../Debug_VC6"
 # PROP Intermediate_Dir "Debug_VC6"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Yu"stdafx.h" /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Yu"stdafx.h" /FD /c
 # ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_LIB" /D "LS_NO_EXCEPTION" /FR /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -87,19 +87,7 @@ LIB32=link.exe -lib
 # PROP Default_Filter "*.cpp;*.c"
 # Begin Source File
 
-SOURCE=.\localization.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\lswinbase.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\lswinbasex.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\safeptr.cpp
+SOURCE=.\debug.cpp
 # End Source File
 # Begin Source File
 
@@ -108,7 +96,7 @@ SOURCE=.\shellhlp.cpp
 # End Group
 # Begin Group "Headers"
 
-# PROP Default_Filter "*.h"
+# PROP Default_Filter "*.hpp;*.h"
 # Begin Source File
 
 SOURCE=.\Base.h
@@ -143,27 +131,7 @@ SOURCE=.\IService.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\localization.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\lswinbase.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\lswinbasex.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\macros.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\safeptr.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\safestr.h
 # End Source File
 # Begin Source File
 
@@ -172,10 +140,6 @@ SOURCE=.\shellhlp.h
 # Begin Source File
 
 SOURCE=.\stringutility.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\wharfdata.h
 # End Source File
 # End Group
 # End Target
