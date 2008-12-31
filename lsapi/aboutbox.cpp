@@ -99,7 +99,7 @@ const char * lsLicense = \
  "LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
  "\r\n"
  "Copyright (C) 1997-1998  Francis Gastellu\r\n"
- "Copyright (C) 1998-2008  Litestep Development Team\r\n"
+ "Copyright (C) 1998-2008  LiteStep Development Team\r\n"
  "\r\n"
  "This program is free software; you can redistribute it and/or modify it under "
  "the terms of the GNU General Public License as published by the Free Software "

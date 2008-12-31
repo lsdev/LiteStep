@@ -43,7 +43,7 @@ const int cMenuCommands = sizeof(rgMenuCommands) / sizeof(rgMenuCommands[0]);
 const TCHAR szRecoveryMenuWndClass[] = _T("RecoveryMenuWndClass");
 
 // this thread provides a recovery menu which can be accessed in
-// case errors render Litestep unusable
+// case errors render LiteStep unusable
 DWORD WINAPI RecoveryThreadProc(LPVOID pvData)
 {
 	HINSTANCE hInstance = static_cast<HINSTANCE>(pvData);

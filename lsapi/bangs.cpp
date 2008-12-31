@@ -79,7 +79,7 @@ void BangAlert(HWND hCaller, LPCSTR pszArgs)
 	{
 		if (nTokenCount == 1)
 		{
-			StringCchCopy(szTitle, MAX_PATH, "!Alert Litestep");
+			StringCchCopy(szTitle, MAX_PATH, "!Alert LiteStep");
 		}
 
 		MessageBox(hCaller, szMessage, szTitle, MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
@@ -115,7 +115,7 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 		{
 			if (nTokenCount == 3)
 			{
-				StringCchCopy(szFourth, MAX_LINE_LENGTH, "Litestep");
+				StringCchCopy(szFourth, MAX_LINE_LENGTH, "!Confirm LiteStep");
 			}
 
 			if (MessageBox(hCaller, szFirst, (nTokenCount == 3) ? szFourth : szSecond, MB_YESNO | MB_TOPMOST | MB_SETFOREGROUND) == IDYES)

@@ -349,18 +349,18 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, int nStartupMode)
 		if (GetRCBool("LSNoShellWarning", FALSE))
 		{
 			RESOURCE_STR(hInstance, IDS_LITESTEP_ERROR3,
-				"Litestep is not able to load as the system shell.\n"
+				"LiteStep is not able to load as the system shell.\n"
 				"Another shell is already active.\n"
 				"\n"
-				"Continuing to load Litestep will disable specific system\n"
-				"shell functions of Litestep and some features will not\n"
+				"Continuing to load LiteStep will disable specific system\n"
+				"shell functions of LiteStep and some features will not\n"
 				"function properly such as icon notifications (systray),\n"
 				"the desktop and some task managers.\n"
 				"\n"
 				"To disable this message, place 'LSNoShellWarning' in\n"
 				"your step.rc.\n"
 				"\n"
-				"Continue to load Litestep?\n");
+				"Continue to load LiteStep?\n");
 			RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
 			if (MessageBox(NULL, resourceTextBuffer, resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
 			{
@@ -380,7 +380,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, int nStartupMode)
     if (!RegisterClassEx(&wc))
 	{
 		RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR4,
-		                  "Error registering main Litestep window class.",
+		                  "Error registering main LiteStep window class.",
 		                  IDS_LITESTEP_TITLE_ERROR, "Error");
 
 		return E_FAIL;
@@ -495,7 +495,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, int nStartupMode)
 	else
 	{
 		RESOURCE_MSGBOX_T(hInstance, IDS_LITESTEP_ERROR5,
-		                  "Error creating Litestep main application window.",
+		                  "Error creating LiteStep main application window.",
 		                  IDS_LITESTEP_TITLE_ERROR, "Error");
 	}
 
