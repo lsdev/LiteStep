@@ -155,7 +155,7 @@ void MathScanner::Next(int count)
         for (int j = 0; j < LOOKAHEAD - 1; j++)
             mLookahead[j] = mLookahead[j + 1];
         
-        mLookahead[LOOKAHEAD - 1] = mStream.get();
+        mStream.get(mLookahead[LOOKAHEAD - 1]);
     }
 }
 
@@ -203,7 +203,7 @@ MathToken MathScanner::ScanNumber()
 MathToken MathScanner::ScanString()
 {
     ostringstream value;
-    int quote = mLookahead[0];
+    char quote = mLookahead[0];
     Next();
     
     while (mLookahead[0] != EOF && mLookahead[0] != quote)
@@ -259,19 +259,19 @@ void MathScanner::SkipSpace()
 }
 
 
-bool MathScanner::IsDigit(int ch)
+bool MathScanner::IsDigit(char ch)
 {
     return (ch >= '0' && ch <= '9');
 }
 
 
-bool MathScanner::IsFirstNameChar(int ch)
+bool MathScanner::IsFirstNameChar(char ch)
 {
     return !IsDigit(ch) && IsNameChar(ch);
 }
 
 
-bool MathScanner::IsNameChar(int ch)
+bool MathScanner::IsNameChar(char ch)
 {
     if (ch < 0 || IsSpace(ch))
     {
@@ -308,7 +308,7 @@ bool MathScanner::IsNameChar(int ch)
 }
 
 
-bool MathScanner::IsSpace(int ch)
+bool MathScanner::IsSpace(char ch)
 {
     return (ch == ' ' || ch == '\t'); // More than this?
 }
