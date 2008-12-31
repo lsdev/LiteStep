@@ -147,13 +147,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://www.lsdev.org/\0"
             VALUE "CompanyName", "LiteStep Development Team\0"
-            VALUE "FileDescription", "An Alternative Win32 Shell\0"
-            VALUE "FileVersion", "0.24.8 RC1\0"
-            VALUE "InternalName", "LiteStep\0"
+            VALUE "FileDescription", "LiteStep\0"
+            VALUE "FileVersion", "0.24.8 RC2 Pre\0"
+            VALUE "InternalName", "LiteStep Core\0"
             VALUE "LegalCopyright", "Copyright © 1997 - 2008\0"
             VALUE "OriginalFilename", "litestep.exe\0"
             VALUE "ProductName", "LiteStep\0"
-            VALUE "ProductVersion", "0.24.8 RC1\0"
+            VALUE "ProductVersion", "0.24.8 RC2 Pre\0"
             VALUE "SpecialBuild", "Release Candidate 1\0"
         END
     END
