@@ -98,7 +98,7 @@ END
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 240, 185
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "About LiteStep..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -110,7 +110,7 @@ BEGIN
     CONTROL         "List1",IDC_LISTVIEW,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | 
                     LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,58,219,100
-    LTEXT           "",IDC_TITLE,38,3,187,16,SS_CENTERIMAGE,    
+    LTEXT           "",IDC_TITLE,38,3,187,16,SS_CENTERIMAGE,
                     WS_EX_TRANSPARENT
     CONTROL         IDB_LS,IDC_LOGO,"Static",SS_BITMAP,2,1,32,30
     LTEXT           "",IDC_COMPILETIME,12,168,153,8
@@ -128,8 +128,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,24,7,0
- PRODUCTVERSION 0,24,7,0
+ FILEVERSION 0,25,0,0
+ PRODUCTVERSION 0,25,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -147,12 +147,13 @@ BEGIN
             VALUE "Comments", "http://www.lsdev.org/"
             VALUE "CompanyName", "LiteStep Development Team"
             VALUE "FileDescription", "LiteStep"
-            VALUE "FileVersion", "0, 24, 7, 0"
+            VALUE "FileVersion", "0.25.0 Pre"
             VALUE "InternalName", "LiteStep Core"
             VALUE "LegalCopyright", "Copyright © 1997 - 2008"
             VALUE "OriginalFilename", "litestep.exe"
             VALUE "ProductName", "LiteStep"
-            VALUE "ProductVersion", "0, 24, 7, 0"
+            VALUE "ProductVersion", "0.25.0 Pre"
+            VALUE "SpecialBuild", "CVS HEAD Test Release"
         END
     END
     BLOCK "VarFileInfo"
