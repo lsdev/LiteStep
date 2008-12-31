@@ -42,7 +42,7 @@ private:
     /** Thread handle */
     HANDLE m_hThread;
     
-    /** Litestep's main window handle */
+    /** LiteStep's main window handle */
     HWND m_hMainWindow;
     
     /** Thread ID */
@@ -51,7 +51,7 @@ private:
     /** Path to module's DLL */
     std::basic_string<TCHAR> m_tzLocation;
     
-    /** Path to Litestep's root directory */
+    /** Path to LiteStep's root directory */
     std::basic_string<TCHAR> m_tzAppPath;
     
     /** Pointer to <code>initModuleEx</code> function */
@@ -88,8 +88,8 @@ public:
      * <code>GetInitEvent</code> to wait for initialization to complete. The parameters
      * are passed to the module's <code>initModuleEx</code> function.
      *
-     * @param  hMainWindow  handle to Litestep's main window
-     * @param  sAppPath     path to Litestep's root directory
+     * @param  hMainWindow  handle to LiteStep's main window
+     * @param  sAppPath     path to LiteStep's root directory
      * @return <code>true</code> if successful or <code>false</code> otherwise
      */
     bool Init(HWND hMainWindow, const std::string& sAppPath);

@@ -33,7 +33,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // IsOtherInstanceRunning
-// Checks if another Litestep instance is running already
+// Checks if another LiteStep instance is running already
 //
 bool IsOtherInstanceRunning(LPHANDLE phMutex)
 {
@@ -60,7 +60,7 @@ WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, DWORD cchFile)
 {
     ASSERT(pszCommandLine);
     
-    // By default, run Litestep and startup apps
+    // By default, run LiteStep and startup apps
     WORD wStartFlags = LSF_RUN_LITESTEP | LSF_RUN_STARTUPAPPS;
 
     char szToken[MAX_LINE_LENGTH] = { 0 };
@@ -271,7 +271,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
         if (GetSystemMetrics(SM_CLEANBOOT))
         {
             // We're in safe mode. We really want Explorer to run now, in case
-            // Litestep is the reason we're here.
+            // LiteStep is the reason we're here.
             // But if we can't, make sure we at least ignore startup apps
             // (see docs for GetSystemMetrics(SM_CLEANBOOT))
             wStartFlags |= LSF_RUN_EXPLORER;
@@ -285,7 +285,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
             //
             if (StartExplorerShell(EXPLORER_WAIT_TIMEOUT))
             {
-                // Explorer started as shell, no need try Litestep as well
+                // Explorer started as shell, no need try LiteStep as well
                 wStartFlags &= ~LSF_RUN_LITESTEP;
             }
             else
@@ -301,7 +301,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
             if (IsOtherInstanceRunning(&hMutex))
             {
                 //
-                // Mode 3a: Other Litestep instance already running
+                // Mode 3a: Other LiteStep instance already running
                 //
                 RESOURCE_STR(hInst, IDS_LITESTEP_ERROR1,
                     "A previous instance of LiteStep was detected.\n"

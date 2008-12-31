@@ -32,9 +32,9 @@
 /**
  * Manages association of messages with windows.
  *
- * Communication within Litestep is done by registering a window for a set
+ * Communication within LiteStep is done by registering a window for a set
  * of window messages using <code>LM_REGISTERMESSAGE</code>. Whenever
- * Litestep's main window (GetLitestepWnd) receives a message it doesn't
+ * LiteStep's main window (GetLitestepWnd) receives a message it doesn't
  * handle, that message is resent to all windows that registered for it.
  */
 class MessageManager

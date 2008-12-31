@@ -32,7 +32,7 @@
 #endif
 
 static const TCHAR szTrayClass[]   = _T("Shell_TrayWnd");
-static const TCHAR szTrayTitle[]   = _T("Litestep Tray Manager");
+static const TCHAR szTrayTitle[]   = _T("LiteStep Tray Manager");
 static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 
 

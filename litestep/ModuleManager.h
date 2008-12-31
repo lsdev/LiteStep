@@ -52,7 +52,7 @@ public:
     /**
      * Starts the module manager and loads all the modules specified in <code>step.rc</code>.
      *
-     * @param  pILiteStep  interface to Litestep's core
+     * @param  pILiteStep  interface to LiteStep's core
      * @return <code>S_OK</code> if successful or an error code
      */
     HRESULT Start(ILiteStep *pILiteStep);
@@ -179,13 +179,13 @@ private:
     /** List of loaded modules */
     ModuleQueue m_ModuleQueue;
     
-    /** Pointer to Litestep's core interface */
+    /** Pointer to LiteStep's core interface */
     ILiteStep *m_pILiteStep;
     
-    /** Litestep's main window handle */
+    /** LiteStep's main window handle */
     HWND m_hLiteStep;
     
-    /** Path to Litestep's root directory */
+    /** Path to LiteStep's root directory */
     std::string m_sAppPath;
     
     /**

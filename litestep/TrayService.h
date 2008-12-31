@@ -169,7 +169,7 @@ private:
     bool setVersionIcon(const NID_XX& nid); // NIM_SETVERSION
     
     //
-    // Send icon notifications on to Litestep (thus systray modules)
+    // Send icon notifications on to LiteStep (thus systray modules)
     //
     bool notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const;
     bool extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) const;
