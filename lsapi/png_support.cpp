@@ -251,9 +251,9 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 
 							BITMAPINFO bmi = {0};
 							bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-							bmi.bmiHeader.biWidth = png_get_image_width(Read, Info);
-							bmi.bmiHeader.biHeight = -(int)png_get_image_height(Read, Info);
-							bmi.bmiHeader.biBitCount = png_get_channels(Read, Info) * png_get_bit_depth(Read, Info);
+							bmi.bmiHeader.biWidth = (LONG)png_get_image_width(Read, Info);
+							bmi.bmiHeader.biHeight = -(LONG)png_get_image_height(Read, Info);
+							bmi.bmiHeader.biBitCount = (WORD)(png_get_channels(Read, Info) * png_get_bit_depth(Read, Info));
 							bmi.bmiHeader.biPlanes = 1;
 							bmi.bmiHeader.biCompression = BI_RGB;
 
