@@ -132,7 +132,7 @@ static MathValue Math_sqrt(const MathValueList& argList);
 static MathValue Math_upperCase(const MathValueList& argList);
 
 // Mapping of names to predefined functions
-struct { const char *name; MathFunction function; int numArgs; } gFunctions[] =
+struct { const char *name; MathFunction function; unsigned int numArgs; } gFunctions[] =
 {
     { "abs",        Math_abs,        1 },
     { "boolean",    Math_boolean,    1 },
@@ -181,7 +181,7 @@ MathValue MathParser::CallFunction(const string& name, const MathValueList& argL
     {
         if (_stricmp(name.c_str(), gFunctions[i].name) == 0)
         {
-            if (static_cast<int>(argList.size()) != gFunctions[i].numArgs)
+            if (argList.size() != gFunctions[i].numArgs)
             {
                 // Incorrect number of arguments
                 ostringstream message;
