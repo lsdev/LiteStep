@@ -68,24 +68,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define HOOK_DLL
 #include "hook.h"
 
-#ifdef _DEBUG 
-//#pragma COMPILE_WARN(If you plan to use hooks and a debugger change the)
-//#pragma COMPILE_WARN(following line to the name of your debugger executable)
-//#pragma COMPILE_WARN(to ensure that the debugger is not hooked)
-#define DEBUGGER "DEB.EXE" // Change this to the name of the debugger, all caps (i.e. MSDEV.EXE)
-#define PATHSIZE 256
-BOOL IsCurProcDebugger();
-#endif // _DEBUG
-
 #pragma data_seg("SHAREDATA")
 static HHOOK g_hHookMessage = 0; // Hook for WH_GETMESSAGE
 static HHOOK g_hHookCallWnd = 0;
 
-#ifdef _DEBUG
-DWORD dwDebuggerProcId = 0;
-#endif // _DEBUG
 #pragma data_seg()
-
 HWND hwndHookMgr = NULL;
 HWND hwndLiteStep = NULL;
 HINSTANCE hInst = NULL;
@@ -115,11 +102,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		                 KEY_READ,
 		                 &hKey) == ERROR_SUCCESS)
 		{
-            char szExeName[MAX_PATH+1] = { 0 };
+			char szExeName[MAX_PATH+1] = { 0 };
 			char *szFileName = szExeName;
 			char *tcp;
 
-			GetModuleFileName(0, szExeName, sizeof(szExeName)-1);
+			GetModuleFileName(NULL, szExeName, sizeof(szExeName)-1);
 
 			for (tcp = szExeName; *tcp; tcp++)
 			{
@@ -130,7 +117,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			if (RegQueryValueEx(hKey, szFileName, NULL, NULL,
 			                    NULL, NULL) == ERROR_SUCCESS)
 			{
-				TRACE("Not hooking file: %s", szFileName);
 				bFilter = true;
 			}
 			else
@@ -143,15 +129,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 	return TRUE;
 }
 
-
-#ifndef _DEBUG
 extern "C" BOOL _stdcall _DllMainCRTStartup(HINSTANCE hinstDLL,
 	        DWORD fdwReason,
 	        LPVOID lpvReserved)
 {
 	return DllMain(hinstDLL, fdwReason, lpvReserved);
 }
-#endif // !_DEBUG
 
 void setMsgHook(HHOOK hMSG)
 {
@@ -192,6 +175,21 @@ void ProcessGetMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 
+#ifdef _DEBUG 
+// *** DO NOT PUT ANY BREAKPOINTS IN THIS CODE!!!
+BOOL IsCurProcDebugger()
+{
+	typedef BOOL (WINAPI* IsDebuggerPresentProc)();
+
+	IsDebuggerPresentProc fnIsDebuggerPresent = (IsDebuggerPresentProc)
+		GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsDebuggerPresent");
+
+	// If a debugger is attached use the current directory as base path
+	return fnIsDebuggerPresent && fnIsDebuggerPresent();
+}
+#endif  // _DEBUG
+
+
 /*
 Call back for WH_GETMESSAGE
 */
@@ -200,11 +198,9 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	PMSG pmsg;
 
 #ifdef _DEBUG
-
 	if (!IsCurProcDebugger()) // If you are not in the debugger...
-	{
 #endif // _DEBUG
-
+	{
 		if ((nCode < 0) || (bFilter) /*|| (wParam == PM_REMOVE)*/)
 		{
 			return (CallNextHookEx(g_hHookMessage, nCode, wParam, lParam));
@@ -223,7 +219,6 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 					case WM_PAINT:
 					break;
 					case WM_SYSCOMMAND:
-					TRACE("WM_SYSCOMMAND");
 					default:
 					{
 						//_LSDEBUGPRINTMSG("GetMsgProc Hook Called for Message", (int)msg);
@@ -233,11 +228,7 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-
-#ifdef _DEBUG
-
 	}
-#endif // _DEBUG
 
 	return (CallNextHookEx(g_hHookMessage, nCode, wParam, lParam));
 }
@@ -251,11 +242,9 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 	PCWPSTRUCT pmsg;
 
 #ifdef _DEBUG
-
 	if (!IsCurProcDebugger()) // If you are not in the debugger...
-	{
 #endif // _DEBUG
-
+	{
 		if ((nCode < 0) || (bFilter))
 		{
 			return (CallNextHookEx(g_hHookCallWnd, nCode, wParam, lParam));
@@ -276,7 +265,6 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 					case WM_COPYDATA:
 					break;
 					case WM_SYSCOMMAND:
-					TRACE("WM_SYSCOMMAND");
 					default:
 					{
 						//_LSDEBUGPRINTMSG("CallWndProc Hook Called for Message", (int)msg);
@@ -286,59 +274,7 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-
-#ifdef _DEBUG
-
 	}
-#endif // _DEBUG
 
 	return (CallNextHookEx(g_hHookCallWnd, nCode, wParam, lParam));
 }
-
-
-#ifdef _DEBUG 
-// *** DO NOT PUT ANY BREAKPOINTS IN THIS CODE!!!
-BOOL IsCurProcDebugger()
-{
-	// Do this first for speed.
-	// If there is only one debugger present
-	// and you have already found it.
-	if (dwDebuggerProcId)
-	{
-		return (GetCurrentProcessId() == dwDebuggerProcId);
-	}
-
-	// In Visual C++, declare these three variables after the
-	// following if-block to speed things up.
-    char szPathName[PATHSIZE+1] = { 0 };
-	char *szFileName = szPathName;
-	char *tcp;
-
-	// If only one debugger is running, then the rest of this code
-	// should be entered only until the debugger is first hooked.
-	// After that, the preceding code should catch it every time.
-
-	GetModuleFileName(NULL, szPathName, PATHSIZE);
-
-	// Only check the file name, not the full path.
-	// A co-worker's path may be different.
-
-	for (tcp = szPathName; *tcp; tcp++)
-	{
-		if (*tcp == '/' || *tcp == '\\')
-			szFileName = tcp + 1;
-	}
-
-	// Use "MSDEV.EXE" for the Visual C++ debugger, or
-	// else use YOUR debugger's name.
-
-	if (!strcmp(strupr(szFileName), DEBUGGER))
-	{
-		// It's the debugger!
-		dwDebuggerProcId = GetCurrentProcessId();
-		return TRUE;
-	}
-
-	return FALSE;
-}
-#endif  // _DEBUG

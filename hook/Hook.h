@@ -20,27 +20,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __HOOK_H
 #define __HOOK_H
 
-#include "../utility/common.h"
-
-#define HOOKMGRWINDOWNAME  _T("HookMgrWindow")
-#define HOOKMGRWINDOWCLASS _T("HookMgrClass")
+#define HOOKMGRWINDOWNAME  TEXT("HookMgrWindow")
+#define HOOKMGRWINDOWCLASS TEXT("HookMgrClass")
 
 #ifdef HOOK_DLL
-	#define HOOK_EXPORT __declspec(dllexport)
+  #include "../litestep/buildoptions.h"
+
+  #if !defined(_WIN32_IE)
+  #define _WIN32_IE 0x600
+  #endif
+
+  // _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
+  #if !defined (_WINDOWS_) && !defined(_WINDOWS_H)
+  #  define WIN32_LEAN_AND_MEAN
+  #  define STRICT
+  #  define NOCRYPT
+  #  include <windows.h>
+  #endif // _WINDOWS_
+
+  #define HOOK_EXPORT __declspec(dllexport)
 #else
-	#define HOOK_EXPORT __declspec(dllimport)
+  #define HOOK_EXPORT __declspec(dllimport)
 #endif
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-
-	HOOK_EXPORT void setMsgHook(HHOOK);
-	HOOK_EXPORT HHOOK getMsgHook();
-	HOOK_EXPORT void setCallWndHook(HHOOK);
-	HOOK_EXPORT HHOOK getCallWndHook();
-
+    HOOK_EXPORT void setMsgHook(HHOOK);
+    HOOK_EXPORT HHOOK getMsgHook();
+    HOOK_EXPORT void setCallWndHook(HHOOK);
+    HOOK_EXPORT HHOOK getCallWndHook();
 #ifdef __cplusplus
 }
 #endif
