@@ -156,6 +156,9 @@ void MathScanner::Next(int count)
             mLookahead[j] = mLookahead[j + 1];
         
         mStream.get(mLookahead[LOOKAHEAD - 1]);
+        
+        if (!mStream)
+            mLookahead[LOOKAHEAD - 1] = -1;
     }
 }
 
