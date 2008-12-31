@@ -208,10 +208,14 @@ MathValue MathParser::GetVariable(const string& name) const
     // Check for recursive variable definitions
     if (mRecursiveVarSet.count(name) > 0)
     {
-        // Output an error message (localize this)
-        char message[MAX_LINE_LENGTH];
-        StringCchPrintf(message, MAX_LINE_LENGTH, "Error: Variable \"%s\" is defined recursively.", name.c_str());
-        throw MathException(message);
+        // While there may be a localized version of this particular
+        // exception string, none of the other exception strings are localized.
+        ostringstream message;
+
+        message << "Error: Variable \"" << name;
+        message << "\" is defined recursively.";
+
+        throw MathException(message.str());
     }
 
     // Look up variable name
