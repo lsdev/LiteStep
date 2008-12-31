@@ -677,7 +677,9 @@ void MathParser::Next(int count)
 // Absolute value
 MathValue Math_abs(const MathValueList& argList)
 {
-    return abs(argList[0].ToNumber());
+    double num = argList[0].ToNumber();
+    if(num < 0) num *= -1;
+    return num;
 }
 
 
