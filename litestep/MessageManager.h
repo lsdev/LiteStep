@@ -40,6 +40,16 @@
 class MessageManager
 {
 public:
+
+    /**
+     * Constructor.
+     */
+    MessageManager();
+    
+    /**
+     * Destructor.
+     */
+    ~MessageManager();
     
     /** Set of window handles */
     typedef std::set<HWND> windowSetT;

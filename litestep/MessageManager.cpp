@@ -22,6 +22,16 @@
 #include "MessageManager.h"
 
 
+MessageManager::MessageManager()
+{
+}
+
+
+MessageManager::~MessageManager()
+{
+}
+
+
 void MessageManager::AddMessage(HWND window, UINT message)
 {
     Lock lock(m_cs);
