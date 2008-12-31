@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2008  Litestep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -53,7 +53,11 @@
 // 0.24.8 default: DISABLED
 //#define LS_CUSTOM_INCLUDEFOLDER
 
+#ifdef _MSC_VER
+#if _MSC_VER > 1200 // VC6 Can't compile picoPNG
 // Makes lsapi use picoPNG instead of zlib+libpng
 //#define LS_USE_PICOPNG
+#endif
+#endif
 
 #endif // BUILDOPTIONS_H
