@@ -155,8 +155,8 @@ void MathScanner::Next(int count)
         for (int j = 0; j < LOOKAHEAD - 1; j++)
             mLookahead[j] = mLookahead[j + 1];
         
-        // get() returns EOF once the stream is exhausted
-        mLookahead[LOOKAHEAD - 1] = (char)mStream.get();
+        if (!mStream.get(mLookahead[LOOKAHEAD - 1]))
+            mLookahead[LOOKAHEAD - 1] = EOF;
     }
 }
 
