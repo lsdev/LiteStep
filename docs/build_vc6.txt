@@ -8,10 +8,10 @@
 
  - Visual C++ 6.0 with Service Pack 5 & 6 (www.microsoft.com)
  - Microsoft Platform SDK February 2003 Edition (www.microsoft.com)
- - libpng 1.2.31 (www.libpng.org)
+ - libpng 1.2.34 (www.libpng.org)
  - zlib 1.2.3 (www.zlib.net)
 
- This is the configuration used during 0.24.7 development, it is quite possible
+ This is the configuration used during 0.24.8 development, it is quite possible
  that other versions of the above packages can be used, but there's no
  guarantee.
 
@@ -67,7 +67,7 @@
         includes png.h.
 
   1. Go to http://www.libpng.org/ and http://www.zlib.net/ and download the
-     respective source code (lpng1231.zip and zlib123.zip).
+     respective source code (lpng1234.zip and zlib123.zip).
 
   2. Extract the archives to two directories "libpng" and "zlib" in the same
      parent directory the LiteStep source resides in (make sure you extract zlib
@@ -78,7 +78,7 @@
       c:\dev\LiteStep
       c:\dev\zlib
 
-  3. Open the \libpng\projects\visualc6\libpng.dsw workspace file in MSVC.
+  3. Open the .\libpng\projects\visualc6\libpng.dsw workspace file in MSVC.
 
   4. In the "Build" menu select "Set Active Configuration" and choose
      "libpng - Win32 DLL".
@@ -119,12 +119,12 @@
  B. Compile
  ----------
 
-  1. Open the \litestep.dsw workspace file in MSVC.
+  1. Open the .\LiteStep\litestep.dsw workspace file in MSVC.
 
   2. In the "Build" menu select "Set Active Configuration" and choose the
      desired build type of the litestep project.
 
   3. Select "Rebuild All" in the "Build" menu to start compiling.
 
-  4. The output directory is a subdirectory of \LiteStep\litestep, depending on
-     your build choice (Debug or Release).
+  4. The binaries are located at .\LiteStep\Release_VC6 and .\LiteStep\Debug_VC6
+     for Release and Debug configurations respectively.
