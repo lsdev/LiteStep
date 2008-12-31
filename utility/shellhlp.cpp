@@ -33,11 +33,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
-	ASSERT(cchPath >= MAX_PATH);
+    ASSERT(cchPath >= MAX_PATH);
     ASSERT_ISVALIDBUF(ptzPath, cchPath);
+    UNREFERENCED_PARAMETER(cchPath);
 
-	IMalloc* pMalloc;
-	bool bReturn = false;
+    IMalloc* pMalloc;
+    bool bReturn = false;
 
     // SHGetSpecialFolderPath is not available on Win95
     // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
