@@ -86,7 +86,7 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 			{
 				char szParam[MAX_PATH];
 				StringCchPrintf(szParam, MAX_PATH, "/e,/idlist,%s", pszParamList[1]);
-				bReturn = ((ShellExecute(NULL, "open", "explorer.exe", szParam, NULL, SW_SHOW) > HINSTANCE(32)) ? TRUE : FALSE);
+				bReturn = ((LSShellExecute(NULL, "open", "explorer.exe", szParam, NULL, SW_SHOW) > HINSTANCE(32)) ? TRUE : FALSE);
 			}
 			break;
 
@@ -95,7 +95,7 @@ BOOL DDEWorker::ParseRequest(LPCSTR pszRequest)
 			{
 				char szParam[MAX_PATH];
 				StringCchPrintf(szParam, MAX_PATH, "/idlist,%s", pszParamList[1]);
-				bReturn = ((ShellExecute(NULL, "open", "explorer.exe", szParam, NULL, SW_SHOW) > HINSTANCE(32)) ? TRUE : FALSE);
+				bReturn = ((LSShellExecute(NULL, "open", "explorer.exe", szParam, NULL, SW_SHOW) > HINSTANCE(32)) ? TRUE : FALSE);
 				// Will return too soon if we don't sleep here... funky
 				Sleep(100);
 			}
@@ -345,7 +345,7 @@ BOOL DDEWorker::_ShowGroup(LPCTSTR strGroupName, int nShow, BOOL bCommon)
 		if (PathIsDirectory(szFullPath))
 		{
 			// open it up!
-			ShellExecute(NULL, "open", szFullPath, NULL, NULL, nShow);
+			LSShellExecute(NULL, "open", szFullPath, NULL, NULL, nShow);
 
 			// set our current group to this one, as per Progman DDE
 			StringCchCopy(m_szCurrentGroup, MAX_PATH, szFullPath);

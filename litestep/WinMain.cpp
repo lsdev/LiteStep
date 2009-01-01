@@ -223,7 +223,7 @@ bool StartExplorerShell(DWORD dwWaitTimeout)
             sei.lpVerb = _T("open");
             sei.lpFile = _T("%windir%\\explorer.exe");
 
-            if (ShellExecuteEx(&sei))
+            if (LSShellExecuteEx(&sei))
             {
                 // If we don't wait here, there'll be a race condition:
                 // We may reset the 'shell' setting before Explorer reads it.

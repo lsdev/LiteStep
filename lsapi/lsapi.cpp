@@ -28,8 +28,8 @@
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.34 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.34 2008/12/27 19:46:49 ilmcuts Exp $"; // The Full RCS ID.
+const char rcsRevision[] = "$Revision: 1.35 $"; // Our Version
+const char rcsId[] = "$Id: lsapi.cpp,v 1.35 2009/01/01 19:05:59 ilmcuts Exp $"; // The Full RCS ID.
 
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
@@ -214,7 +214,7 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 		{
 			if (PathIsDirectory(pszCommand))
 			{
-				hReturn = ShellExecute(hOwner, pszOperation, pszCommand,
+				hReturn = LSShellExecute(hOwner, pszOperation, pszCommand,
                     pszArgs, NULL, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
 			}
 			else
@@ -229,7 +229,7 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 				seiCommand.nShow = nShowCmd;
 				seiCommand.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
 
-				ShellExecuteEx(&seiCommand);
+				LSShellExecuteEx(&seiCommand);
 
 				hReturn = seiCommand.hInstApp;
 			}

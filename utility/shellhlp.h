@@ -23,6 +23,7 @@
 #define SHELLHLP_H
 
 #include "common.h"
+#include <ShellAPI.h>
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -43,6 +44,18 @@ void LSShutdownDialog(HWND hWnd);
 BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias);
 HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
                       LPVOID lpParameter, LPDWORD pdwThreadId);
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// WOW64 Wrappers
+//
+BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue);
+BOOL LSRevertWow64FsRedirection(PVOID pvOldValue);
+
+BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo);
+HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
+                         LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow);
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

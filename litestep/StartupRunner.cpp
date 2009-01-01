@@ -133,8 +133,8 @@ void StartupRunner::_RunRunOnceEx()
             if (PathFileExists(szArgs) && SUCCEEDED(StringCchCat(szArgs,
                 MAX_PATH, _T(",RunOnceExProcess"))))
             {
-                ShellExecute(NULL, _T("open"), _T("rundll32.exe"), szArgs, NULL,
-                    SW_NORMAL);
+                LSShellExecute(NULL,
+                    _T("open"), _T("rundll32.exe"), szArgs, NULL, SW_NORMAL);
             }
         }
     }
@@ -188,7 +188,7 @@ void StartupRunner::_RunShellFolderContents(int nFolder)
                     seiCommand.fMask =
                         SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
 
-                    VERIFY(ShellExecuteEx(&seiCommand));
+                    VERIFY(LSShellExecuteEx(&seiCommand));
                 }
 
                 if (!FindNextFile(hSearch, &findData))
@@ -496,7 +496,7 @@ HANDLE StartupRunner::_ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs)
     sei.fMask =
         SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
 
-    if (ShellExecuteEx(&sei))
+    if (LSShellExecuteEx(&sei))
     {
         hReturn = sei.hProcess;
     }

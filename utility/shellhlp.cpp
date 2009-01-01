@@ -425,3 +425,87 @@ HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
     UNREFERENCED_PARAMETER(pszName);
 #endif
 }
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSDisableWow64FsRedirection
+//
+BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue)
+{
+    typedef BOOL (WINAPI* Wow64DisableWow64FsRedirectionProc)(PVOID*);
+
+    HMODULE hKernel32 = GetModuleHandle(_T("kernel32.dll"));
+
+    Wow64DisableWow64FsRedirectionProc fnWow64DisableWow64FsRedirection =
+        (Wow64DisableWow64FsRedirectionProc)GetProcAddress(
+        hKernel32, "Wow64DisableWow64FsRedirection");
+
+    BOOL bResult = TRUE;
+
+    if (fnWow64DisableWow64FsRedirection)
+    {
+        bResult = fnWow64DisableWow64FsRedirection(ppvOldValue);
+    }
+
+    return bResult;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSRevertWow64FsRedirection
+//
+BOOL LSRevertWow64FsRedirection(PVOID pvOldValue)
+{
+    typedef BOOL (WINAPI* Wow64RevertWow64FsRedirectionProc)(PVOID);
+
+    HMODULE hKernel32 = GetModuleHandle(_T("kernel32.dll"));
+
+    Wow64RevertWow64FsRedirectionProc fnWow64RevertWow64FsRedirection =
+        (Wow64RevertWow64FsRedirectionProc)GetProcAddress(
+        hKernel32, "Wow64RevertWow64FsRedirection");
+
+    BOOL bResult = TRUE;
+
+    if (fnWow64RevertWow64FsRedirection)
+    {
+        bResult = fnWow64RevertWow64FsRedirection(pvOldValue);
+    }
+
+    return bResult;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSShellExecuteEx
+//
+BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo)
+{
+    PVOID pvOldValue = NULL;
+    LSDisableWow64FsRedirection(&pvOldValue);
+
+    BOOL bReturn = ShellExecuteEx(lpExecInfo);
+
+    LSRevertWow64FsRedirection(pvOldValue);
+    return bReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSShellExecuteA
+//
+HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
+                          LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow)
+{
+    PVOID pvOldValue = NULL;
+    LSDisableWow64FsRedirection(&pvOldValue);
+
+    HINSTANCE hinstResult = ShellExecute(
+        hwnd, lpOperation, lpFile, lpParameters, lpDirectory, nShow);
+
+    LSRevertWow64FsRedirection(pvOldValue);
+    return hinstResult;
+}
