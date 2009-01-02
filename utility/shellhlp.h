@@ -62,6 +62,32 @@ HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
+// Windows Versions
+//
+UINT GetWindowsVersion();
+
+#define WINVER_UNKNOWN  (UINT)-1
+
+// Win9x
+#define WINVER_WIN95    1
+#define WINVER_WIN98    2
+#define WINVER_WINME    3
+
+// Windows NT Workstation
+#define WINVER_WINNT4   4
+#define WINVER_WIN2000  5
+#define WINVER_WINXP    6
+#define WINVER_VISTA    7
+#define WINVER_WIN7     8
+
+// Windows NT Server
+#define WINVER_WIN2003  9
+#define WINVER_WHS     10
+#define WINVER_WIN2008 11
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
 // HrGetLastError
 // Convert GetLastError to HRESULT without an ugly macro
 //

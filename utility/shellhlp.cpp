@@ -498,6 +498,119 @@ HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
+// GetVersionMetric
+// Helper for GetWindowsVersion
+//
+enum WINVER_METRIC
+{
+    WVM_ANY,
+    WVM_SERVER,
+    WVM_WORKSTATION,
+    WVM_HOMESERVER
+};
+
+
+BOOL GetVersionMetric(WINVER_METRIC metric)
+{
+    // NB: OSVERSIONINFOEX is not supported on very early platforms but
+    //     those don't require such a "metric"
+    OSVERSIONINFOEX ovi = { 0 };
+    ovi.dwOSVersionInfoSize = sizeof(ovi);
+
+    if (GetVersionEx((LPOSVERSIONINFO)&ovi))
+    {
+        switch (metric)
+        {
+        case WVM_ANY:
+            return TRUE;
+
+        case WVM_SERVER:
+            return (ovi.wProductType != VER_NT_WORKSTATION);
+
+        case WVM_WORKSTATION:
+            return (ovi.wProductType == VER_NT_WORKSTATION);
+
+        case WVM_HOMESERVER:
+            return (ovi.wSuiteMask == VER_SUITE_WH_SERVER);
+
+        default:
+            ASSERT(false);
+        }
+    }
+
+    return FALSE;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// GetWindowsVersion
+//
+UINT GetWindowsVersion()
+{
+    UINT uVersion = WINVER_UNKNOWN;
+
+    OSVERSIONINFO ovi = { 0 };
+    ovi.dwOSVersionInfoSize = sizeof(ovi);
+    GetVersionEx(&ovi);
+
+    if (ovi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    {
+        if (ovi.dwMinorVersion >= 90)
+        {
+            uVersion = WINVER_WIN95;
+        }
+        else if (ovi.dwMinorVersion >= 10)
+        {
+            uVersion = WINVER_WIN98;
+        }
+        else
+        {
+            uVersion = WINVER_WINME;
+        }
+    }
+    else
+    {
+        struct VerStringTable
+        {
+            DWORD dwMajor;
+            DWORD dwMinor;
+            WINVER_METRIC metric;
+            UINT uVersion;
+        }
+        versions[] =
+        {
+            4,  0, WVM_ANY,         WINVER_WINNT4,
+            5,  0, WVM_ANY,         WINVER_WIN2000,
+            5,  1, WVM_ANY,         WINVER_WINXP,   // 32-Bit
+
+            // WVM_HOMESERVER should also match WVM_SERVER, so list it first
+            5,  2, WVM_HOMESERVER,  WINVER_WHS,
+            5,  2, WVM_SERVER,      WINVER_WIN2003,
+            5,  2, WVM_WORKSTATION, WINVER_WINXP,   // 64-Bit
+
+            6,  0, WVM_WORKSTATION, WINVER_VISTA,
+            6,  0, WVM_SERVER,      WINVER_WIN2008,
+            6,  1, WVM_ANY,         WINVER_WIN7
+        };
+
+        for (size_t idx = 0; idx < COUNTOF(versions); idx++)
+        {
+            if (versions[idx].dwMajor == ovi.dwMajorVersion &&
+                versions[idx].dwMinor == ovi.dwMinorVersion &&
+                GetVersionMetric(versions[idx].metric))
+            {
+                uVersion = versions[idx].uVersion;
+            }
+        }
+    }
+
+    return uVersion;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
 // LSDisableWow64FsRedirection
 //
 BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue)

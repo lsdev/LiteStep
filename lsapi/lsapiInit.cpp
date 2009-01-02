@@ -163,7 +163,6 @@ void LSAPIInit::setLitestepVars()
 {
     char szTemp[MAX_PATH];
     DWORD dwLength = MAX_PATH;
-    OSVERSIONINFO OsVersionInfo;
     
     // just using a shorter name, no real reason to re-assign.
     SettingsManager *pSM = m_smSettingsManager;
@@ -225,65 +224,56 @@ void LSAPIInit::setLitestepVars()
     setShellFolderVariable("commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
     setShellFolderVariable("admintoolsdir", CSIDL_ADMINTOOLS);
     
-    OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
-    GetVersionEx(&OsVersionInfo);
-    
-    // Default platform conditionals to FALSE
-    pSM->SetVariable("Win9x", "false");
-    pSM->SetVariable("WinME", "false");
-    pSM->SetVariable("Win98", "false");
-    pSM->SetVariable("Win95", "false");
-    pSM->SetVariable("WinNT", "false");
-    pSM->SetVariable("Win2003", "false");
-    pSM->SetVariable("WinXP", "false");
-    pSM->SetVariable("Win2000", "false");
-    pSM->SetVariable("WinNT4", "false");
-    
-    // Now set the correct platform conditional to TRUE
-    if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    //
+    // Set version identification variables
+    //
+    struct VersionToVariable
     {
-        // Any Win9x-series OS
-        pSM->SetVariable("Win9x", "true");
-        
-        if (OsVersionInfo.dwMinorVersion >= 90)         // Windows ME (4.90)
+        UINT uVersion;
+        LPCTSTR pszVariable;
+    }
+    versions[] =
+    {
+        WINVER_WIN95,   _T("Win95"),
+        WINVER_WIN98,   _T("Win98"),
+        WINVER_WINME,   _T("WinME"),
+
+        WINVER_WINNT4,  _T("WinNT4"),
+        WINVER_WIN2000, _T("Win2000"),
+        WINVER_WINXP,   _T("WinXP"),
+        WINVER_VISTA,   _T("WinVista"),
+        WINVER_WIN7,    _T("Win7"),
+
+        WINVER_WIN2003, _T("Win2003"),
+        WINVER_WHS,     _T("Win2003"),  // WHS is Win2003 in disguise
+        WINVER_WIN2008, _T("Win2008")
+    };
+
+    UINT uVersion = GetWindowsVersion();
+
+    for (size_t idx = 0; idx < COUNTOF(versions); idx++)
+    {
+        if (versions[idx].uVersion == uVersion)
         {
-            pSM->SetVariable("WinME", "true");
+            pSM->SetVariable(versions[idx].pszVariable, "true");
         }
-        else if (OsVersionInfo.dwMinorVersion >= 10)    // Windows 98 (4.10)
+        else
         {
-            pSM->SetVariable("Win98", "true");
-        }
-        else                                            // Windows 95 (4.00)
-        {
-            pSM->SetVariable("Win95", "true");
+            pSM->SetVariable(versions[idx].pszVariable, "false");
         }
     }
-    else if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
+
+    if (IsOS(OS_NT))
     {
-        // Any WinNT-series OS
+        pSM->SetVariable("Win9x", "false");
         pSM->SetVariable("WinNT", "true");
-        
-        if (OsVersionInfo.dwMajorVersion == 5)
-        {
-            if (OsVersionInfo.dwMinorVersion >= 2)      // Windows 2003 (5.2)
-            {
-                pSM->SetVariable("Win2003", "true");
-            }
-            else if (OsVersionInfo.dwMinorVersion >= 1) // Windows XP (5.1)
-            {
-                pSM->SetVariable("WinXP", "true");
-            }
-            else                                        // Windows 2000 (5.0)
-            {
-                pSM->SetVariable("Win2000", "true");
-            }
-        }
-        else if (OsVersionInfo.dwMajorVersion >= 4)     // Windows NT 4.0
-        {
-            pSM->SetVariable("WinNT4", "true");
-        }
     }
-    
+    else
+    {
+        pSM->SetVariable("Win9x", "true");
+        pSM->SetVariable("WinNT", "false");
+    }
+
     // screen resolution
     StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
     pSM->SetVariable("ResolutionX", szTemp);

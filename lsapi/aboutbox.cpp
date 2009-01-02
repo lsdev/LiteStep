@@ -24,6 +24,7 @@
 #include <commctrl.h>
 #include <math.h>
 #include "../utility/core.hpp"
+#include "../utility/shellhlp.h"
 
 extern const char rcsRevision[];
 
@@ -500,6 +501,59 @@ void AboutRevIDs(HWND hListView)
 }
 
 
+HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
+{
+    ASSERT(pszVersion != NULL);
+
+    UINT uVersion = GetWindowsVersion();
+
+    LPCSTR pszTemp = NULL;
+
+    switch (uVersion)
+    {
+    case WINVER_WIN95:   pszTemp = _T("Windows 95");            break;
+    case WINVER_WIN98:   pszTemp = _T("Windows 98");            break;
+    case WINVER_WINME:   pszTemp = _T("Windows ME");            break;
+
+    case WINVER_WINNT4:  pszTemp = _T("Windows NT 4.0");        break;
+    case WINVER_WIN2000: pszTemp = _T("Windows 2000");          break;
+    case WINVER_WINXP:   pszTemp = _T("Windows XP");            break;
+    case WINVER_VISTA:   pszTemp = _T("Windows Vista");         break;
+    case WINVER_WIN7:    pszTemp = _T("Windows 7");             break;
+
+    case WINVER_WIN2003:
+        if (GetSystemMetrics(SM_SERVERR2))
+        {
+            pszTemp = _T("Windows Server 2003 R2");
+        }
+        else
+        {
+            pszTemp = _T("Windows Server 2003");
+        }
+        break;
+
+    case WINVER_WHS:     pszTemp = _T("Windows Home Server");   break;
+    case WINVER_WIN2008: pszTemp = _T("Windows Server 2008");   break;
+
+    default:             pszTemp = _T("<Unknown Version>");     break;
+    }
+
+    HRESULT hr = StringCchCopy(pszVersion, cchVersion, pszTemp);
+
+    if (SUCCEEDED(hr))
+    {
+#ifndef WIN64
+        if (IsOS(OS_WOW6432))
+#endif
+        {
+            StringCchCat(pszVersion, cchVersion, _T(" (64-Bit)"));
+        }
+    }
+
+    return hr;
+}
+
+
 // Fill listview with system information
 //
 void AboutSysInfo(HWND hListView)
@@ -536,51 +590,7 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	OSVERSIONINFO versionInfo;
-	versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&versionInfo);
-
-	if (versionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-	{
-		if (versionInfo.dwMinorVersion >= 90)
-		{
-			StringCchCopy(buffer, MAX_PATH, "Windows ME");
-		}
-		else if (versionInfo.dwMinorVersion >= 10)
-		{
-			StringCchCopy(buffer, MAX_PATH, "Windows 98");
-		}
-		else
-		{
-			StringCchCopy(buffer, MAX_PATH, "Windows 95");
-		}
-	}
-	else
-	{
-		if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1))
-		{
-			StringCchCopy(buffer, MAX_PATH, "Windows XP");
-		}
-		else if (versionInfo.dwMajorVersion == 5)
-		{
-			StringCchCopy(buffer, MAX_PATH, "Windows 2000");
-		}
-		else
-		{
-			StringCchPrintf(buffer, MAX_PATH, "Windows NT %d.%d",
-				versionInfo.dwMajorVersion, versionInfo.dwMinorVersion);
-		}
-	}
-
-	TrimLeft(versionInfo.szCSDVersion);
-
-	if (versionInfo.szCSDVersion[0])
-	{
-		StringCchCat(buffer, MAX_PATH, " (");
-		StringCchCat(buffer, MAX_PATH, versionInfo.szCSDVersion);
-		StringCchCat(buffer, MAX_PATH, ")");
-	}
-
+    GetWinVerString(buffer, COUNTOF(buffer));
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 	// memory information
