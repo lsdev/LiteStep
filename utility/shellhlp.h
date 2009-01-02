@@ -33,7 +33,9 @@
 // These are mostly small wrappers that work around inconveniences or even bugs
 // in some Windows APIs
 //
-bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
+#define LS_CSIDL_QUICKLAUNCH   0x00FF
+HRESULT GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
+
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer);
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer);

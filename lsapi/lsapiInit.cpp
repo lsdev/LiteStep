@@ -188,14 +188,6 @@ void LSAPIInit::setLitestepVars()
         pSM->SetVariable("username", szTemp);
     }
     
-    if (GetShellFolderPath(CSIDL_APPDATA, szTemp, MAX_PATH))
-    {
-        PathAppend(szTemp, "Microsoft\\Internet Explorer\\Quick Launch\\");
-        PathQuoteSpaces(szTemp);
-        
-        pSM->SetVariable("quicklaunch", szTemp);
-    }
-    
     pSM->SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
     pSM->SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
     pSM->SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
@@ -207,6 +199,7 @@ void LSAPIInit::setLitestepVars()
     pSM->SetVariable("scheduled", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
     pSM->SetVariable("admintools", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
     
+    setShellFolderVariable("quicklaunch", LS_CSIDL_QUICKLAUNCH);
     setShellFolderVariable("commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
     setShellFolderVariable("commonfavorites", CSIDL_COMMON_FAVORITES);
     setShellFolderVariable("commonprograms", CSIDL_COMMON_PROGRAMS);
@@ -307,21 +300,21 @@ void LSAPIInit::setLitestepVars()
 #endif // LS_CUSTOM_INCLUDEFOLDER
 }
 
-bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
+HRESULT LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
     char szPath[MAX_PATH] = { 0 };
+
+    HRESULT hr = GetShellFolderPath(nFolder, szPath, MAX_PATH);
     
-    bool bReturn = GetShellFolderPath(nFolder, szPath, MAX_PATH);
-    
-    if (bReturn)
+    if (SUCCEEDED(hr))
     {
         PathAddBackslashEx(szPath, MAX_PATH);
         PathQuoteSpaces(szPath);
         
         m_smSettingsManager->SetVariable(pszVariable, szPath);
     }
-    
-    return bReturn;
+
+    return hr;
 }
 
 // Gets the compiletime/date from the PE header

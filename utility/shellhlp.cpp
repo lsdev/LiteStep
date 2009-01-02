@@ -23,40 +23,109 @@
 #include "core.hpp"
 #include <MMSystem.h>
 
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSGetKnownFolderIDList
+// Wrapper around SHGetKnownFolderIDList. Helper for GetShellFolderPath.
+//
+HRESULT LSGetKnownFolderIDList(REFKNOWNFOLDERID rfid, PIDLIST_ABSOLUTE* ppidl)
+{
+    HRESULT hr = E_FAIL;
+
+    HMODULE hShell32 = GetModuleHandle(_T("SHELL32.DLL"));
+
+    typedef HRESULT (WINAPI* SHGetKnownFolderIDListProc)(
+        REFKNOWNFOLDERID, DWORD, HANDLE, PIDLIST_ABSOLUTE*);
+
+    SHGetKnownFolderIDListProc fnSHGetKnownFolderIDList =
+        (SHGetKnownFolderIDListProc)GetProcAddress(
+        hShell32, "SHGetKnownFolderIDList");
+
+    if (fnSHGetKnownFolderIDList)
+    {
+        hr = fnSHGetKnownFolderIDList(rfid, 0, NULL, ppidl);
+    }
+    else
+    {
+        hr = E_NOTIMPL;
+    }
+
+    return hr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // GetShellFolderPath
 //
-// Given a CLSID, returns the given shell folder.
-// cchPath must be atleast equal to MAX_PATH.
-// Does NOT quote spaces, because often times the first thing that is done with
-// the returned path is to append another string to it, which doesn't work with
-// quotes.
+// Wrapper around SHGetSpecialFolderLocation to get around the lack of
+// SHGetSpecialFolderPath on Win95. Also fetches the QuickLaunch folder.
 //
-bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
+HRESULT GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
     ASSERT(cchPath >= MAX_PATH);
     ASSERT(NULL != ptzPath);
-    UNREFERENCED_PARAMETER(cchPath);
 
-    IMalloc* pMalloc;
-    bool bReturn = false;
-    
-    // SHGetSpecialFolderPath is not available on Win95
-    // use SHGetSpecialFolderLocation and SHGetPathFromIDList instead
-    if (SUCCEEDED(SHGetMalloc(&pMalloc)))
+    HRESULT hr = E_FAIL;
+
+    PIDLIST_ABSOLUTE pidl = NULL;
+
+    if (nFolder == LS_CSIDL_QUICKLAUNCH)
     {
-        PIDLIST_ABSOLUTE pidl;
-        
-        if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, nFolder, &pidl)))
+        if (IsVistaOrAbove())
         {
-            bReturn = SHGetPathFromIDList(pidl, ptzPath) ? true : false;
-            pMalloc->Free(pidl);
+            //
+            // Vista turned the QuickLaunch folder into a "Known Folder"
+            // whose location can be customized. But it didn't retroactively
+            // get a CSIDL constant so we have to use the known folder API.
+            //
+            hr = LSGetKnownFolderIDList(FOLDERID_QuickLaunch, &pidl);
         }
-        
-        pMalloc->Release();
+        else
+        {
+            //
+            // Prior to Vista there is no documented way of getting the path.
+            // We try to hardcode as little as possible.
+            //
+            hr = GetShellFolderPath(CSIDL_APPDATA, ptzPath, cchPath); 
+
+            if (SUCCEEDED(hr))
+            {
+                PathAppend(ptzPath,
+                    _T("Microsoft\\Internet Explorer\\Quick Launch"));
+
+                //
+                // SHGetSpecialFolderLocation only returns directories that
+                // exist, so we do the same for our custom QuickLaunch case.
+                //
+                if (!PathFileExists(ptzPath))
+                {
+                    ptzPath[0] = '\0';
+                    hr = HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+                }
+            }
+        }
     }
-    
-    return bReturn;
+    else
+    {
+        hr = SHGetSpecialFolderLocation(NULL, nFolder, &pidl);
+    }
+
+    //
+    // Convert PIDL to path
+    //
+    if (pidl != NULL)
+    {
+        if (SUCCEEDED(hr) && !SHGetPathFromIDList(pidl, ptzPath))
+        {
+            hr = E_FAIL;
+        }
+
+        CoTaskMemFree(pidl);
+    }
+
+    return hr;
 }
 
 
