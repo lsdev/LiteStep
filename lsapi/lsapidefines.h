@@ -242,6 +242,7 @@ LSDESKTOPINFO;
 //---------------------------------------------------------
 // LM_UN/RELOADMODULE DEFINES
 //---------------------------------------------------------
+#define LMM_PATH      0x0000
 #define LMM_HINSTANCE 0x1000
 
 

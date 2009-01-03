@@ -876,7 +876,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     // wants to reload it shouldn't need the core to do that
                     m_pModuleManager->ReloadModule((HINSTANCE)wParam);
                 }
-                else
+                else  // (lParam & LMM_PATH)
                 {
                     LPCSTR pszPath = (LPCSTR)wParam;
                     
@@ -898,7 +898,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     m_pModuleManager->QuitModule((HINSTANCE)wParam);
                 }
-                else
+                else // (lParam & LMM_PATH)
                 {
                     LPCSTR pszPath = (LPCSTR)wParam;
                     
