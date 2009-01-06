@@ -35,7 +35,7 @@ RSC=rc.exe
 # PROP Output_Dir "Release_VC6"
 # PROP Intermediate_Dir "Release_VC6"
 # PROP Target_Dir ""
-# ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_LIB" /FD /c
+# ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
@@ -49,7 +49,7 @@ LIB32=link.exe -lib
 # PROP Output_Dir "Debug_VC6"
 # PROP Intermediate_Dir "Debug_VC6"
 # PROP Target_Dir ""
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_LIB" /D "LS_NO_EXCEPTION" /FR /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "LS_NO_EXCEPTION" /FR /FD /GZ /c
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
