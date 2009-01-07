@@ -52,6 +52,11 @@ public:
 
 class Lock
 {
+	Lock(const Lock& rhs);
+	Lock& operator=(const Lock& rhs);
+
+	CriticalSection& m_cs;
+
 public:
 	Lock(CriticalSection& cs) : m_cs(cs)
 	{
@@ -62,32 +67,30 @@ public:
 	{
 		m_cs.Release();
 	}
-
-protected:
-	CriticalSection& m_cs;
-
-private:
-    Lock(const Lock& rhs);
-    Lock& operator=(const Lock& rhs);
 };
 
 class Block
 {
+	Block(const Block& rhs);
+	Block& operator=(const Block& rhs);
+
+	UINT& m_Count;
+
 public:
 	Block(UINT& cnt) : m_Count(cnt)
 	{
 		m_Count++;
 	}
+
 	~Block()
 	{
 		m_Count--;
 	}
+
 	bool IsBlocked()
 	{
 		return m_Count > 1;
 	}
-private:
-	UINT& m_Count;
 };
 
 
