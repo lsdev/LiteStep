@@ -57,14 +57,49 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
-// Icon
+// Version
 //
 
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,24,8,0
+ PRODUCTVERSION 0,24,8,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "04090000"
+        BEGIN
+            VALUE "Comments", "http://www.lsdev.org/\0"
+            VALUE "CompanyName", "LiteStep Development Team\0"
+            VALUE "FileDescription", "LiteStep\0"
+            VALUE "FileVersion", "0.24.8 RC2 Pre\0"
+            VALUE "InternalName", "LiteStep Core\0"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2008\0"
+            VALUE "OriginalFilename", "litestep.exe\0"
+            VALUE "ProductName", "LiteStep\0"
+            VALUE "ProductVersion", "0.24.8 RC2 Pre\0"
+            VALUE "SpecialBuild", "Release Candidate 2\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 0
+    END
+END
+
+#endif    // !_MAC
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -72,18 +107,18 @@ IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE MOVEABLE PURE 
+1 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE MOVEABLE PURE 
+2 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE MOVEABLE PURE 
+3 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "\r\n"
     "\0"
@@ -122,56 +157,21 @@ BEGIN
 END
 
 
-#ifndef _MAC
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,24,8,0
- PRODUCTVERSION 0,24,8,0
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "04090000"
-        BEGIN
-            VALUE "Comments", "http://www.lsdev.org/\0"
-            VALUE "CompanyName", "LiteStep Development Team\0"
-            VALUE "FileDescription", "LiteStep\0"
-            VALUE "FileVersion", "0.24.8 RC2 Pre\0"
-            VALUE "InternalName", "LiteStep Core\0"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2008\0"
-            VALUE "OriginalFilename", "litestep.exe\0"
-            VALUE "ProductName", "LiteStep\0"
-            VALUE "ProductVersion", "0.24.8 RC2 Pre\0"
-            VALUE "SpecialBuild", "Release Candidate 1\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 0
-    END
-END
-
-#endif    // !_MAC
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
 IDB_LS                  BITMAP  MOVEABLE PURE   "litestep.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_LS                  ICON    DISCARDABLE     "litestep.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

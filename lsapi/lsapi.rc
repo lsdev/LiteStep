@@ -30,7 +30,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 0,24,8,0
  PRODUCTVERSION 0,24,8,0
- FILEFLAGSMASK 0x17L
+ FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
 #else
@@ -53,7 +53,7 @@ BEGIN
             VALUE "OriginalFilename", "lsapi.dll\0"
             VALUE "ProductName", "LiteStep\0"
             VALUE "ProductVersion", "0.24.8 RC2 Pre\0"
-            VALUE "SpecialBuild", "Release Candidate 1\0"
+            VALUE "SpecialBuild", "Release Candidate 2\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -71,18 +71,18 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE MOVEABLE PURE 
+1 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE MOVEABLE PURE 
+2 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE MOVEABLE PURE 
+3 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "\r\n"
     "\0"
