@@ -85,7 +85,7 @@ BEGIN
             VALUE "FileDescription", "LiteStep\0"
             VALUE "FileVersion", "0.24.8 RC2 Pre\0"
             VALUE "InternalName", "LiteStep Core\0"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2008\0"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2009\0"
             VALUE "OriginalFilename", "litestep.exe\0"
             VALUE "ProductName", "LiteStep\0"
             VALUE "ProductVersion", "0.24.8 RC2 Pre\0"
