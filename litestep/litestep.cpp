@@ -694,7 +694,7 @@ LRESULT CALLBACK CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 {
     static CLiteStep* pLiteStep = NULL;
     
-    if (uMsg == WM_CREATE)
+    if (uMsg == WM_NCCREATE)
     {
         pLiteStep = static_cast<CLiteStep*>(
             reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
@@ -716,7 +716,7 @@ LRESULT CALLBACK CLiteStep::ExternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 //
 LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    LRESULT lReturn = FALSE;
+    LRESULT lReturn = 0;
     
     switch (uMsg)
     {
@@ -738,13 +738,6 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 }
                 break;
             }
-        }
-        break;
-        
-        case WM_QUERYENDSESSION:
-        case WM_ENDSESSION:
-        {
-            lReturn = TRUE;
         }
         break;
         
@@ -793,15 +786,6 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     }
                 }
             }
-        }
-        break;
-        
-        case LM_GETLSOBJECT:
-        case LM_WINDOWLIST:
-        case LM_MESSAGEMANAGER:
-        case LM_DATASTORE:
-        {
-            ; // Obsolete Message, return 0
         }
         break;
         

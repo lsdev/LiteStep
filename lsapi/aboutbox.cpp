@@ -292,7 +292,7 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 				0, 0, SWP_NOSIZE);
 
 #ifdef __GNUC__
-			typedef void (__stdcall *STTWTYPE)(HWND, BOOL);
+			typedef void (WINAPI *STTWTYPE)(HWND, BOOL);
 
 			static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
 				GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
@@ -333,7 +333,7 @@ ULONG WINAPI AboutBoxThread(void *)
 
 // Fill listview with bang command information
 //
-BOOL __stdcall BangCallback(LPCSTR pszName, LPARAM lParam)
+BOOL CALLBACK BangCallback(LPCSTR pszName, LPARAM lParam)
 {
 	CallbackInfo* pCi = (CallbackInfo*)lParam;
 
@@ -413,7 +413,7 @@ void AboutLicense(HWND /* hEdit */)
 
 // Fill listview with module information
 //
-BOOL __stdcall ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
+BOOL CALLBACK ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
 {
 	CallbackInfo* pCi = (CallbackInfo*)lParam;
 
@@ -450,7 +450,7 @@ void AboutModules(HWND hListView)
 
 // Fill listview with revision ID (LM_GETREVID) information
 //
-BOOL __stdcall RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
+BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 {
 	CallbackInfo* pCi = (CallbackInfo*)lParam;
 

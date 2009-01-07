@@ -23,7 +23,7 @@
 
 
 HMODULE DDEStub::m_hShDocVw = NULL;
-DDEStub::ShellDDEFunc* DDEStub::m_pShellDDEInit = NULL;
+DDEStub::ShellDDEFunc DDEStub::m_pShellDDEInit = NULL;
 
 DDEStub::DDEStub()
 {}
@@ -48,7 +48,8 @@ HRESULT DDEStub::Start()
         {
             // Ordinal 0x00BC in shell32.dll
             // Ordinal 0x0076 in shdocvw.dll
-            m_pShellDDEInit = (void (__stdcall*)(BOOL))GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
+            m_pShellDDEInit = (ShellDDEFunc)
+                GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
         }
         
         if(m_pShellDDEInit)

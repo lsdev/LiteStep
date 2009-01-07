@@ -34,9 +34,9 @@ public:
     HRESULT Stop();
     
 private:
-    typedef void (__stdcall ShellDDEFunc)(BOOL);
+    typedef void (WINAPI* ShellDDEFunc)(BOOL);
     static HMODULE m_hShDocVw;
-    static ShellDDEFunc* m_pShellDDEInit; 
+    static ShellDDEFunc m_pShellDDEInit; 
 };
 
 #endif // DDESTUB_H

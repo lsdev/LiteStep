@@ -305,9 +305,9 @@ void BangShutdown(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangSwitchUser(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	typedef BOOL (__stdcall *LockWorkStationType)();
+	typedef BOOL (WINAPI* LockWorkStationType)();
 
-	LockWorkStationType LockWorkStation = (LockWorkStationType )GetProcAddress(
+	LockWorkStationType LockWorkStation = (LockWorkStationType)GetProcAddress(
 		GetModuleHandle("USER32.DLL"), "LockWorkStation");
 
 	if (LockWorkStation)
