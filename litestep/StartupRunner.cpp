@@ -201,7 +201,7 @@ void StartupRunner::_RunShellFolderContents(int nFolder)
     }
     else
     {
-        TRACE("Failed to get full path to Startup folder %n", nFolder);
+        TRACE("Failed to get full path to Startup folder %d", nFolder);
     }
 }
 
