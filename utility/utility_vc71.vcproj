@@ -117,16 +117,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\localization.cpp">
-			</File>
-			<File
-				RelativePath=".\lswinbase.cpp">
-			</File>
-			<File
-				RelativePath=".\lswinbasex.cpp">
-			</File>
-			<File
-				RelativePath=".\safeptr.cpp">
+				RelativePath=".\debug.cpp">
 			</File>
 			<File
 				RelativePath=".\shellhlp.cpp">
@@ -161,31 +152,13 @@
 				RelativePath=".\IService.h">
 			</File>
 			<File
-				RelativePath=".\localization.h">
-			</File>
-			<File
-				RelativePath=".\lswinbase.h">
-			</File>
-			<File
-				RelativePath=".\lswinbasex.h">
-			</File>
-			<File
 				RelativePath=".\macros.h">
-			</File>
-			<File
-				RelativePath=".\safeptr.h">
-			</File>
-			<File
-				RelativePath=".\safestr.h">
 			</File>
 			<File
 				RelativePath=".\shellhlp.h">
 			</File>
 			<File
 				RelativePath=".\stringutility.h">
-			</File>
-			<File
-				RelativePath=".\wharfdata.h">
 			</File>
 		</Filter>
 		<Filter

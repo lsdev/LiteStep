@@ -166,18 +166,6 @@
 			</File>
 			<File
 				RelativePath=".\match.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\MathEvaluate.cpp">
@@ -193,6 +181,9 @@
 			</File>
 			<File
 				RelativePath=".\MathValue.cpp">
+			</File>
+			<File
+				RelativePath=".\picopng.cpp">
 			</File>
 			<File
 				RelativePath=".\png_support.cpp">
@@ -255,6 +246,9 @@
 			</File>
 			<File
 				RelativePath=".\MathValue.h">
+			</File>
+			<File
+				RelativePath=".\picopng.h">
 			</File>
 			<File
 				RelativePath=".\png_support.h">
