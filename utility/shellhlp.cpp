@@ -62,7 +62,7 @@ HRESULT LSGetKnownFolderIDList(REFKNOWNFOLDERID rfid, PIDLIST_ABSOLUTE* ppidl)
 // Wrapper around SHGetSpecialFolderLocation to get around the lack of
 // SHGetSpecialFolderPath on Win95. Also fetches the QuickLaunch folder.
 //
-HRESULT GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
+bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
 {
     ASSERT(cchPath >= MAX_PATH);
     ASSERT(NULL != ptzPath);
@@ -125,7 +125,7 @@ HRESULT GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
         CoTaskMemFree(pidl);
     }
 
-    return hr;
+    return (SUCCEEDED(hr));
 }
 
 

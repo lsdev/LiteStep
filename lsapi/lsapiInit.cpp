@@ -290,21 +290,21 @@ void LSAPIInit::setLitestepVars()
 #endif // LS_CUSTOM_INCLUDEFOLDER
 }
 
-HRESULT LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
+bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
+    bool bSuccess = false;
     char szPath[MAX_PATH] = { 0 };
 
-    HRESULT hr = GetShellFolderPath(nFolder, szPath, MAX_PATH);
-    
-    if (SUCCEEDED(hr))
+    if (GetShellFolderPath(nFolder, szPath, MAX_PATH))
     {
         PathAddBackslashEx(szPath, MAX_PATH);
         PathQuoteSpaces(szPath);
         
         m_smSettingsManager->SetVariable(pszVariable, szPath);
+        bSuccess = true;
     }
 
-    return hr;
+    return bSuccess;
 }
 
 // Gets the compiletime/date from the PE header

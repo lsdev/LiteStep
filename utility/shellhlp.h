@@ -34,7 +34,7 @@
 // in some Windows APIs
 //
 #define LS_CSIDL_QUICKLAUNCH   0x00FF
-HRESULT GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
+bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
 
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer);
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
