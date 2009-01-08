@@ -26,8 +26,6 @@
 #include "../utility/core.hpp"
 #include "../utility/shellhlp.h"
 
-extern const char rcsRevision[];
-
 typedef void (*AboutFunction)(HWND);
 
 void AboutBangs(HWND hListView);
@@ -318,7 +316,7 @@ ULONG WINAPI AboutBoxThread(void *)
 	if (!g_hAboutbox)
 	{
 		DialogBox(GetModuleHandle(NULL),
-            MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, AboutBoxProcedure);
+		          MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, AboutBoxProcedure);
 
 		g_hAboutbox = NULL;
 	}
@@ -469,9 +467,6 @@ BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 void AboutRevIDs(HWND hListView)
 {
 	LVCOLUMN columnInfo;
-	LVITEM itemInfo;
-	int i = 0;
-	char buffer[MAX_PATH];
 
 	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	columnInfo.fmt = LVCFMT_LEFT;
@@ -481,21 +476,9 @@ void AboutRevIDs(HWND hListView)
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
 
-	// special cases: litestep.exe and lsapi.dll
-	itemInfo.mask = LVIF_TEXT;
-	itemInfo.iItem = i++;
-	itemInfo.pszText = buffer;
-	itemInfo.iSubItem = 0;
-
-	StringCchCopy(buffer, MAX_PATH, "lsapi.dll: ");
-	StringCchCat(buffer, MAX_PATH, &rcsRevision[11]);
-	buffer[strlen(buffer) - 1] = 0;
-
-	ListView_InsertItem(hListView, &itemInfo);
-
 	CallbackInfo ci = { 0 };
 	ci.hListView = hListView;
-	ci.nItem = i;
+	ci.nItem = 0;
 
 	EnumLSData(ELD_REVIDS, (FARPROC)RevIDCallback, (LPARAM)&ci);
 }
@@ -590,7 +573,7 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-    GetWinVerString(buffer, COUNTOF(buffer));
+	GetWinVerString(buffer, COUNTOF(buffer));
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 	// memory information

@@ -25,12 +25,8 @@
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
-static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers, LPSTR pszExtraParameters, BOOL bUseBrackets);
-
-extern const char rcsRevision[];
-const char rcsRevision[] = "$Revision: 1.35 $"; // Our Version
-const char rcsId[] = "$Id: lsapi.cpp,v 1.35 2009/01/01 19:05:59 ilmcuts Exp $"; // The Full RCS ID.
-
+static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers,
+                     LPSTR pszExtraParameters, BOOL bUseBrackets);
 
 BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
 {
@@ -123,15 +119,15 @@ BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand)
 //
 BOOL RemoveBangCommand(LPCSTR pszCommand)
 {
-    BOOL bResult = FALSE;
+	BOOL bResult = FALSE;
 
-    if (pszCommand != NULL)
-    {
-	    bResult =
-            g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
-    }
+	if (pszCommand != NULL)
+	{
+		bResult = \
+			g_LSAPIManager.GetBangManager()->RemoveBangCommand(pszCommand);
+	}
 
-    return bResult;
+	return bResult;
 }
 
 
@@ -215,7 +211,7 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 			if (PathIsDirectory(pszCommand))
 			{
 				hReturn = LSShellExecute(hOwner, pszOperation, pszCommand,
-                    pszArgs, NULL, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
+					pszArgs, NULL, nShowCmd ? nShowCmd : SW_SHOWNORMAL);
 			}
 			else
 			{
@@ -594,8 +590,7 @@ void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
 //
 void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString)
 {
-	if (pszExpandedString != NULL && cchExpandedString > 0 &&
-        pszTemplate != NULL)
+	if (pszExpandedString != NULL && cchExpandedString > 0 && pszTemplate != NULL)
 	{
 		if(g_LSAPIManager.IsInitialized())
 		{
