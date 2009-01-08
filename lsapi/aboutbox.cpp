@@ -239,7 +239,7 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 				(WPARAM)hTitleFont, FALSE);
 
 			// set title with LS version
-			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.25.0 Pre");
+			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.25.0 Alpha");
 
 			// set Theme info
 			char themeAuthor[16] = { 0 };

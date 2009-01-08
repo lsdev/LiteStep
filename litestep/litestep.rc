@@ -147,12 +147,12 @@ BEGIN
             VALUE "Comments", "http://www.lsdev.org/"
             VALUE "CompanyName", "LiteStep Development Team"
             VALUE "FileDescription", "LiteStep"
-            VALUE "FileVersion", "0.25.0 Pre"
+            VALUE "FileVersion", "0.25.0 Alpha"
             VALUE "InternalName", "LiteStep Core"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2008"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2009"
             VALUE "OriginalFilename", "litestep.exe"
             VALUE "ProductName", "LiteStep"
-            VALUE "ProductVersion", "0.25.0 Pre"
+            VALUE "ProductVersion", "0.25.0 Alpha"
             VALUE "SpecialBuild", "CVS HEAD Test Release"
         END
     END
