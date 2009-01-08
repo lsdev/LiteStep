@@ -35,6 +35,9 @@
  - Changed bang !alert messagebox caption to "!Alert Litestep" to make apparent
    what generated the messagebox.
 
+ - Changed bang !confirm messagebox caption to "!Confirm Litestep" to make apparent
+   what generated the messagebox.
+
  - Fixed error handling when encountering invalid If/ElseIf syntax.
 
  - Now checks for ElseIf following Else directive and skips conditional block
@@ -72,7 +75,7 @@
  - Added a more specific error message when failing to load a module because of
    unresolved dependencies.
 
- - Targeting libpng 1.2.29 and zlib 1.2.3.
+ - Targeting libpng 1.2.34 and zlib 1.2.3.
 
  - Many other incremental fixes and code cleanup changes... Thanks for reading.
 
