@@ -70,6 +70,8 @@ public:
      */
     void Execute(HWND hCaller, LPCSTR pszParams);
 
+    HINSTANCE GetModule() const;
+
 private:
 
     /** Thread that owns this bang command */

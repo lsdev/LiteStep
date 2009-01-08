@@ -331,37 +331,54 @@ ULONG WINAPI AboutBoxThread(void *)
 
 // Fill listview with bang command information
 //
-BOOL CALLBACK BangCallback(LPCSTR pszName, LPARAM lParam)
+BOOL CALLBACK BangCallback(HMODULE hModule, LPCSTR pszName, LPARAM lParam)
 {
-	CallbackInfo* pCi = (CallbackInfo*)lParam;
+    CallbackInfo* pCi = (CallbackInfo*)lParam;
 
-	LVITEM itemInfo;
-	itemInfo.mask = LVIF_TEXT;
-	itemInfo.iItem = pCi->nItem++;
-	itemInfo.pszText = (char*)pszName;
-	itemInfo.iSubItem = 0;
+    LVITEM itemInfo;
+    itemInfo.mask = LVIF_TEXT;
+    itemInfo.iItem = pCi->nItem;
+    itemInfo.pszText = (char*)pszName;
+    itemInfo.iSubItem = 0;
 
-	ListView_InsertItem(pCi->hListView, &itemInfo);
+    ListView_InsertItem(pCi->hListView, &itemInfo);
 
-	return TRUE;
+    CHAR szModule[MAX_PATH] = { 0 };
+
+    if (LSGetModuleFileName(hModule, szModule, COUNTOF(szModule)))
+    {
+        PathStripPath(szModule);
+        ListView_SetItemText(pCi->hListView, pCi->nItem, 1, szModule);
+    }
+
+    pCi->nItem++;
+    return TRUE;
 }
 
 void AboutBangs(HWND hListView)
 {
 	LVCOLUMN columnInfo;
 
-	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-	columnInfo.fmt = LVCFMT_LEFT;
-	columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
-	columnInfo.pszText = "Bang Command";
-	columnInfo.iSubItem = 0;
+    int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
 
-	ListView_InsertColumn(hListView, 0, &columnInfo);
+    columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+    columnInfo.fmt = LVCFMT_LEFT;
+    columnInfo.cx = width / 2;
+    columnInfo.pszText = "Bang Command";
+    columnInfo.iSubItem = 0;
+
+    ListView_InsertColumn(hListView, 0, &columnInfo);
+
+    columnInfo.cx = width - columnInfo.cx;
+    columnInfo.pszText = "Module";
+    columnInfo.iSubItem = 1;
+
+    ListView_InsertColumn(hListView, 1, &columnInfo);
 
 	CallbackInfo ci = { 0 };
 	ci.hListView = hListView;
 
-	EnumLSData(ELD_BANGS, (FARPROC)BangCallback, (LPARAM)&ci);
+	EnumLSData(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&ci);
 }
 
 

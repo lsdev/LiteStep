@@ -122,7 +122,7 @@ void BangManager::ClearBangCommands()
 }
 
 
-HRESULT BangManager::EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const
+HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROC pfnCallback, LPARAM lParam) const
 {
     Lock lock(m_cs);
     
@@ -131,7 +131,9 @@ HRESULT BangManager::EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const
     for (BangMap::const_iterator iter = bang_map.begin();
         iter != bang_map.end(); iter++)
     {
-        if (!pfnCallback(iter->first.c_str(), lParam))
+        HMODULE hModule = iter->second->GetModule();
+        
+        if (!pfnCallback(hModule, iter->first.c_str(), lParam))
         {
             hr = S_FALSE;
             break;

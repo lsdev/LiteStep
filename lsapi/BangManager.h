@@ -99,7 +99,7 @@ public:
      *          <code>S_FALSE</code> if the callback function returned <code>FALSE</code>,
      *          or an error code
      */
-    HRESULT EnumBangs(LSENUMBANGSPROC pfnCallback, LPARAM lParam) const;
+    HRESULT EnumBangs(LSENUMBANGSV2PROC pfnCallback, LPARAM lParam) const;
 };
 
 #endif // BANGMANAGER_H

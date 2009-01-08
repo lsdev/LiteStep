@@ -603,6 +603,29 @@ void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpan
 	}
 }
 
+
+//
+// ENUMBANG_DATA
+// Helper struct for EnumBangsThunk
+//
+struct ENUMBANG_DATA
+{
+    LSENUMBANGSPROC fnCallback;
+    LPARAM lParam;
+};
+
+
+//
+// EnumBangsThunk
+// An ELD_BANGS_V2 thunk that translates to an ELD_BANGS-style callback
+//
+BOOL CALLBACK EnumBangsThunk(HINSTANCE, LPCSTR pszBang, LPARAM lParam)
+{
+    ENUMBANG_DATA* pData = (ENUMBANG_DATA*)lParam;
+    return pData->fnCallback(pszBang, pData->lParam);
+}
+
+
 //
 // EnumLSData
 //
@@ -624,10 +647,25 @@ HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
 		{
 			case ELD_BANGS:
 			{
-				hr = g_LSAPIManager.GetBangManager()->
-					EnumBangs((LSENUMBANGSPROC)pfnCallback, lParam);
+                //
+                // Call EnumLSData recursively and let a small thunk handle
+                // the translation from ELD_BANGS_V2 to ELD_BANGS
+                //
+                ENUMBANG_DATA data = { 0 };
+                data.fnCallback = (LSENUMBANGSPROC)pfnCallback;
+                data.lParam = lParam;
+
+                hr = EnumLSData(ELD_BANGS_V2,
+                    (FARPROC)EnumBangsThunk, (LPARAM)&data);
 			}
 			break;
+
+            case ELD_BANGS_V2:
+            {
+                hr = g_LSAPIManager.GetBangManager()->
+                    EnumBangs((LSENUMBANGSV2PROC)pfnCallback, lParam);
+            }
+            break;
 
 			case ELD_REVIDS:
 			{

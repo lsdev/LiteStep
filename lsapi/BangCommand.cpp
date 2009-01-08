@@ -74,3 +74,33 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
         }
     }
 }
+
+
+HINSTANCE Bang::GetModule() const
+{
+    HINSTANCE hModule = NULL;
+    LPVOID pAddress = NULL;
+    
+    if (m_bEX)
+    {
+        pAddress = m_bBangEX;
+    }
+    else
+    {
+        pAddress = m_bBang;
+    }
+
+    //
+    // Given the BangProc's address, VirtualQuery can
+    // figure out the module's HMODULE
+    //
+    MEMORY_BASIC_INFORMATION mbi = { 0 };
+    size_t cbBuffer = sizeof(mbi);
+
+    if (VirtualQuery(pAddress, &mbi, cbBuffer) == cbBuffer)
+    {
+        hModule = (HINSTANCE)mbi.AllocationBase;
+    }
+
+    return hModule;
+}

@@ -258,15 +258,17 @@ LSDESKTOPINFO;
 //---------------------------------------------------------
 // ENUMLSDATA DEFINES
 //---------------------------------------------------------
-#define ELD_BANGS   1
-#define ELD_MODULES 2
-#define ELD_REVIDS  3
+#define ELD_BANGS    1
+#define ELD_MODULES  2
+#define ELD_REVIDS   3
+#define ELD_BANGS_V2 4
 
 // ELD_MODULES: possible dwFlags values
 #define LS_MODULE_THREADED  0x0001
 //      LS_MODULE_NOTPUMPED 0x0002    no longer used
 
 typedef BOOL (CALLBACK* LSENUMBANGSPROC)(LPCSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMBANGSV2PROC)(HINSTANCE, LPCSTR, LPARAM);
 typedef BOOL (CALLBACK* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
 typedef BOOL (CALLBACK* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
 
