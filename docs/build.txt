@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7
+    LiteStep 0.25.0
     Developer Information
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -8,7 +8,7 @@
 
  For build instructions, please review
 
-  - build_vc6.txt   (official supported method)
+  - build_vc71.txt   (official supported method)
   - build_mingw.txt
 
  The LiteStep source is segmented into separate code modules.  The source folder
