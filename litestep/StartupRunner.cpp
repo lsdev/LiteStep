@@ -50,7 +50,15 @@ StartupRunner::StartupRunner()
 StartupRunner::~StartupRunner()
 {}
 
-DWORD StartupRunner::Run(LPVOID lpData)
+
+void StartupRunner::Run(BOOL bForce)
+{
+    CloseHandle(LSCreateThread("StartupRunner",
+        StartupRunner::_ThreadProc, (LPVOID)(INT_PTR)bForce, NULL));
+}
+
+
+DWORD WINAPI StartupRunner::_ThreadProc(LPVOID lpData)
 {
     bool bRunStartup = IsFirstRunThisSession(_T("StartupHasBeenRun"));
     BOOL bForceStartup = (lpData != 0);
@@ -66,6 +74,10 @@ DWORD StartupRunner::Run(LPVOID lpData)
     // regkey is created even if we're in "force startup" mode
     if (bRunStartup || bForceStartup)
     {
+        // Need to call CoInitializeEx for ShellExecuteEx
+        VERIFY_HR(CoInitializeEx(
+            NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
+
         bool bHKLMRun = true;
         bool bHKCURun = true;
         bool bHKLMRunOnce = true;
@@ -115,6 +127,8 @@ DWORD StartupRunner::Run(LPVOID lpData)
             _RunRegKeys(HKEY_CURRENT_USER, REGSTR_PATH_RUNONCE,
                 (ERK_RUNSUBKEYS | ERK_DELETE));
         }
+
+        CoUninitialize();
     }
 
     return bRunStartup;

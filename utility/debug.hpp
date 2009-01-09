@@ -47,9 +47,11 @@
 #define ASSERT assert
 
 #if defined(_DEBUG)
-#  define VERIFY(f)  ASSERT(f)
+#  define VERIFY(f)     ASSERT(f)
+#  define VERIFY_HR(f)  ASSERT(SUCCEEDED(f))
 #else
-#  define VERIFY(f)  ((void)(f))
+#  define VERIFY(f)     ((void)(f))
+#  define VERIFY_HR(f)  ((void)(f))
 #endif
 
 

@@ -365,8 +365,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             {
                 BOOL bForceStartup = (wStartFlags & LSF_FORCE_STARTUPAPPS);
 
-                CloseHandle(LSCreateThread("StartupRunner",
-                    StartupRunner::Run, (LPVOID)(INT_PTR)bForceStartup, NULL));
+                StartupRunner::Run(bForceStartup);
             }
 
             // On Vista, the shell is responsible for playing the startup sound
