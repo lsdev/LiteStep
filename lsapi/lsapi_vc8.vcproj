@@ -278,6 +278,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\picopng.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\png_support.cpp"
 				>
 			</File>
@@ -357,6 +361,10 @@
 			</File>
 			<File
 				RelativePath=".\MathValue.h"
+				>
+			</File>
+			<File
+				RelativePath=".\picopng.h"
 				>
 			</File>
 			<File
