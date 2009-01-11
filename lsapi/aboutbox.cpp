@@ -22,6 +22,7 @@
 #include "../utility/common.h"
 #include "../litestep/resource.h"
 #include <commctrl.h>
+#include <WindowsX.h>
 #include <math.h>
 #include "../utility/core.hpp"
 #include "../utility/shellhlp.h"
@@ -129,28 +130,27 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			if (LOWORD(wParam) == IDC_COMBOBOX &&
 			    HIWORD(wParam) == CBN_SELCHANGE)
 			{
-				// delete listview items
-				SendDlgItemMessage(hWnd, IDC_LISTVIEW,
-					LVM_DELETEALLITEMS, 0, 0);
+                HWND hComboBox = (HWND)lParam;
+                HWND hListView = GetDlgItem(hWnd, IDC_LISTVIEW);
 
-				int i;
+				// Delete listview items
+                ListView_DeleteAllItems(hListView);
 
-				// delete listview columns
-				for (i = 3; i >= 0; i--)
+				// Delete listview columns
+				for (int nCol = 3; nCol >= 0; nCol--)
 				{
-					SendDlgItemMessage(hWnd, IDC_LISTVIEW,
-						LVM_DELETECOLUMN, (WPARAM)i, 0);
+                    ListView_DeleteColumn(hListView, nCol);
 				}
 
 				// get new selection
-				i = (int)SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_GETCURSEL, 0, 0);
+				int i = ComboBox_GetCurSel(hComboBox);
 
-				switch(i)
+				switch (i)
 				{
 				default:
 					// default to revision IDs
 					i = ABOUT_REVIDS;
-					SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_SETCURSEL, ABOUT_REVIDS, 0);
+                    ComboBox_SetCurSel(hComboBox, ABOUT_REVIDS);
 					/* FALL THROUGH */
 				case ABOUT_REVIDS:
 				case ABOUT_BANGS:
@@ -158,16 +158,18 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 				case ABOUT_MODULES:
 				case ABOUT_SYSINFO:
 					// set the current display to the list view
-					aboutOptions[i].function(GetDlgItem(hWnd, IDC_LISTVIEW));
-					ShowWindow(GetDlgItem(hWnd, IDC_LISTVIEW), SW_SHOWNA);
+					aboutOptions[i].function(hListView);
+
+					ShowWindow(hListView, SW_SHOWNA);
 					ShowWindow(GetDlgItem(hWnd, IDC_EDIT), SW_HIDE);
 					break;
 
 				case ABOUT_LICENSE:
 					// set the current display to the edit box
 					aboutOptions[i].function(GetDlgItem(hWnd, IDC_EDIT));
+
 					ShowWindow(GetDlgItem(hWnd, IDC_EDIT), SW_SHOWNA);
-					ShowWindow(GetDlgItem(hWnd, IDC_LISTVIEW), SW_HIDE);
+					ShowWindow(hListView, SW_HIDE);
 					break;
 				}
 			}
@@ -188,13 +190,13 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			 * It just ensures our text doesn't get changed somehow */
 			else if (LOWORD(wParam) == IDC_EDIT && HIWORD(wParam) == EN_UPDATE)
 			{
-				DWORD dwStart;
+                HWND hEditCtl = GetDlgItem(hWnd, IDC_EDIT);
 
-				SendDlgItemMessage(hWnd, IDC_EDIT, EM_GETSEL, (WPARAM)&dwStart, 0);
+                DWORD dwStart = 0;
+                SendMessage(hEditCtl, EM_GETSEL, (WPARAM)&dwStart, 0);
 
-				SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
-
-				SendDlgItemMessage(hWnd, IDC_EDIT, EM_SETSEL, dwStart-1, dwStart-1);
+				Edit_SetText(hEditCtl, lsLicense);
+                Edit_SetSel(hEditCtl, dwStart-1, dwStart-1);
 			}
 
 			return FALSE;
@@ -273,18 +275,23 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			// set the License Notice text
 			SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
 
+            //
+            // Initialize ComboBox
+            //
+            HWND hComboBox = GetDlgItem(hWnd, IDC_COMBOBOX);
+
 			// add options to combo box
 			for (unsigned int i = 0; i < aboutOptionsCount; ++i)
 			{
-				SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_ADDSTRING,
-					0, (LPARAM)aboutOptions[i].option);
+                ComboBox_AddString(hComboBox, aboutOptions[i].option);
 			}
 
 			// default to License Notice
-			SendDlgItemMessage(hWnd, IDC_COMBOBOX, CB_SETCURSEL, ABOUT_LICENSE, 0);
-			// CB_SETCURSEL doesn't notify us via WM_COMMAND, so force it */
-			WPARAM wp = MAKEWPARAM(IDC_COMBOBOX, CBN_SELCHANGE);
-			SendMessage(hWnd, WM_COMMAND, wp, (LPARAM)GetDlgItem(hWnd, IDC_COMBOBOX));
+            ComboBox_SetCurSel(hComboBox, ABOUT_LICENSE);
+
+			// SetCurSel doesn't notify us via WM_COMMAND, so force it
+            FORWARD_WM_COMMAND(
+                hWnd, IDC_COMBOBOX, hComboBox, CBN_SELCHANGE, SendMessage);
 
 			// center dialog on screen
 			RECT rc;
