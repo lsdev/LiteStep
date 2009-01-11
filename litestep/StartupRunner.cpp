@@ -292,11 +292,7 @@ bool StartupRunner::IsFirstRunThisSession(LPCTSTR pszSubkey)
 {
     bool bReturn = false;
 
-    OSVERSIONINFO OsVersionInfo = { 0 };
-    OsVersionInfo.dwOSVersionInfoSize = sizeof(OsVersionInfo);
-    VERIFY(GetVersionEx(&OsVersionInfo));
-
-    if (OsVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    if (IsOS(OS_NT))
     {
         HKEY hkSessionInfo = _CreateSessionInfoKey();
 
