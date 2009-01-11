@@ -231,6 +231,12 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			// save global handle
 			g_hAboutbox = hWnd;
 
+            // Add custom extended styles to ListView
+            DWORD dwStyles = LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP;
+
+            HWND hListView = GetDlgItem(hWnd, IDC_LISTVIEW);
+            ListView_SetExtendedListViewStyleEx(hListView, dwStyles, dwStyles);
+
 			// set title font
 			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
 			SendDlgItemMessage(hWnd, IDC_TITLE, WM_SETFONT,
