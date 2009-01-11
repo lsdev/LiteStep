@@ -251,16 +251,8 @@ BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
 
 
     //
-    // Finishing touches: Set icon, center dialog, switch focus
+    // Finishing touches: Center dialog, switch focus
     //
-    HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_LS));
-
-    if (hIcon != NULL)
-    {
-        SendMessage(hwndDialog, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-        SendMessage(hwndDialog, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-    }
-
     RECT rc;
     GetWindowRect(hwndDialog, &rc);
 
