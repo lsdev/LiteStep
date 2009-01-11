@@ -119,6 +119,27 @@ void SetWelcomeScreenEvent()
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// SetDialogClassIcon
+//
+void SetDialogClassIcon(HINSTANCE hInstance, HICON hIcon)
+{
+    ASSERT(hIcon != NULL);
+    ASSERT(hInstance != NULL);
+    
+    // SetClassLongPtr requires a window handle, so create a temporary window
+    HWND hwndTemp = CreateWindow(WC_DIALOG, NULL, 0,
+        0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+
+    if (hwndTemp != NULL)
+    {
+        SetClassLongPtr(hwndTemp, GCLP_HICON, (LONG_PTR)hIcon);
+        DestroyWindow(hwndTemp);
+    }
+}
+
+
 //
 //
 //
@@ -160,6 +181,9 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     // the box would pop up under that screen
     //
     SetWelcomeScreenEvent();
+
+    // Change the icon of all dialogs to the LS icon
+    SetDialogClassIcon(hInst, LoadIcon(hInst, MAKEINTRESOURCE(IDI_LS)));
 
     // If we can't find "step.rc", there's no point in proceeding
     if (!PathFileExists(szRcPath))
@@ -460,6 +484,7 @@ HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
     wc.cbSize = sizeof(wc);
     wc.lpfnWndProc = CLiteStep::ExternalWndProc;
     wc.hInstance = m_hInstance;
+    wc.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_LS));
     wc.lpszClassName = szMainWindowClass;
 
     if (!RegisterClassEx(&wc))
