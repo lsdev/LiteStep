@@ -185,6 +185,12 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     // Change the icon of all dialogs to the LS icon
     SetDialogClassIcon(hInst, LoadIcon(hInst, MAKEINTRESOURCE(IDI_LS)));
 
+    // Make sure we don't quit if there's an app blocking shutdown.
+    // Otherwise the user might be left without a shell if he chooses to abort
+    // shutdown entirely.
+    // 0x00FF is just below the application threshold
+    SetProcessShutdownParameters(0x00FF, SHUTDOWN_NORETRY);
+
     // If we can't find "step.rc", there's no point in proceeding
     if (!PathFileExists(szRcPath))
     {
