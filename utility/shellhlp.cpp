@@ -601,6 +601,7 @@ UINT GetWindowsVersion()
                 GetVersionMetric(versions[idx].metric))
             {
                 uVersion = versions[idx].uVersion;
+                break;
             }
         }
     }
