@@ -309,7 +309,9 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 				GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
 #endif
 			SwitchToThisWindow(hWnd, TRUE);
-			SetFocus(GetDlgItem(hWnd, IDC_COMBOBOX));
+
+            // Set focus to the combo box
+            SendMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hComboBox, TRUE);
 
 			return FALSE;
 		}
