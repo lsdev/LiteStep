@@ -27,6 +27,18 @@
 #include "../utility/core.hpp"
 #include "../utility/shellhlp.h"
 
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Function declarations
+//
+
+// Message handlers
+BOOL    OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam);
+HBRUSH  OnCtlColor(HWND hwndDialog, HDC hdc, HWND hwndChild, int nType);
+INT_PTR OnCommand(HWND hwndDialog, int idCtl, HWND hwndCtl, UINT uCodeNotify);
+
+// ListView Callbacks
 typedef void (*AboutFunction)(HWND);
 
 void AboutBangs(HWND hListView);
@@ -36,20 +48,17 @@ void AboutModules(HWND hListView);
 void AboutRevIDs(HWND hListView);
 void AboutSysInfo(HWND hListView);
 
-//
-// misc functions
-//
-INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
+// Utility
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
 int GetClientWidth(HWND hWnd);
-void TrimLeft(char* pszToTrim);
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
 
-// Global handle to the running AboutBox instance (if any)
-HWND g_hAboutbox = NULL;
 
-/* Keep this enum synch'd with aboutOptions */
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// ComboBox options
+// The enum and struct need to be kept in sync
+//
 enum
 {
 	 ABOUT_BANGS = 0
@@ -62,9 +71,11 @@ enum
 
 struct
 {
-	const char *option;
+	const char* option;
 	AboutFunction function;
-} aboutOptions[] = {
+}
+aboutOptions[] =
+{
 	 {"Bang Commands",      AboutBangs}
 	,{"Development Team",   AboutDevTeam}
 	,{"License",            AboutLicense}
@@ -73,11 +84,18 @@ struct
 	,{"System Information", AboutSysInfo}
 };
 
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LiteStep Development Team
+//
 struct
 {
 	const char *nick;
 	const char *realName;
-} theDevTeam[] = {
+}
+theDevTeam[] =
+{
 	 {"Acidfire", "Alexander Vermaat"}
 	,{"ilmcuts",  "Simon"}
 	,{"jugg",     "Chris Rempel"}
@@ -87,17 +105,12 @@ struct
 	,{"Xjill",    ""}
 };
 
-const unsigned int aboutOptionsCount = COUNTOF(aboutOptions);
-const unsigned int theDevTeamCount = COUNTOF(theDevTeam);
 
-struct CallbackInfo
-{
-	HWND hListView;
-	int nItem;
-};
-
-/* LiteStep license notice */
-const char * lsLicense = \
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LiteStep License Notice
+//
+CHAR lsLicense[] =
  "LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
  "\r\n"
  "Copyright (C) 1997-1998  Francis Gastellu\r\n"
@@ -118,212 +131,280 @@ const char * lsLicense = \
  "\r\n"
  "http://www.lsdev.org/";
 
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// Other global constants or variables
+//
+struct CallbackInfo
+{
+    HWND hListView;
+    int nItem;
+};
+
+// Global handle to the running AboutBox instance (if any)
+HWND g_hAboutbox = NULL;
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // AboutBox Dialog Procedure
 //
-INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AboutBoxProcedure(HWND hwndDialog, UINT uMsg,
+                                   WPARAM wParam, LPARAM lParam)
 {
-	switch (message)
-	{
-		case WM_COMMAND:
-		{
-			if (LOWORD(wParam) == IDC_COMBOBOX &&
-			    HIWORD(wParam) == CBN_SELCHANGE)
-			{
-                HWND hComboBox = (HWND)lParam;
-                HWND hListView = GetDlgItem(hWnd, IDC_LISTVIEW);
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwndDialog, WM_COMMAND,        OnCommand);
+        HANDLE_MSG(hwndDialog, WM_CTLCOLOREDIT,   OnCtlColor);
+        HANDLE_MSG(hwndDialog, WM_CTLCOLORSTATIC, OnCtlColor);
+        HANDLE_MSG(hwndDialog, WM_INITDIALOG,     OnInitDialog);
 
-				// Delete listview items
-                ListView_DeleteAllItems(hListView);
+    default:
+        break;
+    }
 
-				// Delete listview columns
-				for (int nCol = 3; nCol >= 0; nCol--)
-				{
-                    ListView_DeleteColumn(hListView, nCol);
-				}
-
-				// get new selection
-				int i = ComboBox_GetCurSel(hComboBox);
-
-				switch (i)
-				{
-				default:
-					// default to revision IDs
-					i = ABOUT_REVIDS;
-                    ComboBox_SetCurSel(hComboBox, ABOUT_REVIDS);
-					/* FALL THROUGH */
-				case ABOUT_REVIDS:
-				case ABOUT_BANGS:
-				case ABOUT_DEVTEAM:
-				case ABOUT_MODULES:
-				case ABOUT_SYSINFO:
-					// set the current display to the list view
-					aboutOptions[i].function(hListView);
-
-					ShowWindow(hListView, SW_SHOWNA);
-					ShowWindow(GetDlgItem(hWnd, IDC_EDIT), SW_HIDE);
-					break;
-
-				case ABOUT_LICENSE:
-					// set the current display to the edit box
-					aboutOptions[i].function(GetDlgItem(hWnd, IDC_EDIT));
-
-					ShowWindow(GetDlgItem(hWnd, IDC_EDIT), SW_SHOWNA);
-					ShowWindow(hListView, SW_HIDE);
-					break;
-				}
-			}
-			else if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-			{
-				HFONT hTitleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
-					WM_GETFONT, 0, 0);
-
-				// close the dialog box
-				EndDialog(hWnd, IDOK);
-
-				// release title font
-				DeleteObject(hTitleFont);
-
-				return TRUE;
-			}
-			/* This isn't necessary as we have the edit control set to read only.
-			 * It just ensures our text doesn't get changed somehow */
-			else if (LOWORD(wParam) == IDC_EDIT && HIWORD(wParam) == EN_UPDATE)
-			{
-                HWND hEditCtl = GetDlgItem(hWnd, IDC_EDIT);
-
-                DWORD dwStart = 0;
-                SendMessage(hEditCtl, EM_GETSEL, (WPARAM)&dwStart, 0);
-
-				Edit_SetText(hEditCtl, lsLicense);
-                Edit_SetSel(hEditCtl, dwStart-1, dwStart-1);
-			}
-
-			return FALSE;
-		}
-
-		case WM_CTLCOLOREDIT:
-		case WM_CTLCOLORSTATIC:
-		{
-			HBRUSH hbReturn = FALSE; // special return value to tell the system
-			                         // to perform default message processing
-
-			// the header and title need a white (COLOR_WINDOW) background
-			int id = GetDlgCtrlID((HWND)lParam);
-
-			if (id == IDC_TITLE || id == IDC_THEME_INFO || id == IDC_EDIT)
-			{
-				HDC hDC = (HDC)wParam;
-
-				SetTextColor(hDC, GetSysColor(COLOR_WINDOWTEXT));
-				SetBkColor(hDC, GetSysColor(COLOR_WINDOW));
-
-				hbReturn = GetSysColorBrush(COLOR_WINDOW);
-			}
-			else if (id == IDC_HEADER || id == IDC_LOGO)
-			{
-				hbReturn = GetSysColorBrush(COLOR_WINDOW);
-			}
-
-			return (INT_PTR)hbReturn;
-		}
-
-		case WM_INITDIALOG:
-		{
-			// save global handle
-			g_hAboutbox = hWnd;
-
-            // Add custom extended styles to ListView
-            DWORD dwStyles = LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP;
-
-            HWND hListView = GetDlgItem(hWnd, IDC_LISTVIEW);
-            ListView_SetExtendedListViewStyleEx(hListView, dwStyles, dwStyles);
-
-			// set title font
-			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
-			SendDlgItemMessage(hWnd, IDC_TITLE, WM_SETFONT,
-				(WPARAM)hTitleFont, FALSE);
-
-			// set title with LS version
-			SetDlgItemText(hWnd, IDC_TITLE, "LiteStep 0.25.0 Alpha");
-
-			// set Theme info
-			char themeAuthor[16] = { 0 };
-			char themeName[21] = { 0 };
-			char themeOut[MAX_LINE_LENGTH] = { 0 };
-
-			GetRCString("ThemeAuthor", themeAuthor, "(unknown)", sizeof(themeAuthor));
-
-			if (GetRCString("ThemeName", themeName, NULL, sizeof(themeName)))
-			{
-				StringCchPrintf(themeOut, MAX_LINE_LENGTH,
-					"Theme: %s by %s", themeName, themeAuthor);
-			}
-			else
-			{
-				StringCchPrintf(themeOut, MAX_LINE_LENGTH,
-					"Theme by %s", themeAuthor);
-			}
-
-			SetDlgItemText(hWnd, IDC_THEME_INFO, themeOut);
-
-			// set compile time
-			char compileTime[42] = {0};
-			LSGetVariableEx("CompileDate", compileTime, 42);
-			SetDlgItemText(hWnd, IDC_COMPILETIME, compileTime);
-
-			// set the License Notice text
-			SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
-
-            //
-            // Initialize ComboBox
-            //
-            HWND hComboBox = GetDlgItem(hWnd, IDC_COMBOBOX);
-
-			// add options to combo box
-			for (unsigned int i = 0; i < aboutOptionsCount; ++i)
-			{
-                ComboBox_AddString(hComboBox, aboutOptions[i].option);
-			}
-
-			// default to License Notice
-            ComboBox_SetCurSel(hComboBox, ABOUT_LICENSE);
-
-			// SetCurSel doesn't notify us via WM_COMMAND, so force it
-            FORWARD_WM_COMMAND(
-                hWnd, IDC_COMBOBOX, hComboBox, CBN_SELCHANGE, SendMessage);
-
-			// center dialog on screen
-			RECT rc;
-			GetWindowRect(hWnd, &rc);
-
-			SetWindowPos(hWnd, HWND_TOP,
-				(GetSystemMetrics(SM_CXSCREEN) - (rc.right - rc.left)) / 2,
-				(GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
-				0, 0, SWP_NOSIZE);
-
-#ifdef __GNUC__
-			typedef void (WINAPI *STTWTYPE)(HWND, BOOL);
-
-			static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
-				GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
-#endif
-			SwitchToThisWindow(hWnd, TRUE);
-
-            // Set focus to the combo box
-            SendMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hComboBox, TRUE);
-
-			return FALSE;
-		}
-
-		default:
-		break;
-	}
-
-	return FALSE;
+    return FALSE;
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// OnInitDialog
+//
+BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(hwndFocus);
+    UNREFERENCED_PARAMETER(lParam);
+
+    // save global handle
+    g_hAboutbox = hwndDialog;
+
+    //
+    // Initialize ListView
+    //
+    HWND hListView = GetDlgItem(hwndDialog, IDC_LISTVIEW);
+
+    // Add custom extended styles
+    DWORD dwStyles = LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP;
+    ListView_SetExtendedListViewStyleEx(hListView, dwStyles, dwStyles);
+
+
+    //
+    // Initialize title
+    //
+    HWND hwndTitle = GetDlgItem(hwndDialog, IDC_TITLE);
+
+    HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
+    SetWindowFont(hwndTitle, hTitleFont, FALSE);
+
+    Static_SetText(hwndTitle, "LiteStep 0.25.0 Alpha");
+
+
+    //
+    // Initialize theme info
+    //
+    char themeAuthor[16] = { 0 };
+    char themeName[21] = { 0 };
+    char themeOut[MAX_LINE_LENGTH] = { 0 };
+
+    GetRCString("ThemeAuthor", themeAuthor, "(unknown)", sizeof(themeAuthor));
+
+    if (GetRCString("ThemeName", themeName, NULL, sizeof(themeName)))
+    {
+        StringCchPrintf(themeOut, MAX_LINE_LENGTH,
+            "Theme: %s by %s", themeName, themeAuthor);
+    }
+    else
+    {
+        StringCchPrintf(themeOut, MAX_LINE_LENGTH, "Theme by %s", themeAuthor);
+    }
+
+    SetDlgItemText(hwndDialog, IDC_THEME_INFO, themeOut);
+
+
+    //
+    // Initialize compile time
+    //
+    char compileTime[42] = {0};
+    LSGetVariableEx("CompileDate", compileTime, 42);
+    SetDlgItemText(hwndDialog, IDC_COMPILETIME, compileTime);
+
+
+    //
+    // Initialize edit control (license notice)
+    //
+    SetDlgItemText(hwndDialog, IDC_EDIT, lsLicense);
+
+
+    //
+    // Initialize ComboBox
+    //
+    HWND hComboBox = GetDlgItem(hwndDialog, IDC_COMBOBOX);
+
+    for (unsigned int i = 0; i < COUNTOF(aboutOptions); ++i)
+    {
+        ComboBox_AddString(hComboBox, aboutOptions[i].option);
+    }
+
+    // Default to license notice
+    ComboBox_SetCurSel(hComboBox, ABOUT_LICENSE);
+
+    // SetCurSel doesn't notify us via WM_COMMAND, so force it
+    FORWARD_WM_COMMAND(
+        hwndDialog, IDC_COMBOBOX, hComboBox, CBN_SELCHANGE, SendMessage);
+
+
+    //
+    // Finishing touches: center dialog on screen
+    //
+    RECT rc;
+    GetWindowRect(hwndDialog, &rc);
+
+    SetWindowPos(hwndDialog, HWND_TOP,
+        (GetSystemMetrics(SM_CXSCREEN) - (rc.right - rc.left)) / 2,
+        (GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
+        0, 0, SWP_NOSIZE);
+
+#ifdef __GNUC__
+    typedef void (WINAPI *STTWTYPE)(HWND, BOOL);
+
+    static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
+        GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
+#endif
+    SwitchToThisWindow(hwndDialog, TRUE);
+
+    // Set focus to the combo box
+    SendMessage(hwndDialog, WM_NEXTDLGCTL, (WPARAM)hComboBox, TRUE);
+
+    return FALSE;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// OnCtlColor
+//
+HBRUSH OnCtlColor(HWND hwndDialog, HDC hdc, HWND hwndChild, int nType)
+{
+    UNREFERENCED_PARAMETER(hwndDialog);
+    UNREFERENCED_PARAMETER(nType);
+    
+    HBRUSH hbReturn = NULL;
+
+    // The header and title need a white (COLOR_WINDOW) background
+    int idCtl = GetDlgCtrlID(hwndChild);
+
+    if (idCtl == IDC_TITLE || idCtl == IDC_THEME_INFO || idCtl == IDC_EDIT)
+    {
+        SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
+        SetBkColor(hdc, GetSysColor(COLOR_WINDOW));
+
+        hbReturn = GetSysColorBrush(COLOR_WINDOW);
+    }
+    else if (idCtl == IDC_HEADER || idCtl == IDC_LOGO)
+    {
+        hbReturn = GetSysColorBrush(COLOR_WINDOW);
+    }
+    else
+    {
+        // special return value to tell the system
+        // to perform default message processing
+        hbReturn = FALSE;
+    }
+
+    return hbReturn;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// OnCommand
+//
+INT_PTR OnCommand(HWND hwndDialog, int idCtl, HWND hwndCtl, UINT uCodeNotify)
+{
+    BOOL bHandled = FALSE;
+
+    if (idCtl == IDC_COMBOBOX && uCodeNotify == CBN_SELCHANGE)
+    {
+        HWND hwndEdit = GetDlgItem(hwndDialog, IDC_EDIT);
+        HWND hListView = GetDlgItem(hwndDialog, IDC_LISTVIEW);
+
+        // Delete listview items
+        ListView_DeleteAllItems(hListView);
+
+        // Delete listview columns
+        for (int nCol = 3; nCol >= 0; nCol--)
+        {
+            ListView_DeleteColumn(hListView, nCol);
+        }
+
+        // get new selection
+        int i = ComboBox_GetCurSel(hwndCtl);
+
+        switch (i)
+        {
+        default:
+            // default to revision IDs
+            i = ABOUT_REVIDS;
+            ComboBox_SetCurSel(hwndCtl, ABOUT_REVIDS);
+            /* FALL THROUGH */
+        case ABOUT_REVIDS:
+        case ABOUT_BANGS:
+        case ABOUT_DEVTEAM:
+        case ABOUT_MODULES:
+        case ABOUT_SYSINFO:
+            // set the current display to the list view
+            aboutOptions[i].function(hListView);
+
+            ShowWindow(hListView, SW_SHOWNA);
+            ShowWindow(hwndEdit, SW_HIDE);
+            break;
+
+        case ABOUT_LICENSE:
+            // set the current display to the edit box
+            aboutOptions[i].function(hwndEdit);
+
+            ShowWindow(hwndEdit, SW_SHOWNA);
+            ShowWindow(hListView, SW_HIDE);
+            break;
+        }
+
+        bHandled = TRUE;
+    }
+    else if (idCtl == IDOK || idCtl == IDCANCEL)
+    {
+        HFONT hTitleFont =
+            (HFONT)SendDlgItemMessage(hwndCtl, IDC_TITLE, WM_GETFONT, 0, 0);
+
+        // close the dialog box
+        EndDialog(hwndDialog, IDOK);
+
+        // release title font
+        DeleteObject(hTitleFont);
+
+        bHandled = TRUE;
+    }
+    /* This isn't necessary as we have the edit control set to read only.
+    * It just ensures our text doesn't get changed somehow */
+    else if (idCtl == IDC_EDIT && uCodeNotify == EN_UPDATE)
+    {
+        DWORD dwStart = 0;
+        SendMessage(hwndCtl, EM_GETSEL, (WPARAM)&dwStart, 0);
+
+        Edit_SetText(hwndCtl, lsLicense);
+        Edit_SetSel(hwndCtl, dwStart-1, dwStart-1);
+
+        bHandled = TRUE;
+    }
+
+    SetWindowLongPtr(hwndDialog, DWLP_MSGRESULT, bHandled);
+    return bHandled;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
 // AboutBox Thread Procedure
 //
 ULONG WINAPI AboutBoxThread(void *)
@@ -344,7 +425,10 @@ ULONG WINAPI AboutBoxThread(void *)
 }
 
 
-// Fill listview with bang command information
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// BangCallback
+// Used by AboutBangs
 //
 BOOL CALLBACK BangCallback(HMODULE hModule, LPCSTR pszName, LPARAM lParam)
 {
@@ -370,6 +454,11 @@ BOOL CALLBACK BangCallback(HMODULE hModule, LPCSTR pszName, LPARAM lParam)
     return TRUE;
 }
 
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutBangs
+//
 void AboutBangs(HWND hListView)
 {
 	LVCOLUMN columnInfo;
@@ -397,7 +486,9 @@ void AboutBangs(HWND hListView)
 }
 
 
-// Fill listview with development team information
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutDevTeam
 //
 void AboutDevTeam(HWND hListView)
 {
@@ -418,7 +509,7 @@ void AboutDevTeam(HWND hListView)
 
 	ListView_InsertColumn(hListView, 1, &columnInfo);
 
-	for (unsigned int i = 0; i < theDevTeamCount; i++)
+	for (unsigned int i = 0; i < COUNTOF(theDevTeam); i++)
 	{
 		LVITEM itemInfo;
 
@@ -433,15 +524,20 @@ void AboutDevTeam(HWND hListView)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutLicense
 // Show License Notice... Nothing to do
 //
 void AboutLicense(HWND /* hEdit */)
 {
-	//SetDlgItemText(hWnd, IDC_EDIT, lsLicense);
 }
 
 
-// Fill listview with module information
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// ModulesCallback
+// Used by AboutModules
 //
 BOOL CALLBACK ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
 {
@@ -459,6 +555,10 @@ BOOL CALLBACK ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutModules
+//
 void AboutModules(HWND hListView)
 {
 	LVCOLUMN columnInfo;
@@ -478,7 +578,10 @@ void AboutModules(HWND hListView)
 }
 
 
-// Fill listview with revision ID (LM_GETREVID) information
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// RevIDCallback
+// Used by AboutRevIDs
 //
 BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 {
@@ -496,6 +599,10 @@ BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutRevIDs
+//
 void AboutRevIDs(HWND hListView)
 {
 	LVCOLUMN columnInfo;
@@ -516,6 +623,11 @@ void AboutRevIDs(HWND hListView)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// GetWinVerString
+// Helper for AboutSysInfo
+//
 HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
 {
     ASSERT(pszVersion != NULL);
@@ -569,7 +681,9 @@ HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
 }
 
 
-// Fill listview with system information
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutSysInfo
 //
 void AboutSysInfo(HWND hListView)
 {
@@ -656,6 +770,9 @@ void AboutSysInfo(HWND hListView)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// CreateSimpleFont
 // Simplified version of CreateFont
 //
 HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
@@ -680,6 +797,9 @@ HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// GetClientWidth
 // Return the width of the window's client area
 //
 int GetClientWidth(HWND hWnd)
@@ -691,28 +811,9 @@ int GetClientWidth(HWND hWnd)
 }
 
 
-// Trims whitespace from the beginning of a string in-place
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
-void TrimLeft(char *pszToTrim)
-{
-	char * trimmed = pszToTrim;
-
-	// skip past spaces
-	while (*pszToTrim && isspace(*pszToTrim))
-		pszToTrim++;
-
-	if(pszToTrim != trimmed)
-	{
-		// copy the rest of the string over
-		while (*pszToTrim)
-			*trimmed++ = *pszToTrim++;
-	
-		// null-terminate it
-		*trimmed = 0;
-	}
-}
-
-
+// FormatBytes
 // Formats a byte count into a string suitable for display to the user
 //
 LPCSTR units[] = { "bytes", "KB", "MB", "GB", "TB", "PB" };
