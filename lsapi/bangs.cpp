@@ -117,8 +117,8 @@ void BangConfirm(HWND hCaller, LPCSTR pszArgs)
 
         LPCSTR pszTitle = (nTokenCount == 3) ? szFourth : szSecond;
 
-        INT idConfirm = MessageBox(
-            hCaller, szFirst, pszTitle, MB_YESNO | MB_TOPMOST);
+        INT idConfirm = MessageBox(hCaller,
+            szFirst, pszTitle, MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
 
         if (idConfirm == IDYES)
         {
