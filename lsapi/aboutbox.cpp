@@ -256,8 +256,16 @@ BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
 
 
     //
-    // Finishing touches: center dialog on screen
+    // Finishing touches: Set icon, center dialog, switch focus
     //
+    HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_LS));
+
+    if (hIcon != NULL)
+    {
+        SendMessage(hwndDialog, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(hwndDialog, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    }
+
     RECT rc;
     GetWindowRect(hwndDialog, &rc);
 
@@ -375,7 +383,7 @@ INT_PTR OnCommand(HWND hwndDialog, int idCtl, HWND hwndCtl, UINT uCodeNotify)
     else if (idCtl == IDOK || idCtl == IDCANCEL)
     {
         HFONT hTitleFont =
-            (HFONT)SendDlgItemMessage(hwndCtl, IDC_TITLE, WM_GETFONT, 0, 0);
+            (HFONT)SendDlgItemMessage(hwndDialog, IDC_TITLE, WM_GETFONT, 0, 0);
 
         // close the dialog box
         EndDialog(hwndDialog, IDOK);
