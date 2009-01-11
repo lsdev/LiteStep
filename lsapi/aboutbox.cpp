@@ -171,7 +171,7 @@ INT_PTR CALLBACK AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARA
 					break;
 				}
 			}
-			else if (LOWORD(wParam) == IDOK || LOWORD(wParam == IDCANCEL))
+			else if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
 			{
 				HFONT hTitleFont = (HFONT)SendDlgItemMessage(hWnd, IDC_TITLE,
 					WM_GETFONT, 0, 0);
