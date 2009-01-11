@@ -66,7 +66,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib ole32.lib shlwapi.lib shell32.lib gdi32.lib user32.lib msvcrtd.lib msvcprtd.lib"
+				AdditionalDependencies="libpng13d.lib advapi32.lib ole32.lib shlwapi.lib shell32.lib gdi32.lib user32.lib msvcrtd.lib msvcprtd.lib"
 				OutputFile="$(OutDir)/lsapi.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -158,7 +158,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib ole32.lib shlwapi.lib shell32.lib gdi32.lib user32.lib msvcrt.lib msvcprt.lib"
+				AdditionalDependencies="libpng13.lib advapi32.lib ole32.lib shlwapi.lib shell32.lib gdi32.lib user32.lib msvcrt.lib msvcprt.lib"
 				OutputFile="$(OutDir)/lsapi.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
