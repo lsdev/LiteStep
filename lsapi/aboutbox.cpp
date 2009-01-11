@@ -208,19 +208,14 @@ BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
     char themeName[21] = { 0 };
     char themeOut[MAX_LINE_LENGTH] = { 0 };
 
-    GetRCString("ThemeAuthor", themeAuthor, "(unknown)", sizeof(themeAuthor));
+    GetRCString("ThemeAuthor", themeAuthor, "(unknown)", COUNTOF(themeAuthor));
+    GetRCString("ThemeName", themeName, "(unknown", COUNTOF(themeName));
 
-    if (GetRCString("ThemeName", themeName, NULL, sizeof(themeName)))
+    if (SUCCEEDED(StringCchPrintf(themeOut, COUNTOF(themeOut),
+        "Theme: %s by %s", themeName, themeAuthor)))
     {
-        StringCchPrintf(themeOut, MAX_LINE_LENGTH,
-            "Theme: %s by %s", themeName, themeAuthor);
+        SetDlgItemText(hwndDialog, IDC_THEME_INFO, themeOut);
     }
-    else
-    {
-        StringCchPrintf(themeOut, MAX_LINE_LENGTH, "Theme by %s", themeAuthor);
-    }
-
-    SetDlgItemText(hwndDialog, IDC_THEME_INFO, themeOut);
 
 
     //
