@@ -22,8 +22,7 @@
 #if !defined(TRAYNOTIFYICON_H)
 #define TRAYNOTIFYICON_H
 
-#include "../utility/common.h"
-#include <shellapi.h>
+#include "../utility/core.hpp"
 #include <vector>
 
 #define TRAY_MAX_TIP_LENGTH       128

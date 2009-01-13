@@ -32,7 +32,7 @@
  *
  */
 
-#include <windows.h>
+#include "../utility/common.h"
 #include <stdio.h>
 #include "lsapidefines.h"
 #include "lsmultimon.h"

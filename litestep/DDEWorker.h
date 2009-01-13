@@ -25,7 +25,6 @@
 
 #include "../utility/common.h"
 #include <ddeml.h>
-#include <shlobj.h>
 
 #define DDE_REQUEST_NONE			0x0000
 #define DDE_REQUEST_CREATEGROUP		0x0001

@@ -22,6 +22,9 @@
 #ifndef LSMULTIMON_H
 #define LSMULTIMON_H
 
+#include "../utility/common.h"
+
+
 #if !defined(MONITOR_DEFAULTTONULL)
 #define MONITOR_DEFAULTTONULL       0x00000000
 #define MONITOR_DEFAULTTOPRIMARY    0x00000001

@@ -39,6 +39,7 @@
 #include "../utility/common.h"
 #include "lsapidefines.h"
 #include "lsapi.h"
+#include <locale>
 
 static int matche_after_star (LPCSTR pattern, LPCSTR text);
 

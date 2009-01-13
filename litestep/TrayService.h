@@ -26,7 +26,7 @@
 #include "TrayAppBar.h"
 #include "../utility/common.h"
 #include "../utility/IService.h"
-#include <shellapi.h>
+#include <ObjBase.h>
 #include <vector>
 
 // shell copy data types

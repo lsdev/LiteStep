@@ -22,10 +22,6 @@
 #include "png_support.h"
 #include "../utility/core.hpp"
 
-#ifdef __GNUC__
-using std::max;
-#endif
-
 void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent);
 
 

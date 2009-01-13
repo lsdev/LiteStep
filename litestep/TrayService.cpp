@@ -21,11 +21,16 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "TrayService.h"
 #include <regstr.h>
-#include <shlobj.h>
 #include <algorithm>
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 #include <docobj.h>
+
+
+#ifdef __GNUC__
+using std::max;
+using std::min;
+#endif
 
 #if !defined(REGSTR_PATH_SHELLSERVICEOBJECTDELAYED)
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")

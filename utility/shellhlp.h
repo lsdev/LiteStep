@@ -22,8 +22,8 @@
 #if !defined(SHELLHLP_H)
 #define SHELLHLP_H
 
-#include "common.h"
-#include <ShellAPI.h>
+#include "core.hpp"
+#include <ObjBase.h>
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
