@@ -39,6 +39,9 @@
 
 // _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
 #if !defined (_WINDOWS_) && !defined(_WINDOWS_H)
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
 #  define WIN32_LEAN_AND_MEAN
 #  define STRICT
 #  define NOCRYPT

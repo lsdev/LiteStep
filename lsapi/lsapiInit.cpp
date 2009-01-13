@@ -334,7 +334,7 @@ void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
     ASSERT(ntheader);
     lsapitime = (time_t)(ntheader->FileHeader.TimeDateStamp);
     
-    compiletime = max(lsexetime, lsapitime);
+    compiletime = std::max(lsexetime, lsapitime);
     tm* timeStruct = gmtime(&compiletime);
     
     if (timeStruct)

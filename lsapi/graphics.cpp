@@ -21,8 +21,11 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "png_support.h"
 #include "../utility/core.hpp"
+#include <algorithm>
 
-void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, COLORREF colorTransparent);
+
+void TransparentBltLSWorker(HDC hdcDst, int nWidth, int nHeight, HDC hdcSrc,
+                            int nXSrc, int nYSrc, COLORREF colorTransparent);
 
 
 //
@@ -254,8 +257,8 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
 					// now let's paint both images to a new one
 
 					// and we support different sized images!! therefore:
-					wdtResult = max(wdtFirst, wdtSecond);
-					hgtResult = max(hgtFirst, hgtSecond);
+                    wdtResult = std::max(wdtFirst, wdtSecond);
+					hgtResult = std::max(hgtFirst, hgtSecond);
 
 					// create another dc, compatible with second dc
 					hdcResult = CreateCompatibleDC(hdcSecond);
