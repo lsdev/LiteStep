@@ -32,8 +32,9 @@
 #endif
 #endif
 
-#if !defined(_WIN32_IE)
-#define _WIN32_IE 0x603
+#if !defined(_WIN32_WINNT)
+#define _WIN32_WINNT    0x0600
+#define _WIN32_IE       0x0603
 #endif
 
 // _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
