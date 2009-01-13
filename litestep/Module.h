@@ -22,11 +22,9 @@
 #if !defined(MODULE_H)
 #define MODULE_H
 
+#include "../lsapi/lsapidefines.h"
 #include "../utility/common.h"
 #include <string>
-
-typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
-typedef int (*ModuleQuitFunc) (HINSTANCE);
 
 
 /**
@@ -55,10 +53,10 @@ private:
     std::basic_string<TCHAR> m_tzAppPath;
     
     /** Pointer to <code>initModuleEx</code> function */
-    ModuleInitExFunc m_pInitEx;
+    initModuleExProc m_pInitEx;
     
     /** Pointer to <code>quitModule</code> function */
-    ModuleQuitFunc m_pQuit;
+    quitModuleProc m_pQuit;
     
     /** Flags used to load module */
     DWORD m_dwFlags;
@@ -165,12 +163,12 @@ public:
     /**
      * Returns a pointer to this module's <code>quitModule</code> function.
      */
-    ModuleQuitFunc GetQuit() const { return m_pQuit; }
+    quitModuleProc GetQuit() const { return m_pQuit; }
     
     /**
      * Returns a pointer to this module's <code>initModuleEx</code> function.
      */
-    ModuleInitExFunc GetInitEx() const { return m_pInitEx; }
+    initModuleExProc GetInitEx() const { return m_pInitEx; }
 
 private:
 

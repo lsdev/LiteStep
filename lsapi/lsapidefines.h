@@ -180,8 +180,8 @@
 //---------------------------------------------------------
 // MODULE ENTRY POINTS DEFINES
 //---------------------------------------------------------
-typedef int (CDECL* ModuleInitExFunc)(HWND, HINSTANCE, LPCSTR);
-typedef int (CDECL* ModuleQuitFunc)(HINSTANCE);
+typedef int  (CDECL* initModuleExProc)(HWND, HINSTANCE, LPCSTR);
+typedef void (CDECL* quitModuleProc)(HINSTANCE);
 
 
 //---------------------------------------------------------

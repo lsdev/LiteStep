@@ -61,18 +61,18 @@ bool Module::_LoadDll()
         
         if (m_hInstance)
         {
-            m_pInitEx = (ModuleInitExFunc)GetProcAddress(m_hInstance, "initModuleEx");
+            m_pInitEx = (initModuleExProc)GetProcAddress(m_hInstance, "initModuleEx");
             
             if (!m_pInitEx) // Might be a BC module, check for underscore
             {
-                m_pInitEx = (ModuleInitExFunc)GetProcAddress(m_hInstance, "_initModuleEx");
+                m_pInitEx = (initModuleExProc)GetProcAddress(m_hInstance, "_initModuleEx");
             }
             
-            m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "quitModule");
+            m_pQuit = (quitModuleProc)GetProcAddress(m_hInstance, "quitModule");
             
             if (!m_pQuit)   // Might be a BC module, check for underscore
             {
-                m_pQuit = (ModuleQuitFunc)GetProcAddress(m_hInstance, "_quitModule");
+                m_pQuit = (quitModuleProc)GetProcAddress(m_hInstance, "_quitModule");
             }
             
             if (!m_pInitEx)
