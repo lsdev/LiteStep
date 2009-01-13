@@ -310,7 +310,7 @@ BOOL DDEWorker::_FindFiles(LPSTR pszPath, BOOL bFindFolder)
     BOOL bReturn = FALSE;
 
     PathUnquoteSpaces(pszPath);
-    LPITEMIDLIST pidl = ILCreateFromPath(pszPath);
+    PIDLIST_ABSOLUTE pidl = ILCreateFromPath(pszPath);
 
     if (pidl)
     {
