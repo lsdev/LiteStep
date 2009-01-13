@@ -77,12 +77,10 @@ EXEOBJS = \
 	$(OUTPUT)/DDEWorker.o \
 	$(OUTPUT)/litestep.o \
 	$(OUTPUT)/litestep.res \
-	$(OUTPUT)/localization.o \
 	$(OUTPUT)/MessageManager.o \
 	$(OUTPUT)/Module.o \
 	$(OUTPUT)/ModuleManager.o \
 	$(OUTPUT)/RecoveryMenu.o \
-	$(OUTPUT)/safeptr.o \
 	$(OUTPUT)/shellhlp.o \
 	$(OUTPUT)/StartupRunner.o \
 	$(OUTPUT)/TrayNotifyIcon.o \
@@ -107,7 +105,6 @@ DLLOBJS = \
 	$(OUTPUT)/BangManager.o \
 	$(OUTPUT)/bangs.o \
 	$(OUTPUT)/graphics.o \
-	$(OUTPUT)/localization.o \
 	$(OUTPUT)/lsapi.o \
 	$(OUTPUT)/lsapi.res \
 	$(OUTPUT)/lsapiInit.o \
@@ -119,7 +116,6 @@ DLLOBJS = \
 	$(OUTPUT)/MathToken.o \
 	$(OUTPUT)/MathValue.o \
 	$(OUTPUT)/png_support.o \
-	$(OUTPUT)/safeptr.o \
 	$(OUTPUT)/settings.o \
 	$(OUTPUT)/SettingsFileParser.o \
 	$(OUTPUT)/SettingsIterator.o \
@@ -178,8 +174,7 @@ $(OUTPUT)/DataStore.o: litestep/DataStore.cpp \
 	litestep/buildoptions.h \
 	lsapi/lsapidefines.h \
 	utility/common.h \
-	utility/debug.hpp \
-	utility/safeptr.h
+	utility/debug.hpp
 
 $(OUTPUT)/DDEService.o: litestep/DDEService.cpp \
 	litestep/buildoptions.h \
@@ -215,9 +210,6 @@ $(OUTPUT)/DDEWorker.o: litestep/DDEWorker.cpp \
 	utility/common.h \
 	utility/core.hpp \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h
 
 $(OUTPUT)/litestep.o: litestep/litestep.cpp \
@@ -250,10 +242,7 @@ $(OUTPUT)/litestep.o: litestep/litestep.cpp \
 	utility/ILiteStep.h \
 	utility/IManager.h \
 	utility/IService.h \
-	utility/localization.h \
 	utility/macros.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h
 
 $(OUTPUT)/MessageManager.o: litestep/MessageManager.cpp \
@@ -277,10 +266,7 @@ $(OUTPUT)/Module.o: litestep/Module.cpp \
 	utility/common.h \
 	utility/core.hpp \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/macros.h \
-	utility/safeptr.h \
-	utility/safestr.h
+	utility/macros.h
 
 $(OUTPUT)/ModuleManager.o: litestep/ModuleManager.cpp \
 	litestep/buildoptions.h \
@@ -296,10 +282,7 @@ $(OUTPUT)/ModuleManager.o: litestep/ModuleManager.cpp \
 	utility/debug.hpp \
 	utility/ILiteStep.h \
 	utility/IManager.h \
-	utility/localization.h \
-	utility/macros.h \
-	utility/safeptr.h \
-	utility/safestr.h
+	utility/macros.h
 
 $(OUTPUT)/RecoveryMenu.o: litestep/RecoveryMenu.cpp \
 	litestep/buildoptions.h \
@@ -321,9 +304,6 @@ $(OUTPUT)/StartupRunner.o: litestep/StartupRunner.cpp \
 	utility/common.h \
 	utility/core.hpp \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h
 
 $(OUTPUT)/TrayNotifyIcon.o: litestep/TrayNotifyIcon.cpp \
@@ -348,10 +328,7 @@ $(OUTPUT)/TrayService.o: litestep/TrayService.cpp \
 	utility/core.hpp \
 	utility/debug.hpp \
 	utility/IService.h \
-	utility/localization.h \
 	utility/macros.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h
 
 $(OUTPUT)/aboutbox.o: lsapi/aboutbox.cpp \
@@ -362,10 +339,7 @@ $(OUTPUT)/aboutbox.o: lsapi/aboutbox.cpp \
 	lsapi/lsmultimon.h \
 	utility/common.h \
 	utility/core.hpp \
-	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h
+	utility/debug.hpp
 
 $(OUTPUT)/BangCommand.o: lsapi/BangCommand.cpp \
 	litestep/buildoptions.h \
@@ -378,10 +352,7 @@ $(OUTPUT)/BangCommand.o: lsapi/BangCommand.cpp \
 	utility/Base.h \
 	utility/common.h \
 	utility/core.hpp \
-	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h
+	utility/debug.hpp
 
 $(OUTPUT)/BangManager.o: lsapi/BangManager.cpp \
 	litestep/buildoptions.h \
@@ -403,10 +374,7 @@ $(OUTPUT)/bangs.o: lsapi/bangs.cpp \
 	lsapi/lsmultimon.h \
 	utility/common.h \
 	utility/core.hpp \
-	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h
+	utility/debug.hpp
 
 $(OUTPUT)/graphics.o: lsapi/graphics.cpp \
 	litestep/buildoptions.h \
@@ -417,10 +385,7 @@ $(OUTPUT)/graphics.o: lsapi/graphics.cpp \
 	lsapi/png_support.h \
 	utility/common.h \
 	utility/core.hpp \
-	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h
+	utility/debug.hpp
 
 $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
 	litestep/buildoptions.h \
@@ -439,9 +404,6 @@ $(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
 	utility/core.hpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h \
 	utility/stringutility.h
 
@@ -463,9 +425,6 @@ $(OUTPUT)/lsapiInit.o: lsapi/lsapiInit.cpp \
 	utility/core.hpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h \
 	utility/stringutility.h
 
@@ -523,8 +482,7 @@ $(OUTPUT)/png_support.o: lsapi/png_support.cpp \
 	lsapi/lsapidefines.h \
 	lsapi/png_support.h \
 	utility/common.h \
-	utility/debug.hpp \
-	utility/safeptr.h
+	utility/debug.hpp
 
 $(OUTPUT)/settings.o: lsapi/settings.cpp \
 	litestep/buildoptions.h \
@@ -543,9 +501,6 @@ $(OUTPUT)/settings.o: lsapi/settings.cpp \
 	utility/core.hpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/stringutility.h
 
 $(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
@@ -560,9 +515,6 @@ $(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
 	utility/common.h \
 	utility/core.hpp \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/stringutility.h
 
 $(OUTPUT)/SettingsIterator.o: lsapi/SettingsIterator.cpp \
@@ -578,9 +530,6 @@ $(OUTPUT)/SettingsIterator.o: lsapi/SettingsIterator.cpp \
 	utility/core.hpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/stringutility.h
 
 $(OUTPUT)/SettingsManager.o: lsapi/SettingsManager.cpp \
@@ -598,9 +547,6 @@ $(OUTPUT)/SettingsManager.o: lsapi/SettingsManager.cpp \
 	utility/core.hpp \
 	utility/CriticalSection.h \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h \
 	utility/stringutility.h
 
@@ -612,22 +558,6 @@ $(OUTPUT)/stubs.o: lsapi/stubs.cpp \
 	utility/common.h \
 	utility/debug.hpp
 
-$(OUTPUT)/localization.o: utility/localization.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapidefines.h \
-	utility/common.h \
-	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h
-
-$(OUTPUT)/safeptr.o: utility/safeptr.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapidefines.h \
-	utility/common.h \
-	utility/debug.hpp \
-	utility/safeptr.h
-
 $(OUTPUT)/shellhlp.o: utility/shellhlp.cpp \
 	litestep/buildoptions.h \
 	litestep/resource.h \
@@ -637,7 +567,4 @@ $(OUTPUT)/shellhlp.o: utility/shellhlp.cpp \
 	utility/common.h \
 	utility/core.hpp \
 	utility/debug.hpp \
-	utility/localization.h \
-	utility/safeptr.h \
-	utility/safestr.h \
 	utility/shellhlp.h
