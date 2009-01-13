@@ -24,15 +24,6 @@
 #include "../utility/core.hpp"
 #include <regstr.h>
 
-#ifdef __GNUC__ // mingw
-enum RESTRICTIONS
-{
-    REST_NOLOCALMACHINERUN     = 0x40000046,
-    REST_NOCURRENTUSERRUN      = 0x40000047,
-    REST_NOLOCALMACHINERUNONCE = 0x40000048,
-    REST_NOCURRENTUSERRUNONCE  = 0x40000049
-};
-#endif
 
 #define ERK_NONE                0x0000
 #define ERK_RUNSUBKEYS          0x0001 // runs key and its subkeys
@@ -40,9 +31,6 @@ enum RESTRICTIONS
 #define ERK_WAITFOR_QUIT        0x0004 // wait until process exits
 #define ERK_WAITFOR_IDLE        0x0008 // wait until process waits for input
 
-#ifndef REGSTR_PATH_RUN_POLICY
-#  define REGSTR_PATH_RUN_POLICY  REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
-#endif
 
 StartupRunner::StartupRunner()
 {}

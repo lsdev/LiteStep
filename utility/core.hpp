@@ -39,6 +39,7 @@
 #define NO_SHLWAPI_STRFCNS
 #include <shlwapi.h>
 
+#include "fixup.h"
 #include "../lsapi/lsapi.h"
 
 #define STRSAFE_NO_DEPRECATE

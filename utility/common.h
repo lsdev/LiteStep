@@ -22,15 +22,11 @@
 #if !defined(COMMON_H)
 #define COMMON_H
 
-// Build options
-#include "../litestep/buildoptions.h"
+// _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
+#if defined (_WINDOWS_) || defined(_WINDOWS_H)
+#error Do not include Windows.h before this header
+#endif
 
-#ifdef _MSC_VER
-#if _MSC_VER == 1200 // VC 6.0
-#  pragma warning(disable: 4786) // STL naming warnings
-#  pragma warning(disable: 4503) // STL naming warnings
-#endif
-#endif
 
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT    0x0600
@@ -58,6 +54,7 @@
 
 #include <tchar.h>
 
+#include "../litestep/buildoptions.h"
 #include "debug.hpp"
 #include "../lsapi/lsapidefines.h"
 

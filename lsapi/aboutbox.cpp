@@ -260,12 +260,6 @@ BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
         (GetSystemMetrics(SM_CYSCREEN) - (rc.bottom - rc.top)) / 2,
         0, 0, SWP_NOSIZE);
 
-#ifdef __GNUC__
-    typedef void (WINAPI *STTWTYPE)(HWND, BOOL);
-
-    static STTWTYPE SwitchToThisWindow = (STTWTYPE)GetProcAddress(
-        GetModuleHandle("USER32.DLL"), "SwitchToThisWindow");
-#endif
     SwitchToThisWindow(hwndDialog, TRUE);
 
     // Set focus to the combo box
