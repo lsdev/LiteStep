@@ -27,7 +27,7 @@
 using std::string;
 
 
-SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, string szPath)
+SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, const string& szPath)
 {
     if (pSettingsMap)
     {

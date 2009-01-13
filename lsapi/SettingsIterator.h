@@ -40,7 +40,7 @@ public:
      * @param  pSettingsMap  SettingsMap to iterate over
      * @param  szPath        Path to configuration file
      */
-    SettingsIterator(SettingsMap* pSettingsMap, std::string szPath);
+    SettingsIterator(SettingsMap* pSettingsMap, const std::string& szPath);
     
     /**
      * Retrieve the next value.
