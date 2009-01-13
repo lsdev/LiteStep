@@ -83,11 +83,11 @@ HINSTANCE Bang::GetModule() const
     
     if (m_bEX)
     {
-        pAddress = m_bBangEX;
+        pAddress = (LPVOID)m_bBangEX;
     }
     else
     {
-        pAddress = m_bBang;
+        pAddress = (LPVOID)m_bBang;
     }
 
     //
