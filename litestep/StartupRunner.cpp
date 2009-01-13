@@ -21,8 +21,8 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "StartupRunner.h"
 #include "../utility/shellhlp.h"
-#include <regstr.h>
 #include "../utility/core.hpp"
+#include <regstr.h>
 
 #ifdef __GNUC__ // mingw
 enum RESTRICTIONS

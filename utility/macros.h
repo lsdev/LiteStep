@@ -22,7 +22,6 @@
 #if !defined(MACROS_H)
 #define MACROS_H
 
-#include "common.h"
 #include "../litestep/resource.h"
 #include "../lsapi/lsapi.h"
 

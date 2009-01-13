@@ -22,13 +22,13 @@
 #if !defined(SETTINGSMANAGER_H)
 #define SETTINGSMANAGER_H
 
-#include "../utility/common.h"
-#include "../utility/criticalsection.h"
-#include <string>
-#include <map>
-#include <set>
 #include "settingsdefines.h"
 #include "settingsiterator.h"
+#include "../utility/criticalsection.h"
+#include "../utility/common.h"
+#include <map>
+#include <set>
+#include <string>
 
 
 /**

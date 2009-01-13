@@ -32,7 +32,8 @@
 *
 */
 
-#include <windows.h>
+#include "../utility/common.h"
+
 
 //---------------------------------------------------------
 // MATCH.CPP DEFINES

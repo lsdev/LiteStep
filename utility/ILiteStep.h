@@ -22,7 +22,6 @@
 #if !defined(ILITESTEP_H)
 #define ILITESTEP_H
 
-#include "common.h"
 #include "Base.h"
 
 class ILiteStep : public CountedBase

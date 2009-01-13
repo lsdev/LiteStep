@@ -20,17 +20,12 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "TrayService.h"
-#include <regstr.h>
-#include <algorithm>
 #include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
+#include <algorithm>
 #include <docobj.h>
+#include <regstr.h>
 
-
-#ifdef __GNUC__
-using std::max;
-using std::min;
-#endif
 
 #if !defined(REGSTR_PATH_SHELLSERVICEOBJECTDELAYED)
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
@@ -1270,13 +1265,13 @@ void TrayService::modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
     {
     case ABE_LEFT:
     case ABE_RIGHT:
-        rcDst.top = max(rcDst.top, rcOrg.top);
-        rcDst.bottom = min(rcDst.bottom, rcOrg.bottom);
+        rcDst.top = std::max(rcDst.top, rcOrg.top);
+        rcDst.bottom = std::min(rcDst.bottom, rcOrg.bottom);
         break;
     case ABE_TOP:
     case ABE_BOTTOM:
-        rcDst.left = max(rcDst.left, rcOrg.left);
-        rcDst.right = min(rcDst.right, rcOrg.right);
+        rcDst.left = std::max(rcDst.left, rcOrg.left);
+        rcDst.right = std::min(rcDst.right, rcOrg.right);
         break;
     }
     

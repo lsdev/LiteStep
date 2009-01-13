@@ -22,9 +22,8 @@
 #if !defined(LITESTEP_H)
 #define LITESTEP_H
 
-#include "../utility/common.h"
 #include "../utility/ILiteStep.h"
-#include <string>
+#include "../utility/common.h"
 #include <vector>
 
 

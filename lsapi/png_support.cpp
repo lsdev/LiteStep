@@ -22,9 +22,9 @@
 #include "png_support.h"
 
 #ifdef LS_USE_PICOPNG
+#include "picopng.h"
 #include <vector>
 #include <fstream>
-#include "picopng.h"
 
 //designed for loading files from hard disk in an std::vector
 void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) 

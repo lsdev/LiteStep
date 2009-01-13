@@ -22,7 +22,6 @@
 #if !defined(SETTINGSDEFINES_H)
 #define SETTINGSDEFINES_H
 
-#include "../utility/common.h"
 #include "../utility/stringutility.h"
 #include <string>
 #include <map>

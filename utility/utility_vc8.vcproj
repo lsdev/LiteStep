@@ -204,6 +204,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fixup.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ILiteStep.h"
 				>
 			</File>

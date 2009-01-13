@@ -22,12 +22,12 @@
 #if !defined(MATHPARSER_H)
 #define MATHPARSER_H
 
-#include <string>
-#include <vector>
 #include "MathScanner.h"
 #include "MathToken.h"
 #include "MathValue.h"
 #include "SettingsDefines.h"
+#include <string>
+#include <vector>
 
 
 /** Vector of {@link MathValue} */

@@ -22,9 +22,9 @@
 #if !defined(MODULEMANAGER_H)
 #define MODULEMANAGER_H
 
-#include "../utility/common.h"
-#include "../utility/IManager.h"
 #include "module.h"
+#include "../utility/IManager.h"
+#include "../utility/common.h"
 #include <list>
 
 

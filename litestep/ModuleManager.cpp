@@ -20,9 +20,9 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "ModuleManager.h"
+#include "../utility/core.hpp"
 #include <algorithm>
 #include <vector>
-#include "../utility/core.hpp"
 
 
 ModuleManager::ModuleManager() : 

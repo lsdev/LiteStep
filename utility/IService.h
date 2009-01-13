@@ -22,10 +22,9 @@
 #if !defined(ISERVICE_H)
 #define ISERVICE_H
 
-#include "common.h"
 #include "Base.h"
 
-class IService: public CountedBase
+class IService : public CountedBase
 {
 public:
 	virtual HRESULT Start() = 0;

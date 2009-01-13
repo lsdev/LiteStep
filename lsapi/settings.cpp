@@ -20,8 +20,9 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "settingsmanager.h"
-#include "../utility/core.hpp"
 #include "lsapiInit.h"
+#include "../utility/core.hpp"
+
 
 FILE* LCOpen(LPCSTR pszPath)
 {

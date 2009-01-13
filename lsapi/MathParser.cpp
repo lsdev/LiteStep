@@ -19,24 +19,14 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include <algorithm>
-#include <cctype>
-#include <cfloat>
-#include <cmath>
-#include <cstring>
-#include <limits>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "MathParser.h"
 #include "MathEvaluate.h"
 #include "MathException.h"
-#include "MathParser.h"
-#include "MathScanner.h"
-#include "MathToken.h"
-#include "MathValue.h"
 #include "lsapiInit.h"
 #include "../utility/core.hpp"
-
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 using namespace std;
 

@@ -36,8 +36,6 @@
    J. Kercheval  Sun, 03/10/1991  20:37:11  beef up main()
    J. Kercheval  Tue, 03/12/1991  22:25:10  Released as V1.1 to Public Domain
 */
-#include "../utility/common.h"
-#include "lsapidefines.h"
 #include "lsapi.h"
 #include <locale>
 

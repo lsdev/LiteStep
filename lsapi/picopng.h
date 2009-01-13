@@ -22,6 +22,10 @@
 #if !defined(PICOPNG_H)
 #define PICOPNG_H
 
-int decodePNG(std::vector<unsigned char>& out_image_32bit, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, unsigned long in_size);
+#include <vector>
+
+int decodePNG(std::vector<unsigned char>& out_image_32bit,
+              unsigned long& image_width, unsigned long& image_height,
+              const unsigned char* in_png, unsigned long in_size);
 
 #endif // PICOPNG_H

@@ -19,13 +19,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#include "MathValue.h"
 #include <cassert>
 #include <cfloat>
 #include <cmath>
 #include <limits>
 #include <sstream>
-#include <string>
-#include "MathValue.h"
 
 using namespace std;
 

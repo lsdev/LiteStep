@@ -22,9 +22,9 @@
 #if !defined(MATHSCANNER_H)
 #define MATHSCANNER_H
 
+#include "MathToken.h"
 #include <sstream>
 #include <string>
-#include "MathToken.h"
 
 
 /**

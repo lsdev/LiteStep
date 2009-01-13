@@ -21,7 +21,6 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "BangCommand.h"
 #include "ThreadedBangCommand.h"
-#include "../utility/core.hpp"
 
 
 Bang::Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand) :

@@ -23,13 +23,8 @@
 #include "SettingsFileParser.h"
 #include "MathEvaluate.h"
 #include "../utility/macros.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
-#ifdef LS_COMPAT_MATH
-#include <string>
-using std::string;
-#endif // LS_COMPAT_MATH
 
 SettingsManager::SettingsManager()
 {
@@ -422,7 +417,7 @@ void SettingsManager::VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate
 #ifdef LS_COMPAT_MATH
                         else
                         {
-                            string result;
+                            std::string result;
                             
                             if (MathEvaluateString(m_SettingsMap, szVariable,
                                 result, recursiveVarSet,

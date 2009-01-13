@@ -21,8 +21,8 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "settingsiterator.h"
 #include "settingsmanager.h"
-#include <algorithm>
 #include "../utility/core.hpp"
+#include <algorithm>
 
 using std::string;
 

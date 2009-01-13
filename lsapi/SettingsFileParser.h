@@ -22,8 +22,8 @@
 #if !defined(SETTINGSFILEPARSER_H)
 #define SETTINGSFILEPARSER_H
 
-#include "../utility/common.h"
 #include "settingsdefines.h"
+#include "../utility/common.h"
 
 
 /**

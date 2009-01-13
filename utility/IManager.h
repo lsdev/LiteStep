@@ -22,11 +22,10 @@
 #if !defined(IMANAGER_H)
 #define IMANAGER_H
 
-#include "common.h"
 #include "Base.h"
 #include "ILiteStep.h"
 
-class IManager: public CountedBase
+class IManager : public CountedBase
 {
 public:
 	virtual HRESULT Start(ILiteStep *pILiteStep) = 0;

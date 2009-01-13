@@ -23,7 +23,6 @@
 #define MATHVALUE_H
 
 #include <string>
-#include <vector>
 
 
 /**

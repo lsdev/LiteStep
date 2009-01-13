@@ -20,32 +20,27 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "litestep.h"
-#include <WtsApi32.h>
-
-// Misc Helpers
-#include "RecoveryMenu.h"
-#include "StartupRunner.h"
-#include "../lsapi/lsapiInit.h"
-#include "../lsapi/ThreadedBangCommand.h"
-#include "../utility/macros.h"
-#include "../utility/shellhlp.h"
 
 // Services
 #include "DDEService.h"
 #include "DDEStub.h"
+#include "RecoveryMenu.h"
 #include "TrayService.h"
 
 // Managers
 #include "MessageManager.h"
 #include "ModuleManager.h"
 
-// Misc Helpers
+// Other
 #include "DataStore.h"
-
-// STL headers
-#include <algorithm>
-
+#include "StartupRunner.h"
+#include "../lsapi/lsapiInit.h"
+#include "../lsapi/ThreadedBangCommand.h"
+#include "../utility/macros.h"
+#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
+#include <algorithm>
+#include <WtsApi32.h>
 
 
 // namespace stuff

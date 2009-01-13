@@ -22,8 +22,8 @@
 #if !defined(MATHEVALUATE_H)
 #define MATHEVALUATE_H
 
-#include <string>
 #include "SettingsDefines.h"
+#include <string>
 
 
 /**

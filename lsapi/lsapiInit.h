@@ -22,9 +22,9 @@
 #if !defined(LSAPIINIT_H)
 #define LSAPIINIT_H
 
-#include "../utility/common.h"
 #include "BangManager.h"
 #include "SettingsManager.h"
+#include "../utility/common.h"
 
 enum ErrorType
 {

@@ -22,8 +22,8 @@
 #if !defined(BANGMANAGER_H)
 #define BANGMANAGER_H
 
-#include "../utility/common.h"
-#include "../lsapi/BangCommand.h"
+#include "BangCommand.h"
+#include "lsapidefines.h"
 #include "../utility/criticalsection.h"
 #include "../utility/stringutility.h"
 #include <map>

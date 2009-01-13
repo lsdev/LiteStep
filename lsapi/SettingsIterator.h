@@ -22,8 +22,8 @@
 #if !defined(SETTINGSITERATOR_H)
 #define SETTINGSITERATOR_H
 
-#include "../utility/common.h"
 #include "settingsdefines.h"
+#include "../utility/common.h"
 
 
 /**

@@ -32,10 +32,10 @@
  *
  */
 
-#include "../utility/common.h"
-#include <stdio.h>
 #include "lsapidefines.h"
 #include "lsmultimon.h"
+#include "../utility/common.h"
+#include <stdio.h>
 
 
 #ifdef LSAPI_INTERNAL /* only defined when compiling lsapi */
