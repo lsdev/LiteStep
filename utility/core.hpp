@@ -41,6 +41,7 @@
 
 #include "../lsapi/lsapi.h"
 
+#define STRSAFE_NO_DEPRECATE
 #include <strsafe.h>
 
 #endif // CORE_HPP
