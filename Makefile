@@ -84,7 +84,8 @@ EXEOBJS = \
 	$(OUTPUT)/shellhlp.o \
 	$(OUTPUT)/StartupRunner.o \
 	$(OUTPUT)/TrayNotifyIcon.o \
-	$(OUTPUT)/TrayService.o
+	$(OUTPUT)/TrayService.o \
+    $(OUTPUT)/WinMain.o
 
 # Path to lsapi.dll
 DLL = $(OUTPUT)/lsapi.dll
@@ -115,6 +116,7 @@ DLLOBJS = \
 	$(OUTPUT)/MathScanner.o \
 	$(OUTPUT)/MathToken.o \
 	$(OUTPUT)/MathValue.o \
+	$(OUTPUT)/picopng.o \
 	$(OUTPUT)/png_support.o \
 	$(OUTPUT)/settings.o \
 	$(OUTPUT)/SettingsFileParser.o \
@@ -154,7 +156,7 @@ clean:
 	-$(RM) $(OUTPUT)/*.res
 
 # Resources for litestep.exe
-$(OUTPUT)/litestep.res: litestep/litestep.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico
+$(OUTPUT)/litestep.res: litestep/litestep.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico litestep/litestep.manifest
 	$(RC) -Ilitestep $(RCFLAGS) -o $@ $<
 
 # Resources for lsapi.dll
@@ -187,7 +189,6 @@ $(OUTPUT)/DDEService.o: litestep/DDEService.cpp \
 	utility/common.h \
 	utility/debug.hpp \
 	utility/IService.h \
-	utility/safestr.h \
 	utility/shellhlp.h
 
 $(OUTPUT)/DDEStub.o: litestep/DDEStub.cpp \
@@ -197,8 +198,7 @@ $(OUTPUT)/DDEStub.o: litestep/DDEStub.cpp \
 	utility/Base.h \
 	utility/common.h \
 	utility/debug.hpp \
-	utility/IService.h \
-	utility/safestr.h
+	utility/IService.h
 
 $(OUTPUT)/DDEWorker.o: litestep/DDEWorker.cpp \
 	litestep/buildoptions.h \
@@ -311,8 +311,7 @@ $(OUTPUT)/TrayNotifyIcon.o: litestep/TrayNotifyIcon.cpp \
 	litestep/TrayNotifyIcon.h \
 	lsapi/lsapidefines.h \
 	utility/common.h \
-	utility/debug.hpp \
-	utility/safestr.h
+	utility/debug.hpp
 
 $(OUTPUT)/TrayService.o: litestep/TrayService.cpp \
 	litestep/buildoptions.h \
@@ -330,6 +329,12 @@ $(OUTPUT)/TrayService.o: litestep/TrayService.cpp \
 	utility/IService.h \
 	utility/macros.h \
 	utility/shellhlp.h
+
+$(OUTPUT)/WinMain.o: litestep/WinMain.cpp \
+	litestep/litestep.h \
+	utility/macros.h \
+	utility/shellhlp.h \
+	utility/core.hpp
 
 $(OUTPUT)/aboutbox.o: lsapi/aboutbox.cpp \
 	litestep/buildoptions.h \
@@ -476,6 +481,9 @@ $(OUTPUT)/MathToken.o: lsapi/MathToken.cpp \
 
 $(OUTPUT)/MathValue.o: lsapi/MathValue.cpp \
 	lsapi/MathValue.h
+
+$(OUTPUT)/picopng.o: lsapi/picopng.cpp \
+	litestep/buildoptions.h
 
 $(OUTPUT)/png_support.o: lsapi/png_support.cpp \
 	litestep/buildoptions.h \

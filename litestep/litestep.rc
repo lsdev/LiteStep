@@ -66,6 +66,16 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // remains consistent on all systems.
 IDI_LS                  ICON                    "litestep.ico"
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Manifest
+//
+#ifdef __GNUC__
+CREATEPROCESS_MANIFEST_RESOURCE_ID  RT_MANIFEST "litestep.manifest"
+#endif
+
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
