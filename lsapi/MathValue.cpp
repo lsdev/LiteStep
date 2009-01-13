@@ -20,7 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "MathValue.h"
-#include <cassert>
+#include "../utility/debug.hpp"
 #include <cfloat>
 #include <cmath>
 #include <limits>
@@ -155,7 +155,7 @@ bool MathValue::ToBoolean() const
     }
     
     // Should never happen
-    assert(false);
+    ASSERT(false);
     return false;
 }
 
@@ -185,7 +185,7 @@ double MathValue::ToNumber() const
     }
     
     // Should never happen
-    assert(false);
+    ASSERT(false);
     return 0.0;
 }
 
@@ -208,7 +208,7 @@ string MathValue::ToString() const
     }
     
     // Should never happen
-    assert(false);
+    ASSERT(false);
     return string();
 }
 
