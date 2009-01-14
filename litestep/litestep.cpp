@@ -982,15 +982,29 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             {
                 WORD wHookCode  = (LOWORD(wParam) & 0x00FF);
                 WORD wExtraBits = (LOWORD(wParam) & 0xFF00);
-
-                // most shell hook messages pass an HWND as lParam
-                HWND hWndMessage = (HWND)lParam;
-
+                
                 // Convert to an LM_SHELLHOOK message
-                uMsg   = LM_SHELLHOOK + wHookCode;
-                wParam = (WPARAM)hWndMessage;
-                lParam = wExtraBits;
-
+                uMsg = LM_SHELLHOOK + wHookCode;
+                
+                if (uMsg == LM_APPCOMMAND)
+                {
+                    wParam = NULL;
+                    lParam = lParam; // no change
+                }
+                else if (uMsg == LM_MINMAXWIN)
+                {
+                    SHELLHOOKINFO* pshi = (SHELLHOOKINFO*)wParam;
+                    
+                    lParam = (LPARAM)&pshi->rc
+                    wParam = (WPARAM)pshi->hwnd;
+                }
+                else
+                {
+                    wParam = (WPARAM)lParam;
+                    lParam = (LPARAM)wExtraBits;
+                }
+                
+                // Handle fullscreen windows
                 if (uMsg == LM_WINDOWACTIVATED)
                 {
                     /*
@@ -1005,7 +1019,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                      */
                     bool bFullScreenNow = (lParam & HSHELL_HIGHBIT) &&
                         _IsFullScreenActiveOnPrimaryMonitor();
-
+                    
                     if (m_bAppIsFullScreen != bFullScreenNow)
                     {
                         _HandleFullScreenApp(bFullScreenNow);
