@@ -901,11 +901,31 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
             if (uMsg == WM_ShellHook)
             {
-                HWND hWndMessage = (HWND)lParam;
-                uMsg = (LOWORD(wParam) & 0x00FF) + 9500;
-                lParam = (LOWORD(wParam) & 0xFF00);
-                wParam = (WPARAM)hWndMessage;
+                WORD wHookCode  = (LOWORD(wParam) & 0x00FF);
+                WORD wExtraBits = (LOWORD(wParam) & 0xFF00);
                 
+                // Convert to an LM_SHELLHOOK message
+                uMsg = 9500 + wHookCode;
+                
+                if (uMsg == LM_APPCOMMAND)
+                {
+                    wParam = NULL;
+                    lParam = lParam; // no change
+                }
+                else if (uMsg == LM_MINMAXWIN)
+                {
+                    SHELLHOOKINFO* pshi = (SHELLHOOKINFO*)wParam;
+                    
+                    lParam = (LPARAM)&pshi->rc;
+                    wParam = (WPARAM)pshi->hwnd;
+                }
+                else
+                {
+                    wParam = (WPARAM)lParam;
+                    lParam = (LPARAM)wExtraBits;
+                }
+                
+                // Handle fullscreen windows
                 if (uMsg == LM_WINDOWACTIVATED)
                 {
                     /*
@@ -923,14 +943,14 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     
                     if (m_bRudeAppBit && !m_bAppIsFullScreen)
                     {
-                        if (_IsFullScreenActive(hWndMessage))
+                        if (_IsFullScreenActive((HWND)wParam))
                         { 
                             _HandleFullScreenApp(true);
                         }
                     }
                     else if (m_bAppIsFullScreen)
                     {
-                        if (!m_bRudeAppBit || !_IsFullScreenActive(hWndMessage))
+                        if (!m_bRudeAppBit || !_IsFullScreenActive((HWND)wParam))
                         {
                             _HandleFullScreenApp(false);
                         }
