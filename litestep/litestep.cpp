@@ -995,7 +995,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     SHELLHOOKINFO* pshi = (SHELLHOOKINFO*)wParam;
                     
-                    lParam = (LPARAM)&pshi->rc
+                    lParam = (LPARAM)&pshi->rc;
                     wParam = (WPARAM)pshi->hwnd;
                 }
                 else
