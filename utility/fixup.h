@@ -38,6 +38,7 @@
 #endif
 
 #ifdef _MSC_VER
+// Generic MSVC fixup for all PSDK versions
 #  define FIXUP_MSVC
 #endif
 
@@ -78,6 +79,10 @@ enum RESTRICTIONS
 #  define SETWALLPAPER_DEFAULT      ((LPWSTR)-1)
 
 #  define REGSTR_PATH_RUN_POLICY    REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
+
+#  ifndef SM_SERVERR2
+#    define SM_SERVERR2     89
+#  endif
 
 // Shell types
 typedef LPITEMIDLIST                PIDLIST_ABSOLUTE;
@@ -158,14 +163,17 @@ typedef BOOL             (WINAPI* SHUnlockShared_t)(LPVOID lpData);
 typedef BOOL             (WINAPI* IsOS_t)(DWORD);
 
 
-DEFINE_DYNFUNC    (SHFindFiles,         "shell32.dll");
-DEFINE_DYNFUNC_STR(ILCreateFromPath,    "shell32.dll", "ILCreateFromPathA");
-
 DEFINE_DYNFUNC_ORD(SHLockShared,        "shlwapi.dll", 8);
 DEFINE_DYNFUNC_ORD(SHUnlockShared,      "shlwapi.dll", 9);
 DEFINE_DYNFUNC_ORD(IsOS,                "shlwapi.dll", 437);
 
 #endif // FIXUP_OLD_HEADERS
+
+
+#ifdef FIXUP_MINGW
+DEFINE_DYNFUNC    (SHFindFiles,         "shell32.dll");
+DEFINE_DYNFUNC_STR(ILCreateFromPath,    "shell32.dll", "ILCreateFromPathA");
+#endif // FIXUP_MINGW
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
