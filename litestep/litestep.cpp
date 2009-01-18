@@ -448,6 +448,8 @@ HRESULT CLiteStep::Stop()
 //
 int CLiteStep::Run()
 {
+    TRACE("Entering main message loop.");
+
     int nReturn = 0;
     MSG message = { 0 };
 
@@ -461,6 +463,9 @@ int CLiteStep::Run()
     {
         MessageHandler(message);
     }
+
+    TRACE("Left main message loop. Last message: 0x%.4X (%u, %u)",
+        message.message, message.wParam, message.lParam);
 
     if (message.message == WM_QUIT)
     {

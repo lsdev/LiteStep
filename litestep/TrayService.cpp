@@ -540,6 +540,9 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             
         case WM_SETTINGCHANGE:
             {
+                TRACE("WM_SETTINGCHANGE(%.4X, \"%s\")",
+                    wParam, (LPCTSTR)lParam);
+
                 if(SPI_SETWORKAREA == wParam)
                 {
                     RECT rc;
@@ -579,6 +582,11 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             break;
             
         default:
+            if (uMsg >= WM_USER)
+            {
+                DbgTraceWindowMessage("Shell_TrayWnd", uMsg, wParam, lParam);
+            }
+
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
         

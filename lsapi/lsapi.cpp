@@ -147,7 +147,10 @@ BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 //
 BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
 {
-	char szExpandedArgs[MAX_LINE_LENGTH] = { 0 };
+    TRACE("ParseBangCommand(%.8X, \"%s\", \"%s\");",
+        hCaller, pszCommand, pszArgs);
+
+    char szExpandedArgs[MAX_LINE_LENGTH] = { 0 };
 	BOOL bReturn = FALSE;
 
 	if (pszCommand != NULL)
@@ -208,6 +211,10 @@ HINSTANCE LSExecuteEx(HWND hOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCST
 		}
 		else
 		{
+            TRACE("LSExecuteEx(%.8X, \"%s\", \"%s\", \"%s\", \"%s\", %d);",
+                hOwner, pszOperation, pszCommand, pszArgs,pszDirectory,
+                nShowCmd);
+
 			if (PathIsDirectory(pszCommand))
 			{
 				hReturn = LSShellExecute(hOwner, pszOperation, pszCommand,

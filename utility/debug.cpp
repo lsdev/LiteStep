@@ -50,6 +50,51 @@ void DbgTraceMessage(const char* pszFormat, ...)
 }
 
 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// DbgTraceWindowMessage
+//
+#ifdef TRACE_ENABLED
+void DbgTraceWindowMessage(const char* pszPrefix, UINT uMsg,
+                           WPARAM wParam, LPARAM lParam)
+{
+    if (uMsg < WM_USER)
+    {
+        TRACE("[%s] WM_%.4X(%.8X, %.8X)",
+            pszPrefix, uMsg, wParam, lParam);
+    }
+    else if (uMsg >= WM_USER && uMsg <= (WM_APP-1))
+    {
+        TRACE("[%s] WM_USER+%u(%.8X, %.8X)",
+            pszPrefix, uMsg-WM_USER, wParam, lParam);
+    }
+    else if (uMsg >= WM_APP && uMsg <= (MAXINTATOM-1))
+    {
+        TRACE("[%s] WM_APP+%u(%.8X, %.8X)",
+            pszPrefix, uMsg-WM_APP, wParam, lParam);
+    }
+    else if (uMsg >= MAXINTATOM)
+    {
+        TCHAR szMsgName[MAX_PATH] = { 0 };
+
+        // GetClipboardFormatName retrieves the name of
+        // registered window messages too!
+        if (GetClipboardFormatName(
+            uMsg, szMsgName, COUNTOF(szMsgName)) > 0)
+        {
+            TRACE("[%s] WM_'%s'(%.8X, %.8X)",
+                pszPrefix, szMsgName, wParam, lParam);
+        }
+        else
+        {
+            TRACE("[%s] WM_%.8X(%.8X, %.8X)",
+                pszPrefix, uMsg, wParam, lParam);
+        }
+    }
+}
+#endif // #TRACE_ENABLED
+
+
 #ifdef MSVC_DEBUG
 
 #define MS_VC_EXCEPTION 0x406D1388
