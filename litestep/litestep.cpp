@@ -1025,7 +1025,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 }
                 
                 // Handle fullscreen windows
-                if (uMsg == LM_WINDOWACTIVATED)
+                if (uMsg == LM_WINDOWACTIVATED || uMsg == LM_WINDOWDESTROYED)
                 {
                     //
                     // Note: The ShellHook will always set the HighBit when there
