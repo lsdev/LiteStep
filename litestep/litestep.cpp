@@ -1353,8 +1353,8 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
     }
     
     HMONITOR hMonFS = LSMonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
-    RECT rScreen;
-    RECT rWorkArea;
+    RECT rScreen = {0};
+    RECT rWorkArea = {0};
     
     if(hMonFS)
     {
