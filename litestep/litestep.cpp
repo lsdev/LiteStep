@@ -1351,13 +1351,52 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
     {
         return false;
     }
-
-    RECT rScreen = {0};
-    rScreen.right = GetSystemMetrics(SM_CXSCREEN);
-    rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-
+    
+    HMONITOR hMonFS = LSMonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
+    RECT rScreen;
+    RECT rWorkArea;
+    
+    if(hMonFS)
+    {
+        MONITORINFO miFS;
+        miFS.cbSize = sizeof(MONITORINFO);
+        
+        if(LSGetMonitorInfo(hMonFS, &miFS))
+        {
+            VERIFY(CopyRect(&rScreen, &miFS.rcMonitor));
+            VERIFY(CopyRect(&rWorkArea, &miFS.rcWork));
+        }
+        else
+        {
+            hMonFS = NULL;
+        }
+    }
+    
+    if(!hMonFS)
+    {
+        rScreen.left = 0;
+        rScreen.top = 0;
+        rScreen.right = GetSystemMetrics(SM_CXSCREEN);
+        rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+        
+        VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWorkArea, 0));
+    }
+    
     RECT rWnd;
     VERIFY(GetClientRect(hWnd, &rWnd));
+    
+    LONG width, height;
+    width = rWnd.right - rWnd.left;
+    height = rWnd.bottom - rWnd.top;
+    
+    POINT pt = {rWnd.left, rWnd.top};
+    VERIFY(ClientToScreen(hWnd, &pt));
+    
+    rWnd.left = pt.x;
+    rWnd.top = pt.y;
+    rWnd.right = pt.x + width;
+    rWnd.bottom = pt.y + height;
+    
     // If the client area is the size of the screen, then consider it to be
     // a full screen window.
     if (EqualRect(&rScreen, &rWnd))
@@ -1395,9 +1434,7 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
             // coordinates are workspace coordinates and we must fix this.
             if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
             {
-                RECT rWA;
-                VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0));
-                VERIFY(OffsetRect(&rWnd, rWA.left, rWA.top));
+                VERIFY(OffsetRect(&rWnd, rWorkArea.left, rWorkArea.top));
             }
         }
 
