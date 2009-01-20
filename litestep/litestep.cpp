@@ -1254,6 +1254,19 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
 
     RECT rWnd;
     VERIFY(GetClientRect(hWnd, &rWnd));
+    
+    LONG width, height;
+    width = rWnd.right - rWnd.left;
+    height = rWnd.bottom - rWnd.top;
+    
+    POINT pt = {rWnd.left, rWnd.top};
+    VERIFY(ClientToScreen(hWnd, &pt));
+    
+    rWnd.left = pt.x;
+    rWnd.top = pt.y;
+    rWnd.right = pt.x + width;
+    rWnd.bottom = pt.y + height;
+    
     // If the client area is the size of the screen, then consider it to be
     // a full screen window.
     if (EqualRect(&rScreen, &rWnd))
