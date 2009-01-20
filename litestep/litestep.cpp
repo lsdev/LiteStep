@@ -914,10 +914,10 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 }
                 else if (uMsg == LM_GETMINRECT)
                 {
-                    SHELLHOOKINFO* pshi = (SHELLHOOKINFO*)wParam;
+                    SHELLHOOKINFO* pshi = (SHELLHOOKINFO*)lParam;
                     
-                    lParam = (LPARAM)&pshi->rc;
                     wParam = (WPARAM)pshi->hwnd;
+                    lParam = (LPARAM)&pshi->rc;
                 }
                 else
                 {
