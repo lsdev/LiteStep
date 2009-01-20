@@ -696,7 +696,10 @@ void TrimLeft(char* pszToTrim)
 
 // Formats a byte count into a string suitable for display to the user
 //
-LPCSTR units[] = { "bytes", "KB", "MB", "GB", "TB", "PB" };
+// Note: Max value of stBytes is 4 GB, so no need to be concerned of
+//       overrunning units[] index.
+//
+LPCSTR units[] = { "bytes", "KB", "MB", "GB" };
 
 void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 {
@@ -709,6 +712,18 @@ void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
 		++uUnit;
 	}
 
-	StringCchPrintf(pszBuffer, cchBuffer,
-        "%d %s", (int)floor(dValue + 0.5), units[uUnit]);
+	if(uUnit == 3)
+	{
+		StringCchPrintf(
+			pszBuffer, cchBuffer,
+			"%.2f %s",
+			dValue, units[uUnit]);
+	}
+	else
+	{
+		StringCchPrintf(
+			pszBuffer, cchBuffer,
+			"%d %s",
+			(int)floor(dValue + 0.5), units[uUnit]);
+	}
 }
