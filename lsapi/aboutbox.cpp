@@ -591,17 +591,45 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
-	// memory information
-	MEMORYSTATUS ms;
-	ms.dwLength = sizeof(MEMORYSTATUS);
-	GlobalMemoryStatus(&ms);
+	// memory status information
+	DWORD dwMemoryLoad, dwTotalPhys, dwAvailPhys, dwTotalPageFile, dwAvailPageFile;
+
+	typedef BOOL (WINAPI *GMSExFunctionType)(LPMEMORYSTATUSEX);
+
+	GMSExFunctionType fpGlobalMemoryStatusEx = (GMSExFunctionType)GetProcAddress(
+		GetModuleHandle("KERNEL32.DLL"), "GlobalMemoryStatusEx");
+
+	if(fpGlobalMemoryStatusEx)
+	{
+		MEMORYSTATUSEX ms;
+		ms.dwLength = sizeof(MEMORYSTATUSEX);
+		fpGlobalMemoryStatusEx(&ms);
+
+		dwMemoryLoad = ms.dwMemoryLoad;
+		dwTotalPhys = ms.ullTotalPhys > MAXDWORD ? MAXDWORD : (DWORD)ms.ullTotalPhys;
+		dwAvailPhys = ms.ullAvailPhys > MAXDWORD ? MAXDWORD : (DWORD)ms.ullAvailPhys;
+		dwTotalPageFile = ms.ullTotalPageFile > MAXDWORD ? MAXDWORD : (DWORD)ms.ullTotalPageFile;
+		dwAvailPageFile = ms.ullAvailPageFile > MAXDWORD ? MAXDWORD : (DWORD)ms.ullAvailPageFile;
+	}
+	else
+	{
+		MEMORYSTATUS ms;
+		ms.dwLength = sizeof(MEMORYSTATUS);
+		GlobalMemoryStatus(&ms);
+
+		dwMemoryLoad = ms.dwMemoryLoad;
+		dwTotalPhys = ms.dwTotalPhys;
+		dwAvailPhys = ms.dwAvailPhys;
+		dwTotalPageFile = ms.dwTotalPageFile;
+		dwAvailPageFile = ms.dwAvailPageFile;
+	}
 
 	itemInfo.iItem = i;
 	itemInfo.pszText = "Memory Load";
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	StringCchPrintf(buffer, MAX_PATH, "%d%%", ms.dwMemoryLoad);
+	StringCchPrintf(buffer, MAX_PATH, "%d%%", dwMemoryLoad);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 	itemInfo.iItem = i;
@@ -609,7 +637,7 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	FormatBytes(ms.dwTotalPhys, buffer, 64);
+	FormatBytes(dwTotalPhys, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 	itemInfo.iItem = i;
@@ -617,7 +645,7 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	FormatBytes(ms.dwAvailPhys, buffer, 64);
+	FormatBytes(dwAvailPhys, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 	itemInfo.iItem = i;
@@ -625,7 +653,7 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	FormatBytes(ms.dwTotalPageFile, buffer, 64);
+	FormatBytes(dwTotalPageFile, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 	itemInfo.iItem = i;
@@ -633,7 +661,7 @@ void AboutSysInfo(HWND hListView)
 
 	ListView_InsertItem(hListView, &itemInfo);
 
-	FormatBytes(ms.dwAvailPageFile, buffer, 64);
+	FormatBytes(dwAvailPageFile, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
 }
