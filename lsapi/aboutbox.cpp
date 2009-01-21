@@ -561,7 +561,11 @@ void AboutSysInfo(HWND hListView)
 	}
 	else
 	{
-		if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1))
+		if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 2))
+        {
+            StringCchCopy(buffer, MAX_PATH, "Windows 2003");
+        }
+		else if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1))
         {
             StringCchCopy(buffer, MAX_PATH, "Windows XP");
         }
