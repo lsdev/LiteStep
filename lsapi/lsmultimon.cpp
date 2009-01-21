@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "lsmultimon.h"
+#include "../utility/core.hpp"
 
 int (WINAPI* g_pfnGetSystemMetrics)(int) = NULL;
 HMONITOR (WINAPI* g_pfnMonitorFromWindow)(HWND, DWORD) = NULL;
