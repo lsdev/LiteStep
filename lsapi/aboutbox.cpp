@@ -231,7 +231,8 @@ BOOL WINAPI AboutBoxProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
             g_hAboutbox = hWnd;
 
 			// set title font
-			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
+			HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false); //win98+
+			if(!hTitleFont) hTitleFont = CreateSimpleFont("Arial", 14, false); //win95
 			SendDlgItemMessage(hWnd, IDC_TITLE, WM_SETFONT,
                 (WPARAM)hTitleFont, FALSE);
 
