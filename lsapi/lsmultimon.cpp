@@ -128,11 +128,19 @@ HMONITOR LSMonitorFromRect(LPCRECT lprcScreenCoords, DWORD dwFlags)
 	if (InitMultipleMonitorStubs())
 		return g_pfnMonitorFromRect(lprcScreenCoords, dwFlags);
 
-	if ((dwFlags & (MONITOR_DEFAULTTOPRIMARY | MONITOR_DEFAULTTONEAREST)) ||
-	        ((lprcScreenCoords->right > 0) &&
-	         (lprcScreenCoords->bottom > 0) &&
-	         (lprcScreenCoords->left < GetSystemMetrics(SM_CXSCREEN)) &&
-	         (lprcScreenCoords->top < GetSystemMetrics(SM_CYSCREEN))))
+	if (dwFlags & (MONITOR_DEFAULTTOPRIMARY | MONITOR_DEFAULTTONEAREST))
+	{
+		return xPRIMARY_MONITOR;
+	}
+
+	RECT rScreen;
+	rScreen.left = 0;
+	rScreen.top = 0;
+	rScreen.right = GetSystemMetrics(SM_CXSCREEN);
+	rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+
+	RECT rDummy;
+	if(IntersectRect(&rDummy, &rScreen, lprcScreenCoords))
 	{
 		return xPRIMARY_MONITOR;
 	}
@@ -142,23 +150,39 @@ HMONITOR LSMonitorFromRect(LPCRECT lprcScreenCoords, DWORD dwFlags)
 
 HMONITOR LSMonitorFromWindow(HWND hWnd, DWORD dwFlags)
 {
-	WINDOWPLACEMENT wp;
-
 	if (InitMultipleMonitorStubs())
 		return g_pfnMonitorFromWindow(hWnd, dwFlags);
 
 	if (dwFlags & (MONITOR_DEFAULTTOPRIMARY | MONITOR_DEFAULTTONEAREST))
 		return xPRIMARY_MONITOR;
 
-	if (IsIconic(hWnd) ?
-	        GetWindowPlacement(hWnd, &wp) :
-	        GetWindowRect(hWnd, &wp.rcNormalPosition))
-	{
+	RECT rWnd = {0};
 
-		return LSMonitorFromRect(&wp.rcNormalPosition, dwFlags);
+	if (IsIconic(hWnd))
+	{
+		WINDOWPLACEMENT wp;
+		wp.length = sizeof(WINDOWPLACEMENT);
+
+		if(GetWindowPlacement(hWnd, &wp))
+		{
+			// If the window does not have WS_EX_TOOLWINDOW set then the
+			// coordinates are workspace coordinates and we must fix this.
+			if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
+			{
+				RECT rWA;
+				SystemParametersInfo(SPI_GETWORKAREA, 0, &rWA, 0);
+				OffsetRect(&wp.rcNormalPosition, rWA.left, rWA.top);
+			}
+
+			CopyRect(&rWnd, &wp.rcNormalPosition);
+		}
+	}
+	else
+	{
+		GetWindowRect(hWnd, &rWnd);
 	}
 
-	return NULL;
+	return LSMonitorFromRect(&rWnd, dwFlags);
 }
 
 BOOL LSGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpMonitorInfo)
