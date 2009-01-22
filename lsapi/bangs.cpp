@@ -426,10 +426,16 @@ void BangHideModules(HWND hCaller, LPCSTR /* pszArgs */)
 {
 	EMPCONFIG EMPCfg = {0};
 
-	// A hack to support hiding modules only on a certain monitor.
+	// A hack to support hiding modules on a specific monitor.
 	if (NULL != hCaller && !IsWindow(hCaller))
 	{
-		EMPCfg.hMon = (HMONITOR)hCaller;
+		// Check to see if this is a valid monitor handle
+		MONITORINFO mi;
+		mi.cbSize = sizeof(MONITORINFO);
+		if (LSGetMonitorInfo((HMONITOR)hCaller, &mi))
+		{
+			EMPCfg.hMon = (HMONITOR)hCaller;
+		}
 	}
 	EMPCfg.uMode = EMP_HIDE;
 
