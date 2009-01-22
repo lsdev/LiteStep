@@ -182,7 +182,11 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
             {
                 LPCWSTR pwzSrc = ((NID_5W*)(pnidSource))->szTip;
 
-                int nReturn = WideCharToMultiByte(CP_ACP, 0, pwzSrc, 128,
+                WCHAR szTemp[128];
+                memcpy(szTemp, pwzSrc, sizeof(WCHAR)*128);
+                szTemp[127] = 0;
+
+                int nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
                     m_szTip, TRAY_MAX_TIP_LENGTH, NULL, NULL);
 
                 if (!nReturn)
@@ -196,7 +200,11 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
             {
                 LPCWSTR pwzSrc = ((NID_4W*)(pnidSource))->szTip;
 
-                int nReturn = WideCharToMultiByte(CP_ACP, 0, pwzSrc, 64,
+                WCHAR szTemp[64];
+                memcpy(szTemp, pwzSrc, sizeof(WCHAR)*64);
+                szTemp[63] = 0;
+
+                int nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
                     m_szTip, TRAY_MAX_TIP_LENGTH, NULL, NULL);
 
                 if (!nReturn)

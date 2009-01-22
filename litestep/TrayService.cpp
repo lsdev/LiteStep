@@ -1683,8 +1683,11 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
                 NID_5W* pnid = (NID_5W*)&nid;
                 
                 int nReturn;
+                WCHAR szTemp[256];
                 
-                nReturn = WideCharToMultiByte(CP_ACP, 0, pnid->szInfo, 256,
+                memcpy(szTemp, pnid->szInfo, sizeof(WCHAR)*256);
+                szTemp[255] = 0;
+                nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
                     lsnid.szInfo, TRAY_MAX_INFO_LENGTH, NULL, NULL);
                 
                 if(!nReturn)
@@ -1692,7 +1695,9 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
                     lsnid.szInfo[0] = 0;
                 }
                 
-                nReturn = WideCharToMultiByte(CP_ACP, 0, pnid->szInfoTitle, 64,
+                memcpy(szTemp, pnid->szInfoTitle, sizeof(WCHAR)*64);
+                szTemp[63] = 0;
+                nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
                     lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, NULL, NULL);
                 
                 if(!nReturn)
