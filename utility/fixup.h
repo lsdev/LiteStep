@@ -155,9 +155,6 @@ public:
 //
 #ifdef FIXUP_OLD_HEADERS
 
-typedef BOOL             (WINAPI* SHFindFiles_t)(PCIDLIST_ABSOLUTE pidlFolder, PCIDLIST_ABSOLUTE pidlSaveFile);
-typedef PIDLIST_ABSOLUTE (WINAPI* ILCreateFromPath_t)(LPCSTR pszPath);
-
 typedef LPVOID           (WINAPI* SHLockShared_t)(HANDLE hData, DWORD dwProcessId);
 typedef BOOL             (WINAPI* SHUnlockShared_t)(LPVOID lpData);
 typedef BOOL             (WINAPI* IsOS_t)(DWORD);
@@ -171,8 +168,13 @@ DEFINE_DYNFUNC_ORD(IsOS,                "shlwapi.dll", 437);
 
 
 #ifdef FIXUP_MINGW
+
+typedef BOOL             (WINAPI* SHFindFiles_t)(PCIDLIST_ABSOLUTE pidlFolder, PCIDLIST_ABSOLUTE pidlSaveFile);
+typedef PIDLIST_ABSOLUTE (WINAPI* ILCreateFromPath_t)(LPCSTR pszPath);
+
 DEFINE_DYNFUNC    (SHFindFiles,         "shell32.dll");
 DEFINE_DYNFUNC_STR(ILCreateFromPath,    "shell32.dll", "ILCreateFromPathA");
+
 #endif // FIXUP_MINGW
 
 
