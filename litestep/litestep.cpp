@@ -640,14 +640,14 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		case WM_TIMER:
 		{
-			if (LT_RUDEAPP == wParam && m_bRudeAppBit)
+			if (LT_RUDEAPP == wParam)
 			{
+				KillTimer(hWnd, wParam);
 				if (m_bAppIsFullScreen != \
 					_IsFullScreenActive(GetForegroundWindow()))
 				{ 
 					_HandleFullScreenApp(!m_bAppIsFullScreen);
 				}
-				KillTimer(hWnd, wParam);
 			}
 		}
 		break;
@@ -962,6 +962,17 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     if (!m_bAppIsFullScreen && m_bRudeAppBit)
                     {
                         SetTimer(m_hMainWindow, LT_RUDEAPP, 1000, NULL);
+                    }
+                }
+                else if (uMsg == LM_WINDOWDESTROYED)
+                {
+                    if (m_bAppIsFullScreen)
+                    {
+                        // If the FS window was just destroyed, then handle it.
+                        if(!_IsFullScreenActive(GetForegroundWindow()))
+                        {
+                            _HandleFullScreenApp(false);
+                        }
                     }
                 }
             }
