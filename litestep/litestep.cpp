@@ -255,9 +255,8 @@ CLiteStep::CLiteStep()
   m_hWtsDll(NULL)
 {
     m_hInstance = NULL;
-    m_bRudeAppBit = false;
     m_bAutoHideModules = false;
-    m_bAppIsFullScreen = false;
+    m_hFullScreenMonitor = NULL;
     m_hMainWindow = NULL;
     WM_ShellHook = 0;
     m_pModuleManager = NULL;
@@ -774,14 +773,11 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
         case WM_TIMER:
         {
-            if (LT_RUDEAPP == wParam && m_bRudeAppBit)
+            if (LT_RUDEAPP == wParam)
             {
-                if (m_bAppIsFullScreen != \
-                    _IsFullScreenActive(GetForegroundWindow()))
-                {
-                    _HandleFullScreenApp(!m_bAppIsFullScreen);
-                }
                 KillTimer(hWnd, wParam);
+                HMONITOR hMonFS = _FullScreenGetMonitor(GetForegroundWindow());
+                _FullScreenHandler(hMonFS);
             }
         }
         break;
@@ -998,6 +994,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
         default:
         {
+            // Translate Shell Hook messages to LM_SHELLHOOK (ShellProc format).
             if (uMsg == WM_ShellHook)
             {
                 WORD wHookCode  = (LOWORD(wParam) & 0x00FF);
@@ -1023,47 +1020,6 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     wParam = (WPARAM)lParam;
                     lParam = (LPARAM)wExtraBits;
                 }
-
-                // Handle fullscreen windows
-                if (uMsg == LM_WINDOWACTIVATED || uMsg == LM_WINDOWDESTROYED)
-                {
-                    //
-                    // Note: The ShellHook will always set the HighBit when there
-                    // is any full screen app on the desktop, even if it does not
-                    // have focus.  Because of this, we have no easy way to tell
-                    // if the currently activated app is full screen or not.
-                    // This is worked around by checking the window's actual size
-                    // against the screen size.  The correct behavior for this is
-                    // to hide when a full screen app is active, and to show when
-                    // a non full screen app is active.
-                    //
-
-                    m_bRudeAppBit = (0 != lParam);
-                    KillTimer(m_hMainWindow, LT_RUDEAPP);
-
-                    if (m_bRudeAppBit && !m_bAppIsFullScreen)
-                    {
-                        if (_IsFullScreenActive((HWND)wParam))
-                        { 
-                            _HandleFullScreenApp(true);
-                        }
-                    }
-                    else if (m_bAppIsFullScreen)
-                    {
-                        if (!m_bRudeAppBit || !_IsFullScreenActive((HWND)wParam))
-                        {
-                            _HandleFullScreenApp(false);
-                        }
-                    }
-
-                    // If we have been told there is a Rude App, but we did not
-                    // detect one, then wait a second, and check the window
-                    // in the foreground at that time.
-                    if (!m_bAppIsFullScreen && m_bRudeAppBit)
-                    {
-                        SetTimer(m_hMainWindow, LT_RUDEAPP, 1000, NULL);
-                    }
-                }
             }
 
             // WM_APP, LM_XYZ, and registered messages are all >= WM_USER
@@ -1072,9 +1028,8 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 if (m_pMessageManager &&
                     m_pMessageManager->HandlerExists(uMsg))
                 {
-                    lReturn =
+                    lReturn = \
                         m_pMessageManager->SendMessage(uMsg, wParam, lParam);
-
                     break;
                 }
             }
@@ -1083,6 +1038,9 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         }
         break;
     }
+
+    // Internal handling of any LM_SHELLHOOK message we might be interested in.
+    _HandleShellHooks(uMsg, wParam, lParam);
 
     return lReturn;
 }
@@ -1343,20 +1301,26 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
 }
 
 //
-// _IsWindowFullScreen
+// _FullScreenGetMonitorHelper
 //
-bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
+HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
 {
-    if (!IsWindow(hWnd) || !IsWindowVisible(hWnd))
+    if (!IsWindow(hWnd) || !IsWindowVisible(hWnd) || IsIconic(hWnd))
     {
-        return false;
+        return NULL;
     }
 
     HMONITOR hMonFS = LSMonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
+
+    if (NULL == hMonFS)
+    {
+        return NULL;
+    }
+
     RECT rScreen = {0};
     RECT rWorkArea = {0};
 
-    if(hMonFS)
+    if (NULL != hMonFS)
     {
         MONITORINFO miFS;
         miFS.cbSize = sizeof(MONITORINFO);
@@ -1368,18 +1332,15 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
         }
         else
         {
-            hMonFS = NULL;
+            rScreen.left = 0;
+            rScreen.top = 0;
+            rScreen.right = GetSystemMetrics(SM_CXSCREEN);
+            rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+
+            VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWorkArea, 0));
+
+            hMonFS = LSMonitorFromRect(&rScreen, MONITOR_DEFAULTTOPRIMARY);
         }
-    }
-
-    if(!hMonFS)
-    {
-        rScreen.left = 0;
-        rScreen.top = 0;
-        rScreen.right = GetSystemMetrics(SM_CXSCREEN);
-        rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-
-        VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWorkArea, 0));
     }
 
     RECT rWnd;
@@ -1401,7 +1362,7 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
     // a full screen window.
     if (EqualRect(&rScreen, &rWnd))
     {
-        return true;
+        return hMonFS;
     }
 
     DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
@@ -1411,40 +1372,15 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
     if (WS_CAPTION != (WS_CAPTION & dwStyle) ||
         WS_THICKFRAME != (WS_THICKFRAME & dwStyle))
     {
-        // If the window is maximized, then just get its window rect.
-        if(WS_MAXIMIZE == (WS_MAXIMIZE & dwStyle))
-        {
-            VERIFY(GetWindowRect(hWnd, &rWnd));
-        }
-        else
-        {
-            // A window might still not be in its full screen state when we
-            // get here (wp.showCmd is sometimes equal to SW_SHOWMINIMIZED),
-            // so calling GetWindowRect will not always give us the expected
-            // dimensions. Using GetWindowPlacement and its rcNormalPosition
-            // RECT will however. It gets us the size the window will have
-            // after it has finished resizing.
-            WINDOWPLACEMENT wp = {0};
-            wp.length = sizeof(WINDOWPLACEMENT);
-            VERIFY(GetWindowPlacement(hWnd, &wp));
-
-            VERIFY(CopyRect(&rWnd, &wp.rcNormalPosition));
-
-            // If the window does not have WS_EX_TOOLWINDOW set then the
-            // coordinates are workspace coordinates and we must fix this.
-            if (0 == (WS_EX_TOOLWINDOW & GetWindowLongPtr(hWnd, GWL_EXSTYLE)))
-            {
-                VERIFY(OffsetRect(&rWnd, rWorkArea.left, rWorkArea.top));
-            }
-        }
+        VERIFY(GetWindowRect(hWnd, &rWnd));
 
         if (EqualRect(&rScreen, &rWnd))
         {
-            return true;
+            return hMonFS;
         }
     }
 
-    return false;
+    return NULL;
 }
 
 //
@@ -1452,9 +1388,11 @@ bool CLiteStep::_IsWindowFullScreen(HWND hWnd)
 //
 BOOL CALLBACK CLiteStep::_EnumThreadFSWnd(HWND hWnd, LPARAM lParam)
 {
-    if (_IsWindowFullScreen(hWnd))
+    HMONITOR hMonFS = _FullScreenGetMonitorHelper(hWnd);
+
+    if (NULL != hMonFS)
     {
-        *(BOOL*)lParam = TRUE;
+        *(HMONITOR*)lParam = hMonFS;
         return FALSE;
     }
 
@@ -1462,16 +1400,14 @@ BOOL CALLBACK CLiteStep::_EnumThreadFSWnd(HWND hWnd, LPARAM lParam)
 }
 
 //
-// _IsFullScreenActive
+// _FullScreenGetMonitor
 //
-bool CLiteStep::_IsFullScreenActive(HWND hWnd)
+HMONITOR CLiteStep::_FullScreenGetMonitor(HWND hWnd)
 {
     if(!IsWindow(hWnd))
     {
-        return false;
+        return NULL;
     }
-
-    BOOL bIsFullScreen = FALSE;
 
     DWORD dwProcessID;
     DWORD dwThreadID = GetWindowThreadProcessId(hWnd, &dwProcessID);
@@ -1479,36 +1415,114 @@ bool CLiteStep::_IsFullScreenActive(HWND hWnd)
     DWORD dwLSProcessID;
     GetWindowThreadProcessId(GetLitestepWnd(), &dwLSProcessID);
 
-    if(dwProcessID == dwLSProcessID)
+    HMONITOR hMonFS = NULL;
+
+    if(dwProcessID != dwLSProcessID)
     {
-        return false;
+        EnumThreadWindows(dwThreadID, _EnumThreadFSWnd, (LPARAM)&hMonFS);
     }
 
-    EnumThreadWindows(dwThreadID, _EnumThreadFSWnd, (LPARAM)&bIsFullScreen);
-    return FALSE != bIsFullScreen;
+    return hMonFS;
 }
 
 //
-// _HandleFullScreenApp
+// _FullScreenHandler
 //
-void CLiteStep::_HandleFullScreenApp(bool isFullscreen)
+void CLiteStep::_FullScreenHandler(HMONITOR hMonFullScreen)
 {
-    m_bAppIsFullScreen = isFullscreen;
+    if (m_hFullScreenMonitor == hMonFullScreen)
+    {
+        return;
+    }
+
+    m_hFullScreenMonitor = hMonFullScreen;
 
     if (m_pTrayService)
     {
-        m_pTrayService->NotifyRudeApp(isFullscreen);
+        m_pTrayService->NotifyRudeApp(m_hFullScreenMonitor);
     }
 
     if (m_bAutoHideModules)
     {
-        if (isFullscreen)
+        if (NULL != m_hFullScreenMonitor)
         {
-            ParseBangCommand(m_hMainWindow, "!HideModules", NULL);
+            // Must first show all modules on all monitors
+            ParseBangCommand(NULL, "!ShowModules", NULL);
+            // Pass m_hFullScreenMonitor, so that !HideModules can support only
+            // hiding modules on the same monitor as the full screen app.
+            ParseBangCommand((HWND)m_hFullScreenMonitor, "!HideModules", NULL);
         }
         else
         {
-            ParseBangCommand(m_hMainWindow, "!ShowModules", NULL);
+            ParseBangCommand(NULL, "!ShowModules", NULL);
         }
+    }
+}
+
+//
+// _HandleShellHooks
+//
+void CLiteStep::_HandleShellHooks(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch(uMsg)
+    {
+    case LM_WINDOWACTIVATED:
+        {
+            //
+            // Note: The ShellHook will always set the HighBit when there
+            // is any full screen app on the desktop, even if it does not
+            // have focus.  Because of this, we have no easy way to tell
+            // if the currently activated app is full screen or not.
+            //
+            // This is worked around by checking the window's actual size
+            // against the screen size.  The correct behavior for this is
+            // to hide when a full screen app is active, and to show when
+            // a non full screen app is active.
+            //
+            KillTimer(m_hMainWindow, LT_RUDEAPP);
+
+            if (0 != (0x8000 & lParam)) // rudeapp bit
+            {
+                // If the rudeapp bit is set then check to see if we have an
+                // active full screen app and handle it.
+                HMONITOR hMonFS = _FullScreenGetMonitor((HWND)wParam);
+                _FullScreenHandler(hMonFS);
+
+                // If we have been told there is a rudeapp, but we did not
+                // detect one, then wait a second, and check the window in the
+                // foreground at that time.
+                if (NULL == m_hFullScreenMonitor)
+                {
+                    SetTimer(m_hMainWindow, LT_RUDEAPP, 1000, NULL);
+                }
+            }
+            else if (NULL != m_hFullScreenMonitor)
+            {
+                // If we have previously detected a full screen app and the
+                // rudeapp bit is no longer set then remove the handler.
+                _FullScreenHandler(NULL);
+            }
+        }
+        break;
+
+    case LM_WINDOWDESTROYED:
+        {
+            // If we have previously detected a full screen app then remove the
+            // handler if it was just destroyed.
+            if (NULL != m_hFullScreenMonitor)
+            {
+                if (NULL == _FullScreenGetMonitor(GetForegroundWindow()))
+                {
+                    _FullScreenHandler(NULL);
+                }
+            }
+        }
+        break;
+
+    default:
+        {
+            // do nothing
+        }
+        break;
     }
 }

@@ -97,13 +97,13 @@ private:
     IService* m_pRecoveryMenu;
 
     // LSAutoHideModules helpers
-    bool m_bRudeAppBit;
     bool m_bAutoHideModules;
-    bool m_bAppIsFullScreen; // = false;
-    static bool _IsWindowFullScreen(HWND hWnd);
+    HMONITOR m_hFullScreenMonitor; // = NULL;
+    static HMONITOR _FullScreenGetMonitorHelper(HWND hWnd);
     static BOOL CALLBACK _EnumThreadFSWnd(HWND hWnd, LPARAM lParam);
-    bool _IsFullScreenActive(HWND hWnd);
-    void _HandleFullScreenApp(bool isFullscreen);
+    HMONITOR _FullScreenGetMonitor(HWND hWnd);
+    void _FullScreenHandler(HMONITOR hMonFullScreen);
+    void _HandleShellHooks(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     // Windows
     HWND m_hMainWindow; // = NULL;

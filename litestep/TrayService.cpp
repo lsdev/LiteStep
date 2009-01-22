@@ -682,7 +682,7 @@ LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
 //
 // External interface to let us know a window has gone/left full screen mode
 //
-void TrayService::NotifyRudeApp(bool bIsFullScreen) const
+void TrayService::NotifyRudeApp(HMONITOR hFullScreenMonitor) const
 {
     BarVector::const_reverse_iterator rit;
     
@@ -692,7 +692,7 @@ void TrayService::NotifyRudeApp(bool bIsFullScreen) const
              (*rit)->hWnd()
             ,(*rit)->uMsg()
             ,ABN_FULLSCREENAPP
-            ,(LPARAM)(bIsFullScreen ? 1:0)
+            ,(LPARAM)(hFullScreenMonitor ? 1:0)
         );
     }
 }

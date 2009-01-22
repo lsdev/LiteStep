@@ -359,7 +359,14 @@ void BangUnloadModule(HWND /* hCaller */, LPCSTR pszArgs)
 #define EMP_SHOW   1
 #define EMP_TOGGLE 2
 
-static void EMPHandler(HDWP hDwp, HWND hWnd, UINT uMode)
+typedef struct _EMPCONFIG
+{
+	UINT uMode;
+	HDWP hDwp;
+	HMONITOR hMon;
+} EMPCONFIG, *PEMPCONFIG, FAR *LPEMPCONFIG;
+
+static void EMPHandler(HWND hWnd, PEMPCONFIG pEMPCfg)
 {
 // note: must NOT use SWP_NOSENDCHANGING, as it will not show/hide then.
 #define DEFAULT_FLAGS (SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOMOVE)
@@ -369,24 +376,28 @@ static void EMPHandler(HDWP hDwp, HWND hWnd, UINT uMode)
 		LONG_PTR lUserData = GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 		if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
-		    (uMode == EMP_HIDE || uMode == EMP_TOGGLE))
+		    (pEMPCfg->uMode == EMP_HIDE || pEMPCfg->uMode == EMP_TOGGLE))
 		{
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, HIDEmagicDWord);
-			hDwp = DeferWindowPos(
-				 hDwp
-				,hWnd
-				,NULL
-				,0 ,0
-				,0 ,0
-				,SWP_HIDEWINDOW|DEFAULT_FLAGS
-			);
+			if (NULL == pEMPCfg->hMon ||
+			    LSMonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL) == pEMPCfg->hMon)
+			{
+				SetWindowLongPtr(hWnd, GWLP_USERDATA, HIDEmagicDWord);
+				pEMPCfg->hDwp = DeferWindowPos(
+					 pEMPCfg->hDwp
+					,hWnd
+					,NULL
+					,0 ,0
+					,0 ,0
+					,SWP_HIDEWINDOW|DEFAULT_FLAGS
+				);
+			}
 		}
 		else if ((lUserData == HIDEmagicDWord) &&
-		         (uMode == EMP_SHOW || uMode == EMP_TOGGLE))
+		         (pEMPCfg->uMode == EMP_SHOW || pEMPCfg->uMode == EMP_TOGGLE))
 		{
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, magicDWord);
-			hDwp = DeferWindowPos(
-				 hDwp
+			pEMPCfg->hDwp = DeferWindowPos(
+				 pEMPCfg->hDwp
 				,hWnd
 				,NULL
 				,0 ,0
@@ -399,31 +410,11 @@ static void EMPHandler(HDWP hDwp, HWND hWnd, UINT uMode)
 
 
 //
-// CALLBACK EnumHideModulesProc(HWND hWnd, LPARAM lParam)
+// CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
 //
-static BOOL CALLBACK EnumHideModulesProc(HWND hWnd, LPARAM lParam)
+static BOOL CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
 {
-	EMPHandler((HDWP)lParam, hWnd, EMP_HIDE);
-	return TRUE;
-}
-
-
-//
-// CALLBACK EnumShowModulesProc(HWND hWnd, LPARAM lParam)
-//
-static BOOL CALLBACK EnumShowModulesProc(HWND hWnd, LPARAM lParam)
-{
-	EMPHandler((HDWP)lParam, hWnd, EMP_SHOW);
-	return TRUE;
-}
-
-
-//
-// CALLBACK EnumToggleModulesProc(HWND hWnd, LPARAM lParam)
-//
-static BOOL CALLBACK EnumToggleModulesProc(HWND hWnd, LPARAM lParam)
-{
-	EMPHandler((HDWP)lParam, hWnd, EMP_TOGGLE);
+	EMPHandler(hWnd, (PEMPCONFIG)lParam);
 	return TRUE;
 }
 
@@ -431,11 +422,20 @@ static BOOL CALLBACK EnumToggleModulesProc(HWND hWnd, LPARAM lParam)
 //
 // BangHideModules(HWND hCaller, LPCSTR pszArgs)
 //
-void BangHideModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
+void BangHideModules(HWND hCaller, LPCSTR /* pszArgs */)
 {
-	HDWP hDwp = BeginDeferWindowPos(5);
-	EnumWindows(EnumHideModulesProc, (LPARAM)hDwp);
-	EndDeferWindowPos(hDwp);
+	EMPCONFIG EMPCfg = {0};
+
+	// A hack to support hiding modules only on a certain monitor.
+	if (NULL != hCaller && !IsWindow(hCaller))
+	{
+		EMPCfg.hMon = (HMONITOR)hCaller;
+	}
+	EMPCfg.uMode = EMP_HIDE;
+
+	EMPCfg.hDwp = BeginDeferWindowPos(10);
+	EnumWindows(EnumModulesProc, (LPARAM)&EMPCfg);
+	EndDeferWindowPos(EMPCfg.hDwp);
 }
 
 
@@ -444,9 +444,13 @@ void BangHideModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	HDWP hDwp = BeginDeferWindowPos(5);
-	EnumWindows(EnumShowModulesProc, (LPARAM)hDwp);
-	EndDeferWindowPos(hDwp);
+	EMPCONFIG EMPCfg = {0};
+
+	EMPCfg.uMode = EMP_SHOW;
+
+	EMPCfg.hDwp = BeginDeferWindowPos(10);
+	EnumWindows(EnumModulesProc, (LPARAM)&EMPCfg);
+	EndDeferWindowPos(EMPCfg.hDwp);
 }
 
 
@@ -455,7 +459,11 @@ void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 void BangToggleModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
 {
-	HDWP hDwp = BeginDeferWindowPos(5);
-	EnumWindows(EnumToggleModulesProc, (LPARAM)hDwp);
-	EndDeferWindowPos(hDwp);
+	EMPCONFIG EMPCfg = {0};
+
+	EMPCfg.uMode = EMP_TOGGLE;
+
+	EMPCfg.hDwp = BeginDeferWindowPos(10);
+	EnumWindows(EnumModulesProc, (LPARAM)&EMPCfg);
+	EndDeferWindowPos(EMPCfg.hDwp);
 }
