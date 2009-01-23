@@ -430,7 +430,7 @@ static int matche_after_star (LPCSTR p, LPCSTR t)
 		   the next pattern char is the beginning of a range.  Increment
 		   text pointer as we go here */
 
-		if (tolower(nextp) == tolower(*t) || nextp == '[')
+		if (tolower(nextp) == tolower(*t) || *p == '[')
 			match = matche(p, t);
 
 		/* if the end of text is reached then no match */
