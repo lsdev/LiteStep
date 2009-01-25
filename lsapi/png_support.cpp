@@ -100,21 +100,21 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	HBITMAP hDibSection = CreateDIBSection(NULL, &bmi, 0, 
 		reinterpret_cast<LPVOID*>(&bits), NULL, 0);
 	std::vector<unsigned char> bgr;
-	for (int i = image.size() - 1; i >= 0; i -= 4)
+	for (int i = static_cast<int>(image.size()) - w*4; i >= 0; i -= w*4)
 	{
-		bgr.push_back(image[i - 1]);
-		bgr.push_back(image[i - 2]);
-		bgr.push_back(image[i - 3]);
-
-		if ((i - 3) % (w * 4) == 0)
+		for (unsigned long j = 0; j < w*4; j += 4)
 		{
-			int s = bgr.size();
-			while ((s & 3) != 0)
-			{
-				// add padding
-				bgr.push_back(0);
-				s++;
-			}
+			bgr.push_back(image[i + j + 2]);
+			bgr.push_back(image[i + j + 1]);
+			bgr.push_back(image[i + j]);
+		}
+
+		size_t s = bgr.size();
+		while ((s & 3) != 0)
+		{
+			// add padding
+			bgr.push_back(0);
+			s++;
 		}
 	}
 
