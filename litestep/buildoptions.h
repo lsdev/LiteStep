@@ -56,7 +56,7 @@
 #ifdef _MSC_VER
 #if _MSC_VER > 1200 // VC6 Can't compile picoPNG
 // Makes lsapi use picoPNG instead of zlib+libpng
-//#define LS_USE_PICOPNG
+#define LS_USE_PICOPNG
 #endif
 #endif
 
