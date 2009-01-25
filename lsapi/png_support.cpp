@@ -92,7 +92,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bmi.bmiHeader.biWidth = w;
 	bmi.bmiHeader.biHeight = h;
-	bmi.bmiHeader.biBitCount = 24;
+	bmi.bmiHeader.biBitCount = 32;
 	bmi.bmiHeader.biPlanes = 1;
 	bmi.bmiHeader.biCompression = BI_RGB;
 
@@ -104,17 +104,10 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	{
 		for (unsigned long j = 0; j < w*4; j += 4)
 		{
-			bgr.push_back(image[i + j + 2]);
-			bgr.push_back(image[i + j + 1]);
-			bgr.push_back(image[i + j]);
-		}
-
-		size_t s = bgr.size();
-		while ((s & 3) != 0)
-		{
-			// add padding
-			bgr.push_back(0);
-			s++;
+			bgr.push_back(image[i + j + 2]); // blue
+			bgr.push_back(image[i + j + 1]); // green
+			bgr.push_back(image[i + j]);     // red
+			bgr.push_back(image[i + j + 3]); // alpha
 		}
 	}
 
