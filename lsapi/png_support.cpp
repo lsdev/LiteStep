@@ -80,7 +80,6 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	if (error != 0)
 	{
 		return NULL;
-		//std::cout << "error: " << error << std::endl;
 	}
 
 	if (image.size() <= 4)
@@ -99,19 +98,19 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 	unsigned char* bits;
 	HBITMAP hDibSection = CreateDIBSection(NULL, &bmi, 0, 
 		reinterpret_cast<LPVOID*>(&bits), NULL, 0);
-	std::vector<unsigned char> bgr;
+	std::vector<unsigned char> bgra;
 	for (int i = static_cast<int>(image.size()) - w*4; i >= 0; i -= w*4)
 	{
 		for (unsigned long j = 0; j < w*4; j += 4)
 		{
-			bgr.push_back(image[i + j + 2]); // blue
-			bgr.push_back(image[i + j + 1]); // green
-			bgr.push_back(image[i + j]);     // red
-			bgr.push_back(image[i + j + 3]); // alpha
+			bgra.push_back(image[i + j + 2]); // blue
+			bgra.push_back(image[i + j + 1]); // green
+			bgra.push_back(image[i + j]);     // red
+			bgra.push_back(image[i + j + 3]); // alpha
 		}
 	}
 
-	memcpy(bits, &(bgr[0]), bgr.size());
+	memcpy(bits, &(bgra[0]), bgra.size());
 
 	return hDibSection;
 }
