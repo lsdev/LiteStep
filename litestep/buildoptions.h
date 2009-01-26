@@ -53,11 +53,8 @@
 // 0.24.8 default: DISABLED
 //#define LS_CUSTOM_INCLUDEFOLDER
 
-#ifdef _MSC_VER
-#if _MSC_VER > 1200 // VC6 Can't compile picoPNG
 // Makes lsapi use picoPNG instead of zlib+libpng
+// 0.25.0 default: ENABLED
 #define LS_USE_PICOPNG
-#endif
-#endif
 
 #endif // BUILDOPTIONS_H
