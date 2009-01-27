@@ -25,7 +25,7 @@ using namespace std;
 
 
 // Mapping of token types to names
-struct { int type; const char *name; } gTokenTypes[] =
+struct TokenTypeTable { int type; const char *name; } gTokenTypes[] = \
 {
     { TT_INVALID,   "INVALID"   },
     { TT_ID,        "ID"        },

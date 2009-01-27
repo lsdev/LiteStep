@@ -26,8 +26,7 @@
 #if !defined(FIXUP_H)
 #define FIXUP_H
 
-#include "core.hpp"
-
+#include "debug.hpp"
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
@@ -60,6 +59,12 @@ enum RESTRICTIONS
     REST_NOLOCALMACHINERUNONCE = 0x40000048,
     REST_NOCURRENTUSERRUNONCE  = 0x40000049
 };
+
+typedef struct _SHELLHOOKINFO
+{
+    HWND hwnd;
+    RECT rc;
+} SHELLHOOKINFO, *PSHELLHOOKINFO, FAR *LPSHELLHOOKINFO;
 
 #endif // FIXUP_MINGW
 

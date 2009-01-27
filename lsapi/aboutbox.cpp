@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "../litestep/resource.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 #include <CommCtrl.h>
 #include <WindowsX.h>
@@ -68,12 +67,12 @@ enum
 	,ABOUT_SYSINFO
 };
 
-struct
+struct AboutOptions
 {
 	const char* option;
 	AboutFunction function;
 }
-aboutOptions[] =
+aboutOptions[] = \
 {
 	 {"Bang Commands",      AboutBangs}
 	,{"Development Team",   AboutDevTeam}
@@ -88,12 +87,12 @@ aboutOptions[] =
 //
 // LiteStep Development Team
 //
-struct
+struct TheDevTeam
 {
 	const char *nick;
 	const char *realName;
 }
-theDevTeam[] =
+theDevTeam[] = \
 {
 	 {"Acidfire", "Alexander Vermaat"}
 	,{"ilmcuts",  "Simon"}
@@ -449,28 +448,31 @@ BOOL CALLBACK BangCallback(HMODULE hModule, LPCSTR pszName, LPARAM lParam)
 //
 void AboutBangs(HWND hListView)
 {
-	LVCOLUMN columnInfo;
+    LVCOLUMN columnInfo;
+    char text[32];
 
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
 
+    strcpy(text, "Bang Command");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 2;
-    columnInfo.pszText = "Bang Command";
+    columnInfo.pszText = text;
     columnInfo.iSubItem = 0;
 
     ListView_InsertColumn(hListView, 0, &columnInfo);
 
+    strcpy(text, "Module");
     columnInfo.cx = width - columnInfo.cx;
-    columnInfo.pszText = "Module";
+    columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
 
     ListView_InsertColumn(hListView, 1, &columnInfo);
 
-	CallbackInfo ci = { 0 };
-	ci.hListView = hListView;
+    CallbackInfo ci = { 0 };
+    ci.hListView = hListView;
 
-	EnumLSData(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&ci);
+    EnumLSData(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&ci);
 }
 
 
@@ -482,17 +484,20 @@ void AboutDevTeam(HWND hListView)
 {
 	LVCOLUMN columnInfo;
 	int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
+	char text[32];
 
+	strcpy(text, "Nick");
 	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	columnInfo.fmt = LVCFMT_LEFT;
 	columnInfo.cx = width / 3;
-	columnInfo.pszText = "Nick";
+	columnInfo.pszText = text;
 	columnInfo.iSubItem = 0;
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
 
+	strcpy(text, "Real Name");
 	columnInfo.cx = (2 * width) / 3;
-	columnInfo.pszText = "Real Name";
+	columnInfo.pszText = text;
 	columnInfo.iSubItem = 1;
 
 	ListView_InsertColumn(hListView, 1, &columnInfo);
@@ -550,11 +555,13 @@ BOOL CALLBACK ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam
 void AboutModules(HWND hListView)
 {
 	LVCOLUMN columnInfo;
+	char text[32];
 
+	strcpy(text, "Module");
 	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	columnInfo.fmt = LVCFMT_LEFT;
 	columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
-	columnInfo.pszText = "Module";
+	columnInfo.pszText = text;
 	columnInfo.iSubItem = 0;
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
@@ -594,11 +601,13 @@ BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 void AboutRevIDs(HWND hListView)
 {
 	LVCOLUMN columnInfo;
+	char text[32];
 
+	strcpy(text, "Revision ID");
 	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	columnInfo.fmt = LVCFMT_LEFT;
 	columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
-	columnInfo.pszText = "Revision ID";
+	columnInfo.pszText = text;
 	columnInfo.iSubItem = 0;
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
@@ -679,13 +688,15 @@ void AboutSysInfo(HWND hListView)
 	LVITEM itemInfo;
 	int i = 0;
 	char buffer[MAX_PATH];
+	char text[32];
 
 	int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
 
+	strcpy(text, "Name");
 	columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	columnInfo.fmt = LVCFMT_LEFT;
 	columnInfo.cx = width / 3 + width / 8;
-	columnInfo.pszText = "Name";
+	columnInfo.pszText = text;
 	columnInfo.iSubItem = 0;
 
 	ListView_InsertColumn(hListView, 0, &columnInfo);
@@ -693,16 +704,18 @@ void AboutSysInfo(HWND hListView)
 	/* Using this odd size, keeps the columns aligned with
 	 * the other list views, and also gives the text a little
 	 * more room to keep from being truncated. */
+	strcpy(text, "Value");
 	columnInfo.cx = (2 * width) / 3 - width / 8;
-	columnInfo.pszText = "Value";
+	columnInfo.pszText = text;
 	columnInfo.iSubItem = 1;
 
 	ListView_InsertColumn(hListView, 1, &columnInfo);
 
 	// operating system and version
+	strcpy(text, "Operating System");
 	itemInfo.mask = LVIF_TEXT;
 	itemInfo.iItem = i;
-	itemInfo.pszText = "Operating System";
+	itemInfo.pszText = text;
 	itemInfo.iSubItem = 0;
 
 	ListView_InsertItem(hListView, &itemInfo);
@@ -742,40 +755,45 @@ void AboutSysInfo(HWND hListView)
 		dwAvailPageFile = (DWORD)ms.dwAvailPageFile;
 	}
 
+	strcpy(text, "Memory Load");
 	itemInfo.iItem = i;
-	itemInfo.pszText = "Memory Load";
+	itemInfo.pszText = text;
 
 	ListView_InsertItem(hListView, &itemInfo);
 
 	StringCchPrintf(buffer, MAX_PATH, "%d%%", dwMemoryLoad);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
+	strcpy(text, "Physical Memory Total");
 	itemInfo.iItem = i;
-	itemInfo.pszText = "Physical Memory Total";
+	itemInfo.pszText = text;
 
 	ListView_InsertItem(hListView, &itemInfo);
 
 	FormatBytes(dwTotalPhys, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
+	strcpy(text, "Physical Memory Available");
 	itemInfo.iItem = i;
-	itemInfo.pszText = "Physical Memory Available";
+	itemInfo.pszText = text;
 
 	ListView_InsertItem(hListView, &itemInfo);
 
 	FormatBytes(dwAvailPhys, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
+	strcpy(text, "Swap Space Total");
 	itemInfo.iItem = i;
-	itemInfo.pszText = "Swap Space Total";
+	itemInfo.pszText = text;
 
 	ListView_InsertItem(hListView, &itemInfo);
 
 	FormatBytes(dwTotalPageFile, buffer, 64);
 	ListView_SetItemText(hListView, i++, 1, buffer);
 
+	strcpy(text, "Swap Space Available");
 	itemInfo.iItem = i;
-	itemInfo.pszText = "Swap Space Available";
+	itemInfo.pszText = text;
 
 	ListView_InsertItem(hListView, &itemInfo);
 

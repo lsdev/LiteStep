@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "TrayService.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 #include <algorithm>
 #include <docobj.h>
@@ -584,7 +583,7 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
         default:
             if (uMsg >= WM_USER)
             {
-                DbgTraceWindowMessage("Shell_TrayWnd", uMsg, wParam, lParam);
+                DbgTraceWindowMessage("Shell_TrayWnd", uMsg, (unsigned long)wParam, (unsigned long)lParam);
             }
 
             return DefWindowProc(hWnd, uMsg, wParam, lParam);

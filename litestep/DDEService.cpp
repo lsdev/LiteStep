@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "DDEService.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
 

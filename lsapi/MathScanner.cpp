@@ -21,12 +21,13 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "MathScanner.h"
 #include "MathException.h"
+#include <string.h>
 
 using namespace std;
 
 
 // Reserved words
-struct { const char *str; int type; } gReservedWords[] =
+struct ReservedWordTable { const char *str; int type; } gReservedWords[] = \
 {
     { "false",    TT_FALSE    },
     { "true",     TT_TRUE     },
@@ -46,7 +47,7 @@ const int gNumReservedWords = sizeof(gReservedWords) / sizeof(gReservedWords[0])
 // Operators and punctuation
 // Checked in this order so for example "<=" must precede "<". Must have enough
 // lookahead to recognize the longest symbol.
-struct { const char *str; int length; int type; } gSymbols[] =
+struct SymbolTable { const char *str; int length; int type; } gSymbols[] = \
 {
     { "(",  1, TT_LPAREN    },
     { ")",  1, TT_RPAREN    },

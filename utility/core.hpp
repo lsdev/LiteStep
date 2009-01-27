@@ -39,10 +39,18 @@
 #define NO_SHLWAPI_STRFCNS
 #include <shlwapi.h>
 
-#include "fixup.h"
-#include "../lsapi/lsapi.h"
-
 #define STRSAFE_NO_DEPRECATE
 #include <strsafe.h>
+
+// Now first thing after system includes, is our fixup for
+// the system headers.
+#include "fixup.h"
+
+// Add in debugging support for the rest of our files
+#include "debug.hpp"
+
+// Now items that generally most files should have.
+#include "../lsapi/lsapi.h"
+#include "shellhlp.h"
 
 #endif // CORE_HPP

@@ -63,8 +63,10 @@ NotifyIcon::NotifyIcon(const NID_XX& nidSource)
     ,m_uFlags(0)
     ,m_uCallbackMessage(0)
     ,m_hIcon(NULL)
-    ,m_hOriginalIcon(NULL)
     ,m_dwState(0)
+    ,m_hOriginalIcon(NULL)
+    ,m_hSharedWnd(NULL)
+    ,m_uSharedID(0)
 {
     m_szTip[0] = 0;
     Update(nidSource);

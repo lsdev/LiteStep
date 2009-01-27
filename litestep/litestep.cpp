@@ -37,7 +37,6 @@
 #include "../lsapi/lsapiInit.h"
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 #include <algorithm>
 #include <WtsApi32.h>
@@ -308,10 +307,9 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     hr = OleInitialize(NULL);
 
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
-    if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) || 
-        GetRCBool("LSNoStartup", TRUE) &&
-        !(wStartFlags & LSF_FORCE_STARTUPAPPS))
-
+    if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
+        (GetRCBool("LSNoStartup", TRUE) &&
+        !(wStartFlags & LSF_FORCE_STARTUPAPPS)))
     {
         wStartFlags &= ~LSF_RUN_STARTUPAPPS;
     }

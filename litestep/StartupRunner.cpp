@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "StartupRunner.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 #include <regstr.h>
 
@@ -240,7 +239,7 @@ HKEY StartupRunner::_CreateSessionInfoKey()
         }
         else
         {
-            TOKEN_STATISTICS tsStats = { 0 };
+            TOKEN_STATISTICS tsStats = {{0}};
 
             // Prior to Vista the subkey's name is the AuthenticationId
             if (GetTokenInformation(hToken, TokenStatistics,

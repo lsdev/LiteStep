@@ -87,7 +87,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 		return NULL;
 	}
 
-	BITMAPINFO bmi = {0};
+	BITMAPINFO bmi = {{0}};
 	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bmi.bmiHeader.biWidth = w;
 	bmi.bmiHeader.biHeight = h;
@@ -241,7 +241,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
 
 							png_read_update_info(Read, Info);
 
-							BITMAPINFO bmi = {0};
+							BITMAPINFO bmi = {{0}};
 							bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 							bmi.bmiHeader.biWidth = (LONG)png_get_image_width(Read, Info);
 							bmi.bmiHeader.biHeight = -(LONG)png_get_image_height(Read, Info);

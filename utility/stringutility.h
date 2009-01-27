@@ -23,6 +23,7 @@
 #define STRINGUTILITY_H
 
 #include <string>
+#include <string.h> // for _stricmp/strcmp
 
 //
 // stringicmp

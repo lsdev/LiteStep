@@ -22,7 +22,6 @@
 #include "lsapi.h"
 #include "lsapiinit.h"
 #include "BangCommand.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
 static int _Tokenize(LPCSTR pszString, LPSTR* lpszBuffers, DWORD dwNumBuffers,

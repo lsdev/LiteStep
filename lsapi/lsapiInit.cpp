@@ -22,7 +22,6 @@
 #include "lsapiinit.h"
 #include "lsapi.h"
 #include "bangs.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 #include <time.h>
 
@@ -30,8 +29,8 @@ LSAPIInit g_LSAPIManager;
 
 
 LSAPIInit::LSAPIInit()
-:m_smSettingsManager(NULL)
-,m_bmBangManager(NULL)
+:m_bmBangManager(NULL)
+,m_smSettingsManager(NULL)
 ,m_hLitestepWnd(NULL)
 ,m_bIsInitialized(false)
 {
@@ -232,21 +231,21 @@ void LSAPIInit::setLitestepVars()
         UINT uVersion;
         LPCTSTR pszVariable;
     }
-    versions[] =
+    versions[] = \
     {
-        WINVER_WIN95,   _T("Win95"),
-        WINVER_WIN98,   _T("Win98"),
-        WINVER_WINME,   _T("WinME"),
+        {WINVER_WIN95,   _T("Win95")},
+        {WINVER_WIN98,   _T("Win98")},
+        {WINVER_WINME,   _T("WinME")},
 
-        WINVER_WINNT4,  _T("WinNT4"),
-        WINVER_WIN2000, _T("Win2000"),
-        WINVER_WINXP,   _T("WinXP"),
-        WINVER_VISTA,   _T("WinVista"),
-        WINVER_WIN7,    _T("Win7"),
+        {WINVER_WINNT4,  _T("WinNT4")},
+        {WINVER_WIN2000, _T("Win2000")},
+        {WINVER_WINXP,   _T("WinXP")},
+        {WINVER_VISTA,   _T("WinVista")},
+        {WINVER_WIN7,    _T("Win7")},
 
-        WINVER_WIN2003, _T("Win2003"),
-        WINVER_WHS,     _T("Win2003"),  // WHS is Win2003 in disguise
-        WINVER_WIN2008, _T("Win2008")
+        {WINVER_WIN2003, _T("Win2003")},
+        {WINVER_WHS,     _T("Win2003")},  // WHS is Win2003 in disguise
+        {WINVER_WIN2008, _T("Win2008")}
     };
 
     UINT uVersion = GetWindowsVersion();

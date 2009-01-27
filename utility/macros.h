@@ -22,8 +22,8 @@
 #if !defined(MACROS_H)
 #define MACROS_H
 
-#include "../litestep/resource.h"
 #include "../lsapi/lsapi.h"
+#include "../litestep/resource.h"
 
 //
 // Macros for resource strings and localization

@@ -22,8 +22,8 @@
 #if !defined(BANGCOMMAND_H)
 #define BANGCOMMAND_H
 
-#include "../utility/common.h"
 #include "../utility/base.h"
+#include "lsapidefines.h"
 #include <string>
 
 

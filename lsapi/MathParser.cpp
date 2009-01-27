@@ -121,7 +121,7 @@ static MathValue Math_sqrt(const MathValueList& argList);
 static MathValue Math_upperCase(const MathValueList& argList);
 
 // Mapping of names to predefined functions
-struct
+struct FunctionTable
 {
     const char *name; MathFunction function; unsigned int numArgs;
 } gFunctions[] = {

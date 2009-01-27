@@ -21,8 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "RecoveryMenu.h"
 #include "resource.h"
-#include "../lsapi/lsapi.h"
-#include "../utility/shellhlp.h"
+#include "../utility/core.hpp"
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -46,13 +45,13 @@ const TCHAR szRecoveryMenuWndClass[] = _T("RecoveryMenuWndClass");
 //
 // The Menu
 //
-struct
+struct MenuCommands
 {
     int nStringID;
     int nCommandID;
     LPCSTR pszDefText;
 }
-rgMenuCommands[] =
+rgMenuCommands[] = \
 {
      { IDS_LITESTEP_RECYCLELS,  ID_RECYCLE,   "Re&cycle LiteStep"           }
     ,{ IDS_LITESTEP_QUITLS,     ID_QUIT,      "&Quit LiteStep"              }
@@ -277,7 +276,7 @@ int RecoveryMenu::ShowMenu(HWND hWnd) const
     HMENU hMenu = CreatePopupMenu();
 
     // populate the menu
-    for (int i = 0; i < COUNTOF(rgMenuCommands); i++)
+    for (size_t i = 0; i < COUNTOF(rgMenuCommands); i++)
     {
         if (rgMenuCommands[i].nStringID)
         {

@@ -55,8 +55,8 @@ void DbgTraceMessage(const char* pszFormat, ...)
 // DbgTraceWindowMessage
 //
 #ifdef TRACE_ENABLED
-void DbgTraceWindowMessage(const char* pszPrefix, UINT uMsg,
-                           WPARAM wParam, LPARAM lParam)
+void DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
+                           unsigned long wParam, unsigned long lParam)
 {
     if (uMsg < WM_USER)
     {
@@ -122,7 +122,7 @@ typedef struct tagTHREADNAME_INFO
 //
 // DbgSetCurrentThreadName
 //
-void DbgSetCurrentThreadName(LPCSTR pszThreadName)
+void DbgSetCurrentThreadName(const char* pszThreadName)
 {
     //
     // While you can put any thread's ID in the info struct, the thread

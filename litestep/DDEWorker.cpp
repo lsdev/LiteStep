@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "DDEWorker.h"
-#include "../utility/shellhlp.h"
 #include "../utility/core.hpp"
 
 DDEWorker::DDEWorker()

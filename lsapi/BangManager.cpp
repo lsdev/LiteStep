@@ -20,6 +20,7 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "BangManager.h"
+#include "../utility/debug.hpp"
 
 
 BangManager::BangManager()

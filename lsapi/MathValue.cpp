@@ -25,6 +25,7 @@
 #include <cmath>
 #include <limits>
 #include <sstream>
+#include <string.h>
 
 using namespace std;
 

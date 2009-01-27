@@ -17,11 +17,14 @@
 # C++ compiler
 CXX = g++
 
+#CXXWARNING = -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wpacked -Wpadded -Wredundant-decls -Wunreachable-code -Winline -Wdisabled-optimization
+CXXWARNING = -Wall
+
 # C++ compiler flags
 ifdef DEBUG
-CXXFLAGS = -Wall -DLSAPI_PRIVATE -D_DEBUG -g
+CXXFLAGS = $(CXXWARNING) -DLSAPI_PRIVATE -D_DEBUG -g -ggdb
 else
-CXXFLAGS = -Wall -DLSAPI_PRIVATE -DNDEBUG
+CXXFLAGS = $(CXXWARNING) -DLSAPI_PRIVATE -DNDEBUG
 endif
 
 # Linker flags
@@ -58,9 +61,9 @@ VPATH = litestep;lsapi;utility
 
 # Output directory
 ifdef DEBUG
-OUTPUT = Debug
+OUTPUT = Debug_MinGW
 else
-OUTPUT = Release
+OUTPUT = Release_MinGW
 endif
 
 # Path to litestep.exe
@@ -71,21 +74,21 @@ EXELIBS = -L$(OUTPUT) -llsapi -lole32 -lshlwapi -luuid
 
 # Object files for litestep.exe
 EXEOBJS = \
-	$(OUTPUT)/DataStore.o \
-	$(OUTPUT)/DDEService.o \
-	$(OUTPUT)/DDEStub.o \
-	$(OUTPUT)/DDEWorker.o \
-	$(OUTPUT)/litestep.o \
-	$(OUTPUT)/litestep.res \
-	$(OUTPUT)/MessageManager.o \
-	$(OUTPUT)/Module.o \
-	$(OUTPUT)/ModuleManager.o \
-	$(OUTPUT)/RecoveryMenu.o \
-	$(OUTPUT)/shellhlp.o \
-	$(OUTPUT)/StartupRunner.o \
-	$(OUTPUT)/TrayNotifyIcon.o \
-	$(OUTPUT)/TrayService.o \
-    $(OUTPUT)/WinMain.o
+	litestep/$(OUTPUT)/DataStore.o \
+	litestep/$(OUTPUT)/DDEService.o \
+	litestep/$(OUTPUT)/DDEStub.o \
+	litestep/$(OUTPUT)/DDEWorker.o \
+	litestep/$(OUTPUT)/litestep.o \
+	litestep/$(OUTPUT)/MessageManager.o \
+	litestep/$(OUTPUT)/Module.o \
+	litestep/$(OUTPUT)/ModuleManager.o \
+	litestep/$(OUTPUT)/RecoveryMenu.o \
+	litestep/$(OUTPUT)/StartupRunner.o \
+	litestep/$(OUTPUT)/TrayNotifyIcon.o \
+	litestep/$(OUTPUT)/TrayService.o \
+	litestep/$(OUTPUT)/WinMain.o
+
+EXERES = litestep/$(OUTPUT)/litestep.res
 
 # Path to lsapi.dll
 DLL = $(OUTPUT)/lsapi.dll
@@ -97,33 +100,37 @@ DLLDEF = lsapi/lsapi_mingw.def
 DLLIMPLIB = $(OUTPUT)/liblsapi.a
 
 # Libraries that lsapi.dll uses
-DLLLIBS = -lole32 -lpng -lshlwapi -lz
+DLLLIBS = -lole32 -lshlwapi
 
 # Object files for lsapi.dll
 DLLOBJS = \
-	$(OUTPUT)/aboutbox.o \
-	$(OUTPUT)/BangCommand.o \
-	$(OUTPUT)/BangManager.o \
-	$(OUTPUT)/bangs.o \
-	$(OUTPUT)/graphics.o \
-	$(OUTPUT)/lsapi.o \
-	$(OUTPUT)/lsapi.res \
-	$(OUTPUT)/lsapiInit.o \
-	$(OUTPUT)/lsmultimon.o \
-	$(OUTPUT)/match.o \
-	$(OUTPUT)/MathEvaluate.o \
-	$(OUTPUT)/MathParser.o \
-	$(OUTPUT)/MathScanner.o \
-	$(OUTPUT)/MathToken.o \
-	$(OUTPUT)/MathValue.o \
-	$(OUTPUT)/picopng.o \
-	$(OUTPUT)/png_support.o \
-	$(OUTPUT)/settings.o \
-	$(OUTPUT)/SettingsFileParser.o \
-	$(OUTPUT)/SettingsIterator.o \
-	$(OUTPUT)/SettingsManager.o \
-	$(OUTPUT)/shellhlp.o \
-	$(OUTPUT)/stubs.o
+	lsapi/$(OUTPUT)/aboutbox.o \
+	lsapi/$(OUTPUT)/BangCommand.o \
+	lsapi/$(OUTPUT)/BangManager.o \
+	lsapi/$(OUTPUT)/bangs.o \
+	lsapi/$(OUTPUT)/graphics.o \
+	lsapi/$(OUTPUT)/lsapi.o \
+	lsapi/$(OUTPUT)/lsapiInit.o \
+	lsapi/$(OUTPUT)/lsmultimon.o \
+	lsapi/$(OUTPUT)/match.o \
+	lsapi/$(OUTPUT)/MathEvaluate.o \
+	lsapi/$(OUTPUT)/MathParser.o \
+	lsapi/$(OUTPUT)/MathScanner.o \
+	lsapi/$(OUTPUT)/MathToken.o \
+	lsapi/$(OUTPUT)/MathValue.o \
+	lsapi/$(OUTPUT)/picopng.o \
+	lsapi/$(OUTPUT)/png_support.o \
+	lsapi/$(OUTPUT)/settings.o \
+	lsapi/$(OUTPUT)/SettingsFileParser.o \
+	lsapi/$(OUTPUT)/SettingsIterator.o \
+	lsapi/$(OUTPUT)/SettingsManager.o \
+	lsapi/$(OUTPUT)/stubs.o
+
+DLLRES = lsapi/$(OUTPUT)/lsapi.res
+
+UTILOBJS = \
+	utility/$(OUTPUT)/debug.o \
+	utility/$(OUTPUT)/shellhlp.o
 
 #-----------------------------------------------------------------------------
 # Rules
@@ -134,445 +141,57 @@ DLLOBJS = \
 all: setup $(DLL) $(EXE)
 
 # litestep.exe
-$(EXE): setup $(EXEOBJS)
-	$(CXX) -o $(EXE) $(LDFLAGS) $(EXEOBJS) $(EXELIBS)
+$(EXE): setup $(UTILOBJS) $(EXEOBJS) $(EXERES)
+	$(CXX) -o $(EXE) $(LDFLAGS) $(UTILOBJS) $(EXEOBJS) $(EXERES) $(EXELIBS)
 
 # lsapi.dll
-$(DLL): setup $(DLLOBJS) $(DLLDEF)
-	$(DLLWRAP) --driver-name $(CXX) --def $(DLLDEF) --implib $(DLLIMPLIB) -o $(DLL) $(LDFLAGS) $(DLLOBJS) $(DLLLIBS)
+$(DLL): setup $(UTILOBJS) $(DLLOBJS) $(DLLRES) $(DLLDEF)
+	$(DLLWRAP) --driver-name $(CXX) --def $(DLLDEF) --implib $(DLLIMPLIB) -o $(DLL) $(LDFLAGS) $(UTILOBJS) $(DLLOBJS) $(DLLRES) $(DLLLIBS)
 
 # Setup environment
 .PHONY: setup
 setup:
-	-@if not exist $(OUTPUT)/$(NULL) mkdir $(OUTPUT)
+	@-if not exist $(OUTPUT)/$(NULL) mkdir $(OUTPUT)
+	@-if not exist litestep/$(OUTPUT)/$(NULL) mkdir litestep\$(OUTPUT)
+	@-if not exist lsapi/$(OUTPUT)/$(NULL) mkdir lsapi\$(OUTPUT)
+	@-if not exist utility/$(OUTPUT)/$(NULL) mkdir utility\$(OUTPUT)
 
 # Remove output files
 .PHONY: clean
 clean:
-	-$(RM) $(EXE)
-	-$(RM) $(DLL)
-	-$(RM) $(DLLIMPLIB)
-	-$(RM) $(OUTPUT)/*.o
-	-$(RM) $(OUTPUT)/*.res
+	@echo Cleaning output files
+	@echo  $(OUTPUT)/ ...
+	@-$(RM) $(EXE) $(DLL) $(DLLIMPLIB)
+	@echo Cleaning intermediate files
+	@echo  litestep/$(OUTPUT)/ ...
+	@-$(RM) $(EXE) litestep/$(OUTPUT)/*.o litestep/$(OUTPUT)/*.d litestep/$(OUTPUT)/*.res
+	@echo  lsapi/$(OUTPUT)/ ...
+	@-$(RM) lsapi/$(OUTPUT)/*.o lsapi/$(OUTPUT)/*.d lsapi/$(OUTPUT)/*.res
+	@echo  utility/$(OUTPUT)/ ...
+	@-$(RM) utility/$(OUTPUT)/*.o utility/$(OUTPUT)/*.d
+	@echo Done
 
 # Resources for litestep.exe
-$(OUTPUT)/litestep.res: litestep/litestep.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico litestep/litestep.manifest
+litestep/$(OUTPUT)/litestep.res: litestep/litestep.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico litestep/litestep.manifest
 	$(RC) -Ilitestep $(RCFLAGS) -o $@ $<
 
 # Resources for lsapi.dll
-$(OUTPUT)/lsapi.res: lsapi/lsapi.rc lsapi/resource.h
+lsapi/$(OUTPUT)/lsapi.res: lsapi/lsapi.rc lsapi/resource.h
 	$(RC) -Ilsapi $(RCFLAGS) -o $@ $<
 
 # Pattern rule to compile cpp files
-$(OUTPUT)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+utility/$(OUTPUT)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+
+lsapi/$(OUTPUT)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+
+litestep/$(OUTPUT)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
 
 #-----------------------------------------------------------------------------
 # Dependencies
 #-----------------------------------------------------------------------------
-
-$(OUTPUT)/DataStore.o: litestep/DataStore.cpp \
-	litestep/DataStore.h \
-	litestep/buildoptions.h \
-	lsapi/lsapidefines.h \
-	utility/common.h \
-	utility/debug.hpp
-
-$(OUTPUT)/DDEService.o: litestep/DDEService.cpp \
-	litestep/buildoptions.h \
-	litestep/DDEService.h \
-	litestep/DDEWorker.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/debug.hpp \
-	utility/IService.h \
-	utility/shellhlp.h
-
-$(OUTPUT)/DDEStub.o: litestep/DDEStub.cpp \
-	litestep/buildoptions.h \
-	litestep/DDEStub.h \
-	lsapi/lsapidefines.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/debug.hpp \
-	utility/IService.h
-
-$(OUTPUT)/DDEWorker.o: litestep/DDEWorker.cpp \
-	litestep/buildoptions.h \
-	litestep/DDEWorker.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/shellhlp.h
-
-$(OUTPUT)/litestep.o: litestep/litestep.cpp \
-	litestep/buildoptions.h \
-	litestep/DataStore.h \
-	litestep/DDEService.h \
-	litestep/DDEStub.h \
-	litestep/DDEWorker.h \
-	litestep/litestep.h \
-	litestep/MessageManager.h \
-	litestep/Module.h \
-	litestep/ModuleManager.h \
-	litestep/RecoveryMenu.h \
-	litestep/resource.h \
-	litestep/StartupRunner.h \
-	litestep/TrayAppBar.h \
-	litestep/TrayNotifyIcon.h \
-	litestep/TrayService.h \
-	lsapi/BangCommand.h \
-	lsapi/lsapi.h \
-	lsapi/lsapiInit.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/ThreadedBangCommand.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/ILiteStep.h \
-	utility/IManager.h \
-	utility/IService.h \
-	utility/macros.h \
-	utility/shellhlp.h
-
-$(OUTPUT)/MessageManager.o: litestep/MessageManager.cpp \
-	litestep/buildoptions.h \
-	litestep/MessageManager.h \
-	lsapi/lsapidefines.h \
-	utility/common.h \
-	utility/CriticalSection.h \
-	utility/debug.hpp
-
-$(OUTPUT)/Module.o: litestep/Module.cpp \
-	litestep/buildoptions.h \
-	litestep/Module.h \
-	litestep/resource.h \
-	lsapi/BangCommand.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/ThreadedBangCommand.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/macros.h
-
-$(OUTPUT)/ModuleManager.o: litestep/ModuleManager.cpp \
-	litestep/buildoptions.h \
-	litestep/Module.h \
-	litestep/ModuleManager.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/ILiteStep.h \
-	utility/IManager.h \
-	utility/macros.h
-
-$(OUTPUT)/RecoveryMenu.o: litestep/RecoveryMenu.cpp \
-	litestep/buildoptions.h \
-	litestep/RecoveryMenu.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/debug.hpp
-
-$(OUTPUT)/StartupRunner.o: litestep/StartupRunner.cpp \
-	litestep/buildoptions.h \
-	litestep/StartupRunner.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/shellhlp.h
-
-$(OUTPUT)/TrayNotifyIcon.o: litestep/TrayNotifyIcon.cpp \
-	litestep/buildoptions.h \
-	litestep/TrayNotifyIcon.h \
-	lsapi/lsapidefines.h \
-	utility/common.h \
-	utility/debug.hpp
-
-$(OUTPUT)/TrayService.o: litestep/TrayService.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	litestep/TrayAppBar.h \
-	litestep/TrayNotifyIcon.h \
-	litestep/TrayService.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/IService.h \
-	utility/macros.h \
-	utility/shellhlp.h
-
-$(OUTPUT)/WinMain.o: litestep/WinMain.cpp \
-	litestep/litestep.h \
-	utility/macros.h \
-	utility/shellhlp.h \
-	utility/core.hpp
-
-$(OUTPUT)/aboutbox.o: lsapi/aboutbox.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp
-
-$(OUTPUT)/BangCommand.o: lsapi/BangCommand.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/BangCommand.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/ThreadedBangCommand.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp
-
-$(OUTPUT)/BangManager.o: lsapi/BangManager.cpp \
-	litestep/buildoptions.h \
-	lsapi/BangCommand.h \
-	lsapi/BangManager.h \
-	lsapi/lsapidefines.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/stringutility.h
-
-$(OUTPUT)/bangs.o: lsapi/bangs.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/bangs.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp
-
-$(OUTPUT)/graphics.o: lsapi/graphics.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/png_support.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp
-
-$(OUTPUT)/lsapi.o: lsapi/lsapi.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/BangCommand.h \
-	lsapi/BangManager.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsapiInit.h \
-	lsapi/lsmultimon.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsIterator.h \
-	lsapi/SettingsManager.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/shellhlp.h \
-	utility/stringutility.h
-
-$(OUTPUT)/lsapiInit.o: lsapi/lsapiInit.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/BangCommand.h \
-	lsapi/BangManager.h \
-	lsapi/bangs.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsapi.h \
-	lsapi/lsapiInit.h \
-	lsapi/lsmultimon.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsIterator.h \
-	lsapi/SettingsManager.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/shellhlp.h \
-	utility/stringutility.h
-
-$(OUTPUT)/lsmultimon.o: lsapi/lsmultimon.cpp \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h
-
-$(OUTPUT)/match.o: lsapi/match.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/debug.hpp
-
-$(OUTPUT)/MathEvaluate.o: lsapi/MathEvaluate.cpp
-
-$(OUTPUT)/MathParser.o: lsapi/MathParser.cpp \
-	litestep/buildoptions.h \
-	lsapi/BangCommand.h \
-	lsapi/BangManager.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsapiInit.h \
-	lsapi/lsmultimon.h \
-	lsapi/MathEvaluate.h \
-	lsapi/MathException.h \
-	lsapi/MathParser.h \
-	lsapi/MathScanner.h \
-	lsapi/MathToken.h \
-	lsapi/MathValue.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsIterator.h \
-	lsapi/SettingsManager.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/stringutility.h
-
-$(OUTPUT)/MathScanner.o: lsapi/MathScanner.cpp \
-	lsapi/MathException.h \
-	lsapi/MathScanner.h \
-	lsapi/MathToken.h
-
-$(OUTPUT)/MathToken.o: lsapi/MathToken.cpp \
-	lsapi/MathToken.h
-
-$(OUTPUT)/MathValue.o: lsapi/MathValue.cpp \
-	lsapi/MathValue.h
-
-$(OUTPUT)/picopng.o: lsapi/picopng.cpp \
-	litestep/buildoptions.h
-
-$(OUTPUT)/png_support.o: lsapi/png_support.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapidefines.h \
-	lsapi/png_support.h \
-	utility/common.h \
-	utility/debug.hpp
-
-$(OUTPUT)/settings.o: lsapi/settings.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/BangCommand.h \
-	lsapi/BangManager.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsapiInit.h \
-	lsapi/lsmultimon.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsIterator.h \
-	lsapi/SettingsManager.h \
-	utility/Base.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/stringutility.h
-
-$(OUTPUT)/SettingsFileParser.o: lsapi/SettingsFileParser.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/MathEvaluate.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsFileParser.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/stringutility.h
-
-$(OUTPUT)/SettingsIterator.o: lsapi/SettingsIterator.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsIterator.h \
-	lsapi/SettingsManager.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/stringutility.h
-
-$(OUTPUT)/SettingsManager.o: lsapi/SettingsManager.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	lsapi/MathEvaluate.h \
-	lsapi/SettingsDefines.h \
-	lsapi/SettingsFileParser.h \
-	lsapi/SettingsIterator.h \
-	lsapi/SettingsManager.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/CriticalSection.h \
-	utility/debug.hpp \
-	utility/shellhlp.h \
-	utility/stringutility.h
-
-$(OUTPUT)/stubs.o: lsapi/stubs.cpp \
-	litestep/buildoptions.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/debug.hpp
-
-$(OUTPUT)/shellhlp.o: utility/shellhlp.cpp \
-	litestep/buildoptions.h \
-	litestep/resource.h \
-	lsapi/lsapi.h \
-	lsapi/lsapidefines.h \
-	lsapi/lsmultimon.h \
-	utility/common.h \
-	utility/core.hpp \
-	utility/debug.hpp \
-	utility/shellhlp.h
+-include $(EXEOBJS:.o=.d)
+-include $(DLLOBJS:.o=.d)
+-include $(UTILOBJS:.o=.d)

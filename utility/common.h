@@ -55,8 +55,6 @@
 #include <tchar.h>
 
 #include "../litestep/buildoptions.h"
-#include "debug.hpp"
-#include "../lsapi/lsapidefines.h"
 
 // Count array elements
 #define COUNTOF(array)  (sizeof(array)/sizeof(array[0]))

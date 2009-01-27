@@ -173,7 +173,7 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     
     while (i < length)
     {
-        if (szString[i] == 'c' || szString[i] == 'C' && !center)
+        if ((szString[i] == 'c' || szString[i] == 'C') && !center)
             center = true;
         else if (szString[i] == '%' && !percentual)
             percentual = true;

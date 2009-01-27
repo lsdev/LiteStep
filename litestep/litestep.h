@@ -24,6 +24,7 @@
 
 #include "../utility/ILiteStep.h"
 #include "../utility/common.h"
+#include "../lsapi/lsapidefines.h"
 #include <vector>
 
 

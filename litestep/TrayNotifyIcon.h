@@ -298,11 +298,6 @@ private:
 
     void update_state(DWORD dwState, DWORD dwMask);
 
-    // Internal tracking
-    HANDLE m_hOriginalIcon;
-    HANDLE m_hSharedWnd;
-    UINT   m_uSharedID;
-
     // Preserved Notify Icon Data members
     const HWND  m_hWnd;                          /* persistent & non volatile */
     const UINT  m_uID;                           /* persistent & non volatile */
@@ -313,6 +308,11 @@ private:
     CHAR  m_szTip[TRAY_MAX_TIP_LENGTH];          /* persistent &     volatile */
 
     DWORD m_dwState;                             /* persistent &     volatile */
+
+    // Internal tracking
+    HANDLE m_hOriginalIcon;
+    HANDLE m_hSharedWnd;
+    UINT   m_uSharedID;
 
     // not implemented
     NotifyIcon(const NotifyIcon& rhs);

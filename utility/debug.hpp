@@ -22,7 +22,6 @@
 #if !defined(DEBUG_HPP)
 #define DEBUG_HPP
 
-#include "common.h"
 #include <assert.h>
 
 // MSVC debug
@@ -72,8 +71,8 @@ void DbgTraceMessage(const char* pszFormat, ...);
 
 // DbgTraceWindowMessage
 #if defined (TRACE_ENABLED)
-void    DbgTraceWindowMessage(const char* pszPrefix, UINT uMsg,
-                              WPARAM wParam, LPARAM lParam);
+void    DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
+                              unsigned long wParam, unsigned long lParam);
 #else
 #define DbgTraceWindowMessage(pszPrefix, uMsg, wParam, lParam)
 #endif
@@ -84,7 +83,7 @@ void    DbgTraceWindowMessage(const char* pszPrefix, UINT uMsg,
 // DbgSetCurrentThreadName
 //
 #ifdef MSVC_DEBUG
-void DbgSetCurrentThreadName(LPCSTR pszThreadName);
+void DbgSetCurrentThreadName(const char* pszThreadName);
 #else
 #define DbgSetCurrentThreadName(Name)  (void)0
 #endif

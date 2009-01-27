@@ -23,7 +23,7 @@
 #define SETTINGSFILEPARSER_H
 
 #include "settingsdefines.h"
-#include "../utility/common.h"
+#include "lsapidefines.h"
 
 
 /**

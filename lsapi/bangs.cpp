@@ -21,7 +21,6 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "bangs.h"
 #include "../utility/core.hpp"
-#include "../utility/shellhlp.h"
 
 
 extern ULONG WINAPI AboutBoxThread(void *);
