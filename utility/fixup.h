@@ -114,7 +114,7 @@ const KNOWNFOLDERID FOLDERID_QuickLaunch =
 
 // The MinGW version doesn't work with const references
 #undef  UNREFERENCED_PARAMETER
-#define UNREFERENCED_PARAMETER(P) (P)
+#define UNREFERENCED_PARAMETER(P) (void)(P)
 
 #endif // FIXUP_MINGW
 
