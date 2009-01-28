@@ -28,6 +28,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 #include <docobj.h>
 
+#ifdef __GNUC__
+using std::max;
+using std::min;
+#endif
+
 FUNC_PVOID__HANDLE_DWORD fpSHLockShared;
 FUNC_BOOL__PVOID fpSHUnlockShared;
 

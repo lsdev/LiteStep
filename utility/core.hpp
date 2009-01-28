@@ -40,4 +40,12 @@
 #include "safeptr.h"
 #include "safestr.h"
 
+#ifdef __GNUC__
+typedef struct _SHELLHOOKINFO
+{
+    HWND hwnd;
+    RECT rc;
+} SHELLHOOKINFO, *PSHELLHOOKINFO, FAR *LPSHELLHOOKINFO;
+#endif
+
 #endif // !defined(LS_CORE_HPP_INCLUDED)

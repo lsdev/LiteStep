@@ -30,7 +30,6 @@
    // THIS IS BOGUS, WE NEED TO FIX OUR STRING FUNCTION USAGE!!!
 #  define STRSAFE_NO_DEPRECATE
 #  include "../utility/safestr.h"
-#  undef STRSAFE_NO_DEPRECATE
 #endif // defined(_DEBUG)
 
 

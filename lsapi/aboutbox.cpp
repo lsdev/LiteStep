@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include <commctrl.h>
 #include <math.h>
+#include <ctype.h>
 #include "../utility/core.hpp"
 
 extern const char rcsRevision[];

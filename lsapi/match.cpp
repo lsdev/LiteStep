@@ -39,6 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "lsapidefines.h"
 #include "lsapi.h"
+#include <ctype.h>
 
 static int matche_after_star (LPCSTR pattern, LPCSTR text);
 

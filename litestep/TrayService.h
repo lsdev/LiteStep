@@ -30,6 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef PVOID (WINAPI *FUNC_PVOID__HANDLE_DWORD)(HANDLE, DWORD);
 typedef BOOL (WINAPI *FUNC_BOOL__PVOID)(PVOID);
 
+#ifndef ABM_SETSTATE
+#define ABM_SETSTATE            0x0000000a
+#endif
+
 // shell copy data types
 #define SH_APPBAR_DATA    (0)
 #define SH_TRAY_DATA      (1)

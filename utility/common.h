@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __COMMON_H
 #define __COMMON_H
 
+#define STRSAFE_NO_DEPRECATE
+
 // Build options
 #include "../litestep/buildoptions.h"
 
@@ -35,9 +37,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #if !defined(_WIN32_IE)
 #define _WIN32_IE 0x600
 #endif
+#ifdef __GNUC__
+# if !defined(_WIN32_WINNT)
+#  define _WIN32_WINNT 0x0600
+# endif
+#endif
 
 // _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
 #if !defined (_WINDOWS_) && !defined(_WINDOWS_H)
+# ifdef __GNUC__
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+# endif
 #  define WIN32_LEAN_AND_MEAN
 #  define STRICT
 #  define NOCRYPT
@@ -48,6 +60,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <tchar.h>
 
 #include <memory>
+
+#ifdef __GNUC__
+#undef UNREFERENCED_PARAMETER
+#define UNREFERENCED_PARAMETER(P) (void)(P)
+#endif
 
 #include "debug.hpp"
 #include "../lsapi/lsapidefines.h"
