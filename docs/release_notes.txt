@@ -2,7 +2,7 @@
     LiteStep 0.24.8
     Release Notes
     
-    Copyright (c) 2008 - LiteStep Development Team
+    Copyright (c) 2009 - LiteStep Development Team
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Contents:
@@ -62,13 +62,6 @@ Contents:
   - Screenshot and theme repository.
   - LiteStep IRC Logs
 
- http://wiki.litestep.com.ar/
- ----------------------------
- - A LiteStep community wiki with content based largely around the community
-   driven Open Theme Standard.  The OTS facilitates a common framework for
-   Themers to create desktop environments easily accessible to many users.
-   (See also: http://o-t-s.sourceforge.net/)
-
  http://www.shellfront.org/modules-list.php
  ------------------------------------------
  - Module downloads.
@@ -81,9 +74,11 @@ Contents:
 
  LiteStep requires only that you are running a 32bit version of Windows:
 
-  Windows 95, Windows 98(se), Windows ME, Windows 2000, Windows XP
+  Windows 95, Windows 98(se), Windows ME, Windows 2000, Windows XP, Windows 2003
 
- NOTE: Windows Vista 32bit is currently *NOT* supported!
+ NOTE: Windows Vista/2008 32bit versions are *NOT* supported in 0.24.8!  Please
+       check our website for experimental builds containing support for running
+       under both 32bit and 64bit Vista/2008/Win7 versions.
 
  LiteStep is designed to consume less resources than the Explorer shell which it
  replaces; so there are no system requirements above and beyond that which is
@@ -120,26 +115,11 @@ Contents:
  The recommended way to start with LiteStep is to install one of the community
  driven LiteStep distributions.  Typically these distributions come with a
  friendly step by step installation wizard that will set your system up using a
- default desktop environment and theme.  Currently we recommend using one of the
- following two distributions which implement the Open Theme Standard 2 (OTS2).
+ default desktop environment and theme.  Currently we recommend using LOSI -
+ "LiteStep Open Source Installer" implementing the Open Theme Standard 2 (OTS2)
+ by Tobbe.
 
- Traditionally Omar's LiteStep Installer has been widely accepted and used.
- However, Omar has long abandoned his distribution, and as such it has fallen
- out of date.  It no longer contains the most recent version of LiteStep or
- modules; thus requiring manual updates to the distribution after installation.
- Because of this another installation project has been started; the LiteStep
- Open Source Installer (LOSI) is fully up to date with the latest LiteStep and
- module releases.  However, LOSI yet lacks proper documentation and has not
- undergone as thorough of testing where-as Omar's installer and default theme is
- well documented and has been successfully used for the last several years.
-
- Omar's LiteStep Installer may be downloaded from:
-
- http://www.beyondconvention.com/ohussain/lsinstaller/
-
- LOSI may be downloaded from:
-
- http://www.tlundberg.com/LOSI/
+ LOSI may be downloaded from at http://www.tlundberg.com/LOSI/
 
  Regardless of which distribution you use, you will find plenty of help on the
  LiteStep Mailing List (LSML) and user forums on one of the community websites.
@@ -208,8 +188,6 @@ Contents:
 
   2. Win2K/XP
 
-    - Note: Please see the LiteStep Wiki for a "Group Policy" installation.
-
     - Note: If you are NOT an administrator, you will most likely NOT be able to
       set LiteStep as your shell.  The only exception to this is if your System
       Administrator has enabled "per user" shells.  This is highly unlikely.
@@ -239,7 +217,8 @@ Contents:
 
         SYS:Microsoft\Windows NT\CurrentVersion\Winlogon
 
-    - To set the DEFAULT system shell:
+    - To set the system's DEFAULT shell (The shell all users use if "per user"
+      shells are disabled, or if a user does not have a custom shell specified):
       * Locate the following key:
 
         HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon
@@ -296,6 +275,12 @@ Contents:
  The following section lays out the structure of LiteStep, and the available
  configuration options.  When used within this document to describe a parameter
  value, <> means a required parameter, and {} means an optional parameter.
+
+ An always available built-in "Recovery Menu" can be accessed by pressing the
+ key combination: CTRL+ALT+F1 that is, press and hold the CTRL key and the ALT
+ key then depress the F1 key and release all three.  A popup menu will appear at
+ your mouse cursor location.  This menu can be used recover from a broken
+ configuration.
 
  A) LiteStep Structure
  ---------------------
@@ -395,9 +380,11 @@ Contents:
     Furthermore it is recommended that you do not use @, #, or | (vertical bar),
     because these characters may become reserved in the future.
 
-  - {value} is dependant per <command> directive and is explained in each
+  - {value} is dependent per <command> directive and is explained in each
     directive's documentation.  If the directive is required by a Module, please
-    read the corresponding documentation provided with the Module.
+    read the corresponding documentation provided with the Module.  See the
+    section "Step.rc Directive Parser" for more information on possible data
+    types.
 
  LiteStep employs three levels of parsing to step.rc at load-time and expands
  variable references at runtime.
@@ -443,13 +430,38 @@ Contents:
       '' Used as a set within the {value} parameter to delineate that the
          enclosed contents are a sub value.
 
-    - The step.rc Directive Parser recognizes several {value} types.
+    - The step.rc Directive Parser recognizes several {value} data types.
 
-      Boolean => TRUE or FALSE
-      Color   => Hexidecimal RGB color value, or RGB decimal triplet
-      Integer => Any real Integer value
-      Line    => One or more Strings
-      String  => Whitespace delimited string
+      (The examples given have fictitious directive names)
+
+      Boolean
+        Must be either TRUE or FALSE.
+
+        Example: MyModuleHideIfEmpty TRUE
+
+      Color
+        Must be either in RGB Hexidecimal or Decimal Triplet formats.
+
+        Example     (Hex): MyModuleBackgroundColor 4682B4
+        Example (Decimal): MyModuleBackgroundColor 70 130 180
+
+      Integer
+        Must be a real Integer number
+
+        Example: MyModuleWidth 32
+
+      String
+        Can be any non-reserved character set enclosed in quotation marks.
+
+        Example: MyModuleDisplayText "This Module Rocks!"
+
+      Undefined/Line
+        An undefined value type can contain any data type, and is interpreted by
+        a particular Module's implementation and documentation.  For example
+        a Module could require a single Directive Line contain both an Integer
+        and String data type within a single {value}.
+
+        Example: MyModuleFont Bold 16 "Courier New"
 
   3. Step.rc Evaluation Parser
 
@@ -556,7 +568,7 @@ Contents:
 
     - Functions
 
-      LiteStep supports a small set of builtin functions that you can use in
+      LiteStep supports a small set of built-in functions that you can use in
       expressions.  These functions are listed below in alphabetical order, with
       a short description.
 
@@ -573,7 +585,7 @@ Contents:
 
       contains(string, string)
         Returns true if the second argument, converted to a string, is a
-        subtring of the first argument, converted to a string.
+        substring of the first argument, converted to a string.
 
       endsWith(string, string)
         Returns true if the second argument, converted to a string, is a suffix
@@ -640,6 +652,64 @@ Contents:
       (e.g. $LiteStepDir$ or $ScreenWidth - 32$)
 
       See "Step.rc Evaluation Parser" section above.
+
+  5. Images, Icons and Magic Pink
+
+    - Modules may require the loading of an image file.
+
+      LiteStep can currently load BMP and PNG image files as well as icons from
+      ICO files and resource libraries.
+
+      To load a normal BMP or PNG image file, simply specify the path to the
+      file in the Module's configuration directive that requires an image file.
+      (The examples below use the fictitious directive "ModuleBackgroundImage")
+
+      To load an icon from an ICO file or resource library for use as an image,
+      use the syntax:
+
+        ModuleBackgroundImage ".extract=<icon resource>"
+
+      Where <icon resource> specifies the icon to load. See below for further
+      details on the syntaxt for loading icons. Please note that the ".extract="
+      prefix is required when loading an icon file when the Module is expecting
+      a normal image file.
+
+      To load and merge multiple images into a single image, separate the file
+      paths with the pipe character | using the syntax:
+
+        ModuleBackgroundImage "C:\folder\image1.png|C:\folder\image2.png{|...}"
+
+      where the last image specified will be on bottom, and the first image
+      specified will be on top. It is possible to include an icon resource in
+      this merging syntax as well, just use the ".extract=" prefix.
+
+      Relative paths refer to files in the LiteStep image directory. Refer to
+      LSGetImagePath Step.rc directive for details.
+
+    - If an image contains the "magic pink" RGB color 255 0 255 (FF00FF) then
+      the portion of the image that is "magic pink" will be rendered transparent
+      to the content below it.  Some modules require a separate configuration
+      setting to enable or disable transparency support.  Refer to the Module's
+      documentation.
+
+    - Modules may require the specific loading of icon files.  LiteStep supports
+      loading icons from any icon resource file or archive as well as loading an
+      icon associated with a desktop.ini file.
+
+      It is possible to load an icon using the following syntax:
+
+      Directly load an icon file:
+        "C:\path\to\file.ico"
+
+      Extract an icon from a resource library (.icl, .dll, .exe, et cetera)
+      using the specified resource index n:
+        "C:\path\to\library.ext,n"
+
+      Extract the associated icon from a folder's "desktop.ini" file:
+        "C:\some\folder\"
+
+      Relative paths refer to files in the LiteStep image directory. Refer to
+      LSGetImagePath Step.rc directive for details. 
 
  D) Step.rc Directives
  ---------------------
@@ -955,7 +1025,8 @@ Contents:
 
   !ReloadModule
   -------------
-   Reloads a specific module.  Does not reload configuration files.
+   Reloads a specific module.  Does not reload configuration files.  If the
+   specified module is not already loaded, it is loaded.
 
    Usage:
     !ReloadModule <path>
@@ -976,7 +1047,7 @@ Contents:
 
   !ShowModules
   ------------
-   Shows all modules.
+   Shows all modules after having been hidden using !HideModules.
 
    Usage:
     !ShowModules
@@ -990,8 +1061,8 @@ Contents:
 
   !SwitchUser
   -----------
-   Switch to another user with logging off the current user.  This command only
-   works on Windows XP or later.
+   Switch to another user without logging off the current user.  This command
+   only works on Windows XP or later.
 
    Usage:
     !SwitchUser
@@ -1012,7 +1083,7 @@ Contents:
 
   !ToggleModules
   --------------
-   Toggles the visibility of all modules.
+   Toggles the visibility of all modules.  See !HideModules and !ShowModules.
 
    Usage:
     !ToggleModules
@@ -1032,7 +1103,8 @@ Contents:
        relevant modules and extract them to your LiteStep folder.
 
  NOTE: The step.rc contents is what exists between {BeginStepRC} and {EndStepRC}
-       not including those two delimiters.
+       not including those two delimiters.  Create the step.rc file in the same
+       folder as litestep.exe.
 
 {BeginStepRC}
 ; This is an EXAMPLE step.rc file.  This example will NOT work without
@@ -1101,14 +1173,16 @@ ENDIF
    devteam <at> lsdev.org
 
  When reporting a bug, please include:
-
  (use the !About dialog to retrieve version information)
- - LiteStep Core Version
- - All currently loaded modules and their versions
- - Your contact information (email address)
- - A complete description of the bug and if possible a step-by-step procedure to
-   reproduce the bug.  If we can not reproduce the bug, we will not be able to
-   fix it!  So, please do your best to help us help you.  Thanks!
+
+  - Windows OS Version and Service Pack level
+  - LiteStep Core Version
+  - All currently loaded modules and their versions
+  - Theme name and version (if applicable)
+  - Your contact information (email address)
+  - A complete description of the bug and if possible a step-by-step procedure
+    to reproduce the bug.  If we can not reproduce the bug, we will not be able
+    to fix it!  So, please do your best to help us help you.  Thanks!
 
  We look forward to working with any module developers out there.  Please stop
  by our IRC channel #lsdev on Freenode (irc.freenode.net).  We also have a
@@ -1125,11 +1199,11 @@ ENDIF
  - Chris Rempel (jugg)
  - Simon (ilmcuts)
  - Tobbe Lundberg (Tobbe)
- - Xjill
 
  (Inactive Members)
  - Joshua Seagoe (RabidCow)
  - Kevin Schaffer (Maduin)
+ - Vidar T. Fauske (Xjill)
 
  LiteStep 0.24.8
  ---------------
@@ -1234,7 +1308,7 @@ ENDIF
  A) Documentation License Notice
  -------------------------------
 
- Copyright (c) 2005-2008 LiteStep Development Team
+ Copyright (c) 2005-2009 LiteStep Development Team
 
  Permission is granted to copy, distribute and/or modify this document under the
  terms of the GNU Free Documentation License, Version 1.2 or any later version
@@ -1248,7 +1322,7 @@ ENDIF
  LiteStep is a replacement shell for the standard Windows® Explorer shell.
 
  Copyright (C) 1997-1998  Francis Gastellu
- Copyright (C) 1998-2008  LiteStep Development Team
+ Copyright (C) 1998-2009  LiteStep Development Team
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
