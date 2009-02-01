@@ -78,7 +78,7 @@ Contents:
 
  NOTE: Windows Vista/2008 32bit versions are *NOT* supported in 0.24.8!  Please
        check our website for experimental builds containing support for running
-       under both 32bit and 64bit Vista/2008/Win7 versions.
+       under both 32bit and 64bit Windows XP/Vista/2008/Win7 versions.
 
  LiteStep is designed to consume less resources than the Explorer shell which it
  replaces; so there are no system requirements above and beyond that which is
@@ -660,9 +660,12 @@ Contents:
       LiteStep can currently load BMP and PNG image files as well as icons from
       ICO files and resource libraries.
 
+      (The examples below use the fictitious directive "ModuleBackgroundImage")
+
       To load a normal BMP or PNG image file, simply specify the path to the
       file in the Module's configuration directive that requires an image file.
-      (The examples below use the fictitious directive "ModuleBackgroundImage")
+
+        ModuleBackgroundImage "C:\folder\image.bmp"
 
       To load an icon from an ICO file or resource library for use as an image,
       use the syntax:
@@ -684,7 +687,7 @@ Contents:
       this merging syntax as well, just use the ".extract=" prefix.
 
       Relative paths refer to files in the LiteStep image directory. Refer to
-      LSGetImagePath Step.rc directive for details.
+      LSImageFolder Step.rc directive for details.
 
     - If an image contains the "magic pink" RGB color 255 0 255 (FF00FF) then
       the portion of the image that is "magic pink" will be rendered transparent
@@ -699,17 +702,20 @@ Contents:
       It is possible to load an icon using the following syntax:
 
       Directly load an icon file:
+
         "C:\path\to\file.ico"
 
       Extract an icon from a resource library (.icl, .dll, .exe, et cetera)
-      using the specified resource index n:
-        "C:\path\to\library.ext,n"
+      using the specified resource index (in this example, index 9):
+
+        "C:\path\to\icon\library.icl,9"
 
       Extract the associated icon from a folder's "desktop.ini" file:
-        "C:\some\folder\"
+
+        "C:\path\to\some\folder\"
 
       Relative paths refer to files in the LiteStep image directory. Refer to
-      LSGetImagePath Step.rc directive for details. 
+      LSImageFolder Step.rc directive for details. 
 
  D) Step.rc Directives
  ---------------------
@@ -1061,8 +1067,9 @@ Contents:
 
   !SwitchUser
   -----------
-   Switch to another user without logging off the current user.  This command
-   only works on Windows XP or later.
+   On Windows XP with Fast User Switching enabled, this command will switch to
+   another user without logging off the current user.  On other systems this
+   command will lock the workstation.
 
    Usage:
     !SwitchUser
