@@ -1,74 +1,66 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.8 Release Candidate 1
+    LiteStep 0.24.8
     Readme
     
-    Copyright (c) 2008 - LiteStep Development Team
+    Copyright (c) 2009 The LiteStep Development Team
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 
 -- PREFACE ---------------------------------------------------------------------
 
  Your friendly devteam is proud to announce the release of LiteStep 0.24.8
- Release Candidate 1.  Major changes since 0.24.7 are listed below.  Refer to
- release_notes.txt for complete documentation on this release.
+ Final.  Changes since Release Candidate 1 are listed below as usual.  Refer to
+ changes.txt for a list of changes since 0.24.7.  Refer to release_notes.txt for
+ complete documentation on this release.
 
+ LiteStep 0.24.8 Final is our last planned 0.24.x series release.  The next
+ release series will be 0.25.x and will have full support for Windows Vista, but
+ will no longer support Windows 95.  If you are currently running Windows Vista
+ you will want to look at our current unstable releases.  Please visit our
+ home page (link at bottom) for downloads.
 
--- CHANGES SINCE 0.24.7 --------------------------------------------------------
+-- CHANGES SINCE 0.24.8 RELEASE CANDIDATE 1 ------------------------------------
 
- - New evaluation parser
+ - Fixed several Startup Runner issues.
 
-   With the evaluation parser, both conditional expressions (If, ElseIf) and
-   in-line expressions ($a + b$) now use the same syntax.  The new parser also
-   adds some new capabilities that were previously unavailable such as strings
-   and built-in functions.
+ - Fixed the Step.rc Evaluation Parser's abs() function from converting the
+   input to an integer.  Now abs(-1.23) will return 1.23 instead of 1.
 
-   The new syntax should be backwards compatible with existing files, but this
-   is new code and there are bound to be bugs.  So, we're needing users to try
-   out the new code and report bugs back to us.  Also be sure to try out some of
-   the new features and provide feedback on those as well.  The new syntax is
-   documented in the "release_notes.txt".
+ - Fixed LiteStep from shutting down too early if an application blocks the
+   shutdown process which would leave the user with an empty desktop.
 
- - Appbar support
+ - Fixed !about dialog's font display under Windows 95.
 
-   We have added an implementation to support AppBars.  This is a feature found
-   in the Explorer shell which some applications use to dock their window to the
-   edge of a screen (e.g. the Explorer taskbar).  Some typical applications that
-   use this feature are Trillian and various media players.
+ - Fixed a regression from 0.24.7 that was introduced in 0.24.8 RC1 which caused
+   systray tooltips and infotips to be broken on certain locales.
 
-   This also adds support for WorkArea updates when an Appbar is positioned or
-   removed.  Please test the interaction between AppBars adjusting the WorkArea
-   and the Desktop modules adjusting the WorkArea.  Hopefully they will interact
-   nicely.  What you should expect, is if the desktop module has changed the
-   WorkArea for a specific screen edge, then any Appbar placed on the same
-   screen edge will be positioned so that it does not overlap the old WorkArea.
-   This implementation appears to work in practice in the limited testing we
-   were able to do.  Please let us know if you find any odd or undesirable
-   behavior in regards to the WorkArea and AppBars.
+ - Fixed several API bugs: NULL paramater crash in RemoveBangCommand() and
+   invalid message format for LM_GETMINRECT and LM_APPCOMMAND.
 
- - Icon notification tray (systray) service fixes
+ - Updated German language strings.
 
-   The Icon Notification Tray service has been updated to fix several issues.
-   The most visible one being where old icons and sometimes balloon (info)
-   tips would appear during a recycle.  Please verify that all expected
-   functionality still works.
+ - Updated !Confirm dialog's default caption to "!Confirm LiteStep".
 
- - Added checks for recursively defined variables to VarExpansionEx.
+ - Updated the !about dialog's System Information page to show >2GB of memory
+   statistics if needed and to show partial gigabytes.
 
- - Removed !gather bang command proxy for VWM modules (all current VWM modules
-   now implement that function internally).
+ - Updated !about dialog's System Information page to support "Windows 2000" OS
+   version.
 
- - Improvements to LSAutoHideModules.
+ - Greatly improved the full screen application detection code.  It now detects
+   any full screen application on the primary monitor correctly and hides or
+   shows all modules accordingly (when LSAutoHideModules is enabled).
 
+ - Added LiteStep version resource information to hook.dll.
+
+ - Upgraded to libpng version 1.2.34.
+
+ - Brought the VC7.1 and MinGW build files up to date.
 
 -- FINAL WORDS -----------------------------------------------------------------
 
  Thanks to the LiteStep Community for all the positive feedback and support and
  for the endless patience.  Once again it has taken a long time, but LiteStep
- 0.24.8 is finally on its way.
-
- If you upgrade to this version from 0.24.7 Final, and *anything* breaks, please
- let us know.  We intend for 0.24.8 to be drop-in-compatible with all existing
- valid configurations.
+ 0.24.8 has finally arrived.
 
  Please send any suggestions or bug reports to the LSDev team contact address
  at: devteam <at> lsdev.org
@@ -76,11 +68,12 @@
  When reporting a bug, please include:
  (use the !About dialog to retrieve version information)
 
+  - Windows OS Version and Service Pack level
   - LiteStep Core Version
   - All currently loaded modules and their versions
   - Theme name and version (if applicable)
   - Your contact information (email address)
-  - A complete description of the issue and if possible a step-by-step procedure
+  - A complete description of the bug and if possible a step-by-step procedure
     to reproduce the bug.  If we can not reproduce the bug, we will not be able
     to fix it!  So, please do your best to help us help you.  Thanks!
 
@@ -88,3 +81,5 @@
 
  - The LiteStep Development Team
    http://www.lsdev.org/
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
