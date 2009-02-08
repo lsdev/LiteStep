@@ -103,7 +103,9 @@ bool Module::_LoadDll()
         
         if (!bReturn)
         {
-            RESOURCE_MSGBOX_F(m_tzLocation.c_str(), MB_ICONEXCLAMATION);
+            LPCTSTR pszFileName = PathFindFileName(m_tzLocation.c_str());
+
+            RESOURCE_MSGBOX_F(pszFileName, MB_ICONEXCLAMATION);
 
             if (m_hInstance)
             {
