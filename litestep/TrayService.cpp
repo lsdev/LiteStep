@@ -660,6 +660,9 @@ HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
     {
         TRACE("Unknown LoadInProc message: %u", dwMessage);
     }
+#else
+    UNREFERENCED_PARAMETER(clsid);
+    UNREFERENCED_PARAMETER(dwMessage);
 #endif
 
     // This is not actually implemented
