@@ -414,7 +414,10 @@ BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
 
         if (fnPlaySound)
         {
-            DWORD dwFlags = SND_ALIAS;
+            // Use SND_NODEFAULT to make sure that not even a default sound is
+            // played if the sound alias has no corresponding sound set
+            // (if e.g. the user has disabled this particular sound)
+            DWORD dwFlags = SND_ALIAS | SND_NODEFAULT;
 
             if (IsVistaOrAbove())
             {
