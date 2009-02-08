@@ -235,8 +235,13 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
     ASSERT(NULL != ptzBuffer); ASSERT(0 != cchBuffer);
     
     LPOLESTR pOleString = NULL;
-    
-    HRESULT hr = StringFromCLSID(rclsid, &pOleString);
+
+    HRESULT hr = ProgIDFromCLSID(rclsid, &pOleString);
+
+    if (FAILED(hr))
+    {
+        hr = StringFromCLSID(rclsid, &pOleString);
+    }
     
     if (SUCCEEDED(hr) && pOleString)
     {

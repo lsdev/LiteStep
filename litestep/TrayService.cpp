@@ -274,6 +274,13 @@ void TrayService::destroyWindows()
 //
 HRESULT TrayService::loadShellServiceObject(REFCLSID rclsid)
 {
+#ifdef TRACE_ENABLED
+    CHAR szBuffer[MAX_PATH] = { 0 };
+    CLSIDToString(rclsid, szBuffer, COUNTOF(szBuffer));
+
+    TRACE("loadShellServiceObject(\"%s\")", szBuffer);
+#endif
+
     IOleCommandTarget* pCmdTarget = NULL;
 
     HRESULT hr = CoCreateInstance(rclsid, NULL,
@@ -460,8 +467,25 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     
                 case SH_LOADPROC_DATA:
                     {
-                        TRACE("SHLoadInProc message detected");
-                        lResult = E_NOTIMPL;
+                        //
+                        // LoadInProc messages
+                        //
+                        if (pcds->cbData == sizeof(CLSID))
+                        {
+                            // Classic SHLoadInProc message
+                            lResult = pTrayService->HandleLoadInProc((REFCLSID)pcds->lpData, 1);
+                        }
+                        else if (pcds->cbData == sizeof(SHELLINPROCDATA))
+                        {
+                            PSHELLINPROCDATA pipd = (PSHELLINPROCDATA)pcds->lpData;
+                            
+                            lResult = pTrayService->HandleLoadInProc(pipd->clsid, pipd->dwMessage);
+                        }
+                        else
+                        {
+                            TRACE("Unknown SHLoadInProc size: %u", pcds->cbData);
+                            lResult = E_NOTIMPL;
+                        }
                     }
                     break;
 
@@ -605,6 +629,41 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
 LRESULT CALLBACK TrayService::WindowNotifyProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// HandleLoadInProc
+//
+// Handler for SHLoadInProc and SHEnableServiceObject (where available)
+//
+HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
+{
+#ifdef TRACE_ENABLED
+    CHAR szBuffer[MAX_PATH] = { 0 };
+    CLSIDToString(clsid, szBuffer, COUNTOF(szBuffer));
+
+    if (dwMessage == 1)
+    {
+        TRACE("SHLoadInProc(\"%s\")", szBuffer);
+    }
+    else if (dwMessage == 2)
+    {
+        TRACE("SHEnableShellServiceObject(\"%s\", FALSE)", szBuffer);
+    }
+    else if (dwMessage == 3)
+    {
+        TRACE("SHEnableShellServiceObject(\"%s\", TRUE)", szBuffer);
+    }
+    else
+    {
+        TRACE("Unknown LoadInProc message: %u", dwMessage);
+    }
+#endif
+
+    // This is not actually implemented
+    return E_NOTIMPL;
 }
 
 
@@ -1586,7 +1645,7 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
         
     default:
         {
-            TRACE("NIM unknown: %u", pstd->dwMessage);
+            TRACE("Unknown NIM: %u", pstd->dwMessage);
         }
         break;
     }

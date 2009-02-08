@@ -65,6 +65,15 @@ private:
     _SHELLAPPBARDATA& operator=(const _SHELLAPPBARDATA&);
 } SHELLAPPBARDATA, *PSHELLAPPBARDATA;
 
+
+// Data sent with SHLoadInProc/SHEnableServiceObject on XP and up
+// Earlier versions don't have SHEnableServiceObject and only send the CLSID
+typedef struct _SHELLINPROCDATA
+{
+    CLSID clsid;
+    DWORD dwMessage;
+} SHELLINPROCDATA, *PSHELLINPROCDATA;
+
 typedef std::vector<NotifyIcon*> IconVector;
 typedef std::vector<AppBar*> BarVector;
 typedef std::vector<struct IOleCommandTarget*> SsoVector;
@@ -116,6 +125,9 @@ private:
     
     // Handler for system tray notifications
     BOOL HandleNotification(PSHELLTRAYDATA pstd);
+
+    // Handler for LoadInProc messages
+    HRESULT HandleLoadInProc(REFCLSID clsid, DWORD dwMessage);
     
     //
     // ABM_* Notification handlers
