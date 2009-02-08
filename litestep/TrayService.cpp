@@ -650,11 +650,11 @@ HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
     }
     else if (dwMessage == 2)
     {
-        TRACE("SHEnableShellServiceObject(\"%s\", FALSE)", szBuffer);
+        TRACE("SHEnableServiceObject(\"%s\", FALSE)", szBuffer);
     }
     else if (dwMessage == 3)
     {
-        TRACE("SHEnableShellServiceObject(\"%s\", TRUE)", szBuffer);
+        TRACE("SHEnableServiceObject(\"%s\", TRUE)", szBuffer);
     }
     else
     {
