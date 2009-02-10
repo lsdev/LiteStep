@@ -180,16 +180,16 @@
 //---------------------------------------------------------
 // MODULE ENTRY POINTS DEFINES
 //---------------------------------------------------------
-typedef int  (CDECL* initModuleExProc)(HWND, HINSTANCE, LPCSTR);
-typedef void (CDECL* quitModuleProc)(HINSTANCE);
+typedef int  (__cdecl* initModuleExProc)(HWND, HINSTANCE, LPCSTR);
+typedef void (__cdecl* quitModuleProc)(HINSTANCE);
 
 
 //---------------------------------------------------------
 // BANG COMMAND DEFINES
 //---------------------------------------------------------
-typedef void (CDECL *BangCommand)  (HWND hSender, LPCSTR pszArgs);
-typedef void (CDECL *BangCommandEx)(HWND hSender, LPCSTR pszCommand,
-                                    LPCSTR pszArgs);
+typedef void (__cdecl *BangCommand)  (HWND hSender, LPCSTR pszArgs);
+typedef void (__cdecl *BangCommandEx)(HWND hSender, LPCSTR pszCommand,
+                                      LPCSTR pszArgs);
 
 typedef struct _LMBANGCOMMANDA
 {
