@@ -709,3 +709,124 @@ HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
     LSRevertWow64FsRedirection(pvOldValue);
     return hinstResult;
 }
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSActivateActCtxForDll
+// Activates the custom activation context for the specified DLL
+//
+HANDLE LSActivateActCtxForDll(LPCTSTR pszDll, PULONG_PTR pulCookie)
+{
+    HANDLE hContext = INVALID_HANDLE_VALUE;
+
+    typedef HANDLE (WINAPI* CreateActCtx_t)(PACTCTX pCtx);
+    typedef BOOL (WINAPI* ActivateActCtx_t)(HANDLE hCtx, ULONG_PTR* pCookie);
+
+#ifdef UNICODE
+    CreateActCtx_t fnCreateActCtx = (CreateActCtx_t)
+        GetProcAddress(GetModuleHandle(_T("KERNEL32")), "CreateActCtxW");
+#else
+    CreateActCtx_t fnCreateActCtx = (CreateActCtx_t)
+        GetProcAddress(GetModuleHandle(_T("KERNEL32")), "CreateActCtxA");
+#endif
+
+    ActivateActCtx_t fnActivateActCtx = (ActivateActCtx_t)
+        GetProcAddress(GetModuleHandle(_T("KERNEL32")), "ActivateActCtx");
+
+
+    if (fnCreateActCtx != NULL && fnActivateActCtx != NULL)
+    {
+        ACTCTX act = { 0 };
+        act.cbSize = sizeof(act);
+        act.dwFlags = ACTCTX_FLAG_RESOURCE_NAME_VALID;
+        act.lpSource = pszDll;
+        act.lpResourceName = MAKEINTRESOURCE(123);
+
+        hContext = fnCreateActCtx(&act);
+
+        if (hContext != INVALID_HANDLE_VALUE)
+        {
+            if (!fnActivateActCtx(hContext, pulCookie))
+            {
+                LSDeactivateActCtx(hContext, NULL);
+                hContext = INVALID_HANDLE_VALUE;
+            }
+        }
+    }
+
+    return hContext;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSActivateActCtxForClsid
+// Activates the custom activation context for the specified CLSID
+//
+HANDLE LSActivateActCtxForClsid(REFCLSID rclsid, PULONG_PTR pulCookie)
+{
+    HANDLE hContext = INVALID_HANDLE_VALUE;
+    TCHAR szCLSID[39] = { 0 };
+
+    //
+    // Get the DLL that implements the COM object in question
+    //
+    if (SUCCEEDED(CLSIDToString(rclsid, szCLSID, COUNTOF(szCLSID))))
+    {
+        TCHAR szSubkey[MAX_PATH] = { 0 };
+
+        HRESULT hr = StringCchPrintf(szSubkey, COUNTOF(szSubkey),
+            _T("CLSID\\%s\\InProcServer32"), szCLSID);
+
+        if (SUCCEEDED(hr))
+        {
+            TCHAR szDll[MAX_PATH] = { 0 };
+            DWORD cbDll = sizeof(szDll);
+
+            LSTATUS lres = SHGetValue(
+                HKEY_CLASSES_ROOT, szSubkey, NULL, NULL, szDll, &cbDll);
+
+            if (lres == ERROR_SUCCESS)
+            {
+                //
+                // Activate the custom manifest (if any) of that DLL
+                //
+                hContext = LSActivateActCtxForDll(szDll, pulCookie);
+            }
+        }
+    }
+
+    return hContext;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSDeactivateActCtx
+// Removes an activation context from the activation context stack
+//
+void LSDeactivateActCtx(HANDLE hActCtx, ULONG_PTR* pulCookie)
+{
+    typedef BOOL (WINAPI* DeactivateActCtx_t)(DWORD dwFlags, ULONG_PTR ulc);
+    typedef void (WINAPI* ReleaseActCtx_t)(HANDLE hActCtx);
+
+    DeactivateActCtx_t fnDeactivateActCtx = (DeactivateActCtx_t)
+        GetProcAddress(GetModuleHandle(_T("KERNEL32")), "DeactivateActCtx");
+
+    ReleaseActCtx_t fnReleaseActCtx = (ReleaseActCtx_t)
+        GetProcAddress(GetModuleHandle(_T("KERNEL32")), "ReleaseActCtx");
+
+    if (fnDeactivateActCtx != NULL && fnReleaseActCtx != NULL)
+    {
+        if (hActCtx != INVALID_HANDLE_VALUE)
+        {
+            if (pulCookie != NULL)
+            {
+                fnDeactivateActCtx(0, *pulCookie);
+            }
+
+            fnReleaseActCtx(hActCtx);
+        }
+    }
+}

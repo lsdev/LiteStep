@@ -62,6 +62,15 @@ HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
+// Actication contexts
+//
+HANDLE LSActivateActCtxForDll(LPCTSTR pszDll, PULONG_PTR pulCookie);
+HANDLE LSActivateActCtxForClsid(REFCLSID rclsid, PULONG_PTR pulCookie);
+void   LSDeactivateActCtx(HANDLE hActCtx, ULONG_PTR* pulCookie);
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
 // Windows Versions
 //
 UINT GetWindowsVersion();

@@ -81,7 +81,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="litestep.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -179,7 +178,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="litestep.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -335,10 +333,6 @@
 			</File>
 			<File
 				RelativePath=".\litestep.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\litestep.manifest"
 				>
 			</File>
 			<File

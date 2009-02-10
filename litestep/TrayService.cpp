@@ -281,6 +281,11 @@ HRESULT TrayService::loadShellServiceObject(REFCLSID rclsid)
     TRACE("loadShellServiceObject(\"%s\")", szBuffer);
 #endif
 
+    // The SSO might have a custom manifest.
+    // Activate it before loading the object.
+    ULONG_PTR ulCookie;
+    HANDLE hContext = LSActivateActCtxForClsid(rclsid, &ulCookie);
+
     IOleCommandTarget* pCmdTarget = NULL;
 
     HRESULT hr = CoCreateInstance(rclsid, NULL,
@@ -293,6 +298,11 @@ HRESULT TrayService::loadShellServiceObject(REFCLSID rclsid)
             OLECMDEXECOPT_DODEFAULT, NULL, NULL);
 
         m_ssoVector.push_back(pCmdTarget);
+    }
+
+    if (hContext != INVALID_HANDLE_VALUE)
+    {
+        LSDeactivateActCtx(hContext, &ulCookie);
     }
 
     return hr;
