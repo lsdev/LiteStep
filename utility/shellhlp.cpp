@@ -784,7 +784,7 @@ HANDLE LSActivateActCtxForClsid(REFCLSID rclsid, PULONG_PTR pulCookie)
             TCHAR szDll[MAX_PATH] = { 0 };
             DWORD cbDll = sizeof(szDll);
 
-            LSTATUS lres = SHGetValue(
+            LONG lres = SHGetValue(
                 HKEY_CLASSES_ROOT, szSubkey, NULL, NULL, szDll, &cbDll);
 
             if (lres == ERROR_SUCCESS)
