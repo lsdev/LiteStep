@@ -1400,7 +1400,7 @@ BOOL CALLBACK CLiteStep::_EnumThreadFSWnd(HWND hWnd, LPARAM lParam)
 //
 // _FullScreenGetMonitor
 //
-HMONITOR CLiteStep::_FullScreenGetMonitor(HWND hWnd)
+HMONITOR CLiteStep::_FullScreenGetMonitor(HWND hWnd) const
 {
     if(!IsWindow(hWnd))
     {

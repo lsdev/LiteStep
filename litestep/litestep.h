@@ -102,7 +102,7 @@ private:
     HMONITOR m_hFullScreenMonitor; // = NULL;
     static HMONITOR _FullScreenGetMonitorHelper(HWND hWnd);
     static BOOL CALLBACK _EnumThreadFSWnd(HWND hWnd, LPARAM lParam);
-    HMONITOR _FullScreenGetMonitor(HWND hWnd);
+    HMONITOR _FullScreenGetMonitor(HWND hWnd) const;
     void _FullScreenHandler(HMONITOR hMonFullScreen);
     void _HandleShellHooks(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
