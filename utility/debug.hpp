@@ -23,6 +23,7 @@
 #define DEBUG_HPP
 
 #include <assert.h>
+#include <stddef.h>
 
 // MSVC debug
 #if defined(_DEBUG) && defined (_MSC_VER)
