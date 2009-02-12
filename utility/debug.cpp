@@ -56,7 +56,7 @@ void DbgTraceMessage(const char* pszFormat, ...)
 //
 #ifdef TRACE_ENABLED
 void DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
-                           unsigned long wParam, unsigned long lParam)
+                           uintptr_t wParam, uintptr_t lParam)
 {
     if (uMsg < WM_USER)
     {

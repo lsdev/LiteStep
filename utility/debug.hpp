@@ -72,7 +72,7 @@ void DbgTraceMessage(const char* pszFormat, ...);
 // DbgTraceWindowMessage
 #if defined (TRACE_ENABLED)
 void    DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
-                              unsigned long wParam, unsigned long lParam);
+                              uintptr_t wParam, uintptr_t lParam);
 #else
 #define DbgTraceWindowMessage(pszPrefix, uMsg, wParam, lParam)
 #endif
