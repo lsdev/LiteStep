@@ -33,7 +33,6 @@
  */
 
 #include "lsapidefines.h"
-#include "lsmultimon.h"
 #include "../utility/common.h"
 #include <stdio.h>
 

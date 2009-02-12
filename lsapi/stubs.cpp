@@ -210,3 +210,46 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     
     return value;
 }
+
+int LSGetSystemMetrics(int nIndex)
+{
+    return GetSystemMetrics(nIndex);
+}
+
+HMONITOR LSMonitorFromPoint(POINT pt, DWORD dwFlags)
+{
+    return MonitorFromPoint(pt, dwFlags);
+}
+
+HMONITOR LSMonitorFromRect(LPCRECT lprc, DWORD dwFlags)
+{
+    return MonitorFromRect(lprc, dwFlags);
+}
+
+HMONITOR LSMonitorFromWindow(HWND hwnd, DWORD dwFlags)
+{
+    return MonitorFromWindow(hwnd, dwFlags);
+}
+
+BOOL LSGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
+{
+    return GetMonitorInfoA(hMonitor, lpmi);
+}
+
+BOOL LSEnumDisplayMonitors(
+    HDC hdc,
+    LPCRECT lprcClip,
+    MONITORENUMPROC lpfnEnum,
+    LPARAM dwData)
+{
+    return EnumDisplayMonitors(hdc, lprcClip, lpfnEnum, dwData);
+}
+
+BOOL LSEnumDisplayDevices(
+    LPCSTR lpDevice,
+    DWORD iDevNum,
+    PDISPLAY_DEVICEA lpDisplayDevice,
+    DWORD dwFlags)
+{
+    return EnumDisplayDevicesA(lpDevice, iDevNum, lpDisplayDevice, dwFlags);
+}

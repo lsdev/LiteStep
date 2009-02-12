@@ -234,10 +234,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\lsmultimon.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\match.cpp"
 				>
 				<FileConfiguration
@@ -333,10 +329,6 @@
 			</File>
 			<File
 				RelativePath=".\lsapiInit.h"
-				>
-			</File>
-			<File
-				RelativePath=".\lsmultimon.h"
 				>
 			</File>
 			<File

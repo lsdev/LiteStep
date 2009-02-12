@@ -162,9 +162,6 @@
 				RelativePath=".\lsapiInit.cpp">
 			</File>
 			<File
-				RelativePath=".\lsmultimon.cpp">
-			</File>
-			<File
 				RelativePath=".\match.cpp">
 			</File>
 			<File
@@ -225,9 +222,6 @@
 			</File>
 			<File
 				RelativePath=".\lsapiInit.h">
-			</File>
-			<File
-				RelativePath=".\lsmultimon.h">
 			</File>
 			<File
 				RelativePath=".\MathEvaluate.h">

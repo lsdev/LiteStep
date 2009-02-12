@@ -111,7 +111,6 @@ DLLOBJS = \
 	lsapi/$(OUTPUT)/graphics.o \
 	lsapi/$(OUTPUT)/lsapi.o \
 	lsapi/$(OUTPUT)/lsapiInit.o \
-	lsapi/$(OUTPUT)/lsmultimon.o \
 	lsapi/$(OUTPUT)/match.o \
 	lsapi/$(OUTPUT)/MathEvaluate.o \
 	lsapi/$(OUTPUT)/MathParser.o \
