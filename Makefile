@@ -128,6 +128,7 @@ DLLOBJS = \
 
 DLLRES = lsapi/$(OUTPUT)/lsapi.res
 
+# Object files for utility project
 UTILOBJS = \
 	utility/$(OUTPUT)/debug.o \
 	utility/$(OUTPUT)/shellhlp.o
@@ -180,14 +181,33 @@ lsapi/$(OUTPUT)/lsapi.res: lsapi/lsapi.rc lsapi/resource.h
 	$(RC) -Ilsapi $(RCFLAGS) -o $@ $<
 
 # Pattern rule to compile cpp files
+#
+# The sed mess does this with the auto-dependency (*.d) files:
+#  1. strip line of colon and everything preceding it
+#  2. strip whitespace from start of line
+#  3. strip trailing whitespace and backslash from end of line
+#  4. remove empty lines
+#  5. if a space character is left anywhere in the line, replace it with a colon
+#     and a new line. (splits apart multiple file names into individual lines)
+#  6. add a trailing colon at the end of the line.
+#
+# (note: for some reason sed does not like + matching. odd.)
+#
+# If for some reason you don't have sed, just delete those lines, and the only
+# issue you'll run into is that if you ever get the error "No rule to make
+# target <...>" then you'll have to run a 'make clean' to fix the issue.
+#
 utility/$(OUTPUT)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+	@sed -e "s/^[^:]*://" -e "s/^  *//" -e "s/ *\\$$//" -e "/^$$/ d" -e "s/  */:\n/g" -e "s/$$/:/" < utility/$(OUTPUT)/$*.d >> utility/$(OUTPUT)/$*.d
 
 lsapi/$(OUTPUT)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+	@sed -e "s/^[^:]*://" -e "s/^  *//" -e "s/ *\\$$//" -e "/^$$/ d" -e "s/  */:\n/g" -e "s/$$/:/" < lsapi/$(OUTPUT)/$*.d >> lsapi/$(OUTPUT)/$*.d
 
 litestep/$(OUTPUT)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+	@sed -e "s/^[^:]*://" -e "s/^  *//" -e "s/ *\\$$//" -e "/^$$/ d" -e "s/  */:\n/g" -e "s/$$/:/" < litestep/$(OUTPUT)/$*.d >> litestep/$(OUTPUT)/$*.d
 
 #-----------------------------------------------------------------------------
 # Dependencies
