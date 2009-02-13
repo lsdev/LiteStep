@@ -401,7 +401,7 @@ static void EMPHandler(HWND hWnd, PEMPCONFIG pEMPCfg)
         if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
             (pEMPCfg->uMode == EMP_HIDE || pEMPCfg->uMode == EMP_TOGGLE))
         {
-            if (NULL == pEMPCfg->hMon || LSMonitorFromWindow(
+            if (NULL == pEMPCfg->hMon || MonitorFromWindow(
                 hWnd, MONITOR_DEFAULTTONULL) == pEMPCfg->hMon)
             {
                 SetWindowLongPtr(hWnd, GWLP_USERDATA, HIDEmagicDWord);
@@ -455,7 +455,7 @@ static void BangHideModules(HWND hCaller, LPCSTR /* pszArgs */)
         // Check to see if this is a valid monitor handle
         MONITORINFO mi;
         mi.cbSize = sizeof(MONITORINFO);
-        if (LSGetMonitorInfo((HMONITOR)hCaller, &mi))
+        if (GetMonitorInfo((HMONITOR)hCaller, &mi))
         {
             EMPCfg.hMon = (HMONITOR)hCaller;
         }

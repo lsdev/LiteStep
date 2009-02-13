@@ -1321,7 +1321,7 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
         return NULL;
     }
     
-    HMONITOR hMonFS = LSMonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
+    HMONITOR hMonFS = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
     
     if (NULL == hMonFS)
     {
@@ -1336,7 +1336,7 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
         MONITORINFO miFS;
         miFS.cbSize = sizeof(MONITORINFO);
         
-        if (LSGetMonitorInfo(hMonFS, &miFS))
+        if (GetMonitorInfo(hMonFS, &miFS))
         {
             VERIFY(CopyRect(&rScreen, &miFS.rcMonitor));
             VERIFY(CopyRect(&rWorkArea, &miFS.rcWork));
@@ -1350,7 +1350,7 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
             
             VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWorkArea, 0));
             
-            hMonFS = LSMonitorFromRect(&rScreen, MONITOR_DEFAULTTOPRIMARY);
+            hMonFS = MonitorFromRect(&rScreen, MONITOR_DEFAULTTOPRIMARY);
         }
     }
     
