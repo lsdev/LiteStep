@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,11 +24,13 @@
 
 MessageManager::MessageManager()
 {
+    // do nothing
 }
 
 
 MessageManager::~MessageManager()
 {
+    // do nothing
 }
 
 
@@ -47,8 +49,7 @@ void MessageManager::AddMessages(HWND window, UINT *pMessages)
     {
         while (*pMessages != 0)
         {
-            AddMessage(window, *pMessages);
-            pMessages++;
+            AddMessage(window, *pMessages++);
         }
     }
 }
@@ -85,8 +86,7 @@ void MessageManager::RemoveMessages(HWND window, UINT *pMessages)
     {
         while (*pMessages != 0)
         {
-            RemoveMessage(window, *pMessages);
-            pMessages++;
+            RemoveMessage(window, *pMessages++);
         }
     }
 }
@@ -108,10 +108,12 @@ LRESULT MessageManager::SendMessage(UINT message, WPARAM wParam, LPARAM lParam)
     
     if (it != m_MessageMap.end())
     {
-        // Make a copy since modules may unregister messages in their message handlers
+        // Make a copy since modules may unregister messages in their message
+        // handlers
         windowSetT windowSet(it->second);
         
-        for (windowSetT::const_iterator winIt = windowSet.begin(); winIt != windowSet.end(); ++winIt)
+        for (windowSetT::const_iterator winIt = windowSet.begin();
+            winIt != windowSet.end(); ++winIt)
         {
             lResult |= ::SendMessage(*winIt, message, wParam, lParam);
         }
@@ -132,7 +134,8 @@ BOOL MessageManager::PostMessage(UINT message, WPARAM wParam, LPARAM lParam)
     {
         windowSetT::iterator winIt;
         
-        for (winIt = it->second.begin(); (winIt != it->second.end() && bResult); winIt++)
+        for (winIt = it->second.begin();
+            winIt != it->second.end() && bResult; ++winIt)
         {
             bResult = ::PostMessage(*winIt, message, wParam, lParam);
         }

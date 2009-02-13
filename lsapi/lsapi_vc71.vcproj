@@ -212,9 +212,6 @@
 				RelativePath=".\BangManager.h">
 			</File>
 			<File
-				RelativePath=".\bangs.h">
-			</File>
-			<File
 				RelativePath=".\lsapi.h">
 			</File>
 			<File

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -66,37 +66,38 @@ class CLiteStep: public ILiteStep
 public:
     CLiteStep();
     ~CLiteStep();
-
+    
     HRESULT Start(HINSTANCE hInstance, WORD wStartFlags);
     HRESULT Stop();
-
+    
     int Run();
-
-    static LRESULT CALLBACK ExternalWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+    
+    static LRESULT CALLBACK ExternalWndProc(
+        HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    
     // ILiteStep
     int MessageHandler(MSG &message);
-
+    
 private:
     HRESULT CreateMainWindow(bool bSetAsShell);
     HRESULT DestroyMainWindow();
-
+    
     void _RegisterShellNotifications(HWND hWnd);
     void _UnregisterShellNotifications(HWND hWnd);
-
+    
     LRESULT InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT _HandleSessionChange(DWORD dwCode, DWORD dwSession);
-
+    
     void _Recycle();
     HRESULT _EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const;
-
+    
     // Application instance
     HINSTANCE m_hInstance;
-
+    
     // Recovery Menu
     // This is a special service that is not kept in the services array
     IService* m_pRecoveryMenu;
-
+    
     // LSAutoHideModules helpers
     bool m_bAutoHideModules;
     HMONITOR m_hFullScreenMonitor; // = NULL;
@@ -105,40 +106,40 @@ private:
     HMONITOR _FullScreenGetMonitor(HWND hWnd) const;
     void _FullScreenHandler(HMONITOR hMonFullScreen);
     void _HandleShellHooks(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+    
     // Windows
     HWND m_hMainWindow; // = NULL;
-
+    
     // Notifications (Shell Hooks + WTS notifications)
     typedef BOOL (WINAPI* RSHPROC)(HWND, DWORD);
-
+    
     RSHPROC m_pRegisterShellHook;
     UINT WM_ShellHook; // = 0;
     HMODULE m_hWtsDll;
-
+    
     // Function blocks
     UINT m_BlockRecycle; // = 0
-
+    
     //
     // Manager Related
     //
     ModuleManager* m_pModuleManager; // = NULL;
     DataStore* m_pDataStoreManager; // = NULL;
     MessageManager* m_pMessageManager; // = NULL;
-
+    
     HRESULT _InitManagers();
     HRESULT _StartManagers();
     HRESULT _StopManagers();
     void _CleanupManagers();
-
+    
     bool m_bSignalExit; // = false
-
+    
     //
     // Service Related
     //
     TrayService* m_pTrayService; // = NULL;
     std::vector<IService*> m_Services;
-
+    
     HRESULT _InitServices();
     HRESULT _StartServices();
     HRESULT _StopServices();

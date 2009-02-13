@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,14 +25,16 @@
 #include <vector>
 
 
-ModuleManager::ModuleManager() : 
+ModuleManager::ModuleManager() :
     m_pILiteStep(NULL), m_hLiteStep(NULL)
 {
+    // do nothing
 }
 
 
 ModuleManager::~ModuleManager()
 {
+    // do nothing
 }
 
 
@@ -112,7 +114,7 @@ UINT ModuleManager::_LoadModules()
     UINT uReturn = 0;
     char szLine[MAX_LINE_LENGTH];
     
-    FILE* f = LCOpen(NULL);
+    LPVOID f = LCOpen(NULL);
     
     if (f)
     {
@@ -196,32 +198,31 @@ UINT ModuleManager::_StartModules(ModuleQueue& mqModules)
                     {
                         if ((*iter)->GetInitEvent())
                         {
-                            /* Note: We are taking ownership of the Event handle 
-                            * here.  We call CloseHandle() below. */ 
+                            // Note: We are taking ownership of the Event handle
+                            //       here.  We call CloseHandle() below.
                             vecInitEvents.push_back((*iter)->TakeInitEvent());
                         }
                         
                         m_ModuleQueue.push_back(*iter);
-                        uReturn++;
+                        ++uReturn;
                         
-                        iter++;
+                        ++iter;
                         continue;
                     }
                 }
             }
             
-            /* If we got here, then this is an invalid
-             * entry, and needs erased. */
+            // If we got here, then this is an invalid entry, and needs erased.
             ModuleQueue::iterator iterOld = iter++;
             
             delete *iterOld;
             mqModules.erase(iterOld);
         }
         
-        // Are there any "threaded" modules? 
-        if (!vecInitEvents.empty()) 
-        { 
-            // Wait for all modules to signal that they have started. 
+        // Are there any "threaded" modules?
+        if (!vecInitEvents.empty())
+        {
+            // Wait for all modules to signal that they have started.
             _WaitForModules(&vecInitEvents[0], vecInitEvents.size());
             
             // Close the handles we have taken ownership of.
@@ -238,14 +239,13 @@ void ModuleManager::_QuitModules()
 {
     std::vector<HANDLE> vecQuitObjects;
     ModuleQueue::reverse_iterator iter = m_ModuleQueue.rbegin();
-    ModuleQueue TempQueue; 
+    ModuleQueue TempQueue;
     
-    /* Note: 
-    * Store each module in a temporary queue, so that the module 
-    * may not be accessed via our main queue while it is being 
-    * unloaded.  This does -not- protect us from threads, however 
-    * it does hopefully add some security through obscurity from 
-    * recursion. */ 
+    // Note:
+    //  Store each module in a temporary queue, so that the module may not be
+    //  accessed via our main queue while it is being unloaded.  This does -not-
+    //  protect us from threads, however it does hopefully add some security
+    //  through obscurity from recursion.
     
     while (iter != m_ModuleQueue.rend())
     {
@@ -270,9 +270,9 @@ void ModuleManager::_QuitModules()
     {
         _WaitForModules(&vecQuitObjects[0], vecQuitObjects.size());
         
-        // Close the handles we have taken ownership of. 
-        std::for_each( 
-            vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle); 
+        // Close the handles we have taken ownership of.
+        std::for_each(
+            vecQuitObjects.begin(), vecQuitObjects.end(), CloseHandle);
     }
     
     // Clean it all up
@@ -295,11 +295,11 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
         
         if ((*iter)->GetThread())
         {
-            HANDLE hThread = (*iter)->TakeThread(); 
+            HANDLE hThread = (*iter)->TakeThread();
             
-            _WaitForModules(&hThread, 1); 
+            _WaitForModules(&hThread, 1);
             
-            CloseHandle(hThread); 
+            CloseHandle(hThread);
         }
         
         delete *iter;
@@ -362,27 +362,27 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, size_t stCount) cons
 {
     std::vector<HANDLE> vWait(pHandles, pHandles+stCount);
     
-    /* Loop for as long as we have an object whose state is not signaled. */ 
+    // Loop for as long as we have an object whose state is not signaled.
     while (vWait.size())
     {
         MSG message;
         
-        /* Handle all window messages for current thread */
+        // Handle all window messages for current thread
         while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
         {
             m_pILiteStep->MessageHandler(message);
         }
         
-        /* Wait for a new message to come in, or for one of our objects 
-        * to become signaled. */ 
-        DWORD dwWaitStatus = MsgWaitForMultipleObjects((DWORD)vWait.size(), &vWait[0],
-            FALSE, INFINITE, QS_ALLINPUT);
+        // Wait for a new message to come in, or for one of our objects to
+        // become signaled.
+        DWORD dwWaitStatus = MsgWaitForMultipleObjects((DWORD)vWait.size(),
+            &vWait[0], FALSE, INFINITE, QS_ALLINPUT);
         
-        /* Recreate the pObject list, in case any of the objects do not auto 
-        * reset their signaled state.  Otherwise, we would drop through our 
-        * outer loop immediately without waiting for all of our objects. */ 
-        if ((dwWaitStatus >= WAIT_OBJECT_0) && 
-            (dwWaitStatus < (WAIT_OBJECT_0 + vWait.size()))) 
+        // Recreate the pObject list, in case any of the objects do not auto
+        // reset their signaled state.  Otherwise, we would drop through our
+        // outer loop immediately without waiting for all of our objects.
+        if ((dwWaitStatus >= WAIT_OBJECT_0) &&
+            (dwWaitStatus < (WAIT_OBJECT_0 + vWait.size())))
         {
             vWait.erase(vWait.begin() + (dwWaitStatus - WAIT_OBJECT_0));
         }
@@ -394,7 +394,8 @@ HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam)
 {
     HRESULT hr = S_OK;
     
-    for (ModuleQueue::const_iterator iter = m_ModuleQueue.begin(); iter != m_ModuleQueue.end(); ++iter)
+    for (ModuleQueue::const_iterator iter = m_ModuleQueue.begin();
+        iter != m_ModuleQueue.end(); ++iter)
     {
         if (!pfnCallback((*iter)->GetLocation(), (*iter)->GetFlags(),
             lParam))

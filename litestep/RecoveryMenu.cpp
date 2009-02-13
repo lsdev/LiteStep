@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -53,13 +53,13 @@ struct MenuCommands
 }
 rgMenuCommands[] = \
 {
-     { IDS_LITESTEP_RECYCLELS,  ID_RECYCLE,   "Re&cycle LiteStep"           }
-    ,{ IDS_LITESTEP_QUITLS,     ID_QUIT,      "&Quit LiteStep"              }
-    ,{ IDS_LITESTEP_TERMINATELS,ID_TERMINATE, "Forcibly &Terminate LiteStep"}
-    ,{ 0, -1, ""}
-    ,{ IDS_LITESTEP_RUN,        ID_RUN,       "&Run..."                     }
-    ,{ 0, -1, ""}
-    ,{ IDS_LITESTEP_SHUTDOWNWIN,ID_SHUTDOWN,  "Sh&utdown Windows..."        }
+     { IDS_LITESTEP_RECYCLELS,   ID_RECYCLE,   "Re&cycle LiteStep"            }
+    ,{ IDS_LITESTEP_QUITLS,      ID_QUIT,      "&Quit LiteStep"               }
+    ,{ IDS_LITESTEP_TERMINATELS, ID_TERMINATE, "Forcibly &Terminate LiteStep" }
+    ,{ 0,                        -1,           ""                             }
+    ,{ IDS_LITESTEP_RUN,         ID_RUN,       "&Run..."                      }
+    ,{ 0,                        -1,           ""                             }
+    ,{ IDS_LITESTEP_SHUTDOWNWIN, ID_SHUTDOWN,  "Sh&utdown Windows..."         }
 };
 
 
@@ -70,6 +70,7 @@ rgMenuCommands[] = \
 RecoveryMenu::RecoveryMenu(HINSTANCE hInstance)
 : m_hInstance(hInstance)
 {
+    // do nothing
 }
 
 
@@ -80,10 +81,10 @@ RecoveryMenu::RecoveryMenu(HINSTANCE hInstance)
 HRESULT RecoveryMenu::Start()
 {
     HRESULT hr = E_FAIL;
-
+    
     m_hThread = LSCreateThread("RecoveryThread",
         ThreadThunk, (LPVOID)this, &m_dwThreadId);
-
+    
     if (m_hThread != NULL)
     {
         hr = S_OK;
@@ -92,7 +93,7 @@ HRESULT RecoveryMenu::Start()
     {
         hr = HrGetLastError();
     }
-
+    
     return hr;
 }
 
@@ -104,14 +105,14 @@ HRESULT RecoveryMenu::Start()
 HRESULT RecoveryMenu::Stop()
 {
     HRESULT hr = E_FAIL;
-
+    
     if (m_hThread)
     {
         PostThreadMessage(m_dwThreadId, WM_QUIT, 0, 0);
         
         // Wait until the thread is done
         DWORD dwWait = WaitForSingleObject(m_hThread, RECOVERY_WAIT_TIMEOUT);
-
+        
         if (dwWait == WAIT_OBJECT_0)
         {
             hr = S_OK;
@@ -124,7 +125,7 @@ HRESULT RecoveryMenu::Stop()
         {
             hr = HrGetLastError();
         }
-
+        
         VERIFY(CloseHandle(m_hThread));
         m_hThread = NULL;
         m_dwThreadId = 0;
@@ -134,7 +135,7 @@ HRESULT RecoveryMenu::Stop()
         // Nothing to shut down
         hr = S_FALSE;
     }
-
+    
     return hr;
 }
 
@@ -174,7 +175,7 @@ DWORD RecoveryMenu::ThreadProc()
                 NULL,
                 m_hInstance,
                 (LPVOID)this);
-
+        
         if (IsWindow(hRecoveryWnd))
         {
             MSG msg;
@@ -203,15 +204,15 @@ LRESULT WINAPI RecoveryMenu::WindowThunk(HWND hWnd, UINT uMsg,
                                          WPARAM wParam, LPARAM lParam)
 {
     LRESULT lResult = 0;
-
+    
     if (uMsg == WM_NCCREATE)
     {
         LPCREATESTRUCT pData = (LPCREATESTRUCT)lParam;
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pData->lpCreateParams);
     }
-
+    
     RecoveryMenu* self = (RecoveryMenu*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
+    
     if (self)
     {
         lResult = self->WindowProc(hWnd, uMsg, wParam, lParam);
@@ -220,7 +221,7 @@ LRESULT WINAPI RecoveryMenu::WindowThunk(HWND hWnd, UINT uMsg,
     {
         lResult = DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
-
+    
     return lResult;
 }
 
@@ -234,33 +235,42 @@ LRESULT RecoveryMenu::WindowProc(HWND hWnd, UINT uMsg,
 {
     switch (uMsg)
     {
-        case WM_HOTKEY:
+    case WM_HOTKEY:
         {
-            if (wParam != ID_HOTKEY)
-                break;
-
-            int nCommand = ShowMenu(hWnd);
-            HandleMenuCommand(nCommand);
-
-            return 0;
+            if (wParam == ID_HOTKEY)
+            {
+                int nCommand = ShowMenu(hWnd);
+                HandleMenuCommand(nCommand);
+                return 0;
+            }
         }
+        break;
         
-        case WM_CREATE:
+    case WM_CREATE:
         {
             RegisterHotKey(hWnd, ID_HOTKEY, MOD_CONTROL | MOD_ALT, VK_F1);
             return 0;
         }
+        break;
         
-        case WM_DESTROY:
+    case WM_DESTROY:
         {
             UnregisterHotKey(hWnd, ID_HOTKEY);
             return 0;
         }
+        break;
         
-        case WM_CLOSE:
+    case WM_CLOSE:
         {
             return 0;
         }
+        break;
+    
+    default:
+        {
+            // do nothing
+        }
+        break;
     }
     
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -274,9 +284,9 @@ LRESULT RecoveryMenu::WindowProc(HWND hWnd, UINT uMsg,
 int RecoveryMenu::ShowMenu(HWND hWnd) const
 {
     HMENU hMenu = CreatePopupMenu();
-
+    
     // populate the menu
-    for (size_t i = 0; i < COUNTOF(rgMenuCommands); i++)
+    for (size_t i = 0; i < COUNTOF(rgMenuCommands); ++i)
     {
         if (rgMenuCommands[i].nStringID)
         {
@@ -284,7 +294,7 @@ int RecoveryMenu::ShowMenu(HWND hWnd) const
             GetResStr(m_hInstance,
                 rgMenuCommands[i].nStringID, szBuffer, MAX_PATH,
                 rgMenuCommands[i].pszDefText);
-
+            
             AppendMenu(hMenu, MF_STRING, rgMenuCommands[i].nCommandID,
                 szBuffer);
         }
@@ -293,21 +303,21 @@ int RecoveryMenu::ShowMenu(HWND hWnd) const
             AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
         }
     }
-
+    
     // get the current position of the mouse
     POINT pt;
     GetCursorPos(&pt);
-
+    
     SetForegroundWindow(hWnd);
-
-    int nCommand = (int)\
-        TrackPopupMenu(hMenu,
-        TPM_LEFTBUTTON|TPM_RETURNCMD|TPM_NONOTIFY,
+    
+    int nCommand = (int)TrackPopupMenu(
+        hMenu,
+        TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY,
         pt.x, pt.y,
         0, hWnd, NULL);
-
+    
     DestroyMenu(hMenu);
-
+    
     return nCommand;
 }
 
@@ -320,46 +330,49 @@ void RecoveryMenu::HandleMenuCommand(int nCommand) const
 {
     switch (nCommand)
     {
-        case ID_RECYCLE:
+    case ID_RECYCLE:
         {
             // using PostMessage so the user can still use this menu
             // to kill LS should the message queue be blocked
             PostMessage(GetLitestepWnd(), LM_RECYCLE, LR_RECYCLE, 0);
         }
         break;
-
-        case ID_QUIT:
+        
+    case ID_QUIT:
         {
             // ditto
             PostMessage(GetLitestepWnd(), LM_RECYCLE, LR_QUIT, 0);
         }
         break;
-
-        case ID_TERMINATE:
+        
+    case ID_TERMINATE:
         {
             TerminateProcess(GetCurrentProcess(), 1);
         }
         break;
-
-        case ID_RUN:
+        
+    case ID_RUN:
         {
             typedef void (WINAPI* RUNDLGPROC)(
                 HWND, HICON, LPCSTR, LPCSTR, LPCSTR, UINT);
-
+            
             RUNDLGPROC fnRunDlg = (RUNDLGPROC)GetProcAddress(
                 GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x003D));
-
+            
             fnRunDlg(NULL, NULL, NULL, NULL, NULL, 0);
         }
         break;
-
-        case ID_SHUTDOWN:
+        
+    case ID_SHUTDOWN:
         {
             LSShutdownDialog(GetLitestepWnd());
         }
         break;
-
-        default:
+        
+    default:
+        {
+            // do nothing
+        }
         break;
     }
 }

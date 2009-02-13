@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -104,11 +104,11 @@ MathToken MathScanner::NextToken()
     }
     
     // Operators and punctuation symbols
-    for (int i = 0; i < gNumSymbols; i++)
+    for (int i = 0; i < gNumSymbols; ++i)
     {
         bool match = true;
         
-        for (int j = 0; j < gSymbols[i].length; j++)
+        for (int j = 0; j < gSymbols[i].length; ++j)
         {
             if (mLookahead[j] != gSymbols[i].str[j])
             {
@@ -131,7 +131,7 @@ MathToken MathScanner::NextToken()
 
 MathToken MathScanner::CheckReservedWord(const string& identifier)
 {
-    for (int i = 0; i < gNumReservedWords; i++)
+    for (int i = 0; i < gNumReservedWords; ++i)
     {
         if (_stricmp(identifier.c_str(), gReservedWords[i].str) == 0)
         {
@@ -147,13 +147,17 @@ MathToken MathScanner::CheckReservedWord(const string& identifier)
 
 void MathScanner::Next(int count)
 {
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
-        for (int j = 0; j < LOOKAHEAD - 1; j++)
+        for (int j = 0; j < LOOKAHEAD - 1; ++j)
+        {
             mLookahead[j] = mLookahead[j + 1];
+        }
         
         if (!mStream.get(mLookahead[LOOKAHEAD - 1]))
+        {
             mLookahead[LOOKAHEAD - 1] = EOF;
+        }
     }
 }
 
@@ -275,33 +279,33 @@ bool MathScanner::IsNameChar(char ch)
     {
         return false;
     }
-
+    
     switch (ch)
     {
-        case '!':
-        // case '@':  Will be reserved in 0.25
-        // case '#':  Will be reserved in 0.25
-        case '$':
-        case '&':
-        case '*':
-        case '(':
-        case ')':
-        case '-':
-        case '+':
-        case '=':
-        case '[':
-        case ']':
-        // case '|':  Will be reserved in 0.25
-        case ';':
-        case '"':
-        case '\'':
-        case '<':
-        case '>':
-        case ',':
-        case '/':
-            return false;
+    case '!':
+    // case '@':  Will be reserved in 0.25
+    // case '#':  Will be reserved in 0.25
+    case '$':
+    case '&':
+    case '*':
+    case '(':
+    case ')':
+    case '-':
+    case '+':
+    case '=':
+    case '[':
+    case ']':
+    // case '|':  Will be reserved in 0.25
+    case ';':
+    case '"':
+    case '\'':
+    case '<':
+    case '>':
+    case ',':
+    case '/':
+        return false;
     }
-
+    
     return true;
 }
 

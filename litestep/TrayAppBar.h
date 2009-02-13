@@ -1,22 +1,24 @@
-/*
-This is a part of the LiteStep Shell Source code.
-
-Copyright (C) 2005-2006 The LiteStep Development Team
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// This is a part of the Litestep Shell source code.
+//
+// Copyright (C) 1997-2009  LiteStep Development Team
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #if !defined(TRAYAPPBAR_H)
 #define TRAYAPPBAR_H
 
@@ -102,69 +104,71 @@ public:
         ,m_lParam(0)
         ,m_uEdge((UINT)-1)
     {
+        // do nothing
     }
     ~AppBar()
     {
+        // do nothing
     }
-
+    
     inline HWND hWnd() const
     {
         return m_hWnd;
     }
-
+    
     inline LPARAM lParam() const
     {
         return m_lParam;
     }
-
+    
     inline void lParam(LPARAM lParam)
     {
         m_lParam = lParam;
     }
-
+    
     inline UINT uEdge() const
     {
         return m_uEdge;
     }
-
+    
     inline void uEdge(UINT uEdge)
     {
         m_uEdge = uEdge;
     }
-
+    
     inline UINT uMsg() const
     {
         return m_uCallbackMessage;
     }
-
+    
     inline bool IsAutoHide() const
     {
         return ABS_AUTOHIDE == (m_lParam & ABS_AUTOHIDE);
     }
-
+    
     inline bool IsOverLap() const
     {
         return ABS_OVERLAPAUTOHIDE == (m_lParam & ABS_OVERLAPAUTOHIDE);
     }
-
+    
     inline const RECT& GetRectRef() const
     {
         return m_rc;
     }
-
+    
     inline RECT& GetRectRef()
     {
         return m_rc;
     }
-
+    
 private:
     const HWND m_hWnd;
     const UINT m_uCallbackMessage;
-
+    
     LPARAM m_lParam;
     RECT   m_rc;
     UINT   m_uEdge;
-
+    
     // not implemented
     AppBar(const AppBar& rhs);
     AppBar& operator=(const AppBar& rhs);

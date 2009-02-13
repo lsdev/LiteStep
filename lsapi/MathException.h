@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,16 +27,19 @@
 
 
 /**
- * Exception thrown when an error occurs parsing or evaluating a math expression.
+ * Exception thrown when an error occurs parsing or evaluating a math
+ * expression.
  */
 class MathException : public std::runtime_error
 {
 public:
-
     /**
      * Constructs a MathException with the specified message.
      */
-    MathException(const std::string& message) throw() : std::runtime_error(message) { }
+    MathException(const std::string& message) throw() : std::runtime_error(message)
+    {
+        // do nothing
+    }
 };
 
 

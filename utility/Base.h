@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,49 +27,50 @@
 class Base
 {
 protected:
-	ULONG __BaseRefCount;
-
-	virtual ~Base()
-	{
-	}
-
-	inline ULONG BaseAddRef()
-	{
-		InterlockedIncrement((LONG *) & __BaseRefCount);
-		return (ULONG)__BaseRefCount;
-	}
-
-	inline ULONG BaseRelease()
-	{
-		return (ULONG)InterlockedDecrement((LONG *) & __BaseRefCount);
-	}
-
+    ULONG __BaseRefCount;
+    
+    virtual ~Base()
+    {
+        // do nothing
+    }
+    
+    inline ULONG BaseAddRef()
+    {
+        InterlockedIncrement((LONG *) & __BaseRefCount);
+        return (ULONG)__BaseRefCount;
+    }
+    
+    inline ULONG BaseRelease()
+    {
+        return (ULONG)InterlockedDecrement((LONG *) & __BaseRefCount);
+    }
+    
 public:
-	Base()
-	{
-		__BaseRefCount = 1;
-	}
+    Base()
+    {
+        __BaseRefCount = 1;
+    }
 };
 
 
 class CountedBase: public Base
 {
 public:
-	ULONG AddRef()
-	{
-		return BaseAddRef();
-	};
-	ULONG Release()
-	{
-		ULONG cRefs = BaseRelease();
-
-		if (cRefs == 0)
-		{
-			delete this;
-		}
-
-		return cRefs;
-	};
+    ULONG AddRef()
+    {
+        return BaseAddRef();
+    };
+    ULONG Release()
+    {
+        ULONG cRefs = BaseRelease();
+        
+        if (cRefs == 0)
+        {
+            delete this;
+        }
+        
+        return cRefs;
+    };
 };
 
 #endif // BASE_H

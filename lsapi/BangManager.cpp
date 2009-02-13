@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,11 +25,13 @@
 
 BangManager::BangManager()
 {
+    // do nothing
 }
 
 
 BangManager::~BangManager()
 {
+    // do nothing
 }
 
 
@@ -74,7 +76,7 @@ BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 }
 
 
-// Execute a bang command with the specified name, passing params, getting result
+// Execute named bang command, passing params, getting result
 BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams)
 {
     BOOL bReturn = FALSE;
@@ -116,7 +118,7 @@ void BangManager::ClearBangCommands()
     while (iter != bang_map.end())
     {
         iter->second->Release();
-        iter++;
+        ++iter;
     }
     
     bang_map.clear();
@@ -130,7 +132,7 @@ HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROC pfnCallback, LPARAM lParam) con
     HRESULT hr = S_OK;
     
     for (BangMap::const_iterator iter = bang_map.begin();
-        iter != bang_map.end(); iter++)
+        iter != bang_map.end(); ++iter)
     {
         HMODULE hModule = iter->second->GetModule();
         

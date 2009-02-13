@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ public:
     
     static void Run(BOOL bForce);
     static bool IsFirstRunThisSession(LPCTSTR pszSubkey);
-
+    
 private:
     static DWORD WINAPI _ThreadProc(LPVOID lpData);
     static HKEY _CreateSessionInfoKey();

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,36 +24,36 @@
 
 // _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
 #if defined (_WINDOWS_) || defined(_WINDOWS_H)
-#error Do not include Windows.h before this header
-#endif
 
+#  error Do not include Windows.h before this header
 
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT    0x0600
-#define _WIN32_IE       0x0603
-#endif
+#else
 
-// _WINDOWS_ is used by MSVC, _WINDOWS_H is the MinGW variant
-#if !defined (_WINDOWS_) && !defined(_WINDOWS_H)
-#  ifndef NOMINMAX
-#    define NOMINMAX
-#  endif
+#  define _WIN32_WINNT    0x0600
+#  define _WIN32_IE       0x0603
+
 #  define WIN32_LEAN_AND_MEAN
+
 #  define STRICT
 #  define NOCRYPT
+#  define NOMINMAX
+
 #  include <windows.h>
 
 // These GDI macros trigger "smaller type check" errors unless fixed like this
 #  undef GetRValue
 #  undef GetGValue
 #  undef GetBValue
-#  define GetRValue(rgb)    ((BYTE)( (rgb) & 0x0000FF))
-#  define GetGValue(rgb)    ((BYTE)(((rgb) & 0x00FF00) >> 8))
-#  define GetBValue(rgb)    ((BYTE)(((rgb) & 0xFF0000) >> 16))
-#endif // _WINDOWS_
+#  define GetRValue(rgb)    ((BYTE)( (rgb) & 0x000000FF))
+#  define GetGValue(rgb)    ((BYTE)(((rgb) & 0x0000FF00) >> 8))
+#  define GetBValue(rgb)    ((BYTE)(((rgb) & 0x00FF0000) >> 16))
 
+#endif // defined (_WINDOWS_) || defined(_WINDOWS_H)
+
+// tchar header
 #include <tchar.h>
 
+// global project build options header
 #include "../litestep/buildoptions.h"
 
 // Count array elements

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -38,7 +38,6 @@ typedef std::list<Module*> ModuleQueue;
 class ModuleManager: public IManager
 {
 public:
-
     /**
      * Constructor.
      */
@@ -50,7 +49,8 @@ public:
     virtual ~ModuleManager();
     
     /**
-     * Starts the module manager and loads all the modules specified in <code>step.rc</code>.
+     * Starts the module manager and loads all the modules specified in
+     * <code>step.rc</code>.
      *
      * @param  pILiteStep  interface to LiteStep's core
      * @return <code>S_OK</code> if successful or an error code
@@ -83,7 +83,8 @@ public:
      *
      * @param  pszLocation  path to the module's DLL
      * @param  dwFlags      set of flags that control how the module is loaded
-     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an
+     *         error occurs
      */
     BOOL LoadModule(LPCSTR pszLocation, DWORD dwFlags);
     
@@ -91,7 +92,8 @@ public:
      * Unloads a module given its instance handle.
      *
      * @param  hModule  handle to the module's DLL instance
-     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an
+     *         error occurs
      */
     BOOL QuitModule(HINSTANCE hModule);
     
@@ -99,7 +101,8 @@ public:
      * Unloads a module given the path to its DLL.
      *
      * @param  pszLocation  path to the module's DLL
-     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an
+     *         error occurs
      */
     BOOL QuitModule(LPCSTR pszLocation);
     
@@ -107,24 +110,26 @@ public:
      * Reloads a module given its instance handle
      *
      * @param  hModule  handle to the module's DLL instance
-     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an error occurs
+     * @return <code>TRUE</code> if successful or <code>FALSE</code> if an
+     *         error occurs
      */
     BOOL ReloadModule(HINSTANCE hModule);
     
     /**
-     * Enumerates loaded modules. Calls the callback function once for each loaded
-     * module. Continues until all modules have been enumerated or the callback
-     * function returns <code>FALSE</code>.
+     * Enumerates loaded modules. Calls the callback function once for each
+     * loaded module. Continues until all modules have been enumerated or the
+     * callback function returns <code>FALSE</code>.
      *
      * @param  pfnCallback  pointer to callback function
-     * @param  lParam       application-defined value passed to the callback function
-     * @return <code>S_OK</code> if all modules were enumerated, <code>S_FALSE</code> if the
-     *         callback function returned <code>FALSE</code>, or an error code
+     * @param  lParam       application-defined value passed to the callback
+     *                      function
+     * @return <code>S_OK</code> if all modules were enumerated,
+     *         <code>S_FALSE</code> if the callback function returned
+     *         <code>FALSE</code>, or an error code
      */
     HRESULT EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam) const;
-
+    
 private:
-
     /**
      * Loads all the modules specified in <code>step.rc</code>.
      *
@@ -169,7 +174,8 @@ private:
     Module* _MakeModule(LPCSTR pszLocation, DWORD dwFlags);
     
     /**
-     * Waits for an array of events to all be set while remaining responsive to user input.
+     * Waits for an array of events to all be set while remaining responsive
+     * to user input.
      *
      * @param  pHandles  array of event handles
      * @param  dwCount   number of handles in the array
@@ -197,7 +203,10 @@ private:
         /**
          * Constructor.
          */
-        IsLocationEqual(LPCSTR pszLocation) : m_pszLocation(pszLocation) { }
+        IsLocationEqual(LPCSTR pszLocation) : m_pszLocation(pszLocation)
+        {
+            // do nothing
+        }
         
         /**
          * Returns <code>true</code> if specified module's DLL path matches
@@ -209,7 +218,6 @@ private:
         }
         
     private:
-    
         /** Path to match */
         LPCSTR m_pszLocation;
     };
@@ -223,7 +231,10 @@ private:
         /**
          * Constructor.
          */
-        IsInstanceEqual(HINSTANCE hInstance) : m_hInstance(hInstance) { }
+        IsInstanceEqual(HINSTANCE hInstance) : m_hInstance(hInstance)
+        {
+            // do nothing
+        }
         
         /**
          * Returns <code>true</code> if specified module's DLL instance handle
@@ -235,7 +246,6 @@ private:
         }
         
     private:
-    
         /** Instance handle to match */
         HINSTANCE m_hInstance;
     };

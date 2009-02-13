@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -61,52 +61,66 @@ bool Module::_LoadDll()
         
         if (m_hInstance)
         {
-            m_pInitEx = (initModuleExProc)GetProcAddress(m_hInstance, "initModuleEx");
+            m_pInitEx = (initModuleExProc)GetProcAddress(
+                m_hInstance, "initModuleEx");
             
             if (!m_pInitEx) // Might be a BC module, check for underscore
             {
-                m_pInitEx = (initModuleExProc)GetProcAddress(m_hInstance, "_initModuleEx");
+                m_pInitEx = (initModuleExProc)GetProcAddress(
+                    m_hInstance, "_initModuleEx");
             }
             
-            m_pQuit = (quitModuleProc)GetProcAddress(m_hInstance, "quitModule");
+            m_pQuit = (quitModuleProc)GetProcAddress(
+                m_hInstance, "quitModule");
             
             if (!m_pQuit)   // Might be a BC module, check for underscore
             {
-                m_pQuit = (quitModuleProc)GetProcAddress(m_hInstance, "_quitModule");
+                m_pQuit = (quitModuleProc)GetProcAddress(
+                    m_hInstance, "_quitModule");
             }
             
             if (!m_pInitEx)
             {
                 RESOURCE_STR(NULL, IDS_INITMODULEEXNOTFOUND_ERROR,
-                    "Error: Could not find initModuleEx().\n\nPlease confirm that the dll is a LiteStep module,\nand check with the author for updates.");
+                    "Error: Could not find initModuleEx().\n"
+                    "\n"
+                    "Please confirm that the dll is a LiteStep module,\n"
+                    "and check with the author for updates.");
             }
             else if (!m_pQuit)
             {
                 RESOURCE_STR(NULL, IDS_QUITMODULENOTFOUND_ERROR,
-                    "Error: Could not find quitModule().\n\nPlease confirm that the dll is a LiteStep module.");
+                    "Error: Could not find quitModule().\n"
+                    "\n"
+                    "Please confirm that the dll is a LiteStep module.");
             }
             else
             {
                 bReturn = true;
             }
         }
-        else if(PathFileExists(m_tzLocation.c_str()))
+        else if (PathFileExists(m_tzLocation.c_str()))
         {
             RESOURCE_STR(NULL, IDS_MODULEDEPENDENCY_ERROR,
-                "Error: Could not load module.\nThis is likely a case of a missing C Run-Time Library or other dependency.");
+                "Error: Could not load module.\n"
+                "\n"
+                "This is likely a case of a missing C Run-Time Library"
+                "or other dependency.");
         }
         else
         {
             RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
-                "Error: Could not locate module.\nPlease check your configuration.");
+                "Error: Could not locate module.\n"
+                "\n"
+                "Please check your configuration.");
         }
         
         if (!bReturn)
         {
             LPCTSTR pszFileName = PathFindFileName(m_tzLocation.c_str());
-
+            
             RESOURCE_MSGBOX_F(pszFileName, MB_ICONERROR);
-
+            
             if (m_hInstance)
             {
                 FreeLibrary(m_hInstance);
@@ -114,7 +128,7 @@ bool Module::_LoadDll()
             }
         }
     }
-
+    
     return bReturn;
 }
 
@@ -123,18 +137,18 @@ Module::~Module()
 {
     if (m_dwFlags & LS_MODULE_THREADED)
     {
-        // Note: 
-        // - This is problematic because these handles may currently 
-        //   be used in _WaitForModules(), and by closing the handle 
-        //   here before it is done being used, we may cause invalid 
-        //   behavior of that function, with potential lockups. 
-        // - The solution within our current structure, is to allow 
-        //   an external procedure to take ownership of these handles. 
-        //   Meaning, whoever calls _WaitForModules would be required 
-        //   to free these objects when done with them, instead of us 
-        //   releasing them here. (See: TakeThread() TakeInitEvent()) 
-        // - The correct solution is re-writing our module threading 
-        //   behavior, which we will be doing on the trunk code. 
+        // Note:
+        // - This is problematic because these handles may currently
+        //   be used in _WaitForModules(), and by closing the handle
+        //   here before it is done being used, we may cause invalid
+        //   behavior of that function, with potential lockups.
+        // - The solution within our current structure, is to allow
+        //   an external procedure to take ownership of these handles.
+        //   Meaning, whoever calls _WaitForModules would be required
+        //   to free these objects when done with them, instead of us
+        //   releasing them here. (See: TakeThread() TakeInitEvent())
+        // - The correct solution is re-writing our module threading
+        //   behavior, which we will be doing on the trunk code.
         if (m_hInitEvent)
         {
             CloseHandle(m_hInitEvent);
@@ -231,20 +245,19 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
 {
     Module* dllMod = (Module*)dllModPtr;
     
-#ifdef MSVC_DEBUG
+#if defined(MSVC_DEBUG)
     LPCTSTR pszFileName = PathFindFileName(dllMod->m_tzLocation.c_str());
     DbgSetCurrentThreadName(pszFileName);
 #endif
-
+    
     dllMod->CallInit();
     
-    /* We must use a copy of our event, and hope no one 
-    * has closed it before waiting for it to be signaled. 
-    * See: TakeThread() member function. */ 
-    SetEvent(dllMod->m_hInitCopyEvent); 
-
+    // We must use a copy of our event, and hope no one has closed it before
+    // waiting for it to be signaled.  See: TakeThread() member function.
+    SetEvent(dllMod->m_hInitCopyEvent);
+    
     MSG msg;
-
+    
     while (GetMessage(&msg, 0, 0, 0))
     {
         if (msg.hwnd == NULL)
@@ -291,8 +304,11 @@ void Module::HandleThreadMessage(MSG &msg)
             }
         }
         break;
-
+        
     default:
+        {
+            // do nothing
+        }
         break;
     }
 }

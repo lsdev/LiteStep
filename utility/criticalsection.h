@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -95,11 +95,11 @@ class Block
 public:
     Block(UINT& cnt) : m_Count(cnt)
     {
-        m_Count++;
+        ++m_Count;
     }
     ~Block()
     {
-        m_Count--;
+        --m_Count;
     }
     bool IsBlocked()
     {

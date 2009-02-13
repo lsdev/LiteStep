@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -41,8 +41,14 @@ enum ErrorType
 class LSAPIException
 {
 public:
-    explicit LSAPIException(ErrorType et) throw() :m_et(et) { }
-    ErrorType Type() const throw() { return m_et; }
+    explicit LSAPIException(ErrorType et) throw() :m_et(et)
+    {
+        // do nothing
+    }
+    ErrorType Type() const throw()
+    {
+        return m_et;
+    }
     
 private:
     ErrorType m_et;
@@ -61,7 +67,7 @@ public:
     
     BangManager* GetBangManager() const
     {
-        if(!IsInitialized())
+        if (!IsInitialized())
         {
             throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
         }
@@ -71,7 +77,7 @@ public:
     
     SettingsManager* GetSettingsManager() const
     {
-        if(!IsInitialized())
+        if (!IsInitialized())
         {
             throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
         }
@@ -118,5 +124,6 @@ private:
 };
 
 extern LSAPIInit g_LSAPIManager;
+extern void SetupBangs();
 
 #endif // LSAPIINIT_H

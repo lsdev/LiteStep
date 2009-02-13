@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -44,7 +44,7 @@ typedef struct
     UINT uCallbackMessage;                       /* persistent &     volatile */
     HICON hIcon;                                 /* persistent &     volatile */
     CHAR szTip[TRAY_MAX_TIP_LENGTH];             /* persistent &     volatile */
-
+    
     // new in 2K:
     DWORD dwState;                               /* persistent &     volatile */
     DWORD dwStateMask;                           /* arbitrary  &     volatile */
@@ -56,7 +56,7 @@ typedef struct
     } DUMMYUNIONNAME;
     CHAR szInfoTitle[TRAY_MAX_INFOTITLE_LENGTH]; /* arbitrary  &     volatile */
     DWORD dwInfoFlags;                           /* arbitrary  &     volatile */
-
+    
     // new in XP:
     GUID guidItem;                               /* ???? */
     /**/
@@ -246,74 +246,74 @@ class NotifyIcon
 {
     typedef std::vector<NotifyIcon*> IcVtr;
     static IcVtr s_icVtr;
-
+    
 public:
     NotifyIcon(const NID_XX& nidSource);
     ~NotifyIcon();
-
+    
     void Update(const NID_XX& nidSource);
-
+    
     inline bool IsHidden() const
     {
         return ((NIF_STATE & m_uFlags) && (NIS_HIDDEN & m_dwState));
     }
-
+    
     inline bool IsShared() const
     {
         return ((NIF_STATE & m_uFlags) && (NIS_SHAREDICON & m_dwState));
     }
-
+    
     inline bool IsValid() const
     {
         return HasIcon() && !IsHidden();
     }
-
+    
     inline bool HasIcon() const
     {
         return NIF_ICON == (NIF_ICON & m_uFlags);
     }
-
+    
     inline HWND GetHwnd() const
     {
         return m_hWnd;
     }
-
+    
     inline UINT GetuID() const
     {
         return m_uID;
     }
-
+    
     inline void CopyLSNID(LSNOTIFYICONDATA * plsnid) const
     {
         CopyLSNID(plsnid, (UINT)-1);
     }
-
+    
     void CopyLSNID(LSNOTIFYICONDATA * plsnid, UINT uFlagMask) const;
-
+    
 private:
     void copy_message(PCNID_XX pnidSource);
     void copy_icon(PCNID_XX pnidSource);
     void copy_tip(PCNID_XX pnidSource);
     void copy_state(PCNID_XX pnidSource);
-
+    
     void update_state(DWORD dwState, DWORD dwMask);
-
+    
     // Preserved Notify Icon Data members
     const HWND  m_hWnd;                          /* persistent & non volatile */
     const UINT  m_uID;                           /* persistent & non volatile */
-
+    
     UINT  m_uFlags;                              /* persistent &     volatile */
     UINT  m_uCallbackMessage;                    /* persistent &     volatile */
     HICON m_hIcon;                               /* persistent &     volatile */
     CHAR  m_szTip[TRAY_MAX_TIP_LENGTH];          /* persistent &     volatile */
-
+    
     DWORD m_dwState;                             /* persistent &     volatile */
-
+    
     // Internal tracking
     HANDLE m_hOriginalIcon;
     HANDLE m_hSharedWnd;
     UINT   m_uSharedID;
-
+    
     // not implemented
     NotifyIcon(const NotifyIcon& rhs);
     NotifyIcon& operator=(const NotifyIcon& rhs);

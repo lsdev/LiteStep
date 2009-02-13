@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -35,7 +35,6 @@
 class BangManager
 {
 private:
-
     /** Maps bang command names to Bang objects. */
     typedef std::map<std::string, Bang*, stringicmp> BangMap;
     
@@ -50,7 +49,6 @@ private:
     BangManager& operator=(const BangManager& rhs);
     
 public:
-
     /** Constructor */
     BangManager();
     
@@ -62,7 +60,8 @@ public:
      *
      * @param  pszName  bang command name
      * @param  pbbBang  Bang object that implements the bang command
-     * @return <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     * @return <code>TRUE</code> if the operation succeeds or
+     *         <code>FALSE</code> otherwise
      */
     BOOL AddBangCommand(LPCSTR pszName, Bang *pbbBang);
     
@@ -70,7 +69,8 @@ public:
      * Removes a bang command from the list.
      *
      * @param   pszName  bang command name
-     * @return  <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     * @return  <code>TRUE</code> if the operation succeeds or
+     *          <code>FALSE</code> otherwise
      */
     BOOL RemoveBangCommand(LPCSTR pszName);
     
@@ -85,7 +85,8 @@ public:
      * @param  pszName     bang command name
      * @param  hCaller     handle to owner window
      * @param  pszParams   command-line arguments
-     * @return <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     * @return <code>TRUE</code> if the operation succeeds or
+     *         <code>FALSE</code> otherwise
      */
     BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
     
@@ -96,8 +97,8 @@ public:
      * @param   pfnCallback  callback function
      * @param   lParam       parameter passed to callback function
      * @return  <code>S_OK</code> if all bang commands were enumerated,
-     *          <code>S_FALSE</code> if the callback function returned <code>FALSE</code>,
-     *          or an error code
+     *          <code>S_FALSE</code> if the callback function returned
+     *          <code>FALSE</code>, or an error code
      */
     HRESULT EnumBangs(LSENUMBANGSV2PROC pfnCallback, LPARAM lParam) const;
 };

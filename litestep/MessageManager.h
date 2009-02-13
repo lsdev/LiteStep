@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,7 +40,6 @@
 class MessageManager
 {
 public:
-
     /**
      * Constructor.
      */
@@ -53,9 +52,8 @@ public:
     
     /** Set of window handles */
     typedef std::set<HWND> windowSetT;
-
+    
 private:
-
     /** Maps message numbers to sets of window handles */
     typedef std::map<UINT, windowSetT> messageMapT;
     
@@ -64,15 +62,14 @@ private:
     
     /** Critical section used to serialize access to data members */
     mutable CriticalSection m_cs;
-
+    
 public:
-
     /**
      * Registers a window as a handler for a message.
      *
      * @param  window   handle of window that will process the message
      * @param  message  message number
-     */    
+     */
     void AddMessage(HWND window, UINT message);
     
     /**
@@ -111,7 +108,8 @@ public:
      * @param   message  message number
      * @param   wParam   message parameter
      * @param   lParam   message parameter
-     * @return  bitwise OR of the results from sending the message to each registered window
+     * @return  bitwise OR of the results from sending the message to each
+     *          registered window
      */
     LRESULT SendMessage(UINT message, WPARAM wParam, LPARAM lParam);
     
@@ -123,7 +121,8 @@ public:
      * @param   message  message number
      * @param   wParam   message parameter
      * @param   lParam   message parameter
-     * @return  <code>TRUE</code> if the operation succeeds or <code>FALSE</code> otherwise
+     * @return  <code>TRUE</code> if the operation succeeds or
+     *          <code>FALSE</code> otherwise
      */
     BOOL PostMessage(UINT message, WPARAM wParam, LPARAM lParam);
     
@@ -132,8 +131,8 @@ public:
      * the specified message.
      *
      * @param  message  message number
-     * @return <code>TRUE</code> if at least one window is registered for the message,
-     *         <code>FALSE</code> otherwise
+     * @return <code>TRUE</code> if at least one window is registered for the
+     *         message, <code>FALSE</code> otherwise
      */
     BOOL HandlerExists(UINT message);
     
@@ -143,8 +142,8 @@ public:
      *
      * @param  uMsg        message number
      * @param  setWindows  window set to receive results
-     * @return <code>true</code> if at least one window is registered for the message,
-     *         <code>false</code> otherwise
+     * @return <code>true</code> if at least one window is registered for the
+     *         message, <code>false</code> otherwise
      */
     bool GetWindowsForMessage(UINT uMsg, windowSetT& setWindows) const;
 };

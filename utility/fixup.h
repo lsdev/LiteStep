@@ -32,16 +32,16 @@
 //
 // Configuration
 //
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #  define FIXUP_MINGW
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 // Generic MSVC fixup for all PSDK versions
 #  define FIXUP_MSVC
 #endif
 
-#ifndef OS_NT
+#if !defined(OS_NT)
 #  define FIXUP_OLD_HEADERS
 #endif
 
@@ -50,7 +50,7 @@
 //
 // Missing constants and typedefs
 //
-#ifdef FIXUP_MINGW
+#if defined(FIXUP_MINGW)
 
 enum RESTRICTIONS
 {
@@ -69,7 +69,7 @@ typedef struct _SHELLHOOKINFO
 #endif // FIXUP_MINGW
 
 
-#ifdef FIXUP_OLD_HEADERS
+#if defined(FIXUP_OLD_HEADERS)
 
 // IsOS constants
 #  define OS_WINDOWS                 0
@@ -85,7 +85,7 @@ typedef struct _SHELLHOOKINFO
 
 #  define REGSTR_PATH_RUN_POLICY    REGSTR_PATH_POLICIES _T("\\Explorer\\Run")
 
-#  ifndef SM_SERVERR2
+#  if !defined(SM_SERVERR2)
 #    define SM_SERVERR2     89
 #  endif
 
@@ -101,7 +101,7 @@ const KNOWNFOLDERID FOLDERID_QuickLaunch =
 {0x52a4f021, 0x7b75, 0x48a9, {0x9f, 0x6b, 0x4b, 0x87, 0xa2, 0x10, 0xbc, 0x8f}};
 
 // MMSystem.h
-#define SND_SYSTEM 0x00200000L 
+#define SND_SYSTEM 0x00200000L
 
 #endif // FIXUP_OLD_HEADERS
 
@@ -110,7 +110,7 @@ const KNOWNFOLDERID FOLDERID_QuickLaunch =
 //
 // Miscellaneous
 //
-#ifdef FIXUP_MINGW
+#if defined(FIXUP_MINGW)
 
 // The MinGW version doesn't work with const references
 #undef  UNREFERENCED_PARAMETER
@@ -123,22 +123,22 @@ const KNOWNFOLDERID FOLDERID_QuickLaunch =
 //
 // DynamicFunction
 //
-#ifdef FIXUP_OLD_HEADERS
+#if defined(FIXUP_OLD_HEADERS)
 
 template <class Function>
 class DynamicFunction
 {
     Function m_pFunction;
-
+    
 public:
     DynamicFunction(LPCSTR pszDll, LPCSTR pszExport)
     {
-        m_pFunction =
+        m_pFunction = \
             (Function)GetProcAddress(GetModuleHandle(pszDll), pszExport);
-
+        
         ASSERT(m_pFunction != NULL);
     }
-
+    
     operator Function() const
     {
         return m_pFunction;
@@ -158,11 +158,11 @@ public:
 //
 // Missing functions
 //
-#ifdef FIXUP_OLD_HEADERS
+#if defined(FIXUP_OLD_HEADERS)
 
-typedef LPVOID           (WINAPI* SHLockShared_t)(HANDLE hData, DWORD dwProcessId);
-typedef BOOL             (WINAPI* SHUnlockShared_t)(LPVOID lpData);
-typedef BOOL             (WINAPI* IsOS_t)(DWORD);
+typedef LPVOID  (WINAPI* SHLockShared_t)(HANDLE hData, DWORD dwProcessId);
+typedef BOOL    (WINAPI* SHUnlockShared_t)(LPVOID lpData);
+typedef BOOL    (WINAPI* IsOS_t)(DWORD);
 
 
 DEFINE_DYNFUNC_ORD(SHLockShared,        "shlwapi.dll", 8);
@@ -172,7 +172,7 @@ DEFINE_DYNFUNC_ORD(IsOS,                "shlwapi.dll", 437);
 #endif // FIXUP_OLD_HEADERS
 
 
-#ifdef FIXUP_MINGW
+#if defined(FIXUP_MINGW)
 
 typedef BOOL             (WINAPI* SHFindFiles_t)(PCIDLIST_ABSOLUTE pidlFolder, PCIDLIST_ABSOLUTE pidlSaveFile);
 typedef PIDLIST_ABSOLUTE (WINAPI* ILCreateFromPath_t)(LPCSTR pszPath);

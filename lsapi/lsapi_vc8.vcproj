@@ -316,10 +316,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\bangs.h"
-				>
-			</File>
-			<File
 				RelativePath=".\lsapi.h"
 				>
 			</File>

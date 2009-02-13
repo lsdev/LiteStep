@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -44,7 +44,7 @@ private:
     
     bool _DoStart();
     void _DoStop();
-
+    
     static DWORD WINAPI _DDEThreadProc(LPVOID pvService);
     
     static DWORD m_idThread;

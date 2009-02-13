@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -64,27 +64,27 @@ const int gNumTokenTypes = sizeof(gTokenTypes) / sizeof(gTokenTypes[0]);
 MathToken::MathToken() :
     mType(TT_INVALID)
 {
-
+    // do nothing
 }
 
 
 MathToken::MathToken(int type) :
     mType(type)
 {
-
+    // do nothing
 }
 
 
 MathToken::MathToken(int type, const string& value) :
     mType(type), mValue(value)
 {
-
+    // do nothing
 }
 
 
 string MathToken::GetTypeName() const
 {
-    for (int i = 0; i < gNumTokenTypes; i++)
+    for (int i = 0; i < gNumTokenTypes; ++i)
     {
         if (gTokenTypes[i].type == mType)
         {

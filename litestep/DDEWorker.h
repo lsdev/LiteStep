@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,39 +26,41 @@
 #include "../utility/common.h"
 #include <ddeml.h>
 
-#define DDE_REQUEST_NONE			0x0000
-#define DDE_REQUEST_CREATEGROUP		0x0001
-#define DDE_REQUEST_DELETEGROUP		0x0002
-#define DDE_REQUEST_SHOWGROUP		0x0004
-#define DDE_REQUEST_ADDITEM			0x0006
-#define DDE_REQUEST_DELETEITEM		0x0008
-#define DDE_REQUEST_EXPLOREFOLDER	0x0010
-#define DDE_REQUEST_VIEWFOLDER		0x0020
-#define DDE_REQUEST_FINDFOLDER		0x0040
-#define DDE_REQUEST_OPENFINDFILE	0x0060
+#define DDE_REQUEST_NONE          0x0000
+#define DDE_REQUEST_CREATEGROUP   0x0001
+#define DDE_REQUEST_DELETEGROUP   0x0002
+#define DDE_REQUEST_SHOWGROUP     0x0004
+#define DDE_REQUEST_ADDITEM       0x0006
+#define DDE_REQUEST_DELETEITEM    0x0008
+#define DDE_REQUEST_EXPLOREFOLDER 0x0010
+#define DDE_REQUEST_VIEWFOLDER    0x0020
+#define DDE_REQUEST_FINDFOLDER    0x0040
+#define DDE_REQUEST_OPENFINDFILE  0x0060
 
 class DDEWorker
 {
 public:
-	DDEWorker();
-	~DDEWorker();
-
-	BOOL ParseRequest(LPCSTR pszRequest);
-	BOOL ListGroups(LPVOID& pGroupList, UINT& ulSize);
-
+    DDEWorker();
+    ~DDEWorker();
+    
+    BOOL ParseRequest(LPCSTR pszRequest);
+    BOOL ListGroups(LPVOID& pGroupList, UINT& ulSize);
+    
 private:
-
-	BOOL _FindFiles(LPSTR pszPath, BOOL bFindFolder);
-	BOOL _ShowGroup(LPCTSTR strGroupName, int nShow, BOOL bCommon);
-	BOOL _CreateGroup(LPCTSTR strGroupName, BOOL bCommon);
-	BOOL _DeleteGroup(LPCTSTR strGroupName, BOOL bCommon);
-	BOOL _DeleteItem(LPCTSTR strItem);
-	BOOL _AddItem(LPCTSTR strCmdLine, LPCTSTR pszDescription, LPCTSTR pszIconPath, int nIconIndex, LPCTSTR pszDefDir, WORD dwHotKey, BOOL bMinimize);
-	BOOL _ListGroupsHelper(HANDLE hHeap, char* szPath, LPVOID& pGroupList, UINT& ulSize);
-	DWORD _MatchRequest(LPCSTR pszCommand);
-
-	char m_szCurrentGroup[MAX_PATH];
-	BOOL m_bIsUserAnAdmin;
+    BOOL _FindFiles(LPSTR pszPath, BOOL bFindFolder);
+    BOOL _ShowGroup(LPCTSTR strGroupName, int nShow, BOOL bCommon);
+    BOOL _CreateGroup(LPCTSTR strGroupName, BOOL bCommon);
+    BOOL _DeleteGroup(LPCTSTR strGroupName, BOOL bCommon);
+    BOOL _DeleteItem(LPCTSTR strItem);
+    BOOL _AddItem(
+      LPCTSTR strCmdLine, LPCTSTR pszDescription, LPCTSTR pszIconPath,
+      int nIconIndex, LPCTSTR pszDefDir, WORD dwHotKey, BOOL bMinimize);
+    BOOL _ListGroupsHelper(
+      HANDLE hHeap, char* szPath, LPVOID& pGroupList, UINT& ulSize);
+    DWORD _MatchRequest(LPCSTR pszCommand);
+    
+    char m_szCurrentGroup[MAX_PATH];
+    BOOL m_bIsUserAnAdmin;
 };
 
 #endif // DDEWORKER_H

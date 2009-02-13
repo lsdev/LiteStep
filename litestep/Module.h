@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,6 @@
 class Module
 {
 private:
-
     /** Instance handle of module's DLL */
     HINSTANCE m_hInstance;
     
@@ -61,12 +60,13 @@ private:
     /** Flags used to load module */
     DWORD m_dwFlags;
     
-    /** Event that is triggered when a threaded module completes initialization */
+    /**
+     * Event that is triggered when a threaded module completes initialization
+     */
     HANDLE m_hInitEvent;
     HANDLE m_hInitCopyEvent;
-
+    
 public:
-
     /**
      * Constructor.
      *
@@ -81,10 +81,11 @@ public:
     virtual ~Module();
     
     /**
-     * Loads and initializes the module. If the module is loaded in its own thread then
-     * initialization is done asynchronously. Use the event handle returned by
-     * <code>GetInitEvent</code> to wait for initialization to complete. The parameters
-     * are passed to the module's <code>initModuleEx</code> function.
+     * Loads and initializes the module. If the module is loaded in its own
+     * thread then initialization is done asynchronously. Use the event handle
+     * returned by <code>GetInitEvent</code> to wait for initialization to
+     * complete. The parameters are passed to the module's
+     * <code>initModuleEx</code> function.
      *
      * @param  hMainWindow  handle to LiteStep's main window
      * @param  sAppPath     path to LiteStep's root directory
@@ -93,9 +94,9 @@ public:
     bool Init(HWND hMainWindow, const std::string& sAppPath);
     
     /**
-     * Shuts down the module and unloads it. If the module was loaded in its own thread then
-     * shutdown is done asynchronously. Use event handle returned by <code>GetQuitEvent</code>
-     * to wait for shutdown to complete.
+     * Shuts down the module and unloads it. If the module was loaded in its
+     * own thread then shutdown is done asynchronously. Use event handle
+     * returned by <code>GetQuitEvent</code> to wait for shutdown to complete.
      */
     void Quit();
     
@@ -117,61 +118,91 @@ public:
     /**
      * Returns this module's DLL instance handle.
      */
-    HINSTANCE GetInstance() const { return m_hInstance; }
+    HINSTANCE GetInstance() const
+    {
+        return m_hInstance;
+    }
     
     /**
      * Returns this module's thread handle. Returns <code>NULL</code> if the
      * module was not loaded in its own thread.
      */
-    HANDLE GetThread() const { return m_hThread; }
-    
-    /* Caller may NOT call CloseHandle() until the thread 
-    * has an exit signal. */ 
-    HANDLE TakeThread() 
-    { 
-        HANDLE hTemp = m_hThread; 
-        m_hThread = NULL; 
-
-        return hTemp; 
+    HANDLE GetThread() const
+    {
+        return m_hThread;
     }
-
+    
+    /**
+     * Returns this module's thread handle. Returns <code>NULL</code> if the
+     * module was not loaded in its own thread.
+     *
+     * Caller is responsible for calling CloseHandle() on the return value.
+     * Caller must NOT call CloseHandle() until the thread has an exit signal.
+     */
+    HANDLE TakeThread()
+    {
+        HANDLE hTemp = m_hThread;
+        m_hThread = NULL;
+        
+        return hTemp;
+    }
+    
     /**
      * Returns an event that is set once this module has been initialized.
      */
-    HANDLE GetInitEvent() const { return m_hInitEvent; }
-    
-    /* Caller may NOT call CloseHandle() until the event
-    * has been set to signaled. */ 
-    HANDLE TakeInitEvent() 
+    HANDLE GetInitEvent() const
     {
-        HANDLE hTemp = m_hInitEvent; 
-        m_hInitEvent = NULL; 
-
-        return hTemp; 
+        return m_hInitEvent;
+    }
+    
+    /**
+     * Returns an event that is set once this module has been initialized.
+     *
+     * Caller is responsible for calling CloseHandle() on the return value.
+     * Caller must NOT call CloseHandle() until the event has been set to
+     * signaled.
+     */
+    HANDLE TakeInitEvent()
+    {
+        HANDLE hTemp = m_hInitEvent;
+        m_hInitEvent = NULL;
+        
+        return hTemp;
     }
     
     /**
      * Returns the path to this module's DLL.
      */
-    LPCTSTR GetLocation() const { return m_tzLocation.c_str(); }
+    LPCTSTR GetLocation() const
+    {
+        return m_tzLocation.c_str();
+    }
     
     /**
      * Returns the set of flags used to load this module.
      */
-    DWORD GetFlags() const { return m_dwFlags; }
+    DWORD GetFlags() const
+    {
+        return m_dwFlags;
+    }
     
     /**
      * Returns a pointer to this module's <code>quitModule</code> function.
      */
-    quitModuleProc GetQuit() const { return m_pQuit; }
+    quitModuleProc GetQuit() const
+    {
+        return m_pQuit;
+    }
     
     /**
      * Returns a pointer to this module's <code>initModuleEx</code> function.
      */
-    initModuleExProc GetInitEx() const { return m_pInitEx; }
-
+    initModuleExProc GetInitEx() const
+    {
+        return m_pInitEx;
+    }
+    
 private:
-
     /**
      * Loads this module's DLL.
      *

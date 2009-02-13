@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,7 +21,6 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "lsapiinit.h"
 #include "lsapi.h"
-#include "bangs.h"
 #include "../utility/core.hpp"
 #include <time.h>
 
@@ -52,24 +51,24 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
     try
     {
         // Error if called again
-        if(IsInitialized())
+        if (IsInitialized())
         {
             throw LSAPIException(LSAPI_ERROR_RECURRENT);
         }
         
         // Do not allow any thread but the original to load us
-        if(GetCurrentThreadId() != GetMainThreadID())
+        if (GetCurrentThreadId() != GetMainThreadID())
         {
             throw LSAPIException(LSAPI_ERROR_INVALIDTHREAD);
         }
         
         // Copy over the strings
-        if(FAILED(StringCchCopy(m_szLitestepPath, MAX_PATH, pszLitestepPath)))
+        if (FAILED(StringCchCopy(m_szLitestepPath, MAX_PATH, pszLitestepPath)))
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
         
-        if(FAILED(StringCchCopy(m_szRcPath, MAX_PATH, pszRcPath)))
+        if (FAILED(StringCchCopy(m_szRcPath, MAX_PATH, pszRcPath)))
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
@@ -77,7 +76,7 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
         // Create the Bang Manager
         m_bmBangManager = new BangManager;
         
-        if(!m_bmBangManager)
+        if (!m_bmBangManager)
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
@@ -85,7 +84,7 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
         // Create the Settings Manager
         m_smSettingsManager = new SettingsManager();
         
-        if(!m_smSettingsManager)
+        if (!m_smSettingsManager)
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
@@ -105,7 +104,7 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
     }
     catch(LSAPIException& lse)
     {
-        if(LSAPI_ERROR_RECURRENT != lse.Type())
+        if (LSAPI_ERROR_RECURRENT != lse.Type())
         {
             m_bIsInitialized = false;
             
@@ -121,7 +120,7 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
 
 void LSAPIInit::ReloadBangs()
 {
-    if(!IsInitialized())
+    if (!IsInitialized())
     {
         throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
     }
@@ -132,7 +131,7 @@ void LSAPIInit::ReloadBangs()
 
 void LSAPIInit::ReloadSettings()
 {
-    if(!IsInitialized())
+    if (!IsInitialized())
     {
         throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
     }
@@ -144,7 +143,7 @@ void LSAPIInit::ReloadSettings()
     
     m_smSettingsManager = new SettingsManager();
     
-    if(!m_smSettingsManager)
+    if (!m_smSettingsManager)
     {
         throw LSAPIException(LSAPI_ERROR_GENERAL);
     }
@@ -233,24 +232,24 @@ void LSAPIInit::setLitestepVars()
     }
     versions[] = \
     {
-        {WINVER_WIN95,   _T("Win95")},
-        {WINVER_WIN98,   _T("Win98")},
-        {WINVER_WINME,   _T("WinME")},
-
-        {WINVER_WINNT4,  _T("WinNT4")},
-        {WINVER_WIN2000, _T("Win2000")},
-        {WINVER_WINXP,   _T("WinXP")},
-        {WINVER_VISTA,   _T("WinVista")},
-        {WINVER_WIN7,    _T("Win7")},
-
-        {WINVER_WIN2003, _T("Win2003")},
-        {WINVER_WHS,     _T("Win2003")},  // WHS is Win2003 in disguise
-        {WINVER_WIN2008, _T("Win2008")}
+        { WINVER_WIN95,     _T("Win95")    },
+        { WINVER_WIN98,     _T("Win98")    },
+        { WINVER_WINME,     _T("WinME")    },
+        
+        { WINVER_WINNT4,    _T("WinNT4")   },
+        { WINVER_WIN2000,   _T("Win2000")  },
+        { WINVER_WINXP,     _T("WinXP")    },
+        { WINVER_VISTA,     _T("WinVista") },
+        { WINVER_WIN7,      _T("Win7")     },
+        
+        { WINVER_WIN2003,   _T("Win2003")  },
+        { WINVER_WHS,       _T("Win2003")  },  // WHS is Win2003 in disguise
+        { WINVER_WIN2008,   _T("Win2008")  }
     };
-
+    
     UINT uVersion = GetWindowsVersion();
-
-    for (size_t idx = 0; idx < COUNTOF(versions); idx++)
+    
+    for (size_t idx = 0; idx < COUNTOF(versions); ++idx)
     {
         if (versions[idx].uVersion == uVersion)
         {
@@ -261,7 +260,7 @@ void LSAPIInit::setLitestepVars()
             pSM->SetVariable(versions[idx].pszVariable, "false");
         }
     }
-
+    
     if (IsOS(OS_NT))
     {
         pSM->SetVariable("Win9x", "false");
@@ -272,7 +271,7 @@ void LSAPIInit::setLitestepVars()
         pSM->SetVariable("Win9x", "true");
         pSM->SetVariable("WinNT", "false");
     }
-
+    
     // screen resolution
     StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
     pSM->SetVariable("ResolutionX", szTemp);
@@ -284,7 +283,7 @@ void LSAPIInit::setLitestepVars()
     getCompileTime(szTemp, MAX_PATH);
     pSM->SetVariable("CompileDate", szTemp);
     
-#ifdef LS_CUSTOM_INCLUDEFOLDER
+#if defined(LS_CUSTOM_INCLUDEFOLDER)
     pSM->SetVariable("IncludeFolder", "1");
 #endif // LS_CUSTOM_INCLUDEFOLDER
 }
@@ -293,7 +292,7 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
     bool bSuccess = false;
     char szPath[MAX_PATH] = { 0 };
-
+    
     if (GetShellFolderPath(nFolder, szPath, MAX_PATH))
     {
         PathAddBackslashEx(szPath, MAX_PATH);
@@ -302,13 +301,14 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
         m_smSettingsManager->SetVariable(pszVariable, szPath);
         bSuccess = true;
     }
-
+    
     return bSuccess;
 }
 
 // Gets the compiletime/date from the PE header
 //
-#define MakePtr(cast, ptr, addValue) (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
+#define MakePtr(cast, ptr, addValue) \
+    (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
 void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
 {
     IMAGE_DOS_HEADER* dosheader;
@@ -338,10 +338,12 @@ void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
     
     if (timeStruct)
     {
-        _tcsftime(pszValue, cchValue, _T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), timeStruct);
+        _tcsftime(pszValue, cchValue,
+            _T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), timeStruct);
     }
     else
     {
-        StringCchPrintf(pszValue, cchValue, "\"Compiled at an unknown time\"");
+        StringCchPrintf(pszValue, cchValue,
+            "\"Compiled at an unknown time\"");
     }
 }

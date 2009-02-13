@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,7 +40,6 @@ typedef std::vector<MathValue> MathValueList;
 class MathParser
 {
 public:
-
     /**
      * Constructor.
      */
@@ -53,7 +52,6 @@ public:
     MathValue Evaluate();
     
 protected:
-
     /**
      * Calls a function with the specified arguments and returns the result.
      */
@@ -65,7 +63,6 @@ protected:
     MathValue GetVariable(const std::string& name) const;
     
 private:
-
     /**
      * Parses and evaluates a primary expression.
      */
@@ -128,7 +125,6 @@ private:
     void Next(int count = 1);
     
 private:
-    
     /** Number of tokens of lookahead */
     enum { LOOKAHEAD = 2 };
     
@@ -143,10 +139,10 @@ private:
     
     /** Set of variables to check for recursive definition */
     const StringSet& mRecursiveVarSet;
-
+    
     /** Flags */
     unsigned int mFlags;
 };
 
 
-#endif
+#endif // MATHPARSER_H

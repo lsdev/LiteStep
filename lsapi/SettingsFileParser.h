@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,7 +32,6 @@
 class FileParser //: boost::noncopyable
 {
 public:
-
     /**
      * Constructor.
      *
@@ -46,15 +45,14 @@ public:
     ~FileParser();
     
     /**
-     * Parses a configuration file. Settings read from the file are added to the
-     * SettingsMap object passed in to the FileParser constructor.
+     * Parses a configuration file. Settings read from the file are added to
+     * the SettingsMap object passed in to the FileParser constructor.
      *
      * @param  ptzFileName  path to file
      */
     void ParseFile(LPCTSTR ptzFileName);
-
+    
 private:
-
     /** Settings map to receive settings read from file */
     SettingsMap* m_pSettingsMap;
     
@@ -68,25 +66,27 @@ private:
     TCHAR m_tzFullPath[MAX_PATH_LENGTH];
     
     /**
-     * Reads the next line from current file. The line is split into a setting name and
-     * a setting value and the value is stripped of extraneous space and comments.
+     * Reads the next line from current file. The line is split into a setting
+     * name and a setting value and the value is stripped of extraneous space
+     * and comments.
      *
      * @param  ptzName   buffer to receive setting name
      * @param  ptzValue  buffer to receive setting value
-     * @return <code>true</code> if operation succeeded or <code>false</code> if end of
-     *         file was reached or an I/O error occurred.
+     * @return <code>true</code> if operation succeeded or <code>false</code>
+     *         if end of file was reached or an I/O error occurred.
      */
     bool _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
     
     /**
-     * Strips leading and trailing whitespace and comments from a string. The string is
-     * modified in place.
+     * Strips leading and trailing whitespace and comments from a string. The
+     * string is modified in place.
      */
     void _StripString(LPTSTR ptzString);
     
     /**
-     * Processes a line read from a file. If the line is a preprocessor directive then
-     * it is handled appropriately, otherwise it is added to the SettingsMap object.
+     * Processes a line read from a file. If the line is a preprocessor
+     * directive then it is handled appropriately, otherwise it is added to the
+     * SettingsMap object.
      *
      * @param  ptzName   setting name
      * @param  ptzValue  setting value

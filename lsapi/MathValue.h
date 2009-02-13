@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -31,7 +31,6 @@
 class MathValue
 {
 public:
-
     /**
      * Types
      */
@@ -44,7 +43,6 @@ public:
     };
     
 public:
-
     /**
      * Constructs an undefined value.
      */
@@ -108,22 +106,34 @@ public:
     /**
      * Returns <code>true</code> if this value is undefined.
      */
-    bool IsUndefined() const { return (mType == UNDEFINED); }
+    bool IsUndefined() const
+    {
+        return (mType == UNDEFINED);
+    }
     
     /**
      * Returns <code>true</code> if this value is a Boolean.
      */
-    bool IsBoolean() const { return (mType == BOOLEAN); }
+    bool IsBoolean() const
+    {
+        return (mType == BOOLEAN);
+    }
     
     /**
      * Returns <code>true</code> if this value is a number.
      */
-    bool IsNumber() const { return (mType == NUMBER); }
+    bool IsNumber() const
+    {
+        return (mType == NUMBER);
+    }
     
     /**
      * Returns <code>true</code> if this value is a string.
      */
-    bool IsString() const { return (mType == STRING); }
+    bool IsString() const
+    {
+        return (mType == STRING);
+    }
     
     /**
      * Converts this value to a Boolean.
@@ -170,7 +180,6 @@ public:
     friend MathValue operator>=(const MathValue& a, const MathValue& b);
     
 private:
-
     /** Type */
     int mType;
     
@@ -198,4 +207,4 @@ std::string MathNumberToString(double number);
 double MathStringToNumber(const std::string& str);
 
 
-#endif
+#endif // MATHVALUE_H

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,10 +32,9 @@
 class SettingsIterator
 {
 public:
-
     /**
-     * Constructs a SettingsIterator for the given SettingsMap and associated with the
-     * given file.
+     * Constructs a SettingsIterator for the given SettingsMap and associated
+     * with the given file.
      *
      * @param  pSettingsMap  SettingsMap to iterate over
      * @param  szPath        Path to configuration file
@@ -47,8 +46,8 @@ public:
      *
      * @param   pszValue  buffer to receive value
      * @param   cchValue  size of buffer
-     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code> if there are
-     *          no more values to retrieve
+     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code>
+     *          if there are no more values to retrieve
      */
     BOOL ReadNextLine(LPSTR pszValue, size_t cchValue);
     
@@ -58,18 +57,20 @@ public:
      * @param   pszConfig  setting name
      * @param   pszValue   buffer to receive value
      * @param   cchValue   size of buffer
-     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code> if there are
-     *          no more values to retrieve
+     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code>
+     *          if there are no more values to retrieve
      */
     BOOL ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
     
     /**
      * Returns path to configuration file.
      */
-    std::string get_Path() { return m_Path; }
-
+    std::string getPath()
+    {
+        return m_Path;
+    }
+    
 private:
-
     /** Settings map to iterate */
     SettingsMap* m_pSettingsMap;
     

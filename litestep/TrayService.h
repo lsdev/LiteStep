@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -50,7 +50,10 @@ typedef struct _SHELLTRAYDATA
 // Data sent with AppBar Message
 typedef struct _SHELLAPPBARDATA
 {
-    _SHELLAPPBARDATA(APPBARDATAV1& abdsrc):abd(abdsrc) {}
+    _SHELLAPPBARDATA(APPBARDATAV1& abdsrc):abd(abdsrc)
+    {
+        // do nothing
+    }
     
     const APPBARDATAV1& abd;
     /**/
@@ -112,7 +115,7 @@ public:
 private:
     HRESULT createWindows();
     void destroyWindows();
-
+    
     //
     // manage COM based shell services
     //
@@ -126,7 +129,7 @@ private:
     
     // Handler for system tray notifications
     BOOL HandleNotification(PSHELLTRAYDATA pstd);
-
+    
     // Handler for LoadInProc messages
     HRESULT HandleLoadInProc(REFCLSID clsid, DWORD dwMessage);
     

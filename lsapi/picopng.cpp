@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 
 #include "../litestep/buildoptions.h"
 
-#ifdef LS_USE_PICOPNG
+#if defined(LS_USE_PICOPNG)
 
 #include <vector>
 
@@ -193,7 +193,7 @@ int decodePNG(std::vector<unsigned char>& out_image_32bit, unsigned long& image_
         error = tree.makeFromLengths(bitlen, 15); if(error) return; //now we've finally got HLIT and HDIST, so generate the code trees, and the function is done
         error = treeD.makeFromLengths(bitlenD, 15); if(error) return;
       }
-      void inflateHuffmanBlock(std::vector<unsigned char>& out, const unsigned char* in, size_t& bp, size_t& pos, size_t inlength, unsigned long btype) 
+      void inflateHuffmanBlock(std::vector<unsigned char>& out, const unsigned char* in, size_t& bp, size_t& pos, size_t inlength, unsigned long btype)
       {
         if(btype == 1) { generateFixedTrees(codetree, codetreeD); }
         else if(btype == 2) { getTreeInflateDynamic(codetree, codetreeD, in, bp, inlength); if(error) return; }

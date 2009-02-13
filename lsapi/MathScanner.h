@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,6 @@
 class MathScanner
 {
 public:
-
     /**
      * Constructs a MathScanner that reads from the specified string.
      */
@@ -45,7 +44,6 @@ public:
     MathToken NextToken();
     
 private:
-
     /**
      * Returns a token for the specified identifier, first checking to see if
      * its a reserved word.
@@ -71,14 +69,13 @@ private:
      * Scans a string literal.
      */
     MathToken ScanString();
-
-private:
     
+private:
     /**
      * Skips past white space in the input.
      */
     void SkipSpace();
-
+    
     /**
      * Returns true if a character is a digit.
      */
@@ -101,7 +98,6 @@ private:
     static bool IsSpace(char ch);
     
 private:
-
     /** Number of characters of lookahead */
     enum { LOOKAHEAD = 2 };
     
@@ -113,4 +109,4 @@ private:
 };
 
 
-#endif
+#endif // MATHSCANNER_H

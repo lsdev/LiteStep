@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -68,7 +68,6 @@ enum
 class MathToken
 {
 public:
-
     /**
      * Constructs a token with type <code>TT_INVALID</code>.
      */
@@ -87,7 +86,10 @@ public:
     /**
      * Returns the type of this token.
      */
-    int GetType() const { return mType; }
+    int GetType() const
+    {
+        return mType;
+    }
     
     /**
      * Returns a string description of this token's type.
@@ -102,7 +104,10 @@ public:
     /**
      * Returns the lexical value of this token.
      */
-    std::string GetValue() const { return mValue; }
+    std::string GetValue() const
+    {
+        return mValue;
+    }
     
     /**
      * Sets the lexical value of this token.
@@ -110,7 +115,6 @@ public:
     void SetValue(const std::string& value);
     
 private:
-
     /** Token type */
     int mType;
     
@@ -119,4 +123,4 @@ private:
 };
 
 
-#endif
+#endif // MATHTOKEN_H

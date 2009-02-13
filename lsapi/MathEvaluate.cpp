@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -43,9 +43,9 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
             resourceTextBuffer, MAX_LINE_LENGTH,
             "Error in Expression:\n  %s\n\nDescription:\n  %s",
             expression.c_str(), e.what());
-
+        
         RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
-
+        
         return false;
     }
     
@@ -76,11 +76,11 @@ bool MathEvaluateString(const SettingsMap& context, const string& expression,
             resourceTextBuffer, MAX_LINE_LENGTH,
             "Error in Expression:\n  %s\n\nDescription:\n  %s",
             expression.c_str(), e.what());
-
+        
         RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
-
+        
         return false;
     }
-
+    
     return true;
 }

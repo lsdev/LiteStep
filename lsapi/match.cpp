@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@
 
 static int matche_after_star (LPCSTR pattern, LPCSTR text);
 
-/*----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
 *
 * Return TRUE if PATTERN has is a well formed regular expression according
 * to the above syntax
@@ -56,112 +56,110 @@ static int matche_after_star (LPCSTR pattern, LPCSTR text);
 *   PATTERN_CLOSE - [..] construct has no end bracket (ie [abc-g )
 *   PATTERN_EMPTY - [..] construct is empty (ie [])
 *
-----------------------------------------------------------------------------*/
+-----------------------------------------------------------------------------*/
 
-BOOL is_valid_pattern (LPCSTR p, LPINT error_type)
+BOOL is_valid_pattern(LPCSTR p, LPINT error_type)
 {
-	/* init error_type */
-	*error_type = PATTERN_VALID;
-
-	/* loop through pattern to EOS */
-	while (*p)
-	{
-		/* determine pattern type */
-		switch (*p)
-		{
-			/* check literal escape, it cannot be at end of pattern */
-			case '\\':
-			if (!*++p)
-			{
-				*error_type = PATTERN_ESC;
-				return FALSE;
-			}
-			p++;
-			break;
-
-			/* the [..] construct must be well formed */
-			case '[':
-			p++;
-
-			/* if the next character is ']' then bad pattern */
-			if (*p == ']')
-			{
-				*error_type = PATTERN_EMPTY;
-				return FALSE;
-			}
-
-			/* if end of pattern here then bad pattern */
-			if (!*p)
-			{
-				*error_type = PATTERN_CLOSE;
-				return FALSE;
-			}
-
-			/* loop to end of [..] construct */
-			while (*p != ']')
-			{
-				/* check for literal escape */
-				if (*p == '\\')
-				{
-					p++;
-
-					/* if end of pattern here then bad pattern */
-					if (!*p++)
-					{
-						*error_type = PATTERN_ESC;
-						return FALSE;
-					}
-				}
-				else
-					p++;
-
-				/* if end of pattern here then bad pattern */
-				if (!*p)
-				{
-					*error_type = PATTERN_CLOSE;
-					return FALSE;
-				}
-
-				/* if this a range */
-				if (*p == '-')
-				{
-					/* we must have an end of range */
-					if (!*++p || *p == ']')
-					{
-						*error_type = PATTERN_RANGE;
-						return FALSE;
-					}
-					else
-					{
-						/* check for literal escape */
-						if (*p == '\\')
-							p++;
-
-						/* if end of pattern here
-						   then bad pattern           */
-						if (!*p++)
-						{
-							*error_type = PATTERN_ESC;
-							return FALSE;
-						}
-					}
-				}
-			}
-			break;
-
-			/* all other characters are valid pattern elements */
-			case '*':
-			case '?':
-			default:
-			p++;                              /* "normal" character */
-			break;
-		}
-	}
-	return TRUE;
+    // init error_type
+    *error_type = PATTERN_VALID;
+    
+    // loop through pattern to EOS
+    while (*p)
+    {
+        // determine pattern type
+        switch (*p)
+        {
+        // check literal escape, it cannot be at end of pattern
+        case '\\':
+            if (!*++p)
+            {
+                *error_type = PATTERN_ESC;
+                return FALSE;
+            }
+            ++p;
+            break;
+            
+        // the [..] construct must be well formed
+        case '[':
+            ++p;
+            
+            // if the next character is ']' then bad pattern
+            if (*p == ']')
+            {
+                *error_type = PATTERN_EMPTY;
+                return FALSE;
+            }
+            
+            // if end of pattern here then bad pattern
+            if (!*p)
+            {
+                *error_type = PATTERN_CLOSE;
+                return FALSE;
+            }
+            
+            // loop to end of [..] construct
+            while (*p != ']')
+            {
+                // check for literal escape
+                if (*p++ == '\\')
+                {
+                    // if end of pattern here then bad pattern
+                    if (!*p++)
+                    {
+                        *error_type = PATTERN_ESC;
+                        return FALSE;
+                    }
+                }
+                
+                // if end of pattern here then bad pattern
+                if (!*p)
+                {
+                    *error_type = PATTERN_CLOSE;
+                    return FALSE;
+                }
+                
+                // if this a range
+                if (*p == '-')
+                {
+                    // we must have an end of range
+                    if (!*++p || *p == ']')
+                    {
+                        *error_type = PATTERN_RANGE;
+                        return FALSE;
+                    }
+                    else
+                    {
+                        // check for literal escape
+                        if (*p == '\\')
+                        {
+                            ++p;
+                        }
+                        
+                        // if end of pattern here then bad pattern
+                        if (!*p++)
+                        {
+                            *error_type = PATTERN_ESC;
+                            return FALSE;
+                        }
+                    }
+                }
+            }
+            break;
+            
+        // all other characters are valid pattern elements
+        case '*':
+        case '?':
+        default:
+            ++p;                              // "normal" character
+            break;
+        }
+    }
+    
+    return TRUE;
 }
 
 
-/*----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
 *
 *  Match the pattern PATTERN against the string TEXT;
 *
@@ -174,7 +172,6 @@ BOOL is_valid_pattern (LPCSTR p, LPINT error_type)
 *            MATCH_ABORT    - premature end of text string
 *            MATCH_END      - premature end of pattern string
 *            MATCH_VALID    - valid match
-*
 *
 *  A match means the entire string TEXT is used up in matching.
 *
@@ -193,271 +190,271 @@ BOOL is_valid_pattern (LPCSTR p, LPINT error_type)
 *  To suppress the special syntactic significance of any of `[]*?!^-\',
 *  and match the character exactly, precede it with a `\'.
 *
-----------------------------------------------------------------------------*/
+-----------------------------------------------------------------------------*/
 
-int matche (LPCSTR p, LPCSTR t)
+int matche(LPCSTR p, LPCSTR t)
 {
-	char range_start, range_end;  /* start and end in range */
-
-	BOOL invert;             /* is this [..] or [!..] */
-	BOOL member_match;       /* have I matched the [..] construct? */
-	BOOL loop;               /* should I terminate? */
-
-	for (; *p; p++, t++)
-	{
-		/* if this is the end of the text
-		   then this is the end of the match */
-
-		if (!*t)
-		{
-			return (*p == '*' && *++p == '\0') ?
-			       MATCH_VALID : MATCH_ABORT;
-		}
-
-		/* determine and react to pattern type */
-
-		switch (*p)
-		{
-			case '?':                       /* single any character match */
-			break;
-
-			case '*':                       /* multiple any character match */
-			return matche_after_star(p, t);
-
-			/* [..] construct, single member/exclusion character match */
-			case '[':
-			{
-				/* move to beginning of range */
-				p++;
-
-				/* check if this is a member match or exclusion match */
-				invert = FALSE;
-				if (*p == '!' || *p == '^')
-				{
-					invert = TRUE;
-					p++;
-				}
-
-				/* if closing bracket here or at range start then we have a
-				   malformed pattern */
-				if (*p == ']')
-				{
-					return MATCH_PATTERN;
-				}
-
-				member_match = FALSE;
-				loop = TRUE;
-
-				while (loop)
-				{
-					/* if end of construct then loop is done */
-					if (*p == ']')
-					{
-						loop = FALSE;
-						continue;
-					}
-
-					/* matching a '!', '^', '-', '\' or a ']' */
-					if (*p == '\\')
-					{
-						range_start = range_end = *++p;
-					}
-					else
-					{
-						range_start = range_end = *p;
-					}
-
-					/* if end of pattern then bad pattern (Missing ']') */
-					if (!*p)
-						return MATCH_PATTERN;
-
-					/* check for range bar */
-					if (*++p == '-')
-					{
-						/* get the range end */
-						range_end = *++p;
-
-						/* if end of pattern or construct
-						   then bad pattern */
-						if (range_end == '\0' || range_end == ']')
-							return MATCH_PATTERN;
-
-						/* special character range end */
-						if (range_end == '\\')
-						{
-							range_end = *++p;
-
-							/* if end of text then
-							   we have a bad pattern */
-							if (!range_end)
-								return MATCH_PATTERN;
-						}
-
-						/* move just beyond this range */
-						p++;
-					}
-
-					/* if the text character is in range then match found.
-					   make sure the range letters have the proper
-					   relationship to one another before comparison */
-
-					if (range_start < range_end)
-					{
-						if (*t >= range_start && *t <= range_end)
-						{
-							member_match = TRUE;
-							loop = FALSE;
-						}
-					}
-					else
-					{
-						if (*t >= range_end && *t <= range_start)
-						{
-							member_match = TRUE;
-							loop = FALSE;
-						}
-					}
-				}
-
-				/* if there was a match in an exclusion set then no match */
-				/* if there was no match in a member set then no match */
-				if ((invert && member_match) || !(invert || member_match))
-					return MATCH_RANGE;
-
-				/* if this is not an exclusion then skip the rest of
-				   the [...] construct that already matched. */
-
-				if (member_match)
-				{
-					while (*p != ']')
-					{
-						/* bad pattern (Missing ']') */
-						if (!*p)
-							return MATCH_PATTERN;
-
-						/* skip exact match */
-						if (*p == '\\')
-						{
-							p++;
-
-							/* if end of text then
-							   we have a bad pattern */
-
-							if (!*p)
-								return MATCH_PATTERN;
-						}
-
-						/* move to next pattern char */
-
-						p++;
-					}
-				}
-				break;
-			}
-			case '\\':    /* next character is quoted and must match exactly */
-
-			/* move pattern pointer to quoted char and fall through */
-			p++;
-
-			/* if end of text then we have a bad pattern */
-			if (!*p)
-				return MATCH_PATTERN;
-
-			/* must match this character exactly */
-
-			default:
-			if (toupper(*p) != toupper(*t))
-				return MATCH_LITERAL;
-		}
-	}
-
-	/* if end of text not reached then the pattern fails */
-	if (*t)
-		return MATCH_END;
-	else
-		return MATCH_VALID;
+    char range_start, range_end;  // start and end in range
+    
+    BOOL invert;                  // is this [..] or [!..]
+    BOOL member_match;            // have I matched the [..] construct?
+    BOOL loop;                    // should I terminate?
+    
+    for (; *p; ++p, ++t)
+    {
+        // if this is the end of the text then this is the end of the match
+        if (!*t)
+        {
+            return (*p == '*' && !*++p) ? MATCH_VALID : MATCH_ABORT;
+        }
+        
+        // determine and react to pattern type
+        switch (*p)
+        {
+        // single any character match
+        case '?':
+            break;
+            
+        // multiple any character match
+        case '*':
+            return matche_after_star(p, t);
+            
+        // [..] construct, single member/exclusion character match
+        case '[':
+            // move to beginning of range
+            ++p;
+            
+            // check if this is a member match or exclusion match
+            invert = FALSE;
+            if (*p == '!' || *p == '^')
+            {
+                invert = TRUE;
+                ++p;
+            }
+            
+            // if closing bracket here or at range start then we have a
+            // malformed pattern
+            if (*p == ']')
+            {
+                return MATCH_PATTERN;
+            }
+            
+            member_match = FALSE;
+            loop = TRUE;
+            
+            while (loop)
+            {
+                // if end of construct then loop is done
+                if (*p == ']')
+                {
+                    loop = FALSE;
+                    continue;
+                }
+                
+                // matching a '!', '^', '-', '\' or a ']'
+                if (*p == '\\')
+                {
+                    range_start = range_end = *++p;
+                }
+                else
+                {
+                    range_start = range_end = *p;
+                }
+                
+                // if end of pattern then bad pattern (Missing ']')
+                if (!*p)
+                {
+                    return MATCH_PATTERN;
+                }
+                
+                // check for range bar
+                if (*++p == '-')
+                {
+                    // get the range end
+                    range_end = *++p;
+                    
+                    // if end of pattern or construct then bad pattern
+                    if (!range_end || range_end == ']')
+                    {
+                        return MATCH_PATTERN;
+                    }
+                    
+                    // special character range end
+                    if (range_end == '\\')
+                    {
+                        range_end = *++p;
+                        
+                        // if end of text then we have a bad pattern
+                        if (!range_end)
+                        {
+                            return MATCH_PATTERN;
+                        }
+                    }
+                    
+                    // move just beyond this range
+                    ++p;
+                }
+                
+                // if the text character is in range then match found.
+                // Make sure the range letters have the proper relationship
+                // to one another before comparison
+                if (range_start < range_end)
+                {
+                    if (*t >= range_start && *t <= range_end)
+                    {
+                        member_match = TRUE;
+                        loop = FALSE;
+                    }
+                }
+                else
+                {
+                    if (*t >= range_end && *t <= range_start)
+                    {
+                        member_match = TRUE;
+                        loop = FALSE;
+                    }
+                }
+            }
+            
+            // if there was a match in an exclusion set then no match
+            // if there was no match in a member set then no match
+            if ((invert && member_match) || !(invert || member_match))
+            {
+                return MATCH_RANGE;
+            }
+            
+            // if this is not an exclusion then skip the rest of the [...]
+            // construct that already matched.
+            if (member_match)
+            {
+                while (*p != ']')
+                {
+                    // bad pattern (Missing ']')
+                    if (!*p)
+                    {
+                        return MATCH_PATTERN;
+                    }
+                    
+                    // skip exact match
+                    if (*p++ == '\\')
+                    {
+                        // if end of text then we have a bad pattern
+                        if (!*p++)
+                        {
+                            return MATCH_PATTERN;
+                        }
+                    }
+                }
+            }
+            break;
+            
+        // next character is quoted and must match exactly
+        case '\\':
+            // move pattern pointer to quoted char and fall through
+            ++p;
+            
+            // if end of text then we have a bad pattern
+            if (!*p)
+            {
+                return MATCH_PATTERN;
+            }
+            
+            // FALL THROUGH
+            
+        // must match this character exactly
+        default:
+            if (toupper(*p) != toupper(*t))
+            {
+                return MATCH_LITERAL;
+            }
+        }
+    }
+    
+    // if end of text not reached then the pattern fails
+    if (*t)
+    {
+        return MATCH_END;
+    }
+    
+    return MATCH_VALID;
 }
 
 
-/*----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
 *
 * recursively call matche() with final segment of PATTERN and of TEXT.
 *
-----------------------------------------------------------------------------*/
-
+-----------------------------------------------------------------------------*/
 static int matche_after_star (LPCSTR p, LPCSTR t)
 {
-	int match = 0;
-	char nextp;
-
-	/* pass over existing ? and * in pattern */
-	while (*p == '?' || *p == '*')
-	{
-		/* take one char for each ? and + */
-		if (*p == '?')
-		{
-			/* if end of text then no match */
-			if (!*t++)
-				return MATCH_ABORT;
-		}
-
-		/* move to next char in pattern */
-		p++;
-	}
-
-	/* if end of pattern we have matched regardless of text left */
-
-	if (!*p)
-		return MATCH_VALID;
-
-	/* get the next character to match which must be a literal or '[' */
-	nextp = *p;
-	if (nextp == '\\')
-	{
-		nextp = p[1];
-
-		/* if end of text then we have a bad pattern */
-		if (!nextp)
-			return MATCH_PATTERN;
-	}
-
-	/* Continue until we run out of text or definite result seen */
-
-	do
-	{
-		/* a precondition for matching is that the next character
-		   in the pattern match the next character in the text or that
-		   the next pattern char is the beginning of a range.  Increment
-		   text pointer as we go here */
-
-		if (tolower(nextp) == tolower(*t) || *p == '[')
-			match = matche(p, t);
-
-		/* if the end of text is reached then no match */
-		if (!*t++)
-			match = MATCH_ABORT;
-	}
-	while (match != MATCH_VALID &&
-	        match != MATCH_ABORT &&
-	        match != MATCH_PATTERN
-	      );
-
-	/* return result */
-
-	return match;
+    int match = 0;
+    char nextp;
+    
+    // pass over existing ? and * in pattern
+    while (*p == '?' || *p == '*')
+    {
+        // take one char for each ?
+        if (*p++ == '?')
+        {
+            // if end of text then no match
+            if (!*t++)
+            {
+                return MATCH_ABORT;
+            }
+        }
+    }
+    
+    // if end of pattern we have matched regardless of text left
+    if (!*p)
+    {
+        return MATCH_VALID;
+    }
+    
+    // get the next character to match which must be a literal or '['
+    nextp = *p;
+    if (nextp == '\\')
+    {
+        nextp = p[1];
+        
+        // if end of text then we have a bad pattern
+        if (!nextp)
+        {
+            return MATCH_PATTERN;
+        }
+    }
+    
+    // Continue until we run out of text or definite result seen
+    do
+    {
+        // a precondition for matching is that the next character
+        // in the pattern match the next character in the text or that
+        // the next pattern char is the beginning of a range.  Increment
+        // text pointer as we go here
+        if (toupper(nextp) == toupper(*t) || *p == '[')
+        {
+            match = matche(p, t);
+        }
+        
+        // if the end of text is reached then no match
+        if (!*t++)
+        {
+            match = MATCH_ABORT;
+        }
+    } while (match != MATCH_VALID &&
+             match != MATCH_ABORT &&
+             match != MATCH_PATTERN);
+    
+    // return result
+    return match;
 }
 
 
-/*----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
 *
 * match() is a shell to matche() to return only BOOL values.
 *
-----------------------------------------------------------------------------*/
-
+-----------------------------------------------------------------------------*/
 BOOL match(LPCSTR p, LPCSTR t)
 {
-	int error_type;
-
-	error_type = matche(p, t);
-	return (error_type == MATCH_VALID) ? TRUE : FALSE;
+    return (matche(p, t) == MATCH_VALID) ? TRUE : FALSE;
 }

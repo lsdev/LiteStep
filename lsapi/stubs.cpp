@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,8 +24,7 @@
 
 BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {
-#ifdef LS_COMPAT_LOGGING
-
+#if defined(LS_COMPAT_LOGGING)
     char szLogFile[MAX_PATH] = { 0 };
     
     int nLogLevel = GetRCInt("LSLogLevel", 2);
@@ -53,7 +52,7 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
         NULL);
     
     // Did open succeed?
-    if(hLogFile == INVALID_HANDLE_VALUE)
+    if (hLogFile == INVALID_HANDLE_VALUE)
     {
         return FALSE;
     }
@@ -94,7 +93,7 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 
 BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
 {
-#ifdef LS_COMPAT_LOGGING
+#if defined(LS_COMPAT_LOGGING)
     if (!pszModule || !pszFormat)
     {
         return FALSE;
@@ -148,11 +147,11 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     if (szString[0] == '-')
     {
         negative = true;
-        szString++;
+        ++szString;
     }
     else if (szString[0] == '+')
     {
-        szString++;
+        ++szString;
     }
     
     size_t length = strlen(szString);
@@ -160,49 +159,55 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     
     while (i < length)
     {
-        if (szString[i] >= '0' && szString[i] <= '9')
-            value = (value * 10) + (szString[i] - '0');
-        else
+        if (szString[i] < '0' || szString[i] > '9')
+        {
             break;
+        }
+        
+        value = (value * 10) + (szString[i] - '0');
         
         ++i;
     }
     
     if (i == 0)
+    {
         return nDefault;
+    }
     
     while (i < length)
     {
         if ((szString[i] == 'c' || szString[i] == 'C') && !center)
+        {
             center = true;
+        }
         else if (szString[i] == '%' && !percentual)
+        {
             percentual = true;
+        }
         else
-//      {
-//          LSLogPrintf(LOG_WARNING, "SettingsManager", "incorrect coordinate (%s), using \"%s%d%s%s\"", strVal, negative?"-":"",value, percentual?"%":"", center?"c":"");
+        {
             break;
-//      }
+        }
         
         ++i;
     }
     
     if (percentual)
+    {
         value = nMaxVal * value / 100;
+    }
     
     if (center)
     {
         if (negative)
+        {
             value = (nMaxVal / 2) - value;
+        }
         else
+        {
             value = (nMaxVal / 2) + value;
+        }
     }
-/*  else if (percentual) // percentual positioning ie 30% from left side, -30% to count from right
-    {
-        if (negative)
-            value = nMaxVal*(1-value/100);
-        else
-            value = nMaxVal*value/100;
-    }*/
     else if (negative)
     {
         value = nMaxVal - value;

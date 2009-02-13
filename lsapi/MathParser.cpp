@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -168,7 +168,7 @@ MathValue MathParser::Evaluate()
 
 MathValue MathParser::CallFunction(const string& name, const MathValueList& argList) const
 {
-    for (int i = 0; i < gNumFunctions; i++)
+    for (int i = 0; i < gNumFunctions; ++i)
     {
         if (_stricmp(name.c_str(), gFunctions[i].name) == 0)
         {
@@ -222,14 +222,19 @@ MathValue MathParser::GetVariable(const string& name) const
 
     // Expand variable references
     char value[MAX_LINE_LENGTH];
-    g_LSAPIManager.GetSettingsManager()->VarExpansionEx(value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
+    g_LSAPIManager.GetSettingsManager()->VarExpansionEx(
+        value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
     
-    if (_stricmp(value, "false") == 0 || _stricmp(value, "off") == 0 || _stricmp(value, "no") == 0)
+    if (_stricmp(value, "false") == 0 ||
+        _stricmp(value, "off") == 0 ||
+        _stricmp(value, "no") == 0)
     {
         // False
         return false;
     }
-    else if (_stricmp(value, "true") == 0 || _stricmp(value, "on") == 0 || _stricmp(value, "yes") == 0)
+    else if (_stricmp(value, "true") == 0 ||
+             _stricmp(value, "on") == 0 ||
+             _stricmp(value, "yes") == 0)
     {
         // True
         return true;
@@ -279,7 +284,8 @@ MathValue MathParser::GetVariable(const string& name) const
 
 MathValue MathParser::ParsePrimaryExpression()
 {
-    if (mLookahead[0].GetType() == TT_ID && mLookahead[1].GetType() == TT_LPAREN)
+    if (mLookahead[0].GetType() == TT_ID &&
+        mLookahead[1].GetType() == TT_LPAREN)
     {
         // Function Call
         string name;
@@ -362,7 +368,8 @@ MathValue MathParser::ParsePrimaryExpression()
         Match(TT_RPAREN);
         return value;
     }
-    else if (mLookahead[0].GetType() == TT_DEFINED && mLookahead[1].GetType() == TT_LPAREN)
+    else if (mLookahead[0].GetType() == TT_DEFINED &&
+             mLookahead[1].GetType() == TT_LPAREN)
     {
         // Defined
         Match(TT_DEFINED);
@@ -659,10 +666,12 @@ void MathParser::Match(int type)
 
 void MathParser::Next(int count)
 {
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
-        for (int j = 0; j < LOOKAHEAD - 1; j++)
+        for (int j = 0; j < LOOKAHEAD - 1; ++j)
+        {
             mLookahead[j] = mLookahead[j + 1];
+        }
         
         mLookahead[LOOKAHEAD - 1] = mScanner.NextToken();
     }
@@ -673,7 +682,10 @@ void MathParser::Next(int count)
 MathValue Math_abs(const MathValueList& argList)
 {
     double num = argList[0].ToNumber();
-    if(num < 0) num *= -1;
+    if (num < 0)
+    {
+        num *= -1;
+    }
     return num;
 }
 

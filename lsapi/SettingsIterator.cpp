@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -45,7 +45,7 @@ SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, const string& szPa
 BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-
+    
     if (pszValue != NULL && cchValue > 0)
     {
         if (m_pFileIterator != m_pSettingsMap->end())
@@ -53,7 +53,7 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
             StringCchCopy(pszValue, cchValue, m_pFileIterator->first.c_str());
             StringCchCat(pszValue, cchValue, " ");
             StringCchCat(pszValue, cchValue, m_pFileIterator->second.c_str());
-            m_pFileIterator++;
+            ++m_pFileIterator;
             bReturn = TRUE;
         }
         else
@@ -61,7 +61,7 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
             pszValue[0] = '\0';
         }
     }
-
+    
     return bReturn;
 }
 
@@ -88,10 +88,12 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
             // No, so find the first item with a key of pszConfig
             itSettings = m_pSettingsMap->lower_bound(pszConfig);
             
-            if (_stricmp(itSettings->first.c_str(), pszConfig) == 0) // != m_pSettingsManager->end())
+            if (_stricmp(itSettings->first.c_str(), pszConfig) == 0)
             {
                 // Save the iterator for future use and return the value
-                it = (m_Iterators.insert(IteratorMap::value_type(pszConfig, itSettings))).first;
+                it = (m_Iterators.insert(
+                    IteratorMap::value_type(pszConfig, itSettings)
+                )).first;
                 
                 bReturn = TRUE;
             }
@@ -105,10 +107,9 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
             // last matching item
             do
             {
-                it->second++;
-            }
-            while ((_stricmp(pszConfig, it->first.c_str()) != 0) &&
-                    (it->second != itSettings));
+                ++it->second;
+            } while ((_stricmp(pszConfig, it->first.c_str()) != 0) &&
+                     (it->second != itSettings));
             
             // If we found a valid item, return it
             if (it->second != itSettings)

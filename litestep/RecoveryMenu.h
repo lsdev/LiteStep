@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -38,25 +38,25 @@ class RecoveryMenu : public IService
     
     DWORD m_dwThreadId;
     HANDLE m_hThread;
-
+    
 public:
     RecoveryMenu(HINSTANCE hInstance);
-
+    
     //
     // IService methods
     //
     HRESULT Start();
     HRESULT Stop();
-
+    
 private:
     static DWORD WINAPI ThreadThunk(LPVOID pParam);
     DWORD ThreadProc();
-
-    static LRESULT WINAPI WindowThunk(HWND hWnd, UINT uMsg,
-                                      WPARAM wParam, LPARAM lParam);
-
+    
+    static LRESULT WINAPI WindowThunk(
+        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    
     LRESULT WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+    
     int ShowMenu(HWND hWnd) const;
     void HandleMenuCommand(int nCommand) const;
 };

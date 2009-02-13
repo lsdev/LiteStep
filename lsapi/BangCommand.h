@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,6 @@
 class Bang : public CountedBase
 {
 public:
-
     /**
      * Constructs a bang command.
      *
@@ -69,15 +68,17 @@ public:
      * @param  pszParams  parameters for the bang command
      */
     void Execute(HWND hCaller, LPCSTR pszParams);
-
+    
     HINSTANCE GetModule() const;
-
+    
 private:
-
     /** Thread that owns this bang command */
     DWORD m_dwThreadID;
     
-    /** <code>true</code> if the bang command name is passed to the callback function */
+    /**
+     * <code>true</code> if the bang command name is passed to the callback
+     * function
+     */
     bool m_bEX;
     
     /** Callback function */
@@ -89,6 +90,5 @@ private:
     /** Name of this bang command */
     std::string m_szCommand;
 };
-
 
 #endif // BANGCOMMAND_H

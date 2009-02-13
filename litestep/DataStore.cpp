@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,12 +24,13 @@
 
 DataStore::DataStore()
 {
+    // do nothing
 }
 
 
 DataStore::~DataStore()
 {
-	Clear();
+    Clear();
 }
 
 
@@ -40,7 +41,7 @@ void DataStore::Clear()
     while (iter != m_dhmData.end())
     {
         delete iter->second;
-        iter++;
+        ++iter;
     }
     
     m_dhmData.clear();
@@ -84,7 +85,7 @@ BOOL DataStore::ReleaseData(WORD wIdent, void *pvData, WORD wLength)
     if (pvData != NULL && wLength > 0)
     {
         DataHolderMap::iterator iter = m_dhmData.find(wIdent);
-
+        
         if (iter != m_dhmData.end())
         {
             DataHolder* pdhData = iter->second;
@@ -105,8 +106,9 @@ BOOL DataStore::ReleaseData(WORD wIdent, void *pvData, WORD wLength)
 
 
 DataHolder::DataHolder()
-: m_wLength(0),	m_pvData(NULL)
+: m_wLength(0), m_pvData(NULL)
 {
+    // do nothing
 }
 
 
@@ -150,7 +152,7 @@ int DataHolder::GetData(void *pvData, WORD wLength)
         {
             wLength = m_wLength;
         }
-
+        
         memcpy(pvData, m_pvData, wLength);
         nReturn = wLength;
     }

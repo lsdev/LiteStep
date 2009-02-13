@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 #include "../utility/core.hpp"
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // FileParser constructor
 //
@@ -35,16 +35,17 @@ FileParser::FileParser(SettingsMap* pSettingsMap) :
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // FileParser destructor
 //
 FileParser::~FileParser()
 {
+    // do nothing
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // ParseFile
 //
@@ -58,10 +59,10 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
     PathUnquoteSpaces(tzExpandedPath);
     
-    DWORD dwLen;
-    dwLen = GetFullPathName(tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, NULL);
+    DWORD dwLen = GetFullPathName(
+        tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, NULL);
     
-    if(0 == dwLen || dwLen > MAX_PATH_LENGTH)
+    if (0 == dwLen || dwLen > MAX_PATH_LENGTH)
     {
         TRACE("Error: Can not get full path for \"%s\"", tzExpandedPath);
         return;
@@ -69,9 +70,10 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     m_phFile = _tfopen(m_tzFullPath, _T("r"));
     
-    if(NULL == m_phFile)
+    if (NULL == m_phFile)
     {
-        TRACE("Error: Can not open file \"%s\" (Defined as \"%s\").", m_tzFullPath, ptzFileName);
+        TRACE("Error: Can not open file \"%s\" (Defined as \"%s\").",
+            m_tzFullPath, ptzFileName);
         return;
     }
     
@@ -84,7 +86,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     m_uLineNumber = 0;
     
-    while(_ReadLineFromFile(tzKey, tzValue))
+    while (_ReadLineFromFile(tzKey, tzValue))
     {
         _ProcessLine(tzKey, tzValue);
     }
@@ -96,7 +98,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // _ReadLineFromFile
 //
@@ -119,7 +121,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
             break;
         }
         
-        m_uLineNumber++;
+        ++m_uLineNumber;
         
         LPTSTR ptzCurrent = tzBuffer;
         
@@ -142,7 +144,8 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
             }
             
             // Copy directive name to ptzName.
-            if (stEndConfig && SUCCEEDED(StringCchCopyN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
+            if (stEndConfig && SUCCEEDED(StringCchCopyN(
+                ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
             {
                 // If ptzValue is NULL, then the caller doesn't want the value,
                 // however, we still will return TRUE.  If the caller does want
@@ -171,7 +174,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // _StripString
 //
@@ -258,7 +261,7 @@ void FileParser::_StripString(LPTSTR ptzString)
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // _ProcessLine
 //
@@ -271,7 +274,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     {
         _ProcessIf(ptzValue);
     }
-#ifdef _DEBUG
+#if defined(_DEBUG)
     // In a release build ignore dangling elseif/else/endif.
     // Too much overhead just for error handling
     else if (
@@ -301,65 +304,71 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         FileParser fpParser(m_pSettingsMap);
         fpParser.ParseFile(tzPath);
     }
-#ifdef LS_CUSTOM_INCLUDEFOLDER 
-    else if (_stricmp(ptzName, _T("includefolder")) == 0) 
-    { 
-        TCHAR tzPath[MAX_PATH_LENGTH]; // path+pattern 
-        TCHAR tzFilter[MAX_PATH_LENGTH]; // path only 
-
-        // expands string in ptzValue to tzPath - buffer size defined by MAX_PATH_LENGTH 
-        VarExpansionEx(tzPath, ptzValue, MAX_PATH_LENGTH); 
-
-        PathUnquoteSpaces(tzPath); // strips quotation marks from string 
-
-        TRACE("Searching IncludeFolder (%s, line %d): \"%s\"", 
-            m_tzFullPath, m_uLineNumber, tzPath); 
-
-        // Hard-coded filter for *.rc files to limit search operation. 
-        // 
-        // Create tzFilter as tzPath appended with *.rc 
-        //  - the API takes care of trailing slash handling thankfully. 
-        PathCombine(tzFilter, tzPath, _T("*.rc")); 
-
-        WIN32_FIND_DATA findData; // defining variable for filename 
-
-        HANDLE hSearch = FindFirstFile(tzFilter, &findData); // Looking in tzFilter for data :) 
-
-        if (INVALID_HANDLE_VALUE != hSearch) 
-        { 
-            BOOL FoundNextFile; 
-
-            do 
-            { 
-                // stripping out directories, system and hidden files as we're not interested 
-                // in them and MS throws these kind of files around from time to time.... 
-                const DWORD dwAttrib = FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_SYSTEM; 
-
-                if (0 == (dwAttrib & findData.dwFileAttributes)) 
-                { 
-                    // Processing the valid cFileName data now. 
-                    TCHAR tzFile[MAX_PATH_LENGTH]; 
-
-                    // adding (like above) filename to tzPath to set tzFile for opening. 
-                    if (tzFile == PathCombine(tzFile, tzPath, findData.cFileName)) 
-                    { 
-                        TRACE("Found and including: \"%s\"", tzFile); 
-
-                        FileParser fpParser(m_pSettingsMap); 
-                        fpParser.ParseFile(tzFile); 
-                    } 
-                } 
-
-                FoundNextFile = FindNextFile(hSearch, &findData); 
-            }while (FoundNextFile); 
-
-            FindClose(hSearch); 
-        } 
-
-        TRACE("Done searching IncludeFolder (%s, line %d): \"%s\"", 
-            m_tzFullPath, m_uLineNumber, tzPath); 
-    } 
-#endif // LS_CUSTOM_INCLUDEFOLDER 
+#if defined(LS_CUSTOM_INCLUDEFOLDER)
+    else if (_stricmp(ptzName, _T("includefolder")) == 0)
+    {
+        TCHAR tzPath[MAX_PATH_LENGTH]; // path+pattern
+        TCHAR tzFilter[MAX_PATH_LENGTH]; // path only
+          
+        // expands string in ptzValue to tzPath
+        // buffer size defined by MAX_PATH_LENGTH
+        VarExpansionEx(tzPath, ptzValue, MAX_PATH_LENGTH);
+        
+        PathUnquoteSpaces(tzPath); // strips quotation marks from string
+        
+        TRACE("Searching IncludeFolder (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, tzPath);
+        
+        // Hard-coded filter for *.rc files to limit search operation.
+        //
+        // Create tzFilter as tzPath appended with *.rc
+        //  - the API takes care of trailing slash handling thankfully.
+        PathCombine(tzFilter, tzPath, _T("*.rc"));
+        
+        WIN32_FIND_DATA findData; // defining variable for filename
+        
+        // Looking in tzFilter for data :)
+        HANDLE hSearch = FindFirstFile(tzFilter, &findData);
+        
+        if (INVALID_HANDLE_VALUE != hSearch)
+        {
+            BOOL FoundNextFile;
+            
+            do
+            {
+                // stripping out directories, system and hidden files as
+                // we're not interested in them and MS throws these kind of
+                // files around from time to time....
+                const DWORD dwAttrib = (FILE_ATTRIBUTE_DIRECTORY |
+                                        FILE_ATTRIBUTE_HIDDEN |
+                                        FILE_ATTRIBUTE_SYSTEM);
+                
+                if (0 == (dwAttrib & findData.dwFileAttributes))
+                {
+                    // Processing the valid cFileName data now.
+                    TCHAR tzFile[MAX_PATH_LENGTH];
+                    
+                    // adding (like above) filename to tzPath to set tzFile
+                    // for opening.
+                    if (tzFile == PathCombine(tzFile, tzPath, findData.cFileName))
+                    {
+                        TRACE("Found and including: \"%s\"", tzFile);
+                        
+                        FileParser fpParser(m_pSettingsMap);
+                        fpParser.ParseFile(tzFile);
+                    }
+                }
+                
+                FoundNextFile = FindNextFile(hSearch, &findData);
+            } while (FoundNextFile);
+            
+            FindClose(hSearch);
+        }
+        
+        TRACE("Done searching IncludeFolder (%s, line %d): \"%s\"",
+            m_tzFullPath, m_uLineNumber, tzPath);
+    }
+#endif // LS_CUSTOM_INCLUDEFOLDER
     else
     {
         m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
@@ -367,7 +376,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // _ProcessIf
 //
@@ -446,7 +455,8 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                     if (_stricmp(tzName, "elseif") == 0)
                     {
                         // Error: ElseIf after Else
-                        TRACE("Syntax Error (%s, %d): \"ElseIf\" directive after \"Else\"",
+                        TRACE("Syntax Error (%s, %d): "
+                              "\"ElseIf\" directive after \"Else\"",
                             m_tzFullPath, m_uLineNumber);
                         
                         // Invalid syntax, so quit processing conditional block
@@ -477,7 +487,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // _SkipIf
 //

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,7 +27,8 @@
 
 
 #if !defined(REGSTR_PATH_SHELLSERVICEOBJECTDELAYED)
-#define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
+#define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED \
+    _T("Software\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad")
 #endif
 
 static const TCHAR szTrayClass[]   = _T("Shell_TrayWnd");
@@ -40,8 +41,8 @@ static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 //
 // This appears to be the SSO responsible for starting up all other "approved"
 // SSOs on Vista. Name derived from "stobject.dll".
-// 
-const GUID CLSID_SysTrayObject =
+//
+const GUID CLSID_SysTrayObject = \
 {0x35CEC8A3, 0x2BE6, 0x11D2, {0x87, 0x73, 0x92, 0xE2, 0x20, 0x52, 0x41, 0x53}};
 
 
@@ -52,7 +53,9 @@ const GUID CLSID_SysTrayObject =
 TrayService::TrayService() :
 m_uWorkAreaDirty(0), m_hNotifyWnd(NULL), m_hTrayWnd(NULL),
 m_hLiteStep(NULL), m_hInstance(NULL)
-{}
+{
+    // do nothing
+}
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -60,7 +63,9 @@ m_hLiteStep(NULL), m_hInstance(NULL)
 // ~TrayService
 //
 TrayService::~TrayService()
-{}
+{
+    // do nothing
+}
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -71,7 +76,7 @@ HRESULT TrayService::Start()
 {
     ASSERT(NULL == m_hTrayWnd);
     HRESULT hr = E_FAIL;
-
+    
     m_hLiteStep = GetLitestepWnd();
     m_hInstance = GetModuleHandle(NULL);
     
@@ -84,34 +89,36 @@ HRESULT TrayService::Start()
             ,0
         );
         CopyRect(&m_rWorkAreaCur, &m_rWorkAreaDef);
-
+        
         hr = createWindows();
         
         if (SUCCEEDED(hr))
         {
             SetWindowLongPtr(m_hTrayWnd, GWLP_USERDATA, magicDWord);
             SetWindowLongPtr(m_hTrayWnd, 0, (LONG_PTR)this);
-
+            
             // http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=1427677&SiteID=1
             //
             // Re: TaskbarCreated message (not working in Vista)
             //
-            //  > The code is still in there to broadcast the message.
-            //  > SendNotifyMessage(HWND_BROADCAST, RegisterWindowMessage(TEXT("TaskbarCreated")), 0, 0);
+            // > The code is still in there to broadcast the message.
+            // > SendNotifyMessage(HWND_BROADCAST,
+            // >     RegisterWindowMessage(TEXT("TaskbarCreated")), 0, 0);
             //
-            //  >> It looks as though applications running as admin cannot receive the message.
-            //  >> Presumably, this is because Explorer, which publishes the message, is not
-            //  >> running as admin
+            // >> It looks as though applications running as admin cannot
+            // >> receive the message. Presumably, this is because Explorer,
+            // >> which publishes the message, is not running as admin
             //
-            //  >>> The message is blocked by User Interface Privilege Isolation, Administrative
-            //  >>> applications that need to see it can allow it through by calling
-            //  >>> ChangeWindowMessageFilter after making sure the necessary security precautions
-            //  >>> are in place. 
+            // >>> The message is blocked by User Interface Privilege
+            // >>> Isolation, Administrative applications that need to see it
+            // >>> can allow it through by calling ChangeWindowMessageFilter
+            // >>> after making sure the necessary security precautions are in
+            // >>> place.
             
             // tell apps to reregister their icons
             SendNotifyMessage(HWND_BROADCAST,
                 RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
-
+            
             if (IsVistaOrAbove())
             {
                 // On Vista and up there's a single SSO responsible for loading
@@ -125,7 +132,7 @@ HRESULT TrayService::Start()
             }
         }
     }
-
+    
     return hr;
 }
 
@@ -137,28 +144,28 @@ HRESULT TrayService::Start()
 HRESULT TrayService::Stop()
 {
     HRESULT hr = S_OK;
-
+    
     unloadShellServiceObjects();
     destroyWindows();
-
+    
     while (!m_siVector.empty())
     {
         delete m_siVector.back();
         m_siVector.pop_back();
     }
-
+    
     while (!m_abVector.empty())
     {
         delete m_abVector.back();
         m_abVector.pop_back();
     }
-
+    
     // Restore the work area. (should we just clear the work area???)
     adjustWorkArea();
-
+    
     m_hLiteStep = NULL;
     m_hInstance = NULL;
-
+    
     return hr;
 }
 
@@ -182,7 +189,7 @@ HRESULT TrayService::createWindows()
     wc.lpszClassName = szTrayClass;
     wc.style = CS_DBLCLKS;
     
-    if(!RegisterClassEx(&wc))
+    if (!RegisterClassEx(&wc))
     {
         hr = HrGetLastError();
     }
@@ -200,7 +207,7 @@ HRESULT TrayService::createWindows()
             m_hInstance,
             NULL);
         
-        if(NULL == m_hTrayWnd)
+        if (NULL == m_hTrayWnd)
         {
             hr = HrGetLastError();
             UnregisterClass(szTrayClass, m_hInstance);
@@ -274,37 +281,37 @@ void TrayService::destroyWindows()
 //
 HRESULT TrayService::loadShellServiceObject(REFCLSID rclsid)
 {
-#ifdef TRACE_ENABLED
+#if defined(TRACE_ENABLED)
     CHAR szBuffer[MAX_PATH] = { 0 };
     CLSIDToString(rclsid, szBuffer, COUNTOF(szBuffer));
-
+    
     TRACE("loadShellServiceObject(\"%s\")", szBuffer);
 #endif
-
+    
     // The SSO might have a custom manifest.
     // Activate it before loading the object.
     ULONG_PTR ulCookie;
     HANDLE hContext = LSActivateActCtxForClsid(rclsid, &ulCookie);
-
+    
     IOleCommandTarget* pCmdTarget = NULL;
-
+    
     HRESULT hr = CoCreateInstance(rclsid, NULL,
         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
         IID_IOleCommandTarget, (void **)&pCmdTarget);
-
+    
     if (SUCCEEDED(hr))
     {
         hr = pCmdTarget->Exec(&CGID_ShellServiceObject, OLECMDID_NEW,
             OLECMDEXECOPT_DODEFAULT, NULL, NULL);
-
+        
         m_ssoVector.push_back(pCmdTarget);
     }
-
+    
     if (hContext != INVALID_HANDLE_VALUE)
     {
         LSDeactivateActCtx(hContext, &ulCookie);
     }
-
+    
     return hr;
 }
 
@@ -339,11 +346,11 @@ void TrayService::loadShellServiceObjects()
         {
             WCHAR wszCLSID[40] = { 0 };
             CLSID clsid = CLSID_NULL;
-
+            
             MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, 40);
             CLSIDFromString(wszCLSID, &clsid);
-
-            loadShellServiceObject(clsid);            
+            
+            loadShellServiceObject(clsid);
         }
         
         ++nCounter;
@@ -404,7 +411,7 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                 //
                 COPYDATASTRUCT* pcds = (COPYDATASTRUCT*)lParam;
                 
-                switch(pcds->dwData)
+                switch (pcds->dwData)
                 {
                 case SH_APPBAR_DATA:
                     {
@@ -450,7 +457,7 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                         }
                     }
                     break;
-
+                    
                 default:
                     {
                         TRACE("Unsupported tray message: %u", pcds->dwData);
@@ -467,11 +474,12 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                 HWND hSkip = (HWND)wParam;
                 AppBar* p = NULL;
                 
-                for(rit = pTrayService->m_abVector.rbegin(); rit != pTrayService->m_abVector.rend(); rit++)
+                for (rit = pTrayService->m_abVector.rbegin();
+                    rit != pTrayService->m_abVector.rend(); ++rit)
                 {
-                    if(hSkip != (*rit)->hWnd())
+                    if (hSkip != (*rit)->hWnd())
                     {
-                        if(!p || p->uEdge() != (*rit)->uEdge())
+                        if (!p || p->uEdge() != (*rit)->uEdge())
                         {
                             SendMessage(
                                  (*rit)->hWnd()
@@ -495,9 +503,10 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             {
                 BarVector::reverse_iterator rit;
                 
-                for(rit = pTrayService->m_abVector.rbegin(); rit != pTrayService->m_abVector.rend(); rit++)
+                for (rit = pTrayService->m_abVector.rbegin();
+                    rit != pTrayService->m_abVector.rend(); ++rit)
                 {
-                    if(!(*rit)->IsOverLap())
+                    if (!(*rit)->IsOverLap())
                     {
                         SendMessage(
                              (*rit)->hWnd()
@@ -527,8 +536,8 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             {
                 TRACE("WM_SETTINGCHANGE(%.4X, \"%s\")",
                     wParam, (LPCTSTR)lParam);
-
-                if(SPI_SETWORKAREA == wParam)
+                
+                if (SPI_SETWORKAREA == wParam)
                 {
                     RECT rc;
                     
@@ -542,10 +551,11 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     // Always update the Current workarea
                     CopyRect(&pTrayService->m_rWorkAreaCur, &rc);
                     
-                    // This will be the case when we updated the workarea ourselves.
-                    if(pTrayService->m_uWorkAreaDirty)
+                    // This will be the case when we updated the workarea
+                    // ourselves.
+                    if (pTrayService->m_uWorkAreaDirty)
                     {
-                        pTrayService->m_uWorkAreaDirty--;
+                        --pTrayService->m_uWorkAreaDirty;
                         break;
                     }
                     
@@ -555,7 +565,8 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     // Clean up any dead app bars before repositioning
                     pTrayService->removeDeadAppBars();
                     
-                    // Now reposition our appbars based on the new default workarea.
+                    // Now reposition our appbars based on the new default
+                    // workarea.
                     PostMessage(
                          pTrayService->m_hTrayWnd
                         ,ABP_NOTIFYPOSCHANGED
@@ -571,13 +582,13 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             {
                 DbgTraceWindowMessage("Shell_TrayWnd", uMsg, wParam, lParam);
             }
-
+            
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
         
         return lResult;
     }
-
+    
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -602,10 +613,10 @@ LRESULT CALLBACK TrayService::WindowNotifyProc(HWND hWnd, UINT uMsg, WPARAM wPar
 //
 HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
 {
-#ifdef TRACE_ENABLED
+#if defined(TRACE_ENABLED)
     CHAR szBuffer[MAX_PATH] = { 0 };
     CLSIDToString(clsid, szBuffer, COUNTOF(szBuffer));
-
+    
     if (dwMessage == 1)
     {
         TRACE("SHLoadInProc(\"%s\")", szBuffer);
@@ -626,7 +637,7 @@ HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
     UNREFERENCED_PARAMETER(clsid);
     UNREFERENCED_PARAMETER(dwMessage);
 #endif
-
+    
     // This is not actually implemented
     return E_NOTIMPL;
 }
@@ -639,64 +650,70 @@ HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
 LRESULT TrayService::HandleAppBarCopydata(DWORD cbData, LPVOID lpData)
 {
     LRESULT lr = 0;
-
+    
     switch (cbData)
     {
-        case sizeof(APPBARMSGDATAV3):
+    case sizeof(APPBARMSGDATAV3):
         {
             PAPPBARMSGDATAV3 pamd = (PAPPBARMSGDATAV3)lpData;
-
+            
             if (sizeof(APPBARDATAV2) != pamd->abd.cbSize)
             {
+                TRACE("PAPPBARMSGDATAV3 - Invalid ABD size: %u", pamd->abd.cbSize);
+                
                 break;
             }
-
+            
             SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
             sbd.dwMessage = pamd->dwMessage;
             sbd.hSharedMemory = pamd->hSharedMemory;
             sbd.dwSourceProcessId = pamd->dwSourceProcessId;
-
+            
             lr = HandleAppBarMessage(&sbd);
         }
         break;
-
-        case sizeof(APPBARMSGDATAV2):
+        
+    case sizeof(APPBARMSGDATAV2):
         {
             PAPPBARMSGDATAV2 pamd = (PAPPBARMSGDATAV2)lpData;
-
+            
             if (sizeof(APPBARDATAV2) != pamd->abd.cbSize)
             {
+                TRACE("APPBARMSGDATAV2 - Invalid ABD size: %u", pamd->abd.cbSize);
+                
                 break;
             }
-
+            
             SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
             sbd.dwMessage = pamd->dwMessage;
             sbd.hSharedMemory = pamd->hSharedMemory;
             sbd.dwSourceProcessId = pamd->dwSourceProcessId;
-
+            
             lr = HandleAppBarMessage(&sbd);
         }
         break;
-
-        case sizeof(APPBARMSGDATAV1):
+        
+    case sizeof(APPBARMSGDATAV1):
         {
             PAPPBARMSGDATAV1 pamd = (PAPPBARMSGDATAV1)lpData;
-
+            
             if (sizeof(APPBARDATAV1) != pamd->abd.cbSize)
             {
+                TRACE("APPBARMSGDATAV1 - Invalid ABD size: %u", pamd->abd.cbSize);
+                
                 break;
             }
-
+            
             SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
             sbd.dwMessage = pamd->dwMessage;
             sbd.hSharedMemory = pamd->hSharedMemory;
             sbd.dwSourceProcessId = pamd->dwSourceProcessId;
-
+            
             lr = HandleAppBarMessage(&sbd);
         }
         break;
-
-        default:
+        
+    default:
         {
             TRACE("Unknown APPBARMSGDATA size: %u", cbData);
         }
@@ -720,7 +737,7 @@ LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
     removeDeadAppBars();
     
     TRACE("SHAppBarMessage(%u, ...)", psad->dwMessage);
-
+    
     switch(psad->dwMessage)
     {
     case ABM_NEW:
@@ -786,13 +803,13 @@ void TrayService::NotifyRudeApp(HMONITOR hFullScreenMonitor) const
 {
     BarVector::const_reverse_iterator rit;
     
-    for(rit = m_abVector.rbegin(); rit != m_abVector.rend(); rit++)
+    for (rit = m_abVector.rbegin(); rit != m_abVector.rend(); ++rit)
     {
         SendMessage(
              (*rit)->hWnd()
             ,(*rit)->uMsg()
             ,ABN_FULLSCREENAPP
-            ,(LPARAM)(hFullScreenMonitor ? 1:0)
+            ,(LPARAM)(hFullScreenMonitor ? 1 : 0)
         );
     }
 }
@@ -809,11 +826,11 @@ void TrayService::removeDeadAppBars()
 {
     BarVector::iterator it = m_abVector.begin();
     
-    while(it != m_abVector.end())
+    while (it != m_abVector.end())
     {
-        if(IsWindow((*it)->hWnd()))
+        if (IsWindow((*it)->hWnd()))
         {
-            it++;
+            ++it;
             continue;
         }
         
@@ -843,7 +860,7 @@ LRESULT TrayService::barCreate(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
     
-    if(IsWindow(abd.hWnd) && !isBar(abd.hWnd))
+    if (IsWindow(abd.hWnd) && !isBar(abd.hWnd))
     {
         m_abVector.push_back(new AppBar(abd.hWnd, abd.uCallbackMessage));
         lResult = 1;
@@ -870,7 +887,7 @@ LRESULT TrayService::barDestroy(const APPBARDATAV1& abd)
     BarVector::iterator itBar;
     LRESULT lResult = 0;
     
-    if(getBar(abd.hWnd, itBar))
+    if (getBar(abd.hWnd, itBar))
     {
         lResult = 1;
         
@@ -909,15 +926,15 @@ LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
     PAPPBARDATAV1 pabd = ABLock(psad);
     const APPBARDATAV1& abd = psad->abd;
     
-    if(pabd)
+    if (pabd)
     {
         AppBar* p;
         
-        if(getBar(abd.hWnd, p))
+        if (getBar(abd.hWnd, p))
         {
             lResult = 1;
             
-            if(p->IsOverLap())
+            if (p->IsOverLap())
             {
                 modifyOverlapBar(pabd->rc, abd.rc, abd.uEdge);
             }
@@ -956,15 +973,15 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
     PAPPBARDATAV1 pabd = ABLock(psad);
     const APPBARDATAV1& abd = psad->abd;
     
-    if(pabd)
+    if (pabd)
     {
         AppBar* p;
         
-        if(getBar(abd.hWnd, p))
+        if (getBar(abd.hWnd, p))
         {
             lResult = 1;
             
-            if(p->IsOverLap())
+            if (p->IsOverLap())
             {
                 modifyOverlapBar(pabd->rc, abd.rc, abd.uEdge);
             }
@@ -975,7 +992,7 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
                 // If this is the first time to position the bar or if
                 // the new position is different than the previous, then
                 // notify all other appbars.
-                if((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
+                if ((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
                    || !EqualRect(&(p->GetRectRef()), &(pabd->rc)))
                 {
                     // Notify other bars
@@ -1037,9 +1054,9 @@ LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
     LRESULT lResult = 0;
     PAPPBARDATAV1 pabd = ABLock(psad);
     
-    if(pabd)
+    if (pabd)
     {
-        if(GetWindowRect(m_hNotifyWnd, &(pabd->rc)))
+        if (GetWindowRect(m_hNotifyWnd, &(pabd->rc)))
         {
             lResult = 1;
         }
@@ -1069,11 +1086,11 @@ LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
     LRESULT lResult = 0;
     AppBar* p;
     
-    if(getBar(abd.hWnd, p))
+    if (getBar(abd.hWnd, p))
     {
         BarVector::iterator itBar = findBar(p->uEdge(), ABS_AUTOHIDE);
         
-        if(itBar != m_abVector.end())
+        if (itBar != m_abVector.end())
         {
             PostMessage(
                  m_hTrayWnd
@@ -1108,7 +1125,7 @@ LRESULT TrayService::barGetAutoHide(UINT uEdge)
     LRESULT lResult = 0;
     BarVector::iterator itBar = findBar(uEdge, ABS_AUTOHIDE);
     
-    if(itBar != m_abVector.end())
+    if (itBar != m_abVector.end())
     {
         lResult = (LRESULT)(*itBar)->hWnd();
     }
@@ -1140,21 +1157,21 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
     BarVector::iterator itBar = findBar(abd.hWnd);
     BarVector::iterator itAutoHideBar = findBar(abd.uEdge, ABS_AUTOHIDE);
     
-    if(abd.lParam) // Set Auto Hide
+    if (abd.lParam) // Set Auto Hide
     {
         lResult = 1;
         
         // Does an autohide bar already exist on this edge?
-        if(itAutoHideBar != m_abVector.end())
+        if (itAutoHideBar != m_abVector.end())
         {
             // Return true if this appbar is the autohide bar.
             return (itBar == itAutoHideBar);
         }
         
         // if bar doesn't exist, create it and set it as an overlap bar
-        if(itBar == m_abVector.end())
+        if (itBar == m_abVector.end())
         {
-            if(!barCreate(abd))
+            if (!barCreate(abd))
             {
                 return 0;
             }
@@ -1170,12 +1187,12 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
     else // Clear Auto Hide
     {
         // if the bar was the auto hide bar proceed
-        if(itBar != m_abVector.end() && itBar == itAutoHideBar)
+        if (itBar != m_abVector.end() && itBar == itAutoHideBar)
         {
             lResult = 1;
             
             // if bar was overlap, destroy it
-            if((*itBar)->IsOverLap())
+            if ((*itBar)->IsOverLap())
             {
                 barDestroy(abd);
             }
@@ -1209,11 +1226,11 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
     LRESULT lResult = 0;
     AppBar* p;
     
-    if(getBar(abd.hWnd, p) && !p->IsAutoHide())
+    if (getBar(abd.hWnd, p) && !p->IsAutoHide())
     {
         BarVector::iterator itBar = findBar(p->uEdge(), ABS_AUTOHIDE);
         
-        if(itBar != m_abVector.end())
+        if (itBar != m_abVector.end())
         {
             PostMessage(
                  m_hTrayWnd
@@ -1290,28 +1307,30 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
     modifyBarExtent(rcDst, rcOrg, uEdge);
     
     // Set the bar's position
-    for(it = m_abVector.begin(); it != m_abVector.end(); it++)
+    for (it = m_abVector.begin(); it != m_abVector.end(); ++it)
     {
         p = *it;
         
         // ignore overlap bars and invalid windows
-        if(!p || p->IsOverLap())
+        if (!p || p->IsOverLap())
         {
+            // do nothing
         }
         // if this is our appbar, mark it found and continue
-        else if(hWnd == p->hWnd())
+        else if (hWnd == p->hWnd())
         {
             bFound = true;
         }
         // ignore bars that haven't been initialized
-        else if(ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
+        else if (ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
         {
+            // do nothing
         }
         // Ignore other edge appbars for the most part
-        else if(uEdge != p->uEdge())
+        else if (uEdge != p->uEdge())
         {
             // Left/Right bars must resize to top/bottom bars
-            if(ABE_HORIZONTAL != (ABE_HORIZONTAL & uEdge)
+            if (ABE_HORIZONTAL != (ABE_HORIZONTAL & uEdge)
                 &&
                ABE_HORIZONTAL == (ABE_HORIZONTAL & p->uEdge()))
             {
@@ -1319,9 +1338,9 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
                 
                 // If our destination rectangle currently intersects
                 // then resize it
-                if(IntersectRect(&rc, &(p->GetRectRef()), &rcDst))
+                if (IntersectRect(&rc, &(p->GetRectRef()), &rcDst))
                 {
-                    if(ABE_TOP == p->uEdge())
+                    if (ABE_TOP == p->uEdge())
                     {
                         rcDst.top = p->GetRectRef().bottom;
                     }
@@ -1335,9 +1354,9 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
         // Keep moving the destination appbar while we are looking
         // at same edge appbars before our own.  Once we find our
         // own, then we ignore all same edge appbars after ours.
-        else if(!bFound)
+        else if (!bFound)
         {
-            switch(uEdge)
+            switch (uEdge)
             {
             case ABE_LEFT:
                 rcDst.left = p->GetRectRef().right;
@@ -1369,7 +1388,7 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
 //
 void TrayService::modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 {
-    switch(uEdge)
+    switch (uEdge)
     {
     case ABE_LEFT:
     case ABE_RIGHT:
@@ -1394,7 +1413,7 @@ void TrayService::modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 //
 void TrayService::modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 {
-    switch(uEdge)
+    switch (uEdge)
     {
     case ABE_LEFT:
         rcDst.right = rcDst.left + (rcOrg.right - rcOrg.left);
@@ -1425,23 +1444,27 @@ void TrayService::adjustWorkArea()
     
     CopyRect(&rcWorker, &m_rWorkAreaDef);
     
-    for(
+    for (
          BarVector::iterator it = m_abVector.begin()
         ;it != m_abVector.end()
-        ;it++
+        ;++it
     )
     {
         AppBar* p = *it;
         
-        if(!IsWindow(p->hWnd())) continue;
+        if (!IsWindow(p->hWnd()))
+        {
+            continue;
+        }
         
-        if(p && !p->IsOverLap() && (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
+        if (p && !p->IsOverLap() &&
+            (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
         {
             RECT rcBarEx;
             
             CopyRect(&rcBarEx, &p->GetRectRef());
             
-            switch(p->uEdge())
+            switch (p->uEdge())
             {
             case ABE_LEFT:
                 rcBarEx.left = m_rWorkAreaDef.left;
@@ -1469,17 +1492,19 @@ void TrayService::adjustWorkArea()
         }
     }
     
-    if(!EqualRect(&m_rWorkAreaCur, &rcWorker))
+    if (!EqualRect(&m_rWorkAreaCur, &rcWorker))
     {
-        m_uWorkAreaDirty++;
+        ++m_uWorkAreaDirty;
         SystemParametersInfo(
              SPI_SETWORKAREA
             ,1 // readjust maximized windows
             ,&rcWorker
             ,0 // SPIF_SENDCHANGE - see below
         );
-        SendNotifyMessage(    // used in place of SPIF_SENDCHANGE above to avoid lockups
-             HWND_BROADCAST   // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
+        // used in place of SPIF_SENDCHANGE above to avoid lockups
+        // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
+        SendNotifyMessage(
+             HWND_BROADCAST
             ,WM_SETTINGCHANGE
             ,SPI_SETWORKAREA
             ,0
@@ -1525,8 +1550,14 @@ void TrayService::ABUnLock(PAPPBARDATAV1 pabd)
 //
 struct FindAppBarPredicate_hWnd
 {
-    FindAppBarPredicate_hWnd(HWND hWnd) : m_hWnd(hWnd) {}
-    FindAppBarPredicate_hWnd(const FindAppBarPredicate_hWnd& copy) : m_hWnd(copy.m_hWnd) {}
+    FindAppBarPredicate_hWnd(HWND hWnd) : m_hWnd(hWnd)
+    {
+        // do nothing
+    }
+    FindAppBarPredicate_hWnd(const FindAppBarPredicate_hWnd& copy) : m_hWnd(copy.m_hWnd)
+    {
+        // do nothing
+    }
     
     bool operator() (const AppBar* pab) const
     {
@@ -1553,12 +1584,19 @@ private:
 //
 struct FindAppBarPredicate_MatchLParam
 {
-    FindAppBarPredicate_MatchLParam(UINT uEdge, LPARAM lParam) : m_uEdge(uEdge), m_lParam(lParam) {}
-    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) : m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam) {}
+    FindAppBarPredicate_MatchLParam(UINT uEdge, LPARAM lParam) : m_uEdge(uEdge), m_lParam(lParam)
+    {
+        // do nothing
+    }
+    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) : m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam)
+    {
+        // do nothing
+    }
     
     bool operator() (const AppBar* pab) const
     {
-        return (pab->uEdge() == m_uEdge && m_lParam == (pab->lParam() & m_lParam));
+        return (pab->uEdge() == m_uEdge &&
+            m_lParam == (pab->lParam() & m_lParam));
     }
     
 private:
@@ -1612,7 +1650,7 @@ bool TrayService::getBar(HWND hWnd, BarVector::iterator& itBar)
     
     itBar = findBar(hWnd);
     
-    if(itBar != m_abVector.end())
+    if (itBar != m_abVector.end())
     {
         bReturn = true;
     }
@@ -1633,7 +1671,7 @@ bool TrayService::getBar(HWND hWnd, AppBar*& pBarRef)
     bool bReturn = false;
     BarVector::iterator itBar;
     
-    if(getBar(hWnd, itBar))
+    if (getBar(hWnd, itBar))
     {
         pBarRef = *itBar;
         bReturn = true;
@@ -1656,39 +1694,27 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
     switch (pstd->dwMessage)
     {
     case NIM_ADD:
-        {
-            bReturn = addIcon(pstd->nid);
-        }
+        bReturn = addIcon(pstd->nid);
         break;
         
     case NIM_MODIFY:
-        {
-            bReturn = modifyIcon(pstd->nid);
-        }
+        bReturn = modifyIcon(pstd->nid);
         break;
         
     case NIM_DELETE:
-        {
-            bReturn = deleteIcon(pstd->nid);
-        }
+        bReturn = deleteIcon(pstd->nid);
         break;
         
     case NIM_SETFOCUS:
-        {
-            bReturn = setFocusIcon(pstd->nid);
-        }
+        bReturn = setFocusIcon(pstd->nid);
         break;
         
     case NIM_SETVERSION:
-        {
-            bReturn = setVersionIcon(pstd->nid);
-        }
+        bReturn = setVersionIcon(pstd->nid);
         break;
         
     default:
-        {
-            TRACE("Unknown NIM: %u", pstd->dwMessage);
-        }
+        TRACE("Unknown NIM: %u", pstd->dwMessage);
         break;
     }
     
@@ -1704,7 +1730,8 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
 //
 bool TrayService::notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const
 {
-    return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY, dwMessage, (LPARAM)pclsnid);
+    return 0 != SendMessage(m_hLiteStep, LM_SYSTRAY,
+        dwMessage, (LPARAM)pclsnid);
 }
 
 
@@ -1718,13 +1745,13 @@ bool TrayService::notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const
 HWND TrayService::SendSystemTray()
 {
     removeDeadIcons();
-
+    
     for (IconVector::const_iterator it = m_siVector.begin();
          it != m_siVector.end(); ++it)
     {
-        if((*it)->IsValid())
+        if ((*it)->IsValid())
         {
-            LSNOTIFYICONDATA lsnid = {0};
+            LSNOTIFYICONDATA lsnid = { 0 };
             
             (*it)->CopyLSNID(&lsnid);
             
@@ -1747,11 +1774,11 @@ void TrayService::removeDeadIcons()
 {
     IconVector::iterator it = m_siVector.begin();
     
-    while(it != m_siVector.end())
+    while (it != m_siVector.end())
     {
-        if(IsWindow((*it)->GetHwnd()))
+        if (IsWindow((*it)->GetHwnd()))
         {
-            it++;
+            ++it;
             continue;
         }
         
@@ -1772,9 +1799,9 @@ void TrayService::removeDeadIcons()
 bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) const
 {
     // Copy Info Tips
-    if(nid.uFlags & NIF_INFO)
+    if (nid.uFlags & NIF_INFO)
     {
-        switch(nid.cbSize)
+        switch (nid.cbSize)
         {
         case NID_7W_SIZE:
         case NID_6W_SIZE:
@@ -1790,7 +1817,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
                 nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
                     lsnid.szInfo, TRAY_MAX_INFO_LENGTH, NULL, NULL);
                 
-                if(!nReturn)
+                if (!nReturn)
                 {
                     lsnid.szInfo[0] = 0;
                 }
@@ -1800,7 +1827,7 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
                 nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
                     lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, NULL, NULL);
                 
-                if(!nReturn)
+                if (!nReturn)
                 {
                     lsnid.szInfoTitle[0] = 0;
                 }
@@ -1817,16 +1844,18 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
                 
                 HRESULT hr;
                 
-                hr = StringCchCopy(lsnid.szInfo, TRAY_MAX_INFO_LENGTH, pnid->szInfo);
+                hr = StringCchCopy(lsnid.szInfo,
+                    TRAY_MAX_INFO_LENGTH, pnid->szInfo);
                 
-                if(FAILED(hr))
+                if (FAILED(hr))
                 {
                     lsnid.szInfo[0] = 0;
                 }
                 
-                hr = StringCchCopy(lsnid.szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
+                hr = StringCchCopy(lsnid.szInfoTitle,
+                    TRAY_MAX_INFOTITLE_LENGTH, pnid->szInfoTitle);
                 
-                if(FAILED(hr))
+                if (FAILED(hr))
                 {
                     lsnid.szInfoTitle[0] = 0;
                 }
@@ -1837,14 +1866,17 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
             }
             break;
         default:
+            {
+                // do nothing
+            }
             break;
         }
     }
     
     // Copy GUID
-    if(nid.uFlags & NIF_GUID)
+    if (nid.uFlags & NIF_GUID)
     {
-        switch(nid.cbSize)
+        switch (nid.cbSize)
         {
         case NID_7W_SIZE:
         case NID_6W_SIZE:
@@ -1864,6 +1896,9 @@ bool TrayService::extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) cons
             }
             break;
         default:
+            {
+                // do nothing
+            }
             break;
         }
     }
@@ -1880,20 +1915,21 @@ bool TrayService::addIcon(const NID_XX& nid)
 {
     bool bReturn = false;
     
-    if(m_siVector.end() == findIcon(nid))
+    if (m_siVector.end() == findIcon(nid))
     {
         NotifyIcon * pni = new NotifyIcon(nid);
         
         if (pni)
         {
             // Fail shared icons, unless a valid hIcon exists
-            if(IsWindow(pni->GetHwnd()) && (!pni->IsShared() || pni->HasIcon()))
+            if (IsWindow(pni->GetHwnd()) &&
+                (!pni->IsShared() || pni->HasIcon()))
             {
                 m_siVector.push_back(pni);
                 
-                if(pni->IsValid())
+                if (pni->IsValid())
                 {
-                    LSNOTIFYICONDATA lsnid = {0};
+                    LSNOTIFYICONDATA lsnid = { 0 };
                     
                     pni->CopyLSNID(&lsnid);
                     extendNIDCopy(lsnid, nid);
@@ -1923,7 +1959,7 @@ bool TrayService::modifyIcon(const NID_XX& nid)
     
     IconVector::iterator it = findIcon(nid);
     
-    if(m_siVector.end() != it && *it)
+    if (m_siVector.end() != it && *it)
     {
         NotifyIcon * pni = *it;
         
@@ -1932,11 +1968,11 @@ bool TrayService::modifyIcon(const NID_XX& nid)
         // Update stored NotifyIcon
         pni->Update(nid);
         
-        if(pni->IsValid())
+        if (pni->IsValid())
         {
-            LSNOTIFYICONDATA lsnid = {0};
+            LSNOTIFYICONDATA lsnid = { 0 };
             
-            if(!bWasValid)
+            if (!bWasValid)
             {
                 // This is a "new" icon, send entire stored NotifyIcon
                 pni->CopyLSNID(&lsnid);
@@ -1953,7 +1989,7 @@ bool TrayService::modifyIcon(const NID_XX& nid)
                 notify(NIM_MODIFY, &lsnid);
             }
         }
-        else if(bWasValid)
+        else if (bWasValid)
         {
             LSNOTIFYICONDATA lsnid = {
                  sizeof(LSNOTIFYICONDATA)
@@ -1985,7 +2021,7 @@ bool TrayService::deleteIcon(const NID_XX& nid)
     
     IconVector::iterator it = findIcon(nid);
     
-    if(m_siVector.end() != it)
+    if (m_siVector.end() != it)
     {
         LSNOTIFYICONDATA lsnid = {
              sizeof(LSNOTIFYICONDATA)
@@ -2018,7 +2054,7 @@ bool TrayService::setFocusIcon(const NID_XX& nid)
     
     IconVector::iterator it = findIcon(nid);
     
-    if(m_siVector.end() != it)
+    if (m_siVector.end() != it)
     {
         LSNOTIFYICONDATA lsnid = {
              sizeof(LSNOTIFYICONDATA)
@@ -2046,7 +2082,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
     
     IconVector::iterator it = findIcon(nid);
     
-    if(m_siVector.end() != it)
+    if (m_siVector.end() != it)
     {
         LSNOTIFYICONDATA lsnid = {
              sizeof(LSNOTIFYICONDATA)
@@ -2055,7 +2091,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
             ,0
         };
         
-        switch(nid.cbSize)
+        switch (nid.cbSize)
         {
         case NID_7W_SIZE:
         case NID_6W_SIZE:
@@ -2074,7 +2110,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
         
         bReturn = notify(NIM_SETVERSION, &lsnid);
     }
-
+    
     return bReturn;
 }
 
@@ -2088,8 +2124,14 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
 //
 struct FindIconPredicate
 {
-    FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID) {}
-    FindIconPredicate(const FindIconPredicate& copy) : m_hWnd(copy.m_hWnd), m_uID(copy.m_uID) {}
+    FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID)
+    {
+        // do nothing
+    }
+    FindIconPredicate(const FindIconPredicate& copy) : m_hWnd(copy.m_hWnd), m_uID(copy.m_uID)
+    {
+        // do nothing
+    }
     
     bool operator() (const NotifyIcon* pni) const
     {

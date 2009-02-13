@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -83,7 +83,7 @@ void    DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
 //
 // DbgSetCurrentThreadName
 //
-#ifdef MSVC_DEBUG
+#if defined(MSVC_DEBUG)
 void DbgSetCurrentThreadName(const char* pszThreadName);
 #else
 #define DbgSetCurrentThreadName(Name)  (void)0

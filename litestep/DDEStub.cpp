@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,16 +21,18 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "DDEStub.h"
 
-
 HMODULE DDEStub::m_hShDocVw = NULL;
 DDEStub::ShellDDEFunc DDEStub::m_pShellDDEInit = NULL;
 
 DDEStub::DDEStub()
-{}
+{
+    // do nothing
+}
 
 DDEStub::~DDEStub()
-{}
-
+{
+    // do nothing
+}
 
 HRESULT DDEStub::Start()
 {
@@ -44,7 +46,7 @@ HRESULT DDEStub::Start()
             //m_hShDocVw = GetModuleHandle("shell32.dll"); // win2k
         }
         
-        if(m_hShDocVw && !m_pShellDDEInit)
+        if (m_hShDocVw && !m_pShellDDEInit)
         {
             // Ordinal 0x00BC in shell32.dll
             // Ordinal 0x0076 in shdocvw.dll
@@ -52,7 +54,7 @@ HRESULT DDEStub::Start()
                 GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
         }
         
-        if(m_pShellDDEInit)
+        if (m_pShellDDEInit)
         {
             m_pShellDDEInit(TRUE);
             hr = S_OK;
@@ -62,10 +64,9 @@ HRESULT DDEStub::Start()
             hr = E_FAIL;
         }
     }
-
-	return hr;
+    
+    return hr;
 }
-
 
 HRESULT DDEStub::Stop()
 {

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,42 +33,42 @@ using namespace std;
 MathValue::MathValue() :
     mType(UNDEFINED)
 {
-
+    // do nothing
 }
 
 
 MathValue::MathValue(bool value) :
     mType(BOOLEAN), mBoolean(value)
 {
-
+    // do nothing
 }
 
 
 MathValue::MathValue(int value) :
     mType(NUMBER), mNumber(value)
 {
-
+    // do nothing
 }
 
 
 MathValue::MathValue(double value) :
     mType(NUMBER), mNumber(value)
 {
-
+    // do nothing
 }
 
 
 MathValue::MathValue(const string& value) :
     mType(STRING), mString(value)
 {
-
+    // do nothing
 }
 
 
 MathValue::MathValue(const char *value) :
     mType(STRING), mString(value)
 {
-
+    // do nothing
 }
 
 
@@ -134,6 +134,8 @@ string MathValue::GetTypeName() const
         return "string";
     }
     
+    // Should never happen
+    ASSERT(false);
     return string();
 }
 
@@ -220,7 +222,7 @@ string MathValue::ToCompatibleString() const
     // return an integer formatted string for all number type
     // results.  Thus, convert number value to an Integer prior
     // to returning it as a string.
-    if(NUMBER == mType)
+    if (NUMBER == mType)
     {
         ostringstream stream;
         

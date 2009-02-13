@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2007  Litestep Development Team
+// Copyright (C) 1997-2009  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -43,6 +43,7 @@ Bang::Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand) :
 
 Bang::~Bang()
 {
+    // do nothing
 }
 
 
@@ -58,7 +59,8 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
         if (pInfo != NULL)
         {
             // target thread releases pInfo
-            PostThreadMessage(m_dwThreadID, LM_THREAD_BANGCOMMAND, (WPARAM)pInfo, 0);
+            PostThreadMessage(m_dwThreadID, LM_THREAD_BANGCOMMAND,
+                (WPARAM)pInfo, 0);
         }
     }
     else
@@ -88,18 +90,18 @@ HINSTANCE Bang::GetModule() const
     {
         pAddress = (LPVOID)m_bBang;
     }
-
+    
     //
     // Given the BangProc's address, VirtualQuery can
     // figure out the module's HMODULE
     //
     MEMORY_BASIC_INFORMATION mbi = { 0 };
     size_t cbBuffer = sizeof(mbi);
-
+    
     if (VirtualQuery(pAddress, &mbi, cbBuffer) == cbBuffer)
     {
         hModule = (HINSTANCE)mbi.AllocationBase;
     }
-
+    
     return hModule;
 }
