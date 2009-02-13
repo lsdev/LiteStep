@@ -408,59 +408,11 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                 {
                 case SH_APPBAR_DATA:
                     {
-                        TRACE("SH_APPBAR_DATA: %u", pcds->cbData);
-                        
                         //
                         // Application Bar Message
                         //
-                        switch (pcds->cbData)
-                        {
-                        case sizeof(APPBARMSGDATAV2):
-                            {
-                                PAPPBARMSGDATAV2 pamd = (PAPPBARMSGDATAV2)pcds->lpData;
-                                
-                                TRACE("APPBARMSGDATAV2: %u", pamd->abd.cbSize);
-                                
-                                if(sizeof(APPBARDATAV2) != pamd->abd.cbSize)
-                                    break;
-                                
-                                TRACE("dwMessage: %u", pamd->dwMessage);
-                                
-                                SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
-                                sbd.dwMessage = pamd->dwMessage;
-                                sbd.hSharedMemory = pamd->hSharedMemory;
-                                sbd.dwSourceProcessId = pamd->dwSourceProcessId;
-                                
-                                lResult = pTrayService->HandleAppBarMessage(&sbd);
-                            }
-                            break;
-                            
-                        case sizeof(APPBARMSGDATAV1):
-                            {
-                                PAPPBARMSGDATAV1 pamd = (PAPPBARMSGDATAV1)pcds->lpData;
-                                
-                                TRACE("APPBARMSGDATAV1: %u", pamd->abd.cbSize);
-                                
-                                if(sizeof(APPBARDATAV1) != pamd->abd.cbSize)
-                                    break;
-                                
-                                TRACE("dwMessage: %u", pamd->dwMessage);
-                                
-                                SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
-                                sbd.dwMessage = pamd->dwMessage;
-                                sbd.hSharedMemory = pamd->hSharedMemory;
-                                sbd.dwSourceProcessId = pamd->dwSourceProcessId;
-                                
-                                lResult = pTrayService->HandleAppBarMessage(&sbd);
-                            }
-                            break;
-                            
-                        default:
-                            {
-                                TRACE("Unknown APPBARMSGDATA size: %u", pcds->cbData);
-                            }
-                            break;
-                        }
+                        lResult = pTrayService->HandleAppBarCopydata(
+                            pcds->cbData, pcds->lpData);
                     }
                     break;
                     
@@ -682,6 +634,81 @@ HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
+// HandleAppBarCopydata
+//
+LRESULT TrayService::HandleAppBarCopydata(DWORD cbData, LPVOID lpData)
+{
+    LRESULT lr = 0;
+
+    switch (cbData)
+    {
+        case sizeof(APPBARMSGDATAV3):
+        {
+            PAPPBARMSGDATAV3 pamd = (PAPPBARMSGDATAV3)lpData;
+
+            if (sizeof(APPBARDATAV2) != pamd->abd.cbSize)
+            {
+                break;
+            }
+
+            SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
+            sbd.dwMessage = pamd->dwMessage;
+            sbd.hSharedMemory = pamd->hSharedMemory;
+            sbd.dwSourceProcessId = pamd->dwSourceProcessId;
+
+            lr = HandleAppBarMessage(&sbd);
+        }
+        break;
+
+        case sizeof(APPBARMSGDATAV2):
+        {
+            PAPPBARMSGDATAV2 pamd = (PAPPBARMSGDATAV2)lpData;
+
+            if (sizeof(APPBARDATAV2) != pamd->abd.cbSize)
+            {
+                break;
+            }
+
+            SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
+            sbd.dwMessage = pamd->dwMessage;
+            sbd.hSharedMemory = pamd->hSharedMemory;
+            sbd.dwSourceProcessId = pamd->dwSourceProcessId;
+
+            lr = HandleAppBarMessage(&sbd);
+        }
+        break;
+
+        case sizeof(APPBARMSGDATAV1):
+        {
+            PAPPBARMSGDATAV1 pamd = (PAPPBARMSGDATAV1)lpData;
+
+            if (sizeof(APPBARDATAV1) != pamd->abd.cbSize)
+            {
+                break;
+            }
+
+            SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
+            sbd.dwMessage = pamd->dwMessage;
+            sbd.hSharedMemory = pamd->hSharedMemory;
+            sbd.dwSourceProcessId = pamd->dwSourceProcessId;
+
+            lr = HandleAppBarMessage(&sbd);
+        }
+        break;
+
+        default:
+        {
+            TRACE("Unknown APPBARMSGDATA size: %u", cbData);
+        }
+        break;
+    }
+
+    return lr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
 // HandleAppBarMessage
 //
 // Handler for all AppBar Messages
@@ -692,6 +719,8 @@ LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
     
     removeDeadAppBars();
     
+    TRACE("SHAppBarMessage(%u, ...)", psad->dwMessage);
+
     switch(psad->dwMessage)
     {
     case ABM_NEW:

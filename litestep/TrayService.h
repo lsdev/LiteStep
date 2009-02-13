@@ -120,7 +120,8 @@ private:
     void loadShellServiceObjects();
     void unloadShellServiceObjects();
     
-    // Handler for AppBar messages
+    // Handlers for AppBar messages
+    LRESULT HandleAppBarCopydata(DWORD cbData, LPVOID lpData);
     LRESULT HandleAppBarMessage(PSHELLAPPBARDATA psad);
     
     // Handler for system tray notifications

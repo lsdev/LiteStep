@@ -49,6 +49,18 @@ typedef struct _APPBARDATAV2
     DWORD dw64BitAlign;
 } APPBARDATAV2, *PAPPBARDATAV2;
 
+/* 2K */
+typedef struct _APPBARMSGDATAV1
+{
+    APPBARDATAV1 abd;
+    /**/
+    DWORD  dwMessage;
+    HANDLE hSharedMemory;
+    DWORD  dwSourceProcessId;
+    /**/
+} APPBARMSGDATAV1, *PAPPBARMSGDATAV1;
+typedef const APPBARMSGDATAV1 * PCAPPBARMSGDATAV1;
+
 /* XP */
 typedef struct _APPBARMSGDATAV2
 {
@@ -63,17 +75,23 @@ typedef struct _APPBARMSGDATAV2
 } APPBARMSGDATAV2, *PAPPBARMSGDATAV2;
 typedef const APPBARMSGDATAV2 * PCAPPBARMSGDATAV2;
 
-/* 2K */
-typedef struct _APPBARMSGDATAV1
+/* Win7 */
+typedef struct _APPBARMSGDATAV3
 {
-    APPBARDATAV1 abd;
+    APPBARDATAV2 abd;
     /**/
     DWORD  dwMessage;
-    HANDLE hSharedMemory;
-    DWORD  dwSourceProcessId;
+    DWORD  dwPadding1;
     /**/
-} APPBARMSGDATAV1, *PAPPBARMSGDATAV1;
-typedef const APPBARMSGDATAV1 * PCAPPBARMSGDATAV1;
+    HANDLE hSharedMemory;
+    DWORD  dwPadding2;
+    /**/
+    DWORD  dwSourceProcessId;
+    DWORD  dwPadding3;
+    /**/
+} APPBARMSGDATAV3, *PAPPBARMSGDATAV3;
+typedef const APPBARMSGDATAV3* PCAPPBARMSGDATAV3;
+
 
 class AppBar
 {
