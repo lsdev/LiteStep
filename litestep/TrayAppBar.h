@@ -83,6 +83,7 @@ public:
         ,m_uCallbackMessage(uMsg)
         ,m_lParam(0)
         ,m_uEdge((UINT)-1)
+        ,m_hMon(NULL)
     {
     }
     ~AppBar()
@@ -99,7 +100,7 @@ public:
         return m_lParam;
     }
 
-    inline void lParam(LPARAM lParam)
+    inline void lParam(LPARAM const lParam)
     {
         m_lParam = lParam;
     }
@@ -109,9 +110,19 @@ public:
         return m_uEdge;
     }
 
-    inline void uEdge(UINT uEdge)
+    inline void uEdge(UINT const uEdge)
     {
         m_uEdge = uEdge;
+    }
+
+    inline HMONITOR hMon() const
+    {
+        return m_hMon;
+    }
+
+    inline void hMon(HMONITOR const hMon)
+    {
+        m_hMon = hMon;
     }
 
     inline UINT uMsg() const
@@ -143,9 +154,10 @@ private:
     const HWND m_hWnd;
     const UINT m_uCallbackMessage;
 
-    LPARAM m_lParam;
-    RECT   m_rc;
-    UINT   m_uEdge;
+    LPARAM   m_lParam;
+    RECT     m_rc;
+    UINT     m_uEdge;
+    HMONITOR m_hMon;
 };
 
 #endif /* !defined(TRAYAPPBAR_H) */

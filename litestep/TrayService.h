@@ -126,7 +126,7 @@ private:
     LRESULT barGetTaskBarState();
     LRESULT barGetTaskBarPos(PSHELLAPPBARDATA psad);
     LRESULT barActivate(const APPBARDATAV1& abd);
-    LRESULT barGetAutoHide(UINT uEdge);
+    LRESULT barGetAutoHide(const APPBARDATAV1& abd);
     LRESULT barSetAutoHide(const APPBARDATAV1& abd);
     LRESULT barPosChanged(const APPBARDATAV1& abd);
     LRESULT barSetTaskBarState(const APPBARDATAV1& abd);
@@ -153,7 +153,7 @@ private:
     // findBar variants and wrappers
     //
     BarVector::iterator findBar(HWND hWnd);
-    BarVector::iterator findBar(UINT uEdge, LPARAM lParam);
+    BarVector::iterator findBar(HMONITOR hMon, UINT uEdge, LPARAM lParam);
     bool isBar(HWND hWnd);
     bool getBar(HWND hWnd, BarVector::iterator& itAppBar);
     bool getBar(HWND hWnd, AppBar*& pBarRef);
