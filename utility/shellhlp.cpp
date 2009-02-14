@@ -110,7 +110,6 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
                 //
                 if (!PathFileExists(ptzPath))
                 {
-                    ptzPath[0] = '\0';
                     hr = HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
                 }
             }
@@ -118,7 +117,17 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
     }
     else
     {
-        hr = SHGetSpecialFolderLocation(NULL, nFolder, &pidl);
+        // Starting with Vista, the "ALT" folders don't exist any more.
+        // SHGetSpecialFolderLocation maps them to the non-"ALT" versions.
+        if (IsVistaOrAbove() && 
+           (nFolder == CSIDL_ALTSTARTUP || nFolder == CSIDL_COMMON_ALTSTARTUP))
+        {
+            hr = E_FAIL;
+        }
+        else
+        {
+            hr = SHGetSpecialFolderLocation(NULL, nFolder, &pidl);
+        }
     }
     
     //
@@ -132,6 +141,11 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath)
         }
         
         CoTaskMemFree(pidl);
+    }
+    
+    if (FAILED(hr))
+    {
+        ptzPath[0] = '\0';
     }
     
     return (SUCCEEDED(hr));

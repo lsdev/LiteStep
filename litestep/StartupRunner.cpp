@@ -150,21 +150,11 @@ void StartupRunner::_RunRunOnceEx()
 
 void StartupRunner::_RunStartupMenu()
 {
-    // Starting with Vista, the "ALT" CSIDLs are deprecated
-    // and are mapped to the regular non-ALT versions.
     _RunShellFolderContents(CSIDL_COMMON_STARTUP);
-    
-    if (!IsVistaOrAbove())
-    {
-        _RunShellFolderContents(CSIDL_COMMON_ALTSTARTUP);
-    }
+    _RunShellFolderContents(CSIDL_COMMON_ALTSTARTUP);
     
     _RunShellFolderContents(CSIDL_STARTUP);
-    
-    if (!IsVistaOrAbove())
-    {
-        _RunShellFolderContents(CSIDL_ALTSTARTUP);
-    }
+    _RunShellFolderContents(CSIDL_ALTSTARTUP);
 }
 
 
