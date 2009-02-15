@@ -37,6 +37,7 @@ private:
     static DWORD WINAPI _ThreadProc(LPVOID lpData);
     static HKEY _CreateSessionInfoKey();
     static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
+    static void _RunRegKeysWorker(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
     static void _RunRunOnceEx();
     static void _RunStartupMenu();
     static void _RunShellFolderContents(int nFolder);

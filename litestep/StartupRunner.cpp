@@ -29,6 +29,11 @@
 #define ERK_DELETE              0x0002
 #define ERK_WAITFOR_QUIT        0x0004 // wait until process exits
 #define ERK_WAITFOR_IDLE        0x0008 // wait until process waits for input
+#define ERK_WIN64_BOTH          0x0010 // run key from 32-bit and 64-bit branch
+
+// Used internally by _RunRegKeys and _RunRegKeysWorker
+#define ERK_WIN64_KEY32         0x0020 // run 32-bit key specifically
+#define ERK_WIN64_KEY64         0x0040 // run 64-bit key specifically
 
 
 StartupRunner::StartupRunner()
@@ -90,18 +95,26 @@ DWORD WINAPI StartupRunner::_ThreadProc(LPVOID lpData)
             bHKLMRunOnce = !pSHRestricted(REST_NOLOCALMACHINERUNONCE);
             bHKCURunOnce = !pSHRestricted(REST_NOCURRENTUSERRUNONCE);
         }
-        
+
+        //
+        // On Win64 there are separate 32-Bit and 64-Bit versions of
+        // HKLM\Run, HKLM\RunOnce, and HKLM\RunOnceEx.
+        // However, HKLM\...\Policies\Explorer\Run  is a shared key.
+        //
+        // There is only a single version of all HKCU keys.
+        //
         if (bHKLMRunOnce)
         {
             _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUNONCE,
-                (ERK_RUNSUBKEYS | ERK_DELETE | ERK_WAITFOR_QUIT));
+                (ERK_RUNSUBKEYS | ERK_DELETE |
+                 ERK_WAITFOR_QUIT | ERK_WIN64_BOTH));
         }
         
         _RunRunOnceEx();
         
         if (bHKLMRun)
         {
-            _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_NONE);
+            _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN, ERK_WIN64_BOTH);
         }
         
         _RunRegKeys(HKEY_LOCAL_MACHINE, REGSTR_PATH_RUN_POLICY, ERK_NONE);
@@ -129,6 +142,9 @@ DWORD WINAPI StartupRunner::_ThreadProc(LPVOID lpData)
 
 void StartupRunner::_RunRunOnceEx()
 {
+    //
+    // TODO: Figure out how this works on Win64
+    //
     TCHAR szArgs[MAX_PATH] = { 0 };
     UINT uChars = GetSystemDirectory(szArgs, MAX_PATH);
     
@@ -187,7 +203,11 @@ void StartupRunner::_RunShellFolderContents(int nFolder)
                     seiCommand.fMask =
                         SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
                     
-                    VERIFY(LSShellExecuteEx(&seiCommand));
+                    if (!LSShellExecuteEx(&seiCommand))
+                    {
+                        TRACE("StartupRunner failed to launch '%s'",
+                            findData.cFileName);
+                    }
                 }
                 
                 if (!FindNextFile(hSearch, &findData))
@@ -311,15 +331,49 @@ bool StartupRunner::IsFirstRunThisSession(LPCTSTR pszSubkey)
 
 
 //
-// RunRegKeys(HKEY hkParent, LPCSTR pszSubKey, DWORD dwFlags)
+// RunRegKeys
 //
 void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
 {
-    HKEY hkSubKey;
+#ifdef _WIN64
+    if (dwFlags & ERK_WIN64_BOTH)
+#else
+    if (IsOS(OS_WOW6432) && (dwFlags & ERK_WIN64_BOTH))
+#endif
+    {
+        dwFlags &= ~ERK_WIN64_BOTH;
+        _RunRegKeysWorker(hkParent, ptzSubKey, dwFlags | ERK_WIN64_KEY64);
+        _RunRegKeysWorker(hkParent, ptzSubKey, dwFlags | ERK_WIN64_KEY32);
+    }
+    else
+    {
+        _RunRegKeysWorker(hkParent, ptzSubKey, dwFlags);
+    }
+}
+
+
+//
+// _RunRegKeysWorker
+//
+void StartupRunner::_RunRegKeysWorker(HKEY hkParent,
+                                      LPCTSTR ptzSubKey, DWORD dwFlags)
+{
+    REGSAM samDesired = MAXIMUM_ALLOWED;
+
+    if (dwFlags & ERK_WIN64_KEY32)
+    {
+        samDesired |= KEY_WOW64_32KEY;
+    }
     
-    LONG lResult = RegOpenKeyEx(hkParent, ptzSubKey, 0, MAXIMUM_ALLOWED,
-        &hkSubKey);
-    
+    if (dwFlags & ERK_WIN64_KEY64)
+    {
+        samDesired |= KEY_WOW64_64KEY;
+    }
+
+    HKEY hkey = NULL;
+
+    LONG lResult = RegOpenKeyEx(hkParent, ptzSubKey, 0, samDesired, &hkey);
+
     if (lResult == ERROR_SUCCESS)
     {
         //
@@ -327,16 +381,16 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
         //
         for (DWORD dwLoop = 0; ; ++dwLoop)
         {
-            TCHAR tzNameBuffer[MAX_PATH] = { 0 };
-            TCHAR tzValueBuffer[MAX_LINE_LENGTH] = { 0 };
-            
-            DWORD dwNameSize = MAX_PATH;
-            DWORD dwValueSize = MAX_LINE_LENGTH;
+            TCHAR szName[MAX_PATH] = { 0 };
+            TCHAR szValue[MAX_LINE_LENGTH] = { 0 };
+
+            DWORD cchName = COUNTOF(szName);
+            DWORD cbValue = sizeof(szValue);
             DWORD dwType;
-            
-            lResult = RegEnumValue(hkSubKey, dwLoop, tzNameBuffer, &dwNameSize,
-                NULL, &dwType, (LPBYTE)tzValueBuffer, &dwValueSize);
-            
+
+            lResult = RegEnumValue(hkey, dwLoop, szName, &cchName,
+                NULL, &dwType, (LPBYTE)szValue, &cbValue);
+
             if (lResult == ERROR_MORE_DATA)
             {
                 // tzNameBuffer too small?
@@ -346,15 +400,14 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
             {
                 if ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ))
                 {
-                    if (tzValueBuffer[0])
+                    if (szValue[0])
                     {
-                        _SpawnProcess(tzValueBuffer, dwFlags);
+                        _SpawnProcess(szValue, dwFlags);
                     }
-                    
-                    if ((dwFlags & ERK_DELETE) && (tzNameBuffer[0] != _T('!')))
+
+                    if ((dwFlags & ERK_DELETE) && (szName[0] != _T('!')))
                     {
-                        if (RegDeleteValue(hkSubKey, tzNameBuffer) ==
-                            ERROR_SUCCESS)
+                        if (RegDeleteValue(hkey, szName) == ERROR_SUCCESS)
                         {
                             --dwLoop;
                         }
@@ -366,32 +419,33 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
                 break;
             }
         }
-        
+
         //
         // Run subkeys as well?
         //
         if (dwFlags & ERK_RUNSUBKEYS)
         {
             dwFlags &= ~(ERK_RUNSUBKEYS);
-            
+
             for (DWORD dwLoop = 0; ; ++dwLoop)
             {
-                TCHAR tzNameBuffer[MAX_PATH] = { 0 };
-                lResult = RegEnumKey(hkSubKey, dwLoop, tzNameBuffer, MAX_PATH);
-                
+                TCHAR szName[MAX_PATH] = { 0 };
+
+                LONG lResult = RegEnumKey(
+                    hkey, dwLoop, szName, COUNTOF(szName));
+
                 if (lResult == ERROR_MORE_DATA)
                 {
-                    // tzNameBuffer too small?
+                    // szName too small?
                     continue;
                 }
                 else if (lResult == ERROR_SUCCESS)
                 {
-                    _RunRegKeys(hkSubKey, tzNameBuffer, dwFlags);
-                    
+                    _RunRegKeys(hkey, szName, dwFlags);
+
                     if (dwFlags & ERK_DELETE)
                     {
-                        if (RegDeleteKey(hkSubKey, tzNameBuffer) ==
-                            ERROR_SUCCESS)
+                        if (RegDeleteKey(hkey, szName) == ERROR_SUCCESS)
                         {
                             --dwLoop;
                         }
@@ -403,9 +457,9 @@ void StartupRunner::_RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags)
                 }
             }
         }
+
+        RegCloseKey(hkey);
     }
-    
-    RegCloseKey(hkSubKey);
 }
 
 
@@ -418,14 +472,15 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     //
     // 1. "C:\Program Files\App\App.exe" -params
     // 2. C:\Program Files\App\App.exe -params
-    // 3. App.exe -params   (app.exe is in %path% or HKLM->REGSTR_PATH_APPPATHS)
+    // 3. App.exe -params  (App.exe is in %path% or HKLM->REGSTR_PATH_APPPATHS)
     // and all the above cases without arguments.
+    //
+    // Note that 'App.exe' may contain spaces too
     //
     // CreateProcess handles 1 and 2, ShellExecuteEx handles 1 and 3.
     // So if the first token doesn't contain path characters (':' or '\')
     // ShellExecuteEx is used. That's really ugly but it *should* work.
     //
-    
     TCHAR tzToken[MAX_LINE_LENGTH] = { 0 };
     LPCTSTR ptzArgs = NULL;
     
@@ -454,6 +509,10 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
         }
         
         CloseHandle(hProcess);
+    }
+    else
+    {
+        TRACE("StartupRunner failed to launch '%s'", ptzCommandLine);
     }
 }
 
