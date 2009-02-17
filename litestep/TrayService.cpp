@@ -96,12 +96,10 @@ HRESULT TrayService::Start()
             m_bWin2000 = true;
         }
         
-        SystemParametersInfo(
-             SPI_GETWORKAREA
-            ,0
-            ,&m_rWorkAreaDef
-            ,0
-        );
+        // clear work area of primary monitor
+        SetRect(&m_rWorkAreaDef,
+          0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+        setWorkArea(&m_rWorkAreaDef);
         CopyRect(&m_rWorkAreaCur, &m_rWorkAreaDef);
         
         if (createWindows())
@@ -169,8 +167,10 @@ HRESULT TrayService::Stop()
         m_abVector.pop_back();
     }
     
-    // Restore the work area. (should we just clear the work area???)
-    adjustWorkArea();
+    // clear the work area of primary monitor
+    SetRect(&m_rWorkAreaDef,
+      0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+    setWorkArea(&m_rWorkAreaDef);
     
     m_bWin2000 = false;
     m_hLiteStep = NULL;
@@ -508,10 +508,7 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     }
                 }
                 
-                if(LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY) == hMon)
-                {
-                    pTrayService->adjustWorkArea();
-                }
+                pTrayService->adjustWorkArea(hMon);
             }
             break;
             
@@ -876,20 +873,20 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
                 // the new position is different than the previous, then
                 // notify all other appbars.
                 if((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
-                   || !EqualRect(&(p->GetRectRef()), &(pabd->rc)))
+                   || !EqualRect(&p->GetRectRef(), &pabd->rc))
                 {
                     // Notify other bars
                     PostMessage(
                          m_hTrayWnd
                         ,ABP_NOTIFYPOSCHANGED
                         ,(WPARAM)abd.hWnd
-                        ,(LPARAM)LSMonitorFromRect(&p->GetRectRef(), MONITOR_DEFAULTTOPRIMARY)
+                        ,(LPARAM)LSMonitorFromRect(&pabd->rc, MONITOR_DEFAULTTOPRIMARY)
                     );
                 }
             }
             
             // Update the appbar stored parameters
-            CopyRect(&(p->GetRectRef()), &(pabd->rc));
+            CopyRect(&p->GetRectRef(), &pabd->rc);
             p->lParam(p->lParam() | ABS_CLEANRECT);
             p->uEdge(abd.uEdge);
             p->hMon(LSMonitorFromRect(&p->GetRectRef(), MONITOR_DEFAULTTOPRIMARY));
@@ -941,7 +938,7 @@ LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
     
     if(pabd)
     {
-        if(GetWindowRect(m_hNotifyWnd, &(pabd->rc)))
+        if(GetWindowRect(m_hNotifyWnd, &pabd->rc))
         {
             lResult = 1;
             
@@ -1251,7 +1248,7 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
     {
         MONITORINFO mi;
         mi.cbSize = sizeof(mi);
-  
+        
         if(LSGetMonitorInfo(hMon, &mi))
         {
             CopyRect(&rcDst, &mi.rcMonitor);
@@ -1259,7 +1256,7 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
         else
         {
             ASSERT(FALSE);
-
+            
             // Use only the original workarea for the default rectangle
             CopyRect(&rcDst, &m_rWorkAreaDef);
             hMon = hMonPrimary;
@@ -1299,7 +1296,7 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
                 
                 // If our destination rectangle currently intersects
                 // then resize it
-                if(IntersectRect(&rc, &(p->GetRectRef()), &rcDst))
+                if(IntersectRect(&rc, &p->GetRectRef(), &rcDst))
                 {
                     if(ABE_TOP == p->uEdge())
                     {
@@ -1399,13 +1396,32 @@ void TrayService::modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 //
 // Helper function to barSetPos (via ABP_NOTIFYPOSCHANGED)
 //
-void TrayService::adjustWorkArea()
+void TrayService::adjustWorkArea(HMONITOR hMon)
 {
-    RECT rcWorker;
+    RECT rcWorker, rcMonitor, rcWorkArea;
     
-    HMONITOR hMon = LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+    HMONITOR hMonPrimary = LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
     
-    CopyRect(&rcWorker, &m_rWorkAreaDef);
+    if(hMon != hMonPrimary)
+    {
+        MONITORINFO mi;
+        mi.cbSize = sizeof(mi);
+        
+        if(!LSGetMonitorInfo(hMon, &mi))
+        {
+            return;
+        }
+        
+        CopyRect(&rcMonitor, &mi.rcMonitor);
+        CopyRect(&rcWorkArea, &mi.rcWork);
+    }
+    else
+    {
+        CopyRect(&rcMonitor, &m_rWorkAreaDef); // yes, we actually want this
+        CopyRect(&rcWorkArea, &m_rWorkAreaCur);
+    }
+    
+    CopyRect(&rcWorker, &rcMonitor);
     
     for(
          BarVector::iterator it = m_abVector.begin()
@@ -1415,35 +1431,27 @@ void TrayService::adjustWorkArea()
     {
         AppBar* p = *it;
         
-        if(!IsWindow(p->hWnd())) continue;
-        
         if(p && !p->IsOverLap() && p->hMon() == hMon && (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
         {
+            if(!IsWindow(p->hWnd())) continue;
+            
             RECT rcBarEx;
             
-            CopyRect(&rcBarEx, &p->GetRectRef());
+            CopyRect(&rcBarEx, &rcMonitor);
             
             switch(p->uEdge())
             {
             case ABE_LEFT:
-                rcBarEx.left = m_rWorkAreaDef.left;
-                rcBarEx.top = m_rWorkAreaDef.top;
-                rcBarEx.bottom = m_rWorkAreaDef.bottom;
+                rcBarEx.right = p->GetRectRef().right;
                 break;
             case ABE_RIGHT:
-                rcBarEx.right = m_rWorkAreaDef.right;
-                rcBarEx.top = m_rWorkAreaDef.top;
-                rcBarEx.bottom = m_rWorkAreaDef.bottom;
+                rcBarEx.left = p->GetRectRef().left;
                 break;
             case ABE_TOP:
-                rcBarEx.top = m_rWorkAreaDef.top;
-                rcBarEx.left = m_rWorkAreaDef.left;
-                rcBarEx.right = m_rWorkAreaDef.right;
+                rcBarEx.bottom = p->GetRectRef().bottom;
                 break;
             case ABE_BOTTOM:
-                rcBarEx.bottom = m_rWorkAreaDef.bottom;
-                rcBarEx.left = m_rWorkAreaDef.left;
-                rcBarEx.right = m_rWorkAreaDef.right;
+                rcBarEx.top = p->GetRectRef().top;
                 break;
             }
             
@@ -1451,23 +1459,39 @@ void TrayService::adjustWorkArea()
         }
     }
     
-    if(!EqualRect(&m_rWorkAreaCur, &rcWorker))
+    if(!EqualRect(&rcWorker, &rcWorkArea))
     {
-        m_uWorkAreaDirty++;
-        SystemParametersInfo(
-             SPI_SETWORKAREA
-            ,1 // readjust maximized windows
-            ,&rcWorker
-            ,0 // SPIF_SENDCHANGE - see below
-        );
-        SendNotifyMessage(    // used in place of SPIF_SENDCHANGE above to avoid lockups
-             HWND_BROADCAST   // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
-            ,WM_SETTINGCHANGE
-            ,SPI_SETWORKAREA
-            ,0
-        );
+        setWorkArea(&rcWorker);
     }
     
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// setWorkArea
+//
+// Helper function for setting the specified work area
+//
+void TrayService::setWorkArea(LPRECT prcWorkArea)
+{
+    if(m_hTrayWnd)
+    {
+        m_uWorkAreaDirty++;
+    }
+    
+    SystemParametersInfo(
+         SPI_SETWORKAREA
+        ,1 // readjust maximized windows
+        ,prcWorkArea
+        ,0 // SPIF_SENDCHANGE - see below
+    );
+    SendNotifyMessage(    // used in place of SPIF_SENDCHANGE above to avoid lockups
+         HWND_BROADCAST   // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
+        ,WM_SETTINGCHANGE
+        ,SPI_SETWORKAREA
+        ,0
+    );
     return;
 }
 

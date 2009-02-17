@@ -138,7 +138,8 @@ private:
     void modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HWND hWnd);
     void modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
-    void adjustWorkArea();
+    void adjustWorkArea(HMONITOR hMon);
+    void setWorkArea(LPRECT prcWorkArea);
     
     // Remove any "dead" appbars
     void removeDeadAppBars();
