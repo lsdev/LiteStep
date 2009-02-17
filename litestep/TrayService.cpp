@@ -481,13 +481,14 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             
         case ABP_NOTIFYPOSCHANGED:
             {
-                BarVector::reverse_iterator rit;
+                const BarVector abTempV = pTrayService->m_abVector;
+                BarVector::const_reverse_iterator rit;
                 
                 HMONITOR hMon = (HMONITOR)lParam;
                 HWND hSkip = (HWND)wParam;
                 AppBar* p = NULL;
                 
-                for(rit = pTrayService->m_abVector.rbegin(); rit != pTrayService->m_abVector.rend(); rit++)
+                for(rit = abTempV.rbegin(); rit != abTempV.rend(); rit++)
                 {
                     if(hSkip != (*rit)->hWnd())
                     {
@@ -516,9 +517,10 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             
         case ABP_NOTIFYSTATECHANGE:
             {
-                BarVector::reverse_iterator rit;
+                const BarVector abTempV = pTrayService->m_abVector;
+                BarVector::const_reverse_iterator rit;
                 
-                for(rit = pTrayService->m_abVector.rbegin(); rit != pTrayService->m_abVector.rend(); rit++)
+                for(rit = abTempV.rbegin(); rit != abTempV.rend(); rit++)
                 {
                     if(!(*rit)->IsOverLap())
                     {
@@ -681,9 +683,10 @@ LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
 //
 void TrayService::NotifyRudeApp(bool bIsFullScreen) const
 {
+    const BarVector abTempV = m_abVector;
     BarVector::const_reverse_iterator rit;
     
-    for(rit = m_abVector.rbegin(); rit != m_abVector.rend(); rit++)
+    for(rit = abTempV.rbegin(); rit != abTempV.rend(); rit++)
     {
         SendMessage(
              (*rit)->hWnd()
@@ -1150,6 +1153,8 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
     
     if(getBar(abd.hWnd, p) && !p->IsAutoHide())
     {
+        lResult = 1;
+        
         BarVector::iterator itBar = findBar(p->hMon(), p->uEdge(), ABS_AUTOHIDE);
         
         if(itBar != m_abVector.end())
@@ -1161,8 +1166,6 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
                 ,(LPARAM)(*itBar)->uEdge()
             );
         }
-        
-        lResult = 1;
     }
     
     return lResult;
