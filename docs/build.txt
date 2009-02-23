@@ -44,3 +44,6 @@
                     for receiving global system messages.
 
 -- LITESTEP MODULE DEVELOPMENT -------------------------------------------------
+
+ All modules should be built using the LiteStep Module SDK which is available
+ from www.lsdev.org
