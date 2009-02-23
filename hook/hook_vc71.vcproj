@@ -140,9 +140,6 @@
 			<File
 				RelativePath=".\Hook.cpp">
 			</File>
-			<File
-				RelativePath=".\Hook.def">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

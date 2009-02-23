@@ -20,81 +20,114 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /****************************************************************************
 ****************************************************************************/
 #include "HookManager.h"
+#include "../utility/criticalsection.h"
 #include "../utility/macros.h"
 #include "resource.h"
 
-msg2hwnd m2hmap;
-int numMessages;
+#include <map>
+#include <set>
 
-HHOOK hMsgHook;
-HHOOK hCallWndHook;
+typedef std::set<HOOKCALLBACKPROC> HookCallbackSet;
+typedef std::map<UINT, HookCallbackSet*> Msg2HookMap; // Maps a message to a set of hook callbacks
 
-HANDLE hHookMgrThread;
-HWND hwndHookMgr;
-HINSTANCE hInst;
-bool processHooks = false;
-HINSTANCE hmodHook;
+static Msg2HookMap g_m2hmap;
+static CriticalSection * g_pm2hmapCS;
 
-MSG msgd;
-COPYDATASTRUCT gcds = { 0, sizeof(MSG), &msgd };
+static HANDLE g_hHookMgrThread;
+static HWND g_hwndHookMgr;
+static HINSTANCE g_hInstance;
+static HMODULE g_hmodHook;
 
-BOOL startHookManager(HINSTANCE dllInst)
+static SETHOOKSPROC SetHooks;
+
+static bool loadHookModule();
+static bool createHookThread();
+
+static DWORD WINAPI hookMgrMain(LPVOID lpv);
+static LRESULT CALLBACK hookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
+bool StartHookManager(HINSTANCE hInstance)
 {
-	hMsgHook = NULL;
-	hHookMgrThread = NULL;
-	hwndHookMgr = NULL;
-	hInst = dllInst;
+	ASSERT(hInstance);
 
-	hmodHook = LoadLibrary("hook");
-	if (hmodHook)
+	if (NULL == g_hInstance)
 	{
-		processHooks = true;
+		g_pm2hmapCS = new CriticalSection();
+
+		g_hInstance = hInstance;
+
+		if(!loadHookModule())
+		{
+			RESOURCE_MSGBOX(g_hInstance, IDS_HOOKMGR_LOADHOOK_ERROR,
+				"Could not load hook.dll", HOOKMGRWINDOWNAME);
+
+			g_hInstance = NULL;
+
+			delete g_pm2hmapCS;
+			g_pm2hmapCS = NULL;
+
+			return false;
+		}
+
 		if (!createHookThread())
 		{
-			RESOURCE_MSGBOX(hInst, IDS_HOOKMGR_CREATETHREAD_ERROR,
-			                "Could not create Hook Manager Thread", HOOKMGRWINDOWNAME);
+			RESOURCE_MSGBOX(g_hInstance, IDS_HOOKMGR_CREATETHREAD_ERROR,
+				"Could not create HookManager Thread", HOOKMGRWINDOWNAME);
 
-			processHooks = false;
+			FreeLibrary(g_hmodHook);
+			g_hmodHook = NULL;
+
+			g_hInstance = NULL;
+
+			delete g_pm2hmapCS;
+			g_pm2hmapCS = NULL;
+
+			return false;
 		}
 	}
-	else
+
+	return g_hInstance == hInstance;
+}
+
+
+void StopHookManager()
+{
+	if (NULL != g_hInstance)
 	{
-		RESOURCE_MSGBOX(hInst, IDS_HOOKMGR_LOADHOOK_ERROR,
-		                "Could not load hook.dll", HOOKMGRWINDOWNAME);
+		SendMessage(g_hwndHookMgr, WM_CLOSE, 0, 0);
 
-		processHooks = false;
+		WaitForSingleObject(g_hHookMgrThread, INFINITE);
+		CloseHandle(g_hHookMgrThread);
+		g_hHookMgrThread = NULL;
+
+		UnregisterClass(HOOKMGRWINDOWCLASS, g_hInstance);
+
+		FreeLibrary(g_hmodHook);
+		g_hmodHook = NULL;
+
+		g_hInstance = NULL;
+
+		delete g_pm2hmapCS;
+		g_pm2hmapCS = NULL;
 	}
-
-	return processHooks;
 }
 
 
-void stopHookManager()
+static bool createHookThread()
 {
-	SendMessage(hwndHookMgr, WM_CLOSE, 0, 0);
-	WaitForSingleObject(hHookMgrThread, INFINITE);
-	processHooks = false;
-	UnregisterClass(HOOKMGRWINDOWCLASS, hInst);
-	FreeLibrary(hmodHook);
-}
-
-
-bool createHookThread()
-{
-	WNDCLASS wc;
-	DWORD Id;
-
 	//
 	// Register a class for the hook stuff to forward its messages to.
 	//
-	wc.hCursor = NULL;    // this window never shown, so no
+	WNDCLASS wc;
+	wc.hCursor = NULL;  // this window never shown, so no
 	wc.hIcon = NULL;    // cursor or icon are necessary
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = HOOKMGRWINDOWCLASS;
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wc.hInstance = hInst;
+	wc.hInstance = g_hInstance;
 	wc.style = 0;
-	wc.lpfnWndProc = HookMgrWndProc;
+	wc.lpfnWndProc = hookMgrWndProc;
 	wc.cbWndExtra = sizeof(HWND) + sizeof(HWND);
 	wc.cbClsExtra = 0;
 
@@ -102,131 +135,120 @@ bool createHookThread()
 	{
 		return false;
 	}
-	//
-	// Now create another thread to handle the new queue
-	//
-    hHookMgrThread = CreateThread(NULL, 0, HookMgrMain, 0L,
-        STANDARD_RIGHTS_REQUIRED, &Id);
 
-	if (!hHookMgrThread)
+	//
+	// Now create a thread to handle the new queue
+	//
+	HANDLE hReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	DWORD dwID;
+	g_hHookMgrThread = CreateThread(NULL, 0, hookMgrMain, hReadyEvent, 0, &dwID);
+
+	if (!g_hHookMgrThread)
 	{
+		UnregisterClass(HOOKMGRWINDOWCLASS, g_hInstance);
 		return false;
+	}
+
+	HANDLE hWait[2] = { g_hHookMgrThread, hReadyEvent };
+
+	DWORD dwEvent = WaitForMultipleObjects(2, hWait, FALSE, INFINITE);
+
+	switch (dwEvent)
+	{
+	case WAIT_OBJECT_0 + 0: // Premature ending of thread
+		{
+			CloseHandle(g_hHookMgrThread);
+			g_hHookMgrThread = NULL;
+			return false;
+		}
+		break;
+	default: // should not happen, nothing sensible to do if so
+		ASSERT(FALSE);
+		// FALL THROUGH
+	case WAIT_OBJECT_0 + 1: // Ready Event signaled
+		{
+			CloseHandle(hReadyEvent);
+		}
+		break;
 	}
 
 	return true;
 }
 
-
-DWORD WINAPI HookMgrMain(LPVOID /* lpv */)
+static bool loadHookModule()
 {
-	MSG msg;
+	g_hmodHook = LoadLibrary("hook");
 
-	hwndHookMgr = CreateWindow(HOOKMGRWINDOWCLASS, HOOKMGRWINDOWNAME,
-	                           WS_OVERLAPPEDWINDOW,
-	                           0, 0, 0, 0,
-	                           NULL, NULL,
-	                           hInst, NULL);
-
-	if (!hwndHookMgr)
+	if (NULL != g_hmodHook)
 	{
+		SetHooks = (SETHOOKSPROC)GetProcAddress(g_hmodHook, "SetHooks");
 
-		RESOURCE_MSGBOX(hInst, IDS_LITESTEP_CREATEWINDOW_ERROR,
-		                "Unable to create window.", HOOKMGRWINDOWNAME);
-
-		ExitThread(0);
-	}
-
-	while (IsWindow(hwndHookMgr) && GetMessage(&msg, hwndHookMgr, 0, 0))
-	{
-		if (processHooks)
+		if(NULL == SetHooks)
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			FreeLibrary(g_hmodHook);
+			g_hmodHook = NULL;
 		}
 	}
 
-	hwndHookMgr = NULL;
+	return NULL != g_hmodHook;
+}
+
+
+static DWORD WINAPI hookMgrMain(LPVOID lpParameter)
+{
+	g_hwndHookMgr = CreateWindow(
+		HOOKMGRWINDOWCLASS, HOOKMGRWINDOWNAME,
+		WS_OVERLAPPEDWINDOW,
+		0, 0, 0, 0,
+		NULL, NULL,
+		g_hInstance, NULL);
+
+	if (!g_hwndHookMgr)
+	{
+
+		RESOURCE_MSGBOX(g_hInstance, IDS_LITESTEP_CREATEWINDOW_ERROR,
+			"Unable to create window.", HOOKMGRWINDOWNAME);
+		return 1;
+	}
+
+	SetEvent((HANDLE)lpParameter);
+
+	MSG msg;
+	while (GetMessage(&msg, g_hwndHookMgr, 0, 0) > 0)
+	{
+		DispatchMessage(&msg);
+	}
 
 	return 0;
-
 }
 
 
-bool InstallMsgFilter(bool install)
+UINT RegisterHookMessage(UINT uMsg, HOOKCALLBACKPROC pfnCallback)
 {
-	TRACE("Installing Hooks...");
-	if (install && !hMsgHook && !hCallWndHook)
+	if (NULL != g_hInstance && WM_NULL < uMsg && NULL != pfnCallback)
 	{
+		Lock lock(*g_pm2hmapCS);
 
-		setCallWndHook(SetWindowsHookEx(WH_CALLWNDPROC,
-		                                (HOOKPROC)GetProcAddress(hmodHook, "CallWndProc"), hmodHook, 0));
-		TRACE_LASTERR("hook CallWndProc");
-		hCallWndHook = getCallWndHook();
-
-		setMsgHook(SetWindowsHookEx(WH_GETMESSAGE,
-		                            (HOOKPROC)GetProcAddress(hmodHook, "GetMsgProc"), hmodHook, 0));
-		TRACE_LASTERR("hook GetMsgProc");
-		hMsgHook = getMsgHook();
-
-		if (hMsgHook && hCallWndHook)
+		if (g_m2hmap.empty())
 		{
-			TRACE("Hooks Installed!");
-			return true;
+			SetHooks(g_hwndHookMgr);
 		}
-	}
-	else if (!install && hMsgHook && hCallWndHook)
-	{
-		setMsgHook(NULL);
-		UnhookWindowsHookEx(hMsgHook);
-		hMsgHook = NULL;
 
-		setCallWndHook(NULL);
-		UnhookWindowsHookEx(hCallWndHook);
-		hCallWndHook = NULL;
-	}
-	TRACE("Hooks Not Installed!");
-	return false;
-}
+		HookCallbackSet * phcs;
+		Msg2HookMap::iterator m2hit = g_m2hmap.find(uMsg);
 
-
-UINT RegisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback)
-{
-	sMsgHookList * psHwnds;
-	sMsgHookList::reverse_iterator lrit;
-	msg2hwnd::iterator m2hit;
-
-	if ((hwnd != NULL) && (msg > 0) && (pCallback != NULL))
-	{
-		if (numMessages == 0)
+		if (m2hit == g_m2hmap.end())
 		{
-			if (InstallMsgFilter(true))
-			{
-				psHwnds = new sMsgHookList;
-				psHwnds->insert(pCallback);
-				m2hmap.insert(msg2hwnd::value_type(msg, psHwnds));
-				numMessages++;
-			}
-			else
-			{
-				return FALSE;
-			}
+			phcs = new HookCallbackSet;
+			g_m2hmap.insert(Msg2HookMap::value_type(uMsg, phcs));
 		}
 		else
 		{
-			m2hit = m2hmap.find(msg);
-			if (m2hit == m2hmap.end())
-			{
-				psHwnds = new sMsgHookList;
-				psHwnds->insert(pCallback);
-				m2hmap.insert(msg2hwnd::value_type(msg, psHwnds));
-			}
-			else
-			{
-				psHwnds = (*m2hit).second;
-				psHwnds->insert(pCallback);
-			}
-			numMessages++;
+			phcs = m2hit->second;
 		}
+
+		phcs->insert(pfnCallback);
 
 		return TRUE;
 	}
@@ -235,90 +257,95 @@ UINT RegisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback)
 }
 
 
-UINT UnregisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback)
+UINT UnregisterHookMessage(UINT uMsg, HOOKCALLBACKPROC pfnCallback)
 {
-	sMsgHookList * psHwnds;
-	sMsgHookList::reverse_iterator lrit;
-	msg2hwnd::iterator m2hit;
+	Lock lock(*g_pm2hmapCS);
 
-	if ((hwnd != NULL) && (msg > 0) && (pCallback != NULL))
+	if (NULL != g_hInstance && WM_NULL < uMsg && NULL != pfnCallback)
 	{
-		if (numMessages)
+		Msg2HookMap::iterator m2hit = g_m2hmap.find(uMsg);
+
+		if (m2hit != g_m2hmap.end())
 		{
-			m2hit = m2hmap.find(msg);
-			if (m2hit != m2hmap.end())
+			HookCallbackSet * phcs = m2hit->second;
+			HookCallbackSet::iterator hcit = phcs->find(pfnCallback);
+
+			if (hcit != phcs->end())
 			{
-				sMsgHookList::iterator lit;
-				psHwnds = (*m2hit).second;
-				lit = psHwnds->find(pCallback);
-				if (lit != psHwnds->end())
-				{
-					psHwnds->erase(lit);
-					if (psHwnds->empty())
-					{
-						delete (*m2hit).second;
-						m2hmap.erase(m2hit);
-					}
-					numMessages--;
-					if (!numMessages)
-					{
-						InstallMsgFilter(false);
-					}
-				}
+				phcs->erase(hcit);
 			}
+
+			if (phcs->empty())
+			{
+				delete phcs;
+				g_m2hmap.erase(m2hit);
+			}
+		}
+
+		if (g_m2hmap.empty())
+		{
+			SetHooks(NULL);
 		}
 	}
 
-	return numMessages;
+	return g_m2hmap.size();
 }
 
 
-LRESULT CALLBACK HookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK hookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	sMsgHookList * psHwnds;
-	sMsgHookList::reverse_iterator lrit;
-	msg2hwnd::iterator m2hit;
-
 	switch (msg)
 	{
-		case WM_COPYDATA:
+	case WM_COPYDATA:
 		{
-			if (numMessages == 0)
-				break;
-			if (((PCOPYDATASTRUCT)lParam)->cbData != sizeof(MSG))
-				break;
-			msgd.message = ((PMSG)((PCOPYDATASTRUCT)lParam)->lpData)->message;
-			msgd.hwnd = ((PMSG)((PCOPYDATASTRUCT)lParam)->lpData)->hwnd;
-			msgd.wParam = ((PMSG)((PCOPYDATASTRUCT)lParam)->lpData)->wParam;
-			msgd.lParam = ((PMSG)((PCOPYDATASTRUCT)lParam)->lpData)->lParam;
-			m2hit = m2hmap.find(msgd.message);
-			if (m2hit != m2hmap.end())
+			PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
+
+			if (pcds->dwData != HOOK_CDS_MSG || pcds->cbData != sizeof(MSG))
 			{
-				TRACE("WM_COPYDATA message found = %u", msgd.message);
-				psHwnds = (*m2hit).second;
-				for (lrit = psHwnds->rbegin(); lrit != psHwnds->rend(); lrit++)
+				break;
+			}
+
+			Lock lock(*g_pm2hmapCS);
+
+			PMSG pmsg = (PMSG)(pcds->lpData);
+			Msg2HookMap::iterator m2hit = g_m2hmap.find(pmsg->message);
+
+			if (m2hit != g_m2hmap.end())
+			{
+				HookCallbackSet * phcs = m2hit->second;
+
+				for (HookCallbackSet::reverse_iterator hcrit = phcs->rbegin(); hcrit != phcs->rend(); hcrit++)
 				{
-					(*lrit)(msgd.hwnd, msgd.message, msgd.wParam, msgd.lParam);
+					(*hcrit)(pmsg->hwnd, pmsg->message, pmsg->wParam, pmsg->lParam);
 				}
 			}
+			return TRUE;
 		}
-		return TRUE;
+		break;
 
-		case WM_DESTROY:
+	case WM_DESTROY:
 		{
-			InstallMsgFilter(false);
+			Lock lock(*g_pm2hmapCS);
+
+			for (Msg2HookMap::iterator m2hit = g_m2hmap.begin(); m2hit != g_m2hmap.end(); m2hit++)
+			{
+				delete m2hit->second;
+			}
+			g_m2hmap.clear();
+			SetHooks(NULL);
+
+			g_hwndHookMgr = NULL;
+
 			PostQuitMessage(0);
 		}
-		return 0;
+		break;
 
-		case WM_NCDESTROY:
+	default:
 		{
-			processHooks = false;
+			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
 		break;
-		
-		default:
-		break;
 	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+
+	return 0;
 }

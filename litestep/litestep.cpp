@@ -857,11 +857,11 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 			if (!m_bHookManagerStarted)
 			{
-                m_bHookManagerStarted = startHookManager(m_hInstance) ? true : false;
+				m_bHookManagerStarted = StartHookManager(m_hInstance);
 			}
 			if (m_bHookManagerStarted)
 			{
-				lReturn = RegisterHookMessage(hWnd, wParam, (HookCallback*)lParam);
+				lReturn = RegisterHookMessage((UINT)wParam, (HOOKCALLBACKPROC)lParam);
 			}
 		}
 		break;
@@ -870,9 +870,9 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 			if (m_bHookManagerStarted)
 			{
-				if (UnregisterHookMessage(hWnd, wParam, (HookCallback*)lParam) == 0)
+				if (UnregisterHookMessage((UINT)wParam, (HOOKCALLBACKPROC)lParam) == 0)
 				{
-					stopHookManager();
+					StopHookManager();
 					m_bHookManagerStarted = false;
 				}
 			}
@@ -1129,7 +1129,7 @@ HRESULT CLiteStep::_StopManagers()
 
 	if (m_bHookManagerStarted)
 	{
-		stopHookManager();
+		StopHookManager();
 		m_bHookManagerStarted = false;
 	}
 

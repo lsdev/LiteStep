@@ -35,7 +35,7 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "../Release_VC6"
 # PROP Intermediate_Dir "Release_VC6"
-# PROP Ignore_Export_Lib 0
+# PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD CPP /nologo /MD /W3 /WX /GX /Zd /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
 # ADD MTL /nologo /D "NDEBUG" /o "NUL" /win32
@@ -43,7 +43,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /machine:I386 /pdb:none /map:"../Release_VC6/hook.map" /nodefaultlib /def:".\Hook.def" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /machine:I386 /pdb:none /map:"../Release_VC6/hook.map" /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "hook - Win32 Debug"
 
@@ -51,7 +51,7 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "../Debug_VC6"
 # PROP Intermediate_Dir "Debug_VC6"
-# PROP Ignore_Export_Lib 0
+# PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD CPP /nologo /MDd /W3 /WX /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /FD /c
 # ADD MTL /nologo /D "_DEBUG" /o "NUL" /win32
@@ -59,7 +59,7 @@ LINK32=link.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept /nodefaultlib /def:"Hook.def"
+# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept /nodefaultlib
 
 !ENDIF 
 
@@ -73,10 +73,6 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=.\Hook.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\Hook.def
 # End Source File
 # End Group
 # Begin Group "Headers"

@@ -108,7 +108,6 @@
 				OutputFile="$(OutDir)/litestep.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				DelayLoadDLLs="hook.dll"
 				GenerateDebugInformation="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"

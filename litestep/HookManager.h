@@ -23,20 +23,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include "../hook/hook.h"
 
-#include <map> // STL
-#include <set> // STL
+#define HOOKMGRWINDOWNAME  TEXT("HookMgrWindow")
+#define HOOKMGRWINDOWCLASS TEXT("HookMgrClass")
 
+typedef VOID (__cdecl* HOOKCALLBACKPROC)(HWND, UINT, WPARAM, LPARAM);
 
-typedef std::set<HookCallback*> sMsgHookList;
-typedef std::map<UINT, sMsgHookList*> msg2hwnd; // Maps a message to a list of HWNDs
+UINT RegisterHookMessage(UINT uMsg, HOOKCALLBACKPROC pfnCallback);
+UINT UnregisterHookMessage(UINT uMsg, HOOKCALLBACKPROC pfnCallback);
 
-BOOL startHookManager(HINSTANCE dllInst);
-void stopHookManager();
-UINT RegisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback);
-UINT UnregisterHookMessage(HWND hwnd, UINT msg, HookCallback* pCallback);
-bool createHookThread();
-DWORD WINAPI HookMgrMain(LPVOID lpv);
-bool InstallMsgFilter(bool install);
-LRESULT CALLBACK HookMgrWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+bool StartHookManager(HINSTANCE dllInst);
+void StopHookManager();
 
 #endif // __HookManager_H

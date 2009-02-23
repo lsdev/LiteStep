@@ -43,7 +43,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib comdlg32.lib delayimp.lib gdi32.lib kernel32.lib msvcprt.lib msvcrt.lib ole32.lib oleaut32.lib shell32.lib shlwapi.lib user32.lib uuid.lib ..\Release_VC6\hook.lib ..\Release_VC6\lsapi.lib /nologo /subsystem:windows /machine:I386 /pdb:none /map:"../Release_VC6/litestep.map" /nodefaultlib /delayload:"hook.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 advapi32.lib comdlg32.lib gdi32.lib kernel32.lib msvcprt.lib msvcrt.lib ole32.lib oleaut32.lib shell32.lib shlwapi.lib user32.lib uuid.lib ..\Release_VC6\lsapi.lib /nologo /subsystem:windows /machine:I386 /pdb:none /map:"../Release_VC6/litestep.map" /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "litestep - Win32 Debug"
 
@@ -59,7 +59,7 @@ LINK32=link.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib comdlg32.lib delayimp.lib gdi32.lib kernel32.lib msvcprtd.lib msvcrtd.lib ole32.lib oleaut32.lib shell32.lib shlwapi.lib user32.lib uuid.lib ..\Debug_VC6\hook.lib ..\Debug_VC6\lsapi.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept /nodefaultlib /delayload:"hook.dll"
+# ADD LINK32 advapi32.lib comdlg32.lib gdi32.lib kernel32.lib msvcprtd.lib msvcrtd.lib ole32.lib oleaut32.lib shell32.lib shlwapi.lib user32.lib uuid.lib ..\Debug_VC6\lsapi.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept /nodefaultlib
 
 !ENDIF 
 
