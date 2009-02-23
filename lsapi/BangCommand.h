@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class Bang: public CountedBase
 {
 public:
-	Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand);
-	Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand);
+	Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand);
+	Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand);
 	~Bang();
 
 	void Execute(HWND hCaller, LPCSTR pszParams);
@@ -37,8 +37,8 @@ public:
 private:
 	DWORD m_dwThreadID;
 	bool m_bEX;
-	BangCommand* m_bBang;
-	BangCommandEx* m_bBangEX;
+	BangCommand m_bBang;
+	BangCommandEx m_bBangEX;
 	std::string m_szCommand;
 };
 

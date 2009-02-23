@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/core.hpp"
 
 
-Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
+Bang::Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand)
 :m_szCommand(pszCommand)
 {
     m_bEX = false;
@@ -32,7 +32,7 @@ Bang::Bang(DWORD dwThread, BangCommand* pfnBang, LPCSTR pszCommand)
 	m_dwThreadID = dwThread;
 }
 
-Bang::Bang(DWORD dwThread, BangCommandEx* pfnBang, LPCSTR pszCommand)
+Bang::Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand)
 :m_szCommand(pszCommand)
 {
 	m_bEX = true;

@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/common.h"
 #include <string>
 
-typedef int (*ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
-typedef int (*ModuleQuitFunc) (HINSTANCE);
+typedef int (__cdecl *ModuleInitExFunc) (HWND, HINSTANCE, LPCSTR);
+typedef int (__cdecl *ModuleQuitFunc) (HINSTANCE);
 
 class Module
 {

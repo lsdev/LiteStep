@@ -174,13 +174,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //---------------------------------------------------------
 // BANG COMMAND DEFINES
 //---------------------------------------------------------
-#ifdef __cplusplus
-typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
-#else  // __cplusplus
-typedef void (BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
-#endif	// __cplusplus
+typedef void (__cdecl* BangCommand)(HWND hSender, LPCSTR pszArgs);
+typedef void (__cdecl* BangCommandEx)(HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
 
 typedef struct _LMBANGCOMMANDA
 {

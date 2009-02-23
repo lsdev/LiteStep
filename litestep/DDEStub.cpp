@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../utility/safestr.h" // Always include last in cpp file
 
 HMODULE DDEStub::m_hShDocVw = NULL;
-DDEStub::ShellDDEFunc* DDEStub::m_pShellDDEInit = NULL;
+DDEStub::ShellDDEFunc DDEStub::m_pShellDDEInit = NULL;
 
 DDEStub::DDEStub()
 {}
@@ -48,7 +48,7 @@ HRESULT DDEStub::Start()
         {
             // Ordinal 0x00BC in shell32.dll
             // Ordinal 0x0076 in shdocvw.dll
-            m_pShellDDEInit = (void (__stdcall*)(BOOL))GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
+            m_pShellDDEInit = (DDEStub::ShellDDEFunc)GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
         }
         
         if(m_pShellDDEInit)
