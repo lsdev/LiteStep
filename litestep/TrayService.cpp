@@ -442,13 +442,15 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                         if (pcds->cbData == sizeof(CLSID))
                         {
                             // Classic SHLoadInProc message
-                            lResult = pTrayService->HandleLoadInProc((REFCLSID)pcds->lpData, 1);
+                            lResult = pTrayService->HandleLoadInProc(
+                                (REFCLSID)pcds->lpData, 1);
                         }
                         else if (pcds->cbData == sizeof(SHELLINPROCDATA))
                         {
                             PSHELLINPROCDATA pipd = (PSHELLINPROCDATA)pcds->lpData;
                             
-                            lResult = pTrayService->HandleLoadInProc(pipd->clsid, pipd->dwMessage);
+                            lResult = pTrayService->HandleLoadInProc(
+                                pipd->clsid, pipd->dwMessage);
                         }
                         else
                         {
@@ -480,7 +482,8 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                 {
                     if (hSkip != (*rit)->hWnd())
                     {
-                        if((*rit)->hMon() == hMon && (!p || p->uEdge() != (*rit)->uEdge()))
+                        if((*rit)->hMon() == hMon &&
+                            (!p || p->uEdge() != (*rit)->uEdge()))
                         {
                             SendMessage(
                                  (*rit)->hWnd()
@@ -1069,8 +1072,9 @@ LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
             
             if(!LSGetMonitorInfo(LSMonitorFromWindow(m_hNotifyWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
             {
-                SetRect(&mi.rcMonitor,
-                  0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+                SetRect(&mi.rcMonitor, 0, 0,
+                    GetSystemMetrics(SM_CXSCREEN),
+                    GetSystemMetrics(SM_CYSCREEN));
             }
             
             INT nHeight, nWidth, nScreenHeight, nScreenWidth;
@@ -1167,7 +1171,9 @@ LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
 LRESULT TrayService::barGetAutoHide(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
-    BarVector::iterator itBar = findBar(LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY), abd.uEdge, ABS_AUTOHIDE);
+    BarVector::iterator itBar = findBar(
+        LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
+        abd.uEdge, ABS_AUTOHIDE);
     
     if (itBar != m_abVector.end())
     {
@@ -1199,7 +1205,9 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
     LRESULT lResult = 0;
     
     BarVector::iterator itBar = findBar(abd.hWnd);
-    BarVector::iterator itAutoHideBar = findBar(LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY), abd.uEdge, ABS_AUTOHIDE);
+    BarVector::iterator itAutoHideBar = findBar(
+        LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
+        abd.uEdge, ABS_AUTOHIDE);
     
     if (abd.lParam) // Set Auto Hide
     {
@@ -1659,11 +1667,13 @@ void TrayService::ABUnLock(PAPPBARDATAV1 pabd)
 //
 struct FindAppBarPredicate_hWnd
 {
-    FindAppBarPredicate_hWnd(HWND hWnd) : m_hWnd(hWnd)
+    FindAppBarPredicate_hWnd(HWND hWnd) :
+        m_hWnd(hWnd)
     {
         // do nothing
     }
-    FindAppBarPredicate_hWnd(const FindAppBarPredicate_hWnd& copy) : m_hWnd(copy.m_hWnd)
+    FindAppBarPredicate_hWnd(const FindAppBarPredicate_hWnd& copy) :
+        m_hWnd(copy.m_hWnd)
     {
         // do nothing
     }
@@ -1693,11 +1703,13 @@ private:
 //
 struct FindAppBarPredicate_MatchLParam
 {
-    FindAppBarPredicate_MatchLParam(HMONITOR hMon, UINT uEdge, LPARAM lParam) : m_hMon(hMon), m_uEdge(uEdge), m_lParam(lParam)
+    FindAppBarPredicate_MatchLParam(HMONITOR hMon, UINT uEdge, LPARAM lParam) :
+        m_hMon(hMon), m_uEdge(uEdge), m_lParam(lParam)
     {
         // do nothing
     }
-    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) : m_hMon(copy.m_hMon), m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam)
+    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) :
+        m_hMon(copy.m_hMon), m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam)
     {
         // do nothing
     }
@@ -2234,11 +2246,13 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
 //
 struct FindIconPredicate
 {
-    FindIconPredicate(HWND hWnd, UINT uID) : m_hWnd(hWnd), m_uID(uID)
+    FindIconPredicate(HWND hWnd, UINT uID) :
+        m_hWnd(hWnd), m_uID(uID)
     {
         // do nothing
     }
-    FindIconPredicate(const FindIconPredicate& copy) : m_hWnd(copy.m_hWnd), m_uID(copy.m_uID)
+    FindIconPredicate(const FindIconPredicate& copy) :
+        m_hWnd(copy.m_hWnd), m_uID(copy.m_uID)
     {
         // do nothing
     }
