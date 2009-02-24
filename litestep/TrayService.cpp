@@ -82,12 +82,10 @@ HRESULT TrayService::Start()
     
     if (m_hLiteStep && m_hInstance)
     {
-        SystemParametersInfo(
-             SPI_GETWORKAREA
-            ,0
-            ,&m_rWorkAreaDef
-            ,0
-        );
+        // clear work area of primary monitor
+        SetRect(&m_rWorkAreaDef,
+          0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+        setWorkArea(&m_rWorkAreaDef);
         CopyRect(&m_rWorkAreaCur, &m_rWorkAreaDef);
         
         hr = createWindows();
@@ -160,8 +158,10 @@ HRESULT TrayService::Stop()
         m_abVector.pop_back();
     }
     
-    // Restore the work area. (should we just clear the work area???)
-    adjustWorkArea();
+    // clear the work area of primary monitor
+    SetRect(&m_rWorkAreaDef,
+      0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+    setWorkArea(&m_rWorkAreaDef);
     
     m_hLiteStep = NULL;
     m_hInstance = NULL;
@@ -469,17 +469,18 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
             
         case ABP_NOTIFYPOSCHANGED:
             {
-                BarVector::reverse_iterator rit;
+                const BarVector abTempV = pTrayService->m_abVector;
+                BarVector::const_reverse_iterator rit;
                 
+                HMONITOR hMon = (HMONITOR)lParam;
                 HWND hSkip = (HWND)wParam;
                 AppBar* p = NULL;
                 
-                for (rit = pTrayService->m_abVector.rbegin();
-                    rit != pTrayService->m_abVector.rend(); ++rit)
+                for (rit = abTempV.rbegin(); rit != abTempV.rend(); ++rit)
                 {
                     if (hSkip != (*rit)->hWnd())
                     {
-                        if (!p || p->uEdge() != (*rit)->uEdge())
+                        if((*rit)->hMon() == hMon && (!p || p->uEdge() != (*rit)->uEdge()))
                         {
                             SendMessage(
                                  (*rit)->hWnd()
@@ -495,16 +496,16 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     }
                 }
                 
-                pTrayService->adjustWorkArea();
+                pTrayService->adjustWorkArea(hMon);
             }
             break;
             
         case ABP_NOTIFYSTATECHANGE:
             {
-                BarVector::reverse_iterator rit;
+                const BarVector abTempV = pTrayService->m_abVector;
+                BarVector::const_reverse_iterator rit;
                 
-                for (rit = pTrayService->m_abVector.rbegin();
-                    rit != pTrayService->m_abVector.rend(); ++rit)
+                for (rit = abTempV.rbegin(); rit != abTempV.rend(); ++rit)
                 {
                     if (!(*rit)->IsOverLap())
                     {
@@ -571,7 +572,7 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                          pTrayService->m_hTrayWnd
                         ,ABP_NOTIFYPOSCHANGED
                         ,(WPARAM)NULL
-                        ,(LPARAM)MAKELONG(0, 0)
+                        ,(LPARAM)LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY)
                     );
                 }
             }
@@ -769,7 +770,7 @@ LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
         break;
         
     case ABM_GETAUTOHIDEBAR:
-        lResult = barGetAutoHide(psad->abd.uEdge);
+        lResult = barGetAutoHide(psad->abd);
         break;
         
     case ABM_SETAUTOHIDEBAR:
@@ -801,9 +802,10 @@ LRESULT TrayService::HandleAppBarMessage(PSHELLAPPBARDATA psad)
 //
 void TrayService::NotifyRudeApp(HMONITOR hFullScreenMonitor) const
 {
+    const BarVector abTempV = m_abVector;
     BarVector::const_reverse_iterator rit;
     
-    for (rit = m_abVector.rbegin(); rit != m_abVector.rend(); ++rit)
+    for (rit = abTempV.rbegin(); rit != abTempV.rend(); ++rit)
     {
         SendMessage(
              (*rit)->hWnd()
@@ -891,6 +893,8 @@ LRESULT TrayService::barDestroy(const APPBARDATAV1& abd)
     {
         lResult = 1;
         
+        HMONITOR hMon = (*itBar)->hMon();
+        
         delete *itBar;
         m_abVector.erase(itBar);
         
@@ -898,7 +902,7 @@ LRESULT TrayService::barDestroy(const APPBARDATAV1& abd)
              m_hTrayWnd
             ,ABP_NOTIFYPOSCHANGED
             ,(WPARAM)NULL
-            ,(LPARAM)MAKELONG(0, 0)
+            ,(LPARAM)hMon
         );
     }
     
@@ -942,8 +946,6 @@ LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
             {
                 modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, abd.hWnd);
             }
-            
-            p->uEdge(abd.uEdge);
         }
         
         ABUnLock(pabd);
@@ -993,22 +995,23 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
                 // the new position is different than the previous, then
                 // notify all other appbars.
                 if ((ABS_CLEANRECT != (ABS_CLEANRECT & p->lParam()))
-                   || !EqualRect(&(p->GetRectRef()), &(pabd->rc)))
+                   || !EqualRect(&p->GetRectRef(), &pabd->rc))
                 {
                     // Notify other bars
                     PostMessage(
                          m_hTrayWnd
                         ,ABP_NOTIFYPOSCHANGED
                         ,(WPARAM)abd.hWnd
-                        ,(LPARAM)MAKELONG(1, abd.uEdge) //0x00010001
+                        ,(LPARAM)LSMonitorFromRect(&pabd->rc, MONITOR_DEFAULTTOPRIMARY)
                     );
                 }
             }
             
             // Update the appbar stored parameters
-            CopyRect(&(p->GetRectRef()), &(pabd->rc));
+            CopyRect(&p->GetRectRef(), &pabd->rc);
             p->lParam(p->lParam() | ABS_CLEANRECT);
             p->uEdge(abd.uEdge);
+            p->hMon(LSMonitorFromRect(&p->GetRectRef(), MONITOR_DEFAULTTOPRIMARY));
         }
         
         ABUnLock(pabd);
@@ -1048,6 +1051,7 @@ LRESULT TrayService::barGetTaskBarState()
 //
 //  cbSize
 //  hWnd
+//  uEdge (undocumented)
 //
 LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
 {
@@ -1056,9 +1060,49 @@ LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
     
     if (pabd)
     {
-        if (GetWindowRect(m_hNotifyWnd, &(pabd->rc)))
+        if (GetWindowRect(m_hNotifyWnd, &pabd->rc))
         {
             lResult = 1;
+            
+            MONITORINFO mi;
+            mi.cbSize = sizeof(mi);
+            
+            if(!LSGetMonitorInfo(LSMonitorFromWindow(m_hNotifyWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
+            {
+                SetRect(&mi.rcMonitor,
+                  0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+            }
+            
+            INT nHeight, nWidth, nScreenHeight, nScreenWidth;
+            
+            nHeight = pabd->rc.bottom - pabd->rc.top;
+            nWidth = pabd->rc.right - pabd->rc.left;
+            
+            nScreenHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
+            nScreenWidth = mi.rcMonitor.right - mi.rcMonitor.left;
+            
+            if(nHeight > nWidth)
+            {
+                if(pabd->rc.left > nScreenWidth / 2)
+                {
+                    pabd->uEdge = ABE_RIGHT;
+                }
+                else
+                {
+                    pabd->uEdge = ABE_LEFT;
+                }
+            }
+            else
+            {
+                if(pabd->rc.top > nScreenHeight / 2)
+                {
+                    pabd->uEdge = ABE_BOTTOM;
+                }
+                else
+                {
+                    pabd->uEdge = ABE_TOP;
+                }
+            }
         }
         
         ABUnLock(pabd);
@@ -1088,7 +1132,9 @@ LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
     
     if (getBar(abd.hWnd, p))
     {
-        BarVector::iterator itBar = findBar(p->uEdge(), ABS_AUTOHIDE);
+        lResult = 1;
+        
+        BarVector::iterator itBar = findBar(p->hMon(), p->uEdge(), ABS_AUTOHIDE);
         
         if (itBar != m_abVector.end())
         {
@@ -1099,8 +1145,6 @@ LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
                 ,(LPARAM)(*itBar)->uEdge()
             );
         }
-        
-        lResult = 1;
     }
     
     return lResult;
@@ -1120,10 +1164,10 @@ LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
 //  hWnd
 //  uEdge
 //
-LRESULT TrayService::barGetAutoHide(UINT uEdge)
+LRESULT TrayService::barGetAutoHide(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
-    BarVector::iterator itBar = findBar(uEdge, ABS_AUTOHIDE);
+    BarVector::iterator itBar = findBar(LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY), abd.uEdge, ABS_AUTOHIDE);
     
     if (itBar != m_abVector.end())
     {
@@ -1155,7 +1199,7 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
     LRESULT lResult = 0;
     
     BarVector::iterator itBar = findBar(abd.hWnd);
-    BarVector::iterator itAutoHideBar = findBar(abd.uEdge, ABS_AUTOHIDE);
+    BarVector::iterator itAutoHideBar = findBar(LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY), abd.uEdge, ABS_AUTOHIDE);
     
     if (abd.lParam) // Set Auto Hide
     {
@@ -1228,7 +1272,9 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
     
     if (getBar(abd.hWnd, p) && !p->IsAutoHide())
     {
-        BarVector::iterator itBar = findBar(p->uEdge(), ABS_AUTOHIDE);
+        lResult = 1;
+        
+        BarVector::iterator itBar = findBar(p->hMon(), p->uEdge(), ABS_AUTOHIDE);
         
         if (itBar != m_abVector.end())
         {
@@ -1239,8 +1285,6 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
                 ,(LPARAM)(*itBar)->uEdge()
             );
         }
-        
-        lResult = 1;
     }
     
     return lResult;
@@ -1274,8 +1318,21 @@ LRESULT TrayService::barSetTaskBarState(const APPBARDATAV1& abd)
 //
 void TrayService::modifyOverlapBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 {
-    // Use entire desktop for default rectangle
-    GetWindowRect(GetDesktopWindow(), &rcDst);
+    // Use entire screen for default rectangle
+    HMONITOR hMon = LSMonitorFromRect(&rcOrg, MONITOR_DEFAULTTOPRIMARY);
+    
+    MONITORINFO mi;
+    mi.cbSize = sizeof(mi);
+    
+    if(LSGetMonitorInfo(hMon, &mi))
+    {
+        CopyRect(&rcDst, &mi.rcMonitor);
+    }
+    else
+    {
+        SetRect(&rcDst,
+          0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+    }
     
     // Set the bar's extent
     modifyBarExtent(rcDst, rcOrg, uEdge);
@@ -1300,8 +1357,33 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
     AppBar* p;
     bool bFound = FALSE;
     
-    // Use only the original workarea for the default rectangle
-    CopyRect(&rcDst, &m_rWorkAreaDef);
+    // Use entire screen for default rectangle
+    HMONITOR hMon = LSMonitorFromRect(&rcOrg, MONITOR_DEFAULTTOPRIMARY);
+    HMONITOR hMonPrimary = LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+    
+    if(hMonPrimary == hMon)
+    {
+        // Use only the original workarea for the default rectangle
+        CopyRect(&rcDst, &m_rWorkAreaDef);
+    }
+    else
+    {
+        MONITORINFO mi;
+        mi.cbSize = sizeof(mi);
+        
+        if(LSGetMonitorInfo(hMon, &mi))
+        {
+            CopyRect(&rcDst, &mi.rcMonitor);
+        }
+        else
+        {
+            ASSERT(FALSE);
+            
+            // Use only the original workarea for the default rectangle
+            CopyRect(&rcDst, &m_rWorkAreaDef);
+            hMon = hMonPrimary;
+        }
+    }
     
     // Set the bar's extent
     modifyBarExtent(rcDst, rcOrg, uEdge);
@@ -1311,8 +1393,8 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
     {
         p = *it;
         
-        // ignore overlap bars and invalid windows
-        if (!p || p->IsOverLap())
+        // ignore overlap bars and invalid windows and other monitors
+        if(!p || p->IsOverLap() || hMon != p->hMon())
         {
             // do nothing
         }
@@ -1338,7 +1420,7 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
                 
                 // If our destination rectangle currently intersects
                 // then resize it
-                if (IntersectRect(&rc, &(p->GetRectRef()), &rcDst))
+                if (IntersectRect(&rc, &p->GetRectRef(), &rcDst))
                 {
                     if (ABE_TOP == p->uEdge())
                     {
@@ -1438,11 +1520,32 @@ void TrayService::modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 //
 // Helper function to barSetPos (via ABP_NOTIFYPOSCHANGED)
 //
-void TrayService::adjustWorkArea()
+void TrayService::adjustWorkArea(HMONITOR hMon)
 {
-    RECT rcWorker;
+    RECT rcWorker, rcMonitor, rcWorkArea;
     
-    CopyRect(&rcWorker, &m_rWorkAreaDef);
+    HMONITOR hMonPrimary = LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+    
+    if (hMon != hMonPrimary)
+    {
+        MONITORINFO mi;
+        mi.cbSize = sizeof(mi);
+        
+        if (!LSGetMonitorInfo(hMon, &mi))
+        {
+            return;
+        }
+        
+        CopyRect(&rcMonitor, &mi.rcMonitor);
+        CopyRect(&rcWorkArea, &mi.rcWork);
+    }
+    else
+    {
+        CopyRect(&rcMonitor, &m_rWorkAreaDef); // yes, we actually want this
+        CopyRect(&rcWorkArea, &m_rWorkAreaCur);
+    }
+    
+    CopyRect(&rcWorker, &rcMonitor);
     
     for (
          BarVector::iterator it = m_abVector.begin()
@@ -1452,39 +1555,31 @@ void TrayService::adjustWorkArea()
     {
         AppBar* p = *it;
         
-        if (!IsWindow(p->hWnd()))
-        {
-            continue;
-        }
-        
-        if (p && !p->IsOverLap() &&
+        if(p && !p->IsOverLap() && p->hMon() == hMon &&
             (ABS_CLEANRECT == (ABS_CLEANRECT & p->lParam())))
         {
+            if (!IsWindow(p->hWnd()))
+            {
+                continue;
+            }
+            
             RECT rcBarEx;
             
-            CopyRect(&rcBarEx, &p->GetRectRef());
+            CopyRect(&rcBarEx, &rcMonitor);
             
             switch (p->uEdge())
             {
             case ABE_LEFT:
-                rcBarEx.left = m_rWorkAreaDef.left;
-                rcBarEx.top = m_rWorkAreaDef.top;
-                rcBarEx.bottom = m_rWorkAreaDef.bottom;
+                rcBarEx.right = p->GetRectRef().right;
                 break;
             case ABE_RIGHT:
-                rcBarEx.right = m_rWorkAreaDef.right;
-                rcBarEx.top = m_rWorkAreaDef.top;
-                rcBarEx.bottom = m_rWorkAreaDef.bottom;
+                rcBarEx.left = p->GetRectRef().left;
                 break;
             case ABE_TOP:
-                rcBarEx.top = m_rWorkAreaDef.top;
-                rcBarEx.left = m_rWorkAreaDef.left;
-                rcBarEx.right = m_rWorkAreaDef.right;
+                rcBarEx.bottom = p->GetRectRef().bottom;
                 break;
             case ABE_BOTTOM:
-                rcBarEx.bottom = m_rWorkAreaDef.bottom;
-                rcBarEx.left = m_rWorkAreaDef.left;
-                rcBarEx.right = m_rWorkAreaDef.right;
+                rcBarEx.top = p->GetRectRef().top;
                 break;
             }
             
@@ -1492,25 +1587,39 @@ void TrayService::adjustWorkArea()
         }
     }
     
-    if (!EqualRect(&m_rWorkAreaCur, &rcWorker))
+    if(!EqualRect(&rcWorker, &rcWorkArea))
     {
-        ++m_uWorkAreaDirty;
-        SystemParametersInfo(
-             SPI_SETWORKAREA
-            ,1 // readjust maximized windows
-            ,&rcWorker
-            ,0 // SPIF_SENDCHANGE - see below
-        );
-        // used in place of SPIF_SENDCHANGE above to avoid lockups
-        // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
-        SendNotifyMessage(
-             HWND_BROADCAST
-            ,WM_SETTINGCHANGE
-            ,SPI_SETWORKAREA
-            ,0
-        );
+        setWorkArea(&rcWorker);
     }
     
+    return;
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
+// setWorkArea
+//
+// Helper function for setting the specified work area
+//
+void TrayService::setWorkArea(LPRECT prcWorkArea)
+{
+    if (m_hTrayWnd)
+    {
+        m_uWorkAreaDirty++;
+    }
+    
+    SystemParametersInfo(
+         SPI_SETWORKAREA
+        ,1 // readjust maximized windows
+        ,prcWorkArea
+        ,0 // SPIF_SENDCHANGE - see below
+    );
+    SendNotifyMessage(    // used in place of SPIF_SENDCHANGE above to avoid lockups
+         HWND_BROADCAST   // see http://blogs.msdn.com/oldnewthing/archive/2005/03/10/392118.aspx
+        ,WM_SETTINGCHANGE
+        ,SPI_SETWORKAREA
+        ,0
+    );
     return;
 }
 
@@ -1584,22 +1693,23 @@ private:
 //
 struct FindAppBarPredicate_MatchLParam
 {
-    FindAppBarPredicate_MatchLParam(UINT uEdge, LPARAM lParam) : m_uEdge(uEdge), m_lParam(lParam)
+    FindAppBarPredicate_MatchLParam(HMONITOR hMon, UINT uEdge, LPARAM lParam) : m_hMon(hMon), m_uEdge(uEdge), m_lParam(lParam)
     {
         // do nothing
     }
-    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) : m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam)
+    FindAppBarPredicate_MatchLParam(const FindAppBarPredicate_MatchLParam& copy) : m_hMon(copy.m_hMon), m_uEdge(copy.m_uEdge), m_lParam(copy.m_lParam)
     {
         // do nothing
     }
     
     bool operator() (const AppBar* pab) const
     {
-        return (pab->uEdge() == m_uEdge &&
-            m_lParam == (pab->lParam() & m_lParam));
+        return (pab->hMon() == m_hMon && pab->uEdge() == m_uEdge &&
+             m_lParam == (pab->lParam() & m_lParam));
     }
     
 private:
+    const HMONITOR m_hMon;
     const UINT m_uEdge;
     const LPARAM m_lParam;
     
@@ -1619,10 +1729,10 @@ BarVector::iterator TrayService::findBar(HWND hWnd)
     return std::find_if(m_abVector.begin(), m_abVector.end(),
                         FindAppBarPredicate_hWnd(hWnd));
 }
-BarVector::iterator TrayService::findBar(UINT uEdge, LPARAM lParam)
+BarVector::iterator TrayService::findBar(HMONITOR hMon, UINT uEdge, LPARAM lParam)
 {
     return std::find_if(m_abVector.begin(), m_abVector.end(),
-                        FindAppBarPredicate_MatchLParam(uEdge, lParam));
+                        FindAppBarPredicate_MatchLParam(hMon, uEdge, lParam));
 }
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

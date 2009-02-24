@@ -143,7 +143,7 @@ private:
     LRESULT barGetTaskBarState();
     LRESULT barGetTaskBarPos(PSHELLAPPBARDATA psad);
     LRESULT barActivate(const APPBARDATAV1& abd);
-    LRESULT barGetAutoHide(UINT uEdge);
+    LRESULT barGetAutoHide(const APPBARDATAV1& abd);
     LRESULT barSetAutoHide(const APPBARDATAV1& abd);
     LRESULT barPosChanged(const APPBARDATAV1& abd);
     LRESULT barSetTaskBarState(const APPBARDATAV1& abd);
@@ -155,7 +155,8 @@ private:
     void modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HWND hWnd);
     void modifyBarExtent(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
-    void adjustWorkArea();
+    void adjustWorkArea(HMONITOR hMon);
+    void setWorkArea(LPRECT prcWorkArea);
     
     // Remove any "dead" appbars
     void removeDeadAppBars();
@@ -170,7 +171,7 @@ private:
     // findBar variants and wrappers
     //
     BarVector::iterator findBar(HWND hWnd);
-    BarVector::iterator findBar(UINT uEdge, LPARAM lParam);
+    BarVector::iterator findBar(HMONITOR hMon, UINT uEdge, LPARAM lParam);
     bool isBar(HWND hWnd);
     bool getBar(HWND hWnd, BarVector::iterator& itAppBar);
     bool getBar(HWND hWnd, AppBar*& pBarRef);

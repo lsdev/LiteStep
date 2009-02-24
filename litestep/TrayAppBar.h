@@ -103,6 +103,7 @@ public:
         ,m_uCallbackMessage(uMsg)
         ,m_lParam(0)
         ,m_uEdge((UINT)-1)
+        ,m_hMon(NULL)
     {
         // do nothing
     }
@@ -136,6 +137,16 @@ public:
         m_uEdge = uEdge;
     }
     
+    inline HMONITOR hMon() const
+    {
+        return m_hMon;
+    }
+    
+    inline void hMon(HMONITOR hMon)
+    {
+        m_hMon = hMon;
+    }
+    
     inline UINT uMsg() const
     {
         return m_uCallbackMessage;
@@ -165,9 +176,10 @@ private:
     const HWND m_hWnd;
     const UINT m_uCallbackMessage;
     
-    LPARAM m_lParam;
-    RECT   m_rc;
-    UINT   m_uEdge;
+    LPARAM   m_lParam;
+    RECT     m_rc;
+    UINT     m_uEdge;
+    HMONITOR m_hMon;
     
     // not implemented
     AppBar(const AppBar& rhs);
