@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef LSAPI_INTERNAL /* only defined when compiling lsapi */
 #  define LSAPI __declspec(dllexport)
 #else
-#  define LSAPI
+#  define LSAPI __declspec(dllimport)
 #endif	/* LSAPI_INTERNAL */
 
 
