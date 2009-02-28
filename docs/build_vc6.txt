@@ -64,7 +64,8 @@
         source code are the files libpng13.lib, png.h, pngconf.h, zlib.h and
         zconf.h placed in your LIB and INCLUDE paths respectively. LiteStep
         links against libpng13.lib (for debug builds libpng13d.lib) and only
-        includes png.h.
+        includes png.h.  You can get only these files in "lsdev-builddeps.zip"
+        from www.lsdev.org.
 
   1. Go to http://www.libpng.org/ and http://www.zlib.net/ and download the
      respective source code (lpng1235.zip and zlib123.zip).
