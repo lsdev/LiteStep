@@ -100,6 +100,8 @@
  - Updated the !about dialog's System Information page to show >2GB of memory
    statistics if needed and to show partial gigabytes.
 
+ - Fixed hook.dll implementation.
+
  - Added LiteStep version resource information to hook.dll.
 
  - Brought the VC7.1 and MinGW build files up to date.

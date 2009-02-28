@@ -20,6 +20,8 @@
 
 -- CHANGES SINCE 0.24.8 RELEASE CANDIDATE 1 ------------------------------------
 
+ - Fixed Appbar crashes
+
  - Fixed several Startup Runner issues.
 
  - Fixed the Step.rc Evaluation Parser's abs() function from converting the
@@ -36,6 +38,8 @@
  - Fixed several API bugs: NULL paramater crash in RemoveBangCommand() and
    invalid message format for LM_GETMINRECT and LM_APPCOMMAND.
 
+ - Fixed hook.dll implementation.
+
  - Updated German language strings.
 
  - Updated !Confirm dialog's default caption to "!Confirm LiteStep".
@@ -49,6 +53,8 @@
  - Greatly improved the full screen application detection code.  It now detects
    any full screen application on the primary monitor correctly and hides or
    shows all modules accordingly (when LSAutoHideModules is enabled).
+
+ - Appbar implementation now support multiple monitor configurations.
 
  - Added LiteStep version resource information to hook.dll.
 
