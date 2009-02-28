@@ -22,38 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "common.h"
 
-HFONT LocalCreateFontIndirect(LOGFONT *lplf);
-HFONT LocalCreateFont(int nHeight,
-                      int nWidth,
-                      int nEscapement,
-                      int nOrientation,
-                      int fnWeight,
-                      DWORD fdwItalic,
-                      DWORD fdwUnderline,
-                      DWORD fdwStrikeOut,
-                      DWORD fdwCharSet,
-                      DWORD fdwOutputPrecision,
-                      DWORD fdwClipPrecision,
-                      DWORD fdwQuality,
-                      DWORD fdwPitchAndFamily,
-                      LPCTSTR lpszFace);
-
-
-class Localization
-{
-public: 
-	Localization();
-	~Localization();
-	
-	void LoadLanguage(LANGID wLanguageID);
-	void LoadString(UINT uID, LPTSTR ptzBuffer, size_t cchMax);
-	int MessageBox(HWND hWnd, UINT uText, UINT uCaption, UINT uType);
-	
-private:
-	HINSTANCE m_hRes;
-	LANGID m_wLanguageID;
-};
-
 void Error(UINT uMessageId, LPCTSTR ptzDefault, ...);
 void ErrorEx(LPCTSTR ptzCaption, UINT uMessageId, LPCTSTR ptzDefault, ...);
 

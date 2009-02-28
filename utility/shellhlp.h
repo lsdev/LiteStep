@@ -28,7 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, size_t cchBuffer);
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
-HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer);
 bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer);
 HRESULT TryAllowSetForegroundWindow(HWND hWnd);
 
