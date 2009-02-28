@@ -34,12 +34,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "hook.h"
 
+#if defined(__GNUC__)
+
+static HHOOK g_hHookMessage __attribute__((section("SHAREDATA"), shared)) = 0;
+static HHOOK g_hHookCallWnd __attribute__((section("SHAREDATA"), shared)) = 0;
+static HWND g_hwndNotify __attribute__((section("SHAREDATA"), shared)) = NULL;
+
+#else
+
 #pragma comment(linker, "/SECTION:SHAREDATA,RWS")
 #pragma data_seg("SHAREDATA")
 static HHOOK g_hHookMessage = 0;
 static HHOOK g_hHookCallWnd = 0;
 static HWND g_hwndNotify = NULL;
 #pragma data_seg()
+
+#endif // defined(__GNUC__)
 
 static HINSTANCE g_hinstDll;
 static bool g_bFilter;
