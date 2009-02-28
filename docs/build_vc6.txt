@@ -8,7 +8,7 @@
 
  - Visual C++ 6.0 with Service Pack 5 & 6 (www.microsoft.com)
  - Microsoft Platform SDK February 2003 Edition (www.microsoft.com)
- - libpng 1.2.34 (www.libpng.org)
+ - libpng 1.2.35 (www.libpng.org)
  - zlib 1.2.3 (www.zlib.net)
 
  This is the configuration used during 0.24.8 development, it is quite possible
@@ -67,7 +67,7 @@
         includes png.h.
 
   1. Go to http://www.libpng.org/ and http://www.zlib.net/ and download the
-     respective source code (lpng1234.zip and zlib123.zip).
+     respective source code (lpng1235.zip and zlib123.zip).
 
   2. Extract the archives to two directories "libpng" and "zlib" in the same
      parent directory the LiteStep source resides in (make sure you extract zlib

@@ -104,7 +104,7 @@
 
  - Brought the VC7.1 and MinGW build files up to date.
 
- - Targeting libpng 1.2.34 and zlib 1.2.3.
+ - Targeting libpng 1.2.35 and zlib 1.2.3.
 
  - Many other incremental fixes and code cleanup changes... Thanks for reading.
 
