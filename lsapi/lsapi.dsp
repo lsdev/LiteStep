@@ -43,7 +43,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib comdlg32.lib delayimp.lib gdi32.lib kernel32.lib libpng13.lib msvcprt.lib msvcrt.lib ole32.lib shell32.lib shlwapi.lib user32.lib /nologo /subsystem:windows /dll /machine:I386 /pdb:none /map:"../Release_VC6/lsapi.map" /nodefaultlib /delayload:"libpng13.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 advapi32.lib delayimp.lib gdi32.lib kernel32.lib libpng13.lib msvcprt.lib msvcrt.lib shell32.lib shlwapi.lib user32.lib /nologo /subsystem:windows /dll /pdb:none /map:"../Release_VC6/lsapi.map" /machine:I386 /nodefaultlib /delayload:"libpng13.dll" /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "lsapi - Win32 Debug"
 
@@ -59,7 +59,7 @@ LINK32=link.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib comdlg32.lib delayimp.lib gdi32.lib kernel32.lib libpng13d.lib msvcprtd.lib msvcrtd.lib ole32.lib shell32.lib shlwapi.lib user32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept /nodefaultlib /delayload:"libpng13d.dll"
+# ADD LINK32 advapi32.lib delayimp.lib gdi32.lib kernel32.lib libpng13d.lib msvcprtd.lib msvcrtd.lib shell32.lib shlwapi.lib user32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /delayload:"libpng13d.dll"
 
 !ENDIF 
 

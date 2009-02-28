@@ -43,7 +43,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /machine:I386 /pdb:none /map:"../Release_VC6/hook.map" /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
+# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /pdb:none /map:"../Release_VC6/hook.map" /machine:I386 /nodefaultlib /opt:NOWIN98 /MAPINFO:LINES /MAPINFO:EXPORTS
 
 !ELSEIF  "$(CFG)" == "hook - Win32 Debug"
 
@@ -59,7 +59,7 @@ LINK32=link.exe
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept /nodefaultlib
+# ADD LINK32 advapi32.lib kernel32.lib user32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept
 
 !ENDIF 
 
