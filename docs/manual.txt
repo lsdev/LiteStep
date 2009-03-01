@@ -1,0 +1,1355 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    LiteStep 0.24.8
+    Release Notes
+    
+    Copyright (c) 2009 - LiteStep Development Team
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Contents:
+-)ABOUT
+-)SYSTEM REQUIREMENTS
+-)INSTALL
+-)USAGE (HELP)
+-)DEVELOPMENT
+-)CREDITS
+-)LEGAL
+
+-- ABOUT -----------------------------------------------------------------------
+
+ LiteStep is a replacement shell for the standard Windows® Explorer shell.
+
+ The Explorer shell provides the familiar desktop environment, start menu, and
+ task bar.  The developers of LiteStep (and thousands of users) have found the
+ Explorer shell to be static, cumbersome and otherwise too ugly to use.  Thus
+ exists LiteStep.
+
+ LiteStep replaces that environment in just about any way that you might find
+ useful (and eye catching).  LiteStep provides the way to make your desktop
+ interface unique, enjoyable and dynamic.  The desktop environments that the
+ LiteStep users create range from a blank screen full of functionality based on
+ hotkeys and hotspots, to eye pleasing morphing menus and sliding toolbars
+ filled with graphical and informative displays of system status, the latest
+ news headlines and the current weather report.
+
+ (see also: http://en.wikipedia.org/wiki/Operating_system_shell)
+
+ Please visit our community websites:
+
+ http://www.lsdev.org/
+ ---------------------
+ - The LiteStep Development Team's portal.
+ - Contains all official LiteStep releases.
+ - LiteStep module development resources.
+ - Community contact information.
+
+ http://www.litestep.net/
+ ------------------------
+ - The largest LiteStep theme gallery and community website.
+ - Screenshot and theme repository.
+ - Module downloads.
+ - User forums for everything LiteStep related.
+
+ http://www.ls-universe.info/
+ ----------------------------
+ - Home of the xModules.
+ - Module downloads.
+ - Community news.
+ - Theme gallery.
+
+ http://www.ls-themes.org/
+ -------------------------
+  - Module downloads.
+  - Screenshot and theme repository.
+  - LiteStep IRC Logs
+
+ http://www.shellfront.org/modules-list.php
+ ------------------------------------------
+ - Module downloads.
+
+ http://www.litestep-france.net/
+ -------------------------------
+ - French community website.
+
+-- SYSTEM REQUIREMENTS ---------------------------------------------------------
+
+ LiteStep requires only that you are running a 32bit version of Windows:
+
+  Windows 95, Windows 98(se), Windows ME, Windows 2000, Windows XP, Windows 2003
+
+ NOTE: Windows Vista/2008 32bit versions are *NOT* supported in 0.24.8!  Please
+       check our website for experimental builds containing support for running
+       under both 32bit and 64bit Windows XP/Vista/2008/Win7 versions.
+
+ LiteStep is designed to consume less resources than the Explorer shell which it
+ replaces; so there are no system requirements above and beyond that which is
+ needed for a normal Windows-based system.
+
+ However, depending on what modules (add-ons) are loaded, any given desktop
+ environment will have its own system requirements.  This may range from being
+ only compatible with Win2K/XP or requiring a 3d accelerated graphics card.  Be
+ sure to read the accompanying documentation for any theme or module that you
+ choose to install.
+
+-- INSTALL ---------------------------------------------------------------------
+
+ NOTE:
+ -----
+ You are about to install a replacement shell for Windows.  A shell is not a
+ normal application; it runs as a special system process.  Replacing the shell
+ is not a supported procedure by Microsoft®, and as such, it is possible that if
+ you do something wrong, you may end up with a non functional desktop and/ or
+ your system may display an erroneous error message asking you to re-install
+ Windows.  Do NOT panic, a very simple solution will put you back to where you
+ need to be, so that you can fix whatever mistake you made, and try again.
+ Please read the documentation on this topic that came with your LiteStep
+ distribution, or review the "Manual Install" steps below.
+
+ Now that you are ready to get going, there are a couple of methods to start
+ using LiteStep.
+
+ You MUST have administrative access to install LiteStep.
+
+ A) LiteStep Distributions (Recommended and automated)
+ -----------------------------------------------------
+
+ The recommended way to start with LiteStep is to install one of the community
+ driven LiteStep distributions.  Typically these distributions come with a
+ friendly step by step installation wizard that will set your system up using a
+ default desktop environment and theme.  Currently we recommend using LOSI -
+ "LiteStep Open Source Installer" implementing the Open Theme Standard 2 (OTS2)
+ by Tobbe.
+
+ LOSI may be downloaded from at http://www.tlundberg.com/LOSI/
+
+ Regardless of which distribution you use, you will find plenty of help on the
+ LiteStep Mailing List (LSML) and user forums on one of the community websites.
+ Please join us in our IRC channel #litestep on Freenode (irc.freenode.net) if
+ you have any immediate support need.  However, be patient when asking a
+ question as IRC is renown for being full of idlers.
+
+ B) LiteStep From Scratch (Manual install and configuration)
+ -----------------------------------------------------------
+
+ STOP: If you are NOT highly familiar with editing the registry or reading
+       lots of documentation and editing text configuration files, then this
+       procedure is NOT for you!  Please use a LiteStep Distribution. Thank you.
+
+ For the do-it-yourself type, please thoroughly read the following before
+ proceeding.  It will save you a lot of headache.  I promise.
+
+ Create a folder for LiteStep.  Generally this is done at "C:\LiteStep".
+
+ Extract the contents of "LS-0.24.8.zip" to this folder.  Once the contents are
+ extracted, there should be a file located at "C:\LiteStep\litestep.exe".
+
+ Create a text file named "step.rc" and place it in the same folder as
+ "litestep.exe".  Using the previous example location, this empty text file
+ should now be at "C:\LiteStep\step.rc".
+
+ Next, consult the section "USAGE (HELP)" to configure LiteStep via the step.rc
+ text file (A sample step.rc is provided in that section).  Do NOT set LiteStep
+ as your shell until you have configured it, otherwise you will be left with a
+ dysfunctional (yet recoverable) system.
+
+ To set LiteStep as your shell, follow these instructions:
+
+  1. Win9x/ME
+
+    - Using a text editor (e.g. Notepad) open the Windows System file named
+      "system.ini".  This file's location is normally "C:\Windows\system.ini"
+
+    - Locate the line that begins with "shell=".  This line is located in the
+      "[boot]" section.  Typically the full line looks like "shell=explorer.exe"
+      (without quotation marks).  Comment out this line (which disables it) by
+      placing a semi-colon at the beginning of the line.  The line should now
+      look like ";shell=explorer.exe" (without the quotation marks).
+
+    - Create a new "shell=" line in the same location as the one removed.  This
+      new line should contain the location of "litestep.exe".  For example it
+      might look like "shell=C:\LiteStep\litestep.exe" (without the quotation
+      marks).
+
+    - Reboot your system.
+
+    - README! When you reboot, if you get the error:
+
+      "CANNOT FIND <shell file name> PLEASE REINSTALL WINDOWS"
+
+      Do NOT reinstall windows!  Just simply follow the instructions below to
+      put your shell back to the default:
+
+      Boot into DOS (press F8 before Windows starts, or use a DOS boot disk).
+      Issue the command "edit C:\Windows\system.ini" adjusting for the location
+      of your system.ini file.  Delete the new line you created in the previous
+      steps, and uncomment the line you previously disabled.  Do this by
+      deleting the semicolon at the start of the line.  You should now have one
+      line that starts with "shell=" in the "[boot]" section of the "system.ini"
+      file, "shell=explorer.exe".  Save the file and reboot your system.
+
+  2. Win2K/XP
+
+    - Note: If you are NOT an administrator, you will most likely NOT be able to
+      set LiteStep as your shell.  The only exception to this is if your System
+      Administrator has enabled "per user" shells.  This is highly unlikely.
+
+      While it is "possible" to run LiteStep at the same time as the default
+      Explorer shell, it is discouraged and completely unsupported.  Good luck!
+
+    - Open "regedit" or a similar utility.
+
+    - To ENABLE "per user" shells:
+      * Locate the following key:
+
+        HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion
+          \IniFileMapping\system.ini\boot
+
+      * Change the string value named "Shell" to:
+
+        USR:Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+
+    - To DISABLE "per user" shells:
+      * Locate the following key:
+
+        HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion
+          \IniFileMapping\system.ini\boot
+
+      * Change the string value named "Shell" to:
+
+        SYS:Microsoft\Windows NT\CurrentVersion\Winlogon
+
+    - To set the system's DEFAULT shell (The shell all users use if "per user"
+      shells are disabled, or if a user does not have a custom shell specified):
+      * Locate the following key:
+
+        HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+
+      * Change the string value named "Shell" to the location of the file you
+        want to use as your default system shell.
+
+        For LiteStep use (adjust path as necessary):
+
+          C:\LiteStep\litestep.exe
+
+        For Explorer use (do not specify a path):
+
+          Explorer.exe
+
+    - To set the shell for the currently logged in user:
+      * Locate the following key:
+
+        HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+
+      * Change (create) the string value named "Shell" to the location of the
+        file you want to use as your current user shell.
+
+        For LiteStep use (adjust path as necessary):
+
+          C:\LiteStep\litestep.exe
+
+        For Explorer use (do not specify a path):
+
+          Explorer.exe
+
+    - To use any shell besides Explorer, the following key MUST be changed.
+      If you do not configure this key, you will not be able to use the
+      Explorer File Manager.
+
+      * Locate the following key:
+
+        HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer
+
+      * Change (create) the DWORD value named "DesktopProcess" to a value of 1.
+
+    - If you changed the "per user" shell setting, you MUST reboot.  Otherwise
+      simply log off.  When you return to the desktop, LiteStep will be running
+      as your shell if you managed to configure everything correctly.
+
+    - If you end up with a blank or otherwise non-functional desktop.  Press
+      CTRL+SHIFT+ESC key combination.  The Windows Task Manager will open.  Use
+      the File menu to Run a New Task.  Launch your registry editor and use the
+      previous instructions to set your system shell back to the default
+      Explorer shell.
+
+-- USAGE (HELP) ----------------------------------------------------------------
+
+ The following section lays out the structure of LiteStep, and the available
+ configuration options.  When used within this document to describe a parameter
+ value, <> means a required parameter, and {} means an optional parameter.
+
+ An always available built-in "Recovery Menu" can be accessed by pressing the
+ key combination: CTRL+ALT+F1 that is, press and hold the CTRL key and the ALT
+ key then depress the F1 key and release all three.  A popup menu will appear at
+ your mouse cursor location.  This menu can be used recover from a broken
+ configuration.
+
+ A) LiteStep Structure
+ ---------------------
+
+ LiteStep is designed around a modular plugin system.  The LiteStep "core" by
+ itself is rather useless to you until you configure and load a plugin.  These
+ plugins are called "Modules" and are available from several LiteStep community
+ websites (See the ABOUT section).
+
+ The LiteStep core consists of:
+  - litestep.exe     Main executable.  Loads modules, handles window messages
+                     communication.  Runs startup apps, includes DDE and tray
+                     services.
+
+  - lsapi.dll        LiteStep API for modules to use.  Loads and parses step.rc;
+                     handles $evars$ and all other configuration.  Manages !bang
+                     commands, includes core !bangs.
+
+  - hook.dll         The system shell hook used by some legacy LiteStep modules
+                     for receiving global system messages.
+
+ LiteStep also depends on "libpng13.dll" and "zlib1.dll" for Portable Network
+ Graphics (PNG) image support.  Those two files must exist in the same directory
+ as "litestep.exe" or in the system path.
+
+ LiteStep uses a text configuration file named "step.rc" which must exist in the
+ same directory as "litestep.exe".
+
+ LiteStep loads Modules which use the LiteStep API "lsapi.dll" to read their
+ configuration values, create advanced graphical displays and interact with the
+ LiteStep core to provide you with a highly functional and eye-caching desktop.
+
+ B) Command Line Parameters
+ --------------------------
+
+ "litestep.exe" has several command line switches to perform various actions.
+
+  -nostartup
+  ----------
+   Disables running Windows startup items when loading LiteStep.
+
+   This is useful on Windows 95, Windows 98(se) and Windows ME if you need to
+   restart LiteStep.
+
+   On Windows 2000 and Windows XP this switch is not needed as startup items are
+   ran only once per session.
+
+   Usage:
+    litestep.exe -nostartup
+
+  -startup
+  --------
+   Force running Windows startup items when loading LiteStep.
+
+   On Windows 2000 and Windows XP, startup items are run only once per session.
+   Using this switch overrides that behavior and forces startup item execution.
+
+   This is not useful on Windows 95/98(se)/ME as startup items are always ran.
+
+   Usage:
+    litestep.exe -startup
+
+  !<bang command>
+  ---------------
+   Passes the specified !bang command and parameters to a currently running
+   instance of LiteStep.  The previous instance of LiteStep receiving the !bang
+   command executes the specified !bang command.
+
+   This is useful for external control of LiteStep, perhaps from a script.
+
+   Usage:
+    litestep.exe !recycle
+    litestep.exe !ReloadModule "C:\LiteStep\modules\popup.dll"
+
+  <file>
+  ------
+   Specifies the absolute path of the "step.rc" configuration file LiteStep
+   should read its directives from.  This overrides the default of using the
+   step.rc file located in the same folder as litestep.exe.
+
+   Usage:
+    litestep.exe C:\LiteStep\step.rc
+
+ C) Step.rc Syntax
+ -----------------
+
+ The step.rc is formatted in a <command> {value} directive syntax.
+
+  - There may be one directive per textual line.
+
+  - <command> must not begin with a digit, be quoted, bracketed or in any other
+    way use the reserved characters of the step.rc parsers except in the special
+    case of * character.  The following characters are reserved:
+
+    ! $ & * ( ) - + = [ ] ; " ' < > , /
+
+    Furthermore it is recommended that you do not use @, #, or | (vertical bar),
+    because these characters may become reserved in the future.
+
+  - {value} is dependent per <command> directive and is explained in each
+    directive's documentation.  If the directive is required by a Module, please
+    read the corresponding documentation provided with the Module.  See the
+    section "Step.rc Directive Parser" for more information on possible data
+    types.
+
+ LiteStep employs three levels of parsing to step.rc at load-time and expands
+ variable references at runtime.
+
+  1. Step.rc File Parser
+
+    - The step.rc File Parser uses these reserved characters: ;[]"'
+
+      ;  Used at the beginning of a textual line to delineate a comment.
+         Comments are lines that are ignored by the Directive Parser.  A comment
+         may also exist at the end of a <command> directive.  Everything after
+         (and including) the semicolon is ignored.
+
+      See "Step.rc Directive Parser" for other reserved character descriptions.
+
+    - The File Parser behaves similarly to a pre-processor.  The File Parser is
+      the first to touch the step.rc.
+
+    - The step.rc File Parser evaluates the following Directives:
+
+      Include
+      If
+      ElseIf
+      Else
+      Endif
+
+  2. Step.rc Directive Parser
+
+    - The step.rc Directive Parser uses these reserved characters: *$[]"'
+
+      *  Used at the beginning of a <command> directive to delineate the ability
+         to specify multiple <command>s of the same name (one per line).
+
+      $$ Used as a set around a {value} parameter to delineate that a variable
+         expansion should occur for that parameter.
+
+      [] Used as a set around a {value} parameter to delineate that the contents
+         are a single token value.
+
+      "" Used as a set around a {value} parameter to delineate that any enclosed
+         whitespace is part of the value (whitespace is TABs and SPACEs).
+
+      '' Used as a set within the {value} parameter to delineate that the
+         enclosed contents are a sub value.
+
+    - The step.rc Directive Parser recognizes several {value} data types.
+
+      (The examples given have fictitious directive names)
+
+      Boolean
+        Must be either TRUE or FALSE.
+
+        Example: MyModuleHideIfEmpty TRUE
+
+      Color
+        Must be either in RGB Hexidecimal or Decimal Triplet formats.
+
+        Example     (Hex): MyModuleBackgroundColor 4682B4
+        Example (Decimal): MyModuleBackgroundColor 70 130 180
+
+      Integer
+        Must be a real Integer number
+
+        Example: MyModuleWidth 32
+
+      String
+        Can be any non-reserved character set enclosed in quotation marks.
+
+        Example: MyModuleDisplayText "This Module Rocks!"
+
+      Undefined/Line
+        An undefined value type can contain any data type, and is interpreted by
+        a particular Module's implementation and documentation.  For example
+        a Module could require a single Directive Line contain both an Integer
+        and String data type within a single {value}.
+
+        Example: MyModuleFont Bold 16 "Courier New"
+
+  3. Step.rc Evaluation Parser
+
+    - The Evaluation Parser is used by the File Parser in evaluation of the
+      conditional directives: If and ElseIf.  It is also used by the Runtime
+      Variable Expansion handler.  The Evaluation Parser looks at the expression
+      in these parts: Variables (values), Operators and Functions.
+
+    - Data Types
+
+      Values in an expression are of one three fundamental types: boolean,
+      number, or string.  Booleans are logical true or false values.  Numbers
+      are IEEE 754 double-precision numbers, which includes the special values:
+      positive/negative infinity and Not a Number (NaN).  There is no distinct
+      integer data type, as integers are subsumed by the number type.  Strings
+      are sequences of characters.
+
+      As an expression is evaluated, values are automatically converted to
+      different types as necessary.  In the event that an explicit type
+      conversion is needed, use one of the conversion functions.  Whether
+      implicit or explicit, type conversions follow the same set of rules, which
+      are described in the section on Functions, below.
+
+    - Undefined Variables
+
+      For compatibility reasons, conditional expressions (If and ElseIf) can use
+      undefined variables without generating an error.  Any operator or function
+      applied to an undefined value produces an undefined result.  If the result
+      of a conditional expression is undefined, then it is treated as if it were
+      false.
+
+      This behavior, while supported in 0.24.8, will be removed in the future.
+      The correct way to detect undefined variables is to use the "defined"
+      keyword:
+
+        If defined(SomeVariable)
+        If not defined(AnotherVariable)
+
+      Defined behaves like a function that takes a variable name and returns
+      true if that variable is defined or false if it is not.  Defined is not,
+      however, a real function because its argument must be a variable name.
+
+      Using an undefined variable in an inline expression (one enclosed in $'s)
+      generates an error, just as it always has.
+
+    - Operators
+
+      The operators that LiteStep supports are listed below from highest
+      precedence to lowest precedence.  With the exception of the three unary
+      operators, all operators are binary and left associative.
+
+      Parentheses:    ( )
+      Unary:          + - not
+      Multiplicative: * / div mod
+      Additive:       + -
+      Concatenation:  &
+      Relational:     = < <= > >= <> !=
+      Logical AND:    and
+      Logical OR:     or
+
+      Identity (unary +)
+        Returns the operand, converted to a number.
+
+      Negation (unary -)
+        Returns the negative of the operand, converted to a number.
+
+      Logical Complement (not)
+        Returns the logical complement of the operand, converted to a Boolean.
+
+      Multiplication (*)
+        Returns the product of the operands, converted to numbers.
+
+      Division (/)
+        Returns the ratio of the operands, converted to numbers.
+
+      Integer Division (div)
+        Returns the quotient from a truncating division of the operands,
+        converted to numbers.
+
+      Modulus (mod)
+        Returns the remainder from a truncating division of the operands,
+        converted to numbers.
+
+      Addition (+)
+        Returns the sum of the operands, converted to numbers.
+
+      Subtraction (-)
+        Returns the difference of the operands, converted to numbers.
+
+      Concatenation (&)
+        Returns the concatenation of the operands, converted to strings.
+
+      Relational Operators (=, <, <=, >, >=, <>, !=)
+        Returns true if the given relationship holds between the operands.  If
+        both operands are strings then they are compared as strings, otherwise
+        they are compared as numbers.  The inequality operators <> and != are
+        interchangeable.  String comparison is case-sensitive.
+
+      Logical AND (and)
+        Returns true if both of the operands, converted to Booleans, are true.
+
+      Logical OR (or)
+        Returns true if either of the operands, converted to Booleans, are true.
+
+    - Functions
+
+      LiteStep supports a small set of built-in functions that you can use in
+      expressions.  These functions are listed below in alphabetical order, with
+      a short description.
+
+      abs(number)
+        Returns the absolute value of the argument, converted to a number.
+
+      boolean(value)
+        Returns its argument, converted to a Boolean.  Zero, Not a Number (NaN),
+        and the empty string map to false.  All other values map to true.
+
+      ceil(number)
+        Returns the ceiling (least greater integer) of the argument, converted
+        to a number.
+
+      contains(string, string)
+        Returns true if the second argument, converted to a string, is a
+        substring of the first argument, converted to a string.
+
+      endsWith(string, string)
+        Returns true if the second argument, converted to a string, is a suffix
+        of the first argument, converted to a string.
+
+      floor(number)
+        Returns the floor (greatest lesser integer) of the argument, converted
+        to a number.
+
+      if(condition, then, else)
+        Converts its first argument to a Boolean.  If its true, returns the
+        second argument (then). If its false, returns the third argument (else).
+        This function lets you do simple conditionals in an inline expression.
+
+      integer(value)
+        Returns the argument, converted to an integer.  Conversion to integer is
+        the same as conversion to number, except that infinites and NaNs become
+        zero.
+
+      length(string)
+        Returns the length of the argument, converted to a string.
+
+      lowerCase(string)
+        Returns the argument, converted to a string, in lower case.
+
+      max(number, number)
+        Returns the larger of its arguments, converted to numbers.
+
+      min(number, number)
+        Returns the smaller of its arguments, converted to numbers.
+
+      number(value)
+        Returns its argument, converted to a number.  For Booleans, true maps to
+        1 and false maps to 0.  A string is parsed as a numeric literal; if
+        parsing fails, the string is mapped to NaN.
+
+      pow(number, number)
+        Returns the first argument, converted to a number, raised to the power
+        of the second argument, converted to a number.
+
+      round(number)
+        Returns the argument, converted to a number, rounded to the nearest
+        integer.
+
+      startsWith(string, string)
+        Returns true if the second argument, converted to a string, is a prefix
+        of the first argument, converted to a string.
+
+      string(value)
+        Returns the argument, converted to a string.  For Booleans, true maps to
+        "true" and false maps to "false".  Numbers are formatted as strings in
+        the standard way.
+
+      sqrt(number)
+        Returns the square root of the argument, converted to a number.
+
+      upperCase(string)
+        Returns the argument, converted to a string, in upper case.
+
+  4. Runtime Variable Expansion
+
+    - Variable expansion supports textual replacements and expression
+      evaluation when enclosed within a set of $ characters.
+      (e.g. $LiteStepDir$ or $ScreenWidth - 32$)
+
+      See "Step.rc Evaluation Parser" section above.
+
+  5. Images, Icons and Magic Pink
+
+    - Modules may require the loading of an image file.
+
+      LiteStep can currently load BMP and PNG image files as well as icons from
+      ICO files and resource libraries.
+
+      (The examples below use the fictitious directive "ModuleBackgroundImage")
+
+      To load a normal BMP or PNG image file, simply specify the path to the
+      file in the Module's configuration directive that requires an image file.
+
+        ModuleBackgroundImage "C:\folder\image.bmp"
+
+      To load an icon from an ICO file or resource library for use as an image,
+      use the syntax:
+
+        ModuleBackgroundImage ".extract=<icon resource>"
+
+      Where <icon resource> specifies the icon to load. See below for further
+      details on the syntaxt for loading icons. Please note that the ".extract="
+      prefix is required when loading an icon file when the Module is expecting
+      a normal image file.
+
+      To load and merge multiple images into a single image, separate the file
+      paths with the pipe character | using the syntax:
+
+        ModuleBackgroundImage "C:\folder\image1.png|C:\folder\image2.png{|...}"
+
+      where the last image specified will be on bottom, and the first image
+      specified will be on top. It is possible to include an icon resource in
+      this merging syntax as well, just use the ".extract=" prefix.
+
+      Relative paths refer to files in the LiteStep image directory. Refer to
+      LSImageFolder Step.rc directive for details.
+
+    - If an image contains the "magic pink" RGB color 255 0 255 (FF00FF) then
+      the portion of the image that is "magic pink" will be rendered transparent
+      to the content below it.  Some modules require a separate configuration
+      setting to enable or disable transparency support.  Refer to the Module's
+      documentation.
+
+    - Modules may require the specific loading of icon files.  LiteStep supports
+      loading icons from any icon resource file or archive as well as loading an
+      icon associated with a desktop.ini file.
+
+      It is possible to load an icon using the following syntax:
+
+      Directly load an icon file:
+
+        "C:\path\to\file.ico"
+
+      Extract an icon from a resource library (.icl, .dll, .exe, et cetera)
+      using the specified resource index (in this example, index 9):
+
+        "C:\path\to\icon\library.icl,9"
+
+      Extract the associated icon from a folder's "desktop.ini" file:
+
+        "C:\path\to\some\folder\"
+
+      Relative paths refer to files in the LiteStep image directory. Refer to
+      LSImageFolder Step.rc directive for details. 
+
+ D) Step.rc Directives
+ ---------------------
+
+  Include <file>
+  --------------
+   Specifies an additional step.rc format file to include.
+
+   Usage:
+    Include C:\LiteStep\config\theme.rc
+
+  If, ElseIf, Else, and EndIf
+  ---------------------------
+   Conditionally parse a section of the step.rc.
+
+   The If directive marks the start of a conditional section.  The If directive
+   evaluates an expression to produce a true (nonzero) or false (zero) result.
+   If the result is true then the lines following up to the next ElseIf, Else,
+   or EndIf are parsed, otherwise they are ignored.
+
+   The ElseIf directive behaves like an If, but the expression is evaluated only
+   if all of the previous If and ElseIf expressions have evaluated to false.
+
+   The Else directive parses the lines that follow it only if all the previous
+   If and Elseif expressions have evaluated to false.  There may be at most one
+   Else and it must follow any ElseIf statements.
+
+   The EndIf directive marks the end of a conditional section.  Each If
+   directive must have a corresponding EndIf.  If-EndIf blocks may be nested to
+   any depth.
+
+   See "Step.rc Evaluation Parser" section above for conditional operators and
+   expression syntax.  When referencing LiteStep variables (e-vars) do not
+   enclose the variable references in dollar signs ($) when they occur in
+   conditional expressions (dollar signs are only used in Runtime Variable
+   Expansion - see above named section).
+
+   Usage:
+    If <expression>
+     <lines>
+    ElseIf <expression>
+     <lines>
+    Else
+     <lines>
+    EndIf
+
+  LoadModule <file>
+  -----------------
+   Specifies a Module (plugin) to load.
+
+   Usage:
+    LoadModule C:\LiteStep\modules\popup.dll
+
+  LSNoStartup <boolean>
+  ---------------------
+   Disables running of system Startup items.
+
+   Note: LiteStep must be restarted for this setting to take affect.
+
+   Usage:
+    LSNoStartup TRUE
+
+  LSAutoHideModules <boolean>
+  ---------------------------
+   Automatically hides all LiteStep modules from the display when an application
+   enters Full Screen mode. (e.g. A full screen game)
+
+   Usage:
+    LSAutoHideModules TRUE
+
+  LSNoShellWarning <boolean>
+  --------------------------
+   Disables the warning issued when loading LiteStep if another shell is already
+   running.  Do not use this setting unless you know what you are doing!
+
+   Note: LiteStep must be restarted for this setting to take affect.
+
+   Usage:
+    LSNoShellWarning TRUE
+
+  LSSetAsShell <boolean>
+  ----------------------
+   Registers LiteStep as the system shell on load.  This will enable an
+   automatic re-spawn of LiteStep if LiteStep exits inadvertently.  However,
+   this feature is experimental and not recommended at this time.  If you
+   experience problem using Explorer as your file manager, try disabling this
+   setting.
+
+   Note: LiteStep must be restarted for this setting to take affect.
+
+   Usage:
+    LSSetAsShell TRUE
+
+  LSUseSystemDDE <boolean>
+  ------------------------
+   Enables Dynamic Data Exchange under LiteStep.  This is required to enable
+   many features of the Explorer file manager and other system services.
+   However its functionality is not fully developed at this time and
+   irregularities may exist.  If you experience resource usage troubles, try
+   disabling this setting.
+
+   Note: LiteStep must be restarted for this setting to take affect.
+
+   Usage:
+    LSUseSystemDDE TRUE
+
+  LSDisableTrayService <boolean>
+  ------------------------------
+   Disables the Icon Notification (Systray) service.  This is useful if you have
+   to run LiteStep on top of another shell, or if you have another application
+   implementing the service.
+
+   Note: LiteStep must be restarted for this setting to take affect.
+
+   Usage:
+    LSDisableTrayService TRUE
+
+  LSImageFolder <path>
+  --------------------
+   Sets the default folder that LiteStep looks in when loading images.  This
+   will default to <install path>\images\ (e.g. C:\LiteStep\images\).
+
+   Usage:
+    LSImageFolder "C:\LiteStep\themes\mytheme\images\"
+
+  ThemeAuthor <string>
+  --------------------
+   Sets the name of the Author of the current Theme and is displayed in the
+   !About box dialog.
+
+   Usage:
+    ThemeAuthor "Mr. ThemeWizard"
+
+  ThemeName <string>
+  ------------------
+   Sets the name of the current Theme and is displayed in the !About box dialog.
+
+   Usage:
+    ThemeName "Elite-h/\x"
+
+  LSLogLevel
+  ----------
+   (Deprecated)
+
+  LSLogFile
+  ---------
+   (Deprecated)
+
+ E) Step.rc Variables
+ --------------------
+  Variables that are evaluated at runtime when enclosed in $ characters.
+
+  1. Folder Path Expansions
+
+   AdminToolsDir
+   CommonAdminToolsDir
+   CommonDesktopDir
+   CommonFavorites
+   CommonPrograms
+   CommonStartMenu
+   CommonStartup
+   Cookies
+   Desktop
+   DesktopDir
+   DocumentsDir
+   Favorites
+   Fonts
+   History
+   Internet
+   InternetCache
+   LiteStepDir
+   Nethood
+   Printhood
+   Programs
+   QuickLaunch
+   Recent
+   Sendto
+   Startmenu
+   Startup
+   Templates
+   WinDir
+
+  2. Conditional Expansions
+
+   Win2000
+   Win2003
+   Win95
+   Win98
+   Win9X
+   WinME
+   WinNT
+   WinNT4
+   WinXP
+
+  3. Resource Expansions
+
+   CompileDate
+   ResolutionX
+   ResolutionY
+   UserName
+
+  4. GUID Folder Mapping Expansions
+
+   AdminTools
+   BitBucket
+   Controls
+   Dialup
+   Documents
+   Drives
+   Network
+   NetworkAndDialup
+   Printers
+   Scheduled
+
+ F) !Bang Commands
+ -----------------
+
+  !About
+  ------
+   Displays the About LiteStep dialog.
+
+   Usage:
+    !About
+
+  !Alert
+  ------
+   Displays a message box.
+
+   Usage:
+    !Alert <message> {title}
+
+  !CascadeWindows
+  ---------------
+   Cascades all non-minimized application windows.
+
+   Usage:
+    !CascadeWindows
+
+  !Confirm
+  --------
+   Displays a message box that allows the user to choose Yes or No.  Executes a
+   different command based on the users choice.
+
+   Usage:
+    !Confirm <message> {title} <yes-command> <no-command>
+
+  !Execute
+  --------
+   Executes a sequence of programs or bang commands.
+
+   Usage:
+    !Execute [<command-1>]{[<command-2>]...[<command-n>]}
+
+  !HideModules
+  ------------
+   Hides all modules.
+
+   Usage:
+    !HideModules
+
+  !Logoff
+  -------
+   Logs off the current user.  Does not display a prompt first.
+
+   Usage:
+    !Logoff
+
+  !MinimizeWindows
+  ----------------
+   Minimizes all application windows.
+
+   Usage:
+    !MinimizeWindows
+
+  !None
+  -----
+   Does nothing.  Useful as a placeholder where a command is required.
+
+   Usage:
+    !None
+
+  !Quit
+  -----
+   Shuts down LiteStep, but does not shut down Windows.  Be careful as there
+   will not be a shell running after this command is executed.
+
+   Usage:
+    !Quit
+
+  !Recycle
+  --------
+   Reloads configuration files and modules.  You can pause a recycle operation
+   by holding down the shift key.  This allows you to replace a module without
+   quiting LiteStep.
+
+   Usage:
+    !Recycle
+
+  !Refresh
+  --------
+   Reloads configuration files and notifies modules to update, however not all
+   modules support this.
+
+   Usage:
+    !Refresh
+
+  !Reload
+  -------
+   Reloads configuration files.  Does not reload modules or notify them.
+
+   Usage:
+    !Reload
+
+  !ReloadModule
+  -------------
+   Reloads a specific module.  Does not reload configuration files.  If the
+   specified module is not already loaded, it is loaded.
+
+   Usage:
+    !ReloadModule <path>
+
+  !RestoreWindows
+  ---------------
+   Restores all minimized application windows.
+
+   Usage:
+    !RestoreWindows
+
+  !Run
+  ----
+   Displays the Windows Run dialog box.
+
+   Usage:
+    !Run
+
+  !ShowModules
+  ------------
+   Shows all modules after having been hidden using !HideModules.
+
+   Usage:
+    !ShowModules
+
+  !Shutdown
+  ---------
+   Displays the Windows Shutdown dialog box.
+
+   Usage:
+    !Shutdown
+
+  !SwitchUser
+  -----------
+   On Windows XP with Fast User Switching enabled, this command will switch to
+   another user without logging off the current user.  On other systems this
+   command will lock the workstation.
+
+   Usage:
+    !SwitchUser
+
+  !TileWindowsH
+  -------------
+   Tiles all non-minimized application windows horizontally.
+
+   Usage:
+    !TileWindowsH
+
+  !TileWindowsV
+  -------------
+   Tiles all non-minimized application windows vertically.
+
+   Usage:
+    !TileWindowsV
+
+  !ToggleModules
+  --------------
+   Toggles the visibility of all modules.  See !HideModules and !ShowModules.
+
+   Usage:
+    !ToggleModules
+
+  !UnloadModule
+  -------------
+   Unloads a specific module.
+
+   Usage:
+    !UnloadModule <path>
+
+ G) Sample Step.rc
+ -----------------
+
+ STOP: Copying and pasting the following to your step.rc will *NOT* give you a
+       working LiteStep installation.  You will first need to download the
+       relevant modules and extract them to your LiteStep folder.
+
+ NOTE: The step.rc contents is what exists between {BeginStepRC} and {EndStepRC}
+       not including those two delimiters.  Create the step.rc file in the same
+       folder as litestep.exe.
+
+{BeginStepRC}
+; This is an EXAMPLE step.rc file.  This example will NOT work without
+; downloading the necessary modules (plugins) and placing them in the
+; same folder as litestep.exe.
+
+; First, we need to load the modules (plugins) that we want to use.
+; You may download these modules from:
+;  http://www.shellfront.org/modules-list.php
+; Extract these modules into your LiteStep folder.
+LoadModule $LiteStepDir$hotkey.dll    ; hotkey-2.0.zip
+LoadModule $LiteStepDir$popup2.dll    ; popup2-2.1.5.zip
+
+; Configure a Hotkey combination to launch Notepad and open this
+; step.rc configuration file.
+*Hotkey WIN+CTRL   S   notepad.exe "$LiteStepDir$step.rc"
+
+; Configure a Hotkey to recycle (restart) LiteStep.  This will reload
+; this step.rc configuration file with any changes, and reload all modules.
+*Hotkey WIN+CTRL   R   !recycle
+
+; Configure a Hotkey to open an explorer window and quit LiteStep.
+*Hotkey WIN+CTRL   Q   !execute [explorer.exe /e,/root,,$Drives$][!quit]
+
+; Configure a Hotkey to display LiteStep's "About" dialog.
+*Hotkey WIN+CTRL   A   !about
+
+; Configure a few default hotkeys that emulate Explorer's functionality
+*Hotkey WIN        C   explorer.exe /root,,$Controls$
+*Hotkey WIN        E   explorer.exe /e,/root,,$Drives$
+*Hotkey WIN        L   !logoff
+*Hotkey WIN        M   !MinimizeWindows
+*Hotkey WIN+SHIFT  M   !RestoreWindows
+*Hotkey WIN        R   !run
+
+; NOTE: pressing CTRL+ESC or the Windows Key will display the Popup Menu.
+; The Hotkey module automatically configures those hotkeys by default.
+
+; Next, we will configure a basic Popup Menu.
+HotlistName "LiteStep 0.24.8"
+PopupIcons
+PopupAdaptiveWidth
+PopupMinWidth 125
+PopupMaxWidth 300
+PopupNoBevel
+
+*Popup "My Computer" !PopupMyComputer
+*Popup !Separator
+IF Win9x
+*Popup "Start Menu" !PopupDynamicfolder:"$Startmenu$"
+ENDIF
+IF WinNT
+*Popup "Start Menu" !PopupDynamicfolder:"$Startmenu$|$CommonStartMenu$"
+ENDIF
+*Popup !Separator
+*Popup "Control Panel" !PopupControlPanel
+*Popup "Recent Documents" !PopupRecentDocuments
+*Popup !Separator
+*Popup .icon="$LiteStepDir$litestep.exe,0" "Running Tasks" !PopupTasks
+{EndStepRC}
+
+-- DEVELOPMENT -----------------------------------------------------------------
+
+ Please report bugs, feature requests and other feedback to our contact address:
+
+   devteam <at> lsdev.org
+
+ When reporting a bug, please include:
+ (use the !About dialog to retrieve version information)
+
+  - Windows OS Version and Service Pack level
+  - LiteStep Core Version
+  - All currently loaded modules and their versions
+  - Theme name and version (if applicable)
+  - Your contact information (email address)
+  - A complete description of the bug and if possible a step-by-step procedure
+    to reproduce the bug.  If we can not reproduce the bug, we will not be able
+    to fix it!  So, please do your best to help us help you.  Thanks!
+
+ We look forward to working with any module developers out there.  Please stop
+ by our IRC channel #lsdev on Freenode (irc.freenode.net).  We also have a
+ dedicated LiteStep Development mailing list open to all module developers.
+ Please visit our website http://www.lsdev.org/ for more information and links.
+
+-- CREDITS ---------------------------------------------------------------------
+
+ The LiteStep Development Team:
+
+ The Current Team:
+ -----------------
+ - Alexander Vermaat (Acidfire)
+ - Chris Rempel (jugg)
+ - Simon (ilmcuts)
+ - Tobbe Lundberg (Tobbe)
+
+ (Inactive Members)
+ - Joshua Seagoe (RabidCow)
+ - Kevin Schaffer (Maduin)
+ - Vidar T. Fauske (Xjill)
+
+ LiteStep 0.24.8
+ ---------------
+ - Alexander Vermaat (Acidfire)
+ - Chris Rempel (jugg)
+ - Kevin Schaffer (Maduin)
+ - Simon (ilmcuts)
+ - Tobbe Lundberg (Tobbe)
+
+ LiteStep 0.24.7
+ ---------------
+ - Bobby G Vineyard (Message)
+ - Chris Rempel (jugg)
+ - Simon (ilmcuts)
+
+ Previous Developers
+ -------------------
+ - LiteSTEP Creator
+   Francis Gastellu (Lonerunnr)
+
+ - v0.24.0 Developers & Team
+   Brandon Williams (Floach)
+   Bryan Kilian (MHolmesIV)
+   Damian Hodgkiss (Mian)
+   Marlon West (AnTi_MTtr)
+   Chad Boyda (Toasty)
+   Brad Webb (webba)
+   Jonathan Vaughn (Sehnsucht)
+   Warren Konkel (Warren)
+   Ian Hanschen (Furan)
+   Todd Kadrie (tin_omen)
+   Edwin Man (TheMAN)
+   Josh Devens (cael)
+   Sam Phillips (Sammy)
+   Scott Nance (Cyric^)
+   Tim Lloyd (Apollo18)
+   David Walker (PhenomTT)
+
+ - v0.24.2 Developers
+   Bryan Kilian (MHolmesIV)
+   Fahim Farook (Fahim)
+   Warren Konkel (Warren)
+
+ - v0.24.3 Developers
+   Bryan Kilian (MHolmesIV)
+   Fahim Farook (Fahim)
+   Warren Konkel (Warren)
+
+ - v0.24.4 Developers
+   Bryan Kilian (MHolmesIV)
+   Fahim Farook (Fahim)
+   Johan Redestig (Re5ource)
+   Josh Devens (cael)
+
+ - v0.24.5 Developers & Team
+ - and 11-23-99 era code
+   Bryan Kilian (MHolmesIV)
+   Fahim Farook (Fahim)
+   Johan Redestig (Re5ource)
+   Drew (snowchyld)
+   Warren Konkel (Warren)
+   Brad Webb (webba)
+   Edwin Man (TheMAN)
+   Från (cbjcyber)
+   James Brown (Ender_Gcc)
+   Shaheen Gandhi (Visigoth)
+   Torsten Stelling (Murphy)
+   Kevin Schaffer (Maduin)
+   Peter Edwards ((e))
+   Chris Rempel (jugg)
+   Lowell Heddings (GeekMaster)
+   B. Todd Kleinert II (WareWolf)
+   Bob Wells (Bob)
+   Kirill Arushanov (c0mrade)
+   MorpheusX
+
+ - v0.24.6 Developers & Team
+   Oliver Nutter (Headius)
+   Bobby G. Vinyard (Message)
+   Joachim Clavert (NeXTer)
+   Kevin Schaffer (Maduin)
+   Dustin Williams (noodge)
+   Richard Lin (Chaku)
+   Zakhar Arushanov (cccp)
+   Torsten Stelling (Murphy)
+   Gustav Munkby (grd)
+   Bret Anderson (MrJukes)
+   John Mc Graw Jr. (DeViLbOi)
+   Daniel Massey (ondioline)
+   David Fraser (dreamer)
+   Steve Dunstan (jalist)
+   Joel D. Parker (rootrider)
+   Kelly Rabourn (ksr)
+   Brandon S. (nivenh)
+   demigod
+
+ And thanks to all of those who have contributed to LiteStep and its community
+ over the last 10+ years!  It is much appreciated by everyone.
+
+-- LEGAL -----------------------------------------------------------------------
+
+ A) Documentation License Notice
+ -------------------------------
+
+ Copyright (c) 2005-2009 LiteStep Development Team
+
+ Permission is granted to copy, distribute and/or modify this document under the
+ terms of the GNU Free Documentation License, Version 1.2 or any later version
+ published by the Free Software Foundation; with no Invariant Sections, no
+ Front-Cover Texts, and no Back-Cover Texts.  A copy of the license is included
+ in license.txt.
+
+ B) LiteStep License Notice
+ --------------------------
+
+ LiteStep is a replacement shell for the standard Windows® Explorer shell.
+
+ Copyright (C) 1997-1998  Francis Gastellu
+ Copyright (C) 1998-2009  LiteStep Development Team
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 51 Franklin
+ Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+ http://www.lsdev.org/
+
+
+ ------------------------------------------------------------------------------
+  Windows and Microsoft are registered trademarks of Microsoft Corporation in
+  the United States and other countries.
+ ------------------------------------------------------------------------------
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
