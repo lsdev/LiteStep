@@ -4,12 +4,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
--- NOTE ------------------------------------------------------------------------
-
- MinGW build support is considered experimental at this time. Visual C++ 6.0 is
- currently the only officially supported compiler.
-
-
 -- BUILD REQUIREMENTS ----------------------------------------------------------
 
  - TDM/MinGW Installer 1.812.0 (www.tdragon.net/recentgcc/)
