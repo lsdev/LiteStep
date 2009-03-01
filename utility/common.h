@@ -36,7 +36,10 @@
 
 #  define STRICT
 #  define NOCRYPT
-#  define NOMINMAX
+
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
 
 #  include <windows.h>
 
