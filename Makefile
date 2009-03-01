@@ -6,8 +6,8 @@
 # To clean up a release build: make clean
 # To clean up a debug build:   make clean DEBUG=1
 #
-# The output directory (Release or Debug by default) must exist before you
-# run make. For 'make clean' to work you need rm.exe.
+# While mingw32-make.exe will work with this makefile we suggest using
+# GNU Make 3.81 available from http://gnuwin32.sourceforge.net/
 #-----------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------
@@ -22,16 +22,16 @@ CXXWARNING = -Wall
 
 # C++ compiler flags
 ifdef DEBUG
-CXXFLAGS = $(CXXWARNING) -DLSAPI_PRIVATE -D_DEBUG -g -ggdb
+CXXFLAGS = $(CXXWARNING) -DLS_NO_EXCEPTION -D_DEBUG -g
 else
-CXXFLAGS = $(CXXWARNING) -DLSAPI_PRIVATE -DNDEBUG
+CXXFLAGS = $(CXXWARNING) -DNDEBUG
 endif
 
 # Linker flags
 ifdef DEBUG
-LDFLAGS = -mwindows
+LDFLAGS = 
 else
-LDFLAGS = -mwindows -s
+LDFLAGS = -s
 endif
 
 # Resource compiler
@@ -40,11 +40,14 @@ RC = windres
 # Resource compiler flags
 RCFLAGS = -O coff
 
-# dllwrap
-DLLWRAP = dllwrap
+# dlltool
+DLLTOOL = dlltool
 
 # rm
-RM = rm -f
+RM = del /F
+
+# md
+MD = mkdir
 
 ifeq ($(OS), Windows_NT)
 NULL = 
@@ -56,9 +59,6 @@ endif
 # Files and Paths
 #-----------------------------------------------------------------------------
 
-# Search path for dependencies
-VPATH = litestep;lsapi;utility
-
 # Output directory
 ifdef DEBUG
 OUTPUT = Debug_MinGW
@@ -67,116 +67,132 @@ OUTPUT = Release_MinGW
 endif
 
 # Path to litestep.exe
-EXE = $(OUTPUT)/litestep.exe
+EXE = $(OUTPUT)\litestep.exe
 
 # Libraries that litestep.exe uses
-EXELIBS = -L$(OUTPUT) -llsapi -lole32 -lshlwapi -luuid
+EXELIBS = -ladvapi32 -lkernel32 -lmsvcp60 -lmsvcrt -lole32 -lshell32 -lshlwapi -luser32 -luuid -L$(OUTPUT) -llsapi.dll
+
+EXEMAP = $(OUTPUT)\litestep.map
 
 # Object files for litestep.exe
 EXEOBJS = \
-	litestep/$(OUTPUT)/DataStore.o \
-	litestep/$(OUTPUT)/DDEService.o \
-	litestep/$(OUTPUT)/DDEStub.o \
-	litestep/$(OUTPUT)/DDEWorker.o \
-	litestep/$(OUTPUT)/litestep.o \
-	litestep/$(OUTPUT)/MessageManager.o \
-	litestep/$(OUTPUT)/Module.o \
-	litestep/$(OUTPUT)/ModuleManager.o \
-	litestep/$(OUTPUT)/RecoveryMenu.o \
-	litestep/$(OUTPUT)/StartupRunner.o \
-	litestep/$(OUTPUT)/TrayNotifyIcon.o \
-	litestep/$(OUTPUT)/TrayService.o \
-	litestep/$(OUTPUT)/WinMain.o
+	litestep\$(OUTPUT)\DataStore.o \
+	litestep\$(OUTPUT)\DDEService.o \
+	litestep\$(OUTPUT)\DDEStub.o \
+	litestep\$(OUTPUT)\DDEWorker.o \
+	litestep\$(OUTPUT)\litestep.o \
+	litestep\$(OUTPUT)\MessageManager.o \
+	litestep\$(OUTPUT)\Module.o \
+	litestep\$(OUTPUT)\ModuleManager.o \
+	litestep\$(OUTPUT)\RecoveryMenu.o \
+	litestep\$(OUTPUT)\StartupRunner.o \
+	litestep\$(OUTPUT)\TrayNotifyIcon.o \
+	litestep\$(OUTPUT)\TrayService.o \
+	litestep\$(OUTPUT)\WinMain.o
 
-EXERES = litestep/$(OUTPUT)/litestep.res
+EXERES = litestep\$(OUTPUT)\litestep.res
+
+EXERESFILES = \
+	litestep\litestep.rc \
+	litestep\resource.h \
+	litestep\litestep.bmp \
+	litestep\litestep.ico
 
 # Path to lsapi.dll
-DLL = $(OUTPUT)/lsapi.dll
+DLL = $(OUTPUT)\lsapi.dll
 
-# Path to lsapi.dll export definitions file
-DLLDEF = lsapi/lsapi_mingw.def
+DLLEXP = $(OUTPUT)\lsapi.exp
 
 # Path to lsapi.dll import library
-DLLIMPLIB = $(OUTPUT)/liblsapi.a
+DLLIMPLIB = $(OUTPUT)\liblsapi.dll.a
 
 # Libraries that lsapi.dll uses
-DLLLIBS = -lole32 -lshlwapi
+DLLLIBS = -ladvapi32 -lgdi32 -lkernel32 -lmsvcrt -lole32 -lshell32 -lshlwapi -luser32
+
+DLLMAP = $(OUTPUT)\lsapi.map
 
 # Object files for lsapi.dll
 DLLOBJS = \
-	lsapi/$(OUTPUT)/aboutbox.o \
-	lsapi/$(OUTPUT)/BangCommand.o \
-	lsapi/$(OUTPUT)/BangManager.o \
-	lsapi/$(OUTPUT)/bangs.o \
-	lsapi/$(OUTPUT)/graphics.o \
-	lsapi/$(OUTPUT)/lsapi.o \
-	lsapi/$(OUTPUT)/lsapiInit.o \
-	lsapi/$(OUTPUT)/match.o \
-	lsapi/$(OUTPUT)/MathEvaluate.o \
-	lsapi/$(OUTPUT)/MathParser.o \
-	lsapi/$(OUTPUT)/MathScanner.o \
-	lsapi/$(OUTPUT)/MathToken.o \
-	lsapi/$(OUTPUT)/MathValue.o \
-	lsapi/$(OUTPUT)/picopng.o \
-	lsapi/$(OUTPUT)/png_support.o \
-	lsapi/$(OUTPUT)/settings.o \
-	lsapi/$(OUTPUT)/SettingsFileParser.o \
-	lsapi/$(OUTPUT)/SettingsIterator.o \
-	lsapi/$(OUTPUT)/SettingsManager.o \
-	lsapi/$(OUTPUT)/stubs.o
+	lsapi\$(OUTPUT)\aboutbox.o \
+	lsapi\$(OUTPUT)\BangCommand.o \
+	lsapi\$(OUTPUT)\BangManager.o \
+	lsapi\$(OUTPUT)\bangs.o \
+	lsapi\$(OUTPUT)\graphics.o \
+	lsapi\$(OUTPUT)\lsapi.o \
+	lsapi\$(OUTPUT)\lsapiInit.o \
+	lsapi\$(OUTPUT)\match.o \
+	lsapi\$(OUTPUT)\MathEvaluate.o \
+	lsapi\$(OUTPUT)\MathParser.o \
+	lsapi\$(OUTPUT)\MathScanner.o \
+	lsapi\$(OUTPUT)\MathToken.o \
+	lsapi\$(OUTPUT)\MathValue.o \
+	lsapi\$(OUTPUT)\picopng.o \
+	lsapi\$(OUTPUT)\png_support.o \
+	lsapi\$(OUTPUT)\settings.o \
+	lsapi\$(OUTPUT)\SettingsFileParser.o \
+	lsapi\$(OUTPUT)\SettingsIterator.o \
+	lsapi\$(OUTPUT)\SettingsManager.o \
+	lsapi\$(OUTPUT)\stubs.o
 
-DLLRES = lsapi/$(OUTPUT)/lsapi.res
+DLLRES = lsapi\$(OUTPUT)\lsapi.res
+
+DLLRESFILES = \
+	lsapi\lsapi.rc \
+	lsapi\resource.h
 
 # Object files for utility project
 UTILOBJS = \
-	utility/$(OUTPUT)/debug.o \
-	utility/$(OUTPUT)/shellhlp.o
+	utility\$(OUTPUT)\debug.o \
+	utility\$(OUTPUT)\shellhlp.o
 
 #-----------------------------------------------------------------------------
 # Rules
 #-----------------------------------------------------------------------------
 
-# all targets
+# all targets (default)
 .PHONY: all
 all: setup $(DLL) $(EXE)
 
 # litestep.exe
 $(EXE): setup $(UTILOBJS) $(EXEOBJS) $(EXERES)
-	$(CXX) -o $(EXE) $(LDFLAGS) $(UTILOBJS) $(EXEOBJS) $(EXERES) $(EXELIBS)
+	$(CXX) $(LDFLAGS) -Wl,--subsystem,windows,-Map,$(EXEMAP) -o $(EXE) $(UTILOBJS) $(EXEOBJS) $(EXERES) $(EXELIBS)
 
 # lsapi.dll
-$(DLL): setup $(UTILOBJS) $(DLLOBJS) $(DLLRES) $(DLLDEF)
-	$(DLLWRAP) --driver-name $(CXX) --def $(DLLDEF) --implib $(DLLIMPLIB) -o $(DLL) $(LDFLAGS) $(UTILOBJS) $(DLLOBJS) $(DLLRES) $(DLLLIBS)
+$(DLL): setup $(UTILOBJS) $(DLLOBJS) $(DLLRES)
+# The only reason that we must use dlltool, is to generate an export file and
+# import library which contains the correct stdcall naming fixups.
+	$(DLLTOOL) --add-stdcall-underscore -e $(DLLEXP) -l $(DLLIMPLIB) -D $(DLL) $(UTILOBJS) $(DLLOBJS) $(DLLRES)
+	$(CXX) $(DLLEXP) $(LDFLAGS) -shared -Wl,--subsystem,windows,-Map,$(DLLMAP) -o $(DLL) $(UTILOBJS) $(DLLOBJS) $(DLLRES) $(DLLLIBS)
 
 # Setup environment
 .PHONY: setup
 setup:
-	@-if not exist $(OUTPUT)/$(NULL) mkdir $(OUTPUT)
-	@-if not exist litestep/$(OUTPUT)/$(NULL) mkdir litestep\$(OUTPUT)
-	@-if not exist lsapi/$(OUTPUT)/$(NULL) mkdir lsapi\$(OUTPUT)
-	@-if not exist utility/$(OUTPUT)/$(NULL) mkdir utility\$(OUTPUT)
+	@-if not exist $(OUTPUT)\$(NULL) $(MD) $(OUTPUT)
+	@-if not exist litestep\$(OUTPUT)\$(NULL) $(MD) litestep\$(OUTPUT)
+	@-if not exist lsapi\$(OUTPUT)\$(NULL) $(MD) lsapi\$(OUTPUT)
+	@-if not exist utility\$(OUTPUT)\$(NULL) $(MD) utility\$(OUTPUT)
 
 # Remove output files
 .PHONY: clean
 clean:
 	@echo Cleaning output files
-	@echo  $(OUTPUT)/ ...
-	@-$(RM) $(EXE) $(DLL) $(DLLIMPLIB)
+	@echo  $(OUTPUT)\ ...
+	@-$(RM) $(EXE) $(EXEMAP) $(DLL) $(DLLMAP) $(DLLEXP) $(DLLIMPLIB)
 	@echo Cleaning intermediate files
-	@echo  litestep/$(OUTPUT)/ ...
-	@-$(RM) $(EXE) litestep/$(OUTPUT)/*.o litestep/$(OUTPUT)/*.d litestep/$(OUTPUT)/*.res
-	@echo  lsapi/$(OUTPUT)/ ...
-	@-$(RM) lsapi/$(OUTPUT)/*.o lsapi/$(OUTPUT)/*.d lsapi/$(OUTPUT)/*.res
-	@echo  utility/$(OUTPUT)/ ...
-	@-$(RM) utility/$(OUTPUT)/*.o utility/$(OUTPUT)/*.d
+	@echo  litestep\$(OUTPUT)\ ...
+	@-$(RM) litestep\$(OUTPUT)\*.o litestep\$(OUTPUT)\*.d $(EXERES)
+	@echo  lsapi\$(OUTPUT)\ ...
+	@-$(RM) lsapi\$(OUTPUT)\*.o lsapi\$(OUTPUT)\*.d $(DLLRES)
+	@echo  utility\$(OUTPUT)\ ...
+	@-$(RM) utility\$(OUTPUT)\*.o utility\$(OUTPUT)\*.d
 	@echo Done
 
 # Resources for litestep.exe
-litestep/$(OUTPUT)/litestep.res: litestep/litestep.rc litestep/resource.h litestep/litestep.bmp litestep/litestep.ico litestep/litestep.manifest
+$(EXERES): $(EXERESFILES)
 	$(RC) -Ilitestep $(RCFLAGS) -o $@ $<
 
 # Resources for lsapi.dll
-lsapi/$(OUTPUT)/lsapi.res: lsapi/lsapi.rc lsapi/resource.h
+$(DLLRES): $(DLLRESFILES)
 	$(RC) -Ilsapi $(RCFLAGS) -o $@ $<
 
 # Pattern rule to compile cpp files
@@ -196,16 +212,16 @@ lsapi/$(OUTPUT)/lsapi.res: lsapi/lsapi.rc lsapi/resource.h
 # issue you'll run into is that if you ever get the error "No rule to make
 # target <...>" then you'll have to run a 'make clean' to fix the issue.
 #
-utility/$(OUTPUT)/%.o: %.cpp
+utility\$(OUTPUT)\\%.o: utility\%.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
 	@sed -e "s/^[^:]*://" -e "s/^  *//" -e "s/ *\\$$//" -e "/^$$/ d" -e "s/  */:\n/g" -e "s/$$/:/" < utility/$(OUTPUT)/$*.d >> utility/$(OUTPUT)/$*.d
 
-lsapi/$(OUTPUT)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+lsapi\$(OUTPUT)\\%.o: lsapi\%.cpp
+	$(CXX) $(CXXFLAGS) -MMD -DLSAPI_PRIVATE -DLSAPI_INTERNAL -c -o $@ $<
 	@sed -e "s/^[^:]*://" -e "s/^  *//" -e "s/ *\\$$//" -e "/^$$/ d" -e "s/  */:\n/g" -e "s/$$/:/" < lsapi/$(OUTPUT)/$*.d >> lsapi/$(OUTPUT)/$*.d
 
-litestep/$(OUTPUT)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
+litestep\$(OUTPUT)\\%.o: litestep\%.cpp
+	$(CXX) $(CXXFLAGS) -MMD -DLSAPI_PRIVATE -c -o $@ $<
 	@sed -e "s/^[^:]*://" -e "s/^  *//" -e "s/ *\\$$//" -e "/^$$/ d" -e "s/  */:\n/g" -e "s/$$/:/" < litestep/$(OUTPUT)/$*.d >> litestep/$(OUTPUT)/$*.d
 
 #-----------------------------------------------------------------------------

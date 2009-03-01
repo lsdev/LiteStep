@@ -38,10 +38,8 @@
 
 #if defined(LSAPI_INTERNAL) /* only defined when compiling lsapi */
 #  define LSAPI __declspec(dllexport)
-#elif defined(_MSC_VER)
-#  define LSAPI __declspec(dllimport)
 #else
-#  define LSAPI
+#  define LSAPI __declspec(dllimport)
 #endif /* LSAPI_INTERNAL */
 
 
