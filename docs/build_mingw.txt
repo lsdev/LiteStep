@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7
+    LiteStep 0.25.0
     MinGW Developer Information
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -12,11 +12,10 @@
 
 -- BUILD REQUIREMENTS ----------------------------------------------------------
 
- - MinGW 4.1.0 (www.mingw.org)
- - libpng 1.2.8 (www.devpaks.org)
- - zlib 1.2.3 (www.devpaks.org)
+ - TDM/MinGW Installer 1.812.0 (www.tdragon.net/recentgcc/)
+ - Recent version of Strsafe.h from Microsoft Windows SDK (www.microsoft.com)
 
- This is the configuration used during 0.24.7 development, it is quite possible
+ This is the configuration used during 0.25.0 development, it is quite possible
  that other versions of the above packages can be used, but there's no
  guarantee.
 
@@ -26,31 +25,23 @@
  A. Install MinGW
  ----------------
 
-  1. Download the MinGW installer (MinGW-4.1.0.exe) from www.mingw.org.
+  1. Download the TDM/MinGW Installer 1.812.0 (Bundled version).
 
-  2. Run the installer. At a minimum you need to install the runtime, w32api,
-     binutils, gcc-core, gcc-g++, and mingw32-make packages. These are all
-     included if you install with the default settings.
+  2. Run the installer, and leave all component selections at defaults.
 
-  3. Add the MinGW bin directory to your PATH.
+ B. Install strsafe.h
+ --------------------
 
- B. Install libpng and zlib
- --------------------------
-
-  1. Download the libpng and zlib devpaks from www.devpaks.org.
-
-  2. Rename the files to change the .DevPak extension to .tar.bz2.
-
-  3. Extract both files into your MinGW directory, so that the binaries go in
-     \bin, headers go in \include, and libraries (.a) go in \lib.
-
+  1. LiteStep currently requires the MicroSoft Strsafe.h header file.  This is
+     included in recent Microsoft SDKs.  Copy the strsafe.h header file into the
+     MinGW include directory.
 
 -- BUILDING LITESTEP -----------------------------------------------------------
 
  A. Extract source code
  ----------------------
 
-  1. Create a build directory for the source code (LiteStep, for example).
+  1. Create a build directory for the source code (eg. C:\src\LiteStep).
 
   2. Extract the source code into the build directory. So that the build
      directory has the following structure:
@@ -62,9 +53,14 @@
 
  B. Compile
  ----------
+ 
+  1. Open a MinGW build prompt and change to the LiteStep source directory.
 
-  1. Open a command prompt and change to the build directory.
+  2. For a release build, run: mingw32-make
+     To clean use: mingw32-make clean
 
-  2. Create the output directory: mkdir Release
+     For a debug build, run: mingw32-make DEBUG=1
+     To clean use: mingw32-make DEBUG=1 clean
 
-  3. Run: mingw32-make
+  3. The output binaries will be off of the LiteStep source directory in
+     Release_MinGW or Debug_MinGW folders depending on the build type.
