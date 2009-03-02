@@ -254,7 +254,7 @@ void FileParser::_StripString(LPTSTR ptzString)
         *ptzLast = '\0';
     }
     
-    if ((ptzCurrent != ptzString) && ptzStart)
+    if (ptzStart != NULL && ptzStart != ptzString)
     {
         StringCchCopy(ptzString, strlen(ptzString) + 1, ptzStart);
     }
