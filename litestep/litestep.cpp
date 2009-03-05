@@ -457,9 +457,16 @@ int CLiteStep::Run()
     // know right away if there was a WM_QUIT in the queue, and
     // subsequently do not incorrectly call GetMessage() again.
     //
-    while (!m_bSignalExit && GetMessage(&message, 0, 0, 0) > 0)
+    while (GetMessage(&message, NULL, 0, 0) > 0)
     {
         MessageHandler(message);
+        
+        // This only occurs in PeekAllMsgs()
+        if (m_bSignalExit)
+        {
+            m_bSignalExit = FALSE;
+            PostQuitMessage(m_nQuitMsg);
+        }
     }
     
     TRACE("Left main message loop. Last message: 0x%.4X (%u, %u)",
@@ -570,14 +577,29 @@ HRESULT CLiteStep::DestroyMainWindow()
 //
 //
 //
-int CLiteStep::MessageHandler(MSG &message)
+void CLiteStep::PeekAllMsgs()
 {
-    if (WM_QUIT == message.message)
-    {
-        m_bSignalExit = true;
-        return 0;
-    }
+    MSG message;
     
+    while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+    {
+        if (WM_QUIT == message.message)
+        {
+            m_bSignalExit = true;
+            m_nQuitMsg = (int)message.wParam;
+            return;
+        }
+        
+        MessageHandler(message);
+    }
+}
+
+
+//
+//
+//
+void CLiteStep::MessageHandler(MSG &message)
+{
     if (NULL == message.hwnd)
     {
         // Thread message
@@ -606,10 +628,8 @@ int CLiteStep::MessageHandler(MSG &message)
     else
     {
         TranslateMessage(&message);
-        DispatchMessage (&message);
+        DispatchMessage(&message);
     }
-    
-    return 0;
 }
 
 

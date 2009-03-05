@@ -27,7 +27,7 @@
 class ILiteStep : public CountedBase
 {
 public:
-    virtual int MessageHandler(/*[in]*/ MSG &message) = 0;
+    virtual void PeekAllMsgs() = 0;
 };
 
 #endif // ILITESTEP_H

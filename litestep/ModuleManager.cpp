@@ -379,13 +379,8 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, size_t stCount) cons
     // Loop for as long as we have an object whose state is not signaled.
     while (vWait.size())
     {
-        MSG message;
-        
-        // Handle all window messages for current thread
-        while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-        {
-            m_pILiteStep->MessageHandler(message);
-        }
+        // Handle all pending messages first
+        m_pILiteStep->PeekAllMsgs();
         
         // Wait for a new message to come in, or for one of our objects to
         // become signaled.

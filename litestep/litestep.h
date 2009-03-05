@@ -76,9 +76,11 @@ public:
         HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     
     // ILiteStep
-    int MessageHandler(MSG &message);
+    void PeekAllMsgs();
     
 private:
+    void MessageHandler(MSG &message);
+    
     HRESULT CreateMainWindow(bool bSetAsShell);
     HRESULT DestroyMainWindow();
     
@@ -133,6 +135,7 @@ private:
     void _CleanupManagers();
     
     bool m_bSignalExit; // = false
+    int m_nQuitMsg;
     
     //
     // Service Related
