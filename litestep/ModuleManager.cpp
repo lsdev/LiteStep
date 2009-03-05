@@ -122,16 +122,28 @@ UINT ModuleManager::_LoadModules()
         // mzscript via LoadModule) during the startup process
         ModuleQueue mqModules;
         
+#if defined(LS_COMPAT_LCREADNEXTCONFIG)
+        while (LCReadNextCommand(f, szLine, MAX_LINE_LENGTH))
+#else
         while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
+#endif
         {
+            char szCommand[MAX_RCCOMMAND] = { 0 };
             char szToken1[MAX_LINE_LENGTH] = { 0 };
             char szToken2[MAX_LINE_LENGTH] = { 0 };
             
             // first buffer takes the "LoadModule" token
-            LPSTR lpszBuffers[] = { NULL, szToken1, szToken2 };
+            LPSTR lpszBuffers[] = { szCommand, szToken1, szToken2 };
             
             if (LCTokenize(szLine, lpszBuffers, 3, NULL) >= 2)
             {
+#if defined(LS_COMPAT_LCREADNEXTCONFIG)
+                if (_stricmp(szCommand, "LoadModule"))
+                {
+                    continue;
+                }
+#endif
+                
                 DWORD dwFlags = 0;
                 
                 if (_stricmp(szToken2, "threaded") == 0)

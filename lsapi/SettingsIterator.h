@@ -62,7 +62,8 @@ public:
     BOOL ReadNextCommand(LPSTR pszValue, size_t cchValue);
     
     /**
-     * Retrieve the next value with the specified setting name.
+     * Retrieve the next value with the specified setting name that starts
+     * with an '*'.
      *
      * @param   pszConfig  setting name
      * @param   pszValue   buffer to receive value

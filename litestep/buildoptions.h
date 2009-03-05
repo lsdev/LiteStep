@@ -58,4 +58,8 @@
 // 0.25.0 default: ENABLED
 #define LS_USE_PICOPNG
 
+// Makes LCReadNextConfig conform to pre 0.24.7 API
+// 0.25.0 default: DISABLED
+//#define LS_COMPAT_LCREADNEXTCONFIG
+
 #endif // BUILDOPTIONS_H

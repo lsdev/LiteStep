@@ -231,9 +231,9 @@ public:
     BOOL LCClose(LPVOID pFile);
     
     /**
-     * Retrieves the next line that begins with the specified setting name from
-     * a configuration file. The entire line (including the setting name) is
-     * placed in the buffer.
+     * Retrieves the next config line (one that starts with a '*') that begins
+     * with the specified setting name from a configuration file. The entire
+     * line (including the setting name) is placed in the buffer.
      *
      * Call this function repeatedly until it returns <code>FALSE</code> to
      * retrieve all the lines that begin with the specified setting name.

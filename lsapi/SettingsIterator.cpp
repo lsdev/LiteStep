@@ -97,6 +97,22 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
         
         pszValue[0] = '\0';
         
+#if defined(LS_COMPAT_LCREADNEXTCONFIG)
+        string sConfig;
+        
+        if('*' != *pszConfig)
+        {
+            sConfig = "*";
+            sConfig += pszConfig;
+        }
+        else
+        {
+            sConfig = pszConfig;
+        }
+        
+        pszConfig = sConfig.c_str();
+#endif // defined(LS_COMPAT_LCREADNEXTCONFIG)
+        
         // Has ReadNextConfig been used before for pszConfig?
         IteratorMap::iterator it = m_Iterators.find(pszConfig);
         
