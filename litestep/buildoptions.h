@@ -62,4 +62,8 @@
 // 0.25.0 default: DISABLED
 //#define LS_COMPAT_LCREADNEXTCONFIG
 
+// Uses *LSLoadModule instead of LoadModule
+// 0.25.0 default: DISABLED
+//#define LS_COMPAT_LSLOADMODULE
+
 #endif // BUILDOPTIONS_H

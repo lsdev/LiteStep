@@ -122,7 +122,9 @@ UINT ModuleManager::_LoadModules()
         // mzscript via LoadModule) during the startup process
         ModuleQueue mqModules;
         
-#if defined(LS_COMPAT_LCREADNEXTCONFIG)
+#if defined(LS_COMPAT_LSLOADMODULE)
+        while (LCReadNextConfig(f, "*LSLoadModule", szLine, MAX_LINE_LENGTH))
+#elif defined(LS_COMPAT_LCREADNEXTCONFIG)
         while (LCReadNextCommand(f, szLine, MAX_LINE_LENGTH))
 #else
         while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
