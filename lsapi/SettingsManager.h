@@ -249,6 +249,23 @@ public:
     BOOL LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR pszBuffer, size_t cchBufferLen);
     
     /**
+     * Retrieves the next none config line (one that does not start with a '*'
+     * from a configuration file. The entire line (including the setting name)
+     * is placed in the buffer.
+     *
+     * Call this function repeatedly until it returns <code>FALSE</code> to
+     * retrieve all non config lines in the file.
+     *
+     * @param   pFile         file handle returned by LCOpen
+     * @param   pszBuffer     buffer to receive line
+     * @param   cchBufferLen  size of buffer
+     * @return  <code>TRUE</code> if the line was retrieved or
+     *          <code>FALSE</code> if there are no more lines or an error
+     *          occurred
+     */
+    BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszBuffer, size_t cchBufferLen);
+    
+    /**
      * Retrieves the next line from a configuration file. The entire line
      * (including the setting name) is placed in the buffer.
      *
@@ -262,7 +279,7 @@ public:
      *          <code>FALSE</code> if there are no more lines or an error
      *          occurred
      */
-    BOOL LCReadNextLineOrCommand(LPVOID pFile, LPSTR pszBuffer, size_t cchBufferLen);
+    BOOL LCReadNextLine(LPVOID pFile, LPSTR pszBuffer, size_t cchBufferLen);
     
     /**
      * Expands variable references. The template string is copied into the

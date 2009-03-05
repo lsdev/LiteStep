@@ -66,10 +66,27 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
 }
 
 
-//
-// BOOL ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
-//
-//
+BOOL SettingsIterator::ReadNextCommand(LPSTR pszValue, size_t cchValue)
+{
+    BOOL bReturn = FALSE;
+    
+    while (!bReturn && m_pFileIterator != m_pSettingsMap->end())
+    {
+        if (!ispunct(*(m_pFileIterator->first.c_str())))
+        {
+            StringCchCopy(pszValue, cchValue, m_pFileIterator->first.c_str());
+            StringCchCat(pszValue, cchValue, " ");
+            StringCchCat(pszValue, cchValue, m_pFileIterator->second.c_str());
+            bReturn = TRUE;
+        }
+        
+        ++m_pFileIterator;
+    }
+    
+    return bReturn;
+}
+
+
 BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;

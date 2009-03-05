@@ -52,6 +52,16 @@ public:
     BOOL ReadNextLine(LPSTR pszValue, size_t cchValue);
     
     /**
+     * Retrieve the next value that does not start with an '*'.
+     *
+     * @param   pszValue  buffer to receive value
+     * @param   cchValue  size of buffer
+     * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code>
+     *          if there are no more values to retrieve
+     */
+    BOOL ReadNextCommand(LPSTR pszValue, size_t cchValue);
+    
+    /**
      * Retrieve the next value with the specified setting name.
      *
      * @param   pszConfig  setting name

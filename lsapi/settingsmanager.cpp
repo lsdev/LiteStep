@@ -598,7 +598,31 @@ BOOL SettingsManager::LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR psz
 }
 
 
-BOOL SettingsManager::LCReadNextLineOrCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+BOOL SettingsManager::LCReadNextCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+{
+    BOOL bReturn = FALSE;
+    char szTempValue[MAX_LINE_LENGTH];
+    
+    if (pFile != NULL && pszValue != NULL && cchValue > 0)
+    {
+        IteratorSet::iterator it = m_Iterators.find((SettingsIterator*)pFile);
+        
+        if (it != m_Iterators.end())
+        {
+            bReturn = (*it)->ReadNextCommand(szTempValue, MAX_LINE_LENGTH);
+            
+            if (bReturn)
+            {
+                VarExpansionEx(pszValue, szTempValue, cchValue);
+            }
+        }
+    }
+    
+    return bReturn;
+}
+
+
+BOOL SettingsManager::LCReadNextLine(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     char szTempValue[MAX_LINE_LENGTH];

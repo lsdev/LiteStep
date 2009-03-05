@@ -71,7 +71,7 @@ BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue)
     {
         if (pFile != NULL && pszValue != NULL && cchValue > 0)
         {
-            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextCommand(
                 pFile, pszValue, cchValue);
         }
     }
@@ -106,7 +106,7 @@ BOOL LCReadNextLine(LPVOID pFile, LPSTR pszValue, size_t cchValue)
     {
         if (pFile != NULL && pszValue != NULL && cchValue > 0)
         {
-            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLineOrCommand(
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLine(
                 pFile, pszValue, cchValue);
         }
     }
