@@ -382,7 +382,7 @@ void LSShutdownDialog(HWND hWnd)
     {
         if (IsVistaOrAbove())
         {
-            typedef void (WINAPI* ExitWindowsDialogProc)(HWND, DWORD);
+            typedef VOID (WINAPI* ExitWindowsDialogProc)(HWND, DWORD);
             
             ExitWindowsDialogProc fnExitWindowsDialog = \
                 (ExitWindowsDialogProc)fnProc;
@@ -392,12 +392,20 @@ void LSShutdownDialog(HWND hWnd)
         }
         else
         {
-            typedef void (WINAPI* ExitWindowsDialogProc)(HWND);
+            typedef VOID (WINAPI* ExitWindowsDialogProc)(HWND);
             
             ExitWindowsDialogProc fnExitWindowsDialog = \
                 (ExitWindowsDialogProc)fnProc;
             
             fnExitWindowsDialog(hWnd);
+        }
+        
+        // provide same mechansim for exiting the shell as explorer
+        if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) &&
+            (GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
+            (GetAsyncKeyState(VK_MENU) & 0x8000))
+        {
+            PostQuitMessage(1);
         }
     }
 }
