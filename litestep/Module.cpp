@@ -258,7 +258,7 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
     
     MSG msg;
     
-    while (GetMessage(&msg, 0, 0, 0))
+    while (GetMessage(&msg, 0, 0, 0) > 0)
     {
         if (msg.hwnd == NULL)
         {
