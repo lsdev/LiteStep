@@ -594,34 +594,27 @@ static void TransparentBltLSWorker(
     HBITMAP hbmMask, hbmMem;
     HBITMAP hbmOldMem, hbmOldMask;
     
-    // create a destination compatble dc containing
-    // a copy of the source dc
+    // create a destination compatble dc containing a copy of the source dc
     hdcMem = CreateCompatibleDC(hdcDst);
     hbmMem = CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
     hbmOldMem = (HBITMAP)SelectObject(hdcMem, hbmMem);
     
     BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, SRCCOPY);
     
-    // the transparent color should be selected as
-    // bkcolor into the memory dc
-    SetBkColor(hdcMem, colorTransparent);
-    
     // Create monochrome bitmap for the mask
     hdcMask = CreateCompatibleDC(hdcDst);
     hbmMask = CreateBitmap(nWidth, nHeight, 1, 1, NULL);
     hbmOldMask = (HBITMAP)SelectObject(hdcMask, hbmMask);
     
-    // Create the mask from the memory dc
+    // pixels matching the hdcMem bkcolor are white in the mask,
+    // while all others are black.
+    SetBkColor(hdcMem, colorTransparent);
+    // Create the mask from the memory dc holding the source image
     BitBlt(hdcMask, 0, 0, nWidth, nHeight, hdcMem, 0, 0, SRCCOPY);
     
-    // Set the background in hdcMem to black. Using SRCPAINT with black
-    // and any other color results in the other color, thus making
-    // black the transparent color
-    SetBkColor(hdcMem, RGB(0, 0, 0));
-    SetTextColor(hdcMem, RGB(255, 255, 255));
-    
-    BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
-    
+    // Mask off source (XOR - hdcMem bkcolor is still the transparent color)
+    BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCINVERT);
+    // Mask off dest (assumption is made that hdcDest bkcolor is white)
     BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
     
     // Combine the foreground with the background
