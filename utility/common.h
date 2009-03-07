@@ -37,7 +37,7 @@
 #  define STRICT
 #  define NOCRYPT
 
-#  ifndef NOMINMAX
+#  if !defined(NOMINMAX)
 #    define NOMINMAX
 #  endif
 
