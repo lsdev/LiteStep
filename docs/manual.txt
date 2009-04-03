@@ -900,15 +900,20 @@ Contents:
 
   2. Conditional Expansions
 
+   Win64
+   Win9X
+   WinNT
+   
    Win2000
    Win2003
+   Win2008
+   Win7
    Win95
    Win98
-   Win9X
    WinME
-   WinNT
    WinNT4
    WinXP
+   WinVista
 
   3. Resource Expansions
 

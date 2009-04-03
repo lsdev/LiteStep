@@ -271,6 +271,19 @@ void LSAPIInit::setLitestepVars()
         pSM->SetVariable("Win9x", "true");
         pSM->SetVariable("WinNT", "false");
     }
+
+#if defined(_WIN64)
+    pSM->SetVariable("Win64", "true");
+#else
+    if (IsOS(OS_WOW6432))
+    {
+        pSM->SetVariable("Win64", "true");
+    }
+    else
+    {
+        pSM->SetVariable("Win64", "false");
+    }
+#endif
     
     // screen resolution
     StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
