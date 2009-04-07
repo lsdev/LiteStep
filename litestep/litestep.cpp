@@ -1063,14 +1063,16 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     break;
                 }
             }
-            
+
+            // Handle shell hook messages *after* relaying them to modules.
+            // A module may show or hide some parts of its UI in response to
+            // those messages, thus undoing any auto-hide done here.
+            _HandleShellHooks(uMsg, wParam, lParam);
+
             lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
         }
         break;
     }
-    
-    // Internal handling of any LM_SHELLHOOK message we might be interested in.
-    _HandleShellHooks(uMsg, wParam, lParam);
     
     return lReturn;
 }
@@ -1349,7 +1351,6 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
     }
     
     RECT rScreen = { 0 };
-    RECT rWorkArea = { 0 };
     
     if (NULL != hMonFS)
     {
@@ -1359,7 +1360,6 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
         if (GetMonitorInfo(hMonFS, &miFS))
         {
             VERIFY(CopyRect(&rScreen, &miFS.rcMonitor));
-            VERIFY(CopyRect(&rWorkArea, &miFS.rcWork));
         }
         else
         {
@@ -1368,8 +1368,6 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
             rScreen.right = GetSystemMetrics(SM_CXSCREEN);
             rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
             
-            VERIFY(SystemParametersInfo(SPI_GETWORKAREA, 0, &rWorkArea, 0));
-            
             hMonFS = MonitorFromRect(&rScreen, MONITOR_DEFAULTTOPRIMARY);
         }
     }
@@ -1377,9 +1375,8 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
     RECT rWnd;
     VERIFY(GetClientRect(hWnd, &rWnd));
     
-    LONG width, height;
-    width = rWnd.right - rWnd.left;
-    height = rWnd.bottom - rWnd.top;
+    LONG width = rWnd.right - rWnd.left;
+    LONG height = rWnd.bottom - rWnd.top;
     
     POINT pt = { rWnd.left, rWnd.top };
     VERIFY(ClientToScreen(hWnd, &pt));
@@ -1397,6 +1394,7 @@ HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
     }
     
     DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
+
     // Check Window Rect if WS_CAPTION or WS_THICKFRAME is part of the style.
     // As long as at least one of them is not set, then we can check if the
     // window is full screen or not: http://support.microsoft.com/kb/q179363/
