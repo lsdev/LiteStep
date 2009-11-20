@@ -21,7 +21,8 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "MathScanner.h"
 #include "MathException.h"
-#include <string.h>
+#include <string.h> // needed for _stricmp
+#include <stdio.h> // needed for EOF
 
 using namespace std;
 
