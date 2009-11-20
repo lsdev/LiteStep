@@ -575,7 +575,7 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                          pTrayService->m_hTrayWnd
                         ,ABP_NOTIFYPOSCHANGED
                         ,(WPARAM)NULL
-                        ,(LPARAM)LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY)
+                        ,(LPARAM)MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY)
                     );
                 }
             }
@@ -1005,7 +1005,7 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
                          m_hTrayWnd
                         ,ABP_NOTIFYPOSCHANGED
                         ,(WPARAM)abd.hWnd
-                        ,(LPARAM)LSMonitorFromRect(&pabd->rc, MONITOR_DEFAULTTOPRIMARY)
+                        ,(LPARAM)MonitorFromRect(&pabd->rc, MONITOR_DEFAULTTOPRIMARY)
                     );
                 }
             }
@@ -1014,7 +1014,7 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
             CopyRect(&p->GetRectRef(), &pabd->rc);
             p->lParam(p->lParam() | ABS_CLEANRECT);
             p->uEdge(abd.uEdge);
-            p->hMon(LSMonitorFromRect(&p->GetRectRef(), MONITOR_DEFAULTTOPRIMARY));
+            p->hMon(MonitorFromRect(&p->GetRectRef(), MONITOR_DEFAULTTOPRIMARY));
         }
         
         ABUnLock(pabd);
@@ -1070,7 +1070,7 @@ LRESULT TrayService::barGetTaskBarPos(PSHELLAPPBARDATA psad)
             MONITORINFO mi;
             mi.cbSize = sizeof(mi);
             
-            if(!LSGetMonitorInfo(LSMonitorFromWindow(m_hNotifyWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
+            if(!GetMonitorInfo(MonitorFromWindow(m_hNotifyWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
             {
                 SetRect(&mi.rcMonitor, 0, 0,
                     GetSystemMetrics(SM_CXSCREEN),
@@ -1172,7 +1172,7 @@ LRESULT TrayService::barGetAutoHide(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
     BarVector::iterator itBar = findBar(
-        LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
+        MonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
         abd.uEdge, ABS_AUTOHIDE);
     
     if (itBar != m_abVector.end())
@@ -1206,7 +1206,7 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
     
     BarVector::iterator itBar = findBar(abd.hWnd);
     BarVector::iterator itAutoHideBar = findBar(
-        LSMonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
+        MonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
         abd.uEdge, ABS_AUTOHIDE);
     
     if (abd.lParam) // Set Auto Hide
@@ -1327,12 +1327,12 @@ LRESULT TrayService::barSetTaskBarState(const APPBARDATAV1& abd)
 void TrayService::modifyOverlapBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge)
 {
     // Use entire screen for default rectangle
-    HMONITOR hMon = LSMonitorFromRect(&rcOrg, MONITOR_DEFAULTTOPRIMARY);
+    HMONITOR hMon = MonitorFromRect(&rcOrg, MONITOR_DEFAULTTOPRIMARY);
     
     MONITORINFO mi;
     mi.cbSize = sizeof(mi);
     
-    if(LSGetMonitorInfo(hMon, &mi))
+    if(GetMonitorInfo(hMon, &mi))
     {
         CopyRect(&rcDst, &mi.rcMonitor);
     }
@@ -1366,8 +1366,8 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
     bool bFound = FALSE;
     
     // Use entire screen for default rectangle
-    HMONITOR hMon = LSMonitorFromRect(&rcOrg, MONITOR_DEFAULTTOPRIMARY);
-    HMONITOR hMonPrimary = LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+    HMONITOR hMon = MonitorFromRect(&rcOrg, MONITOR_DEFAULTTOPRIMARY);
+    HMONITOR hMonPrimary = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
     
     if(hMonPrimary == hMon)
     {
@@ -1379,7 +1379,7 @@ void TrayService::modifyNormalBar(RECT& rcDst, const RECT& rcOrg, UINT uEdge, HW
         MONITORINFO mi;
         mi.cbSize = sizeof(mi);
         
-        if(LSGetMonitorInfo(hMon, &mi))
+        if(GetMonitorInfo(hMon, &mi))
         {
             CopyRect(&rcDst, &mi.rcMonitor);
         }
@@ -1532,14 +1532,14 @@ void TrayService::adjustWorkArea(HMONITOR hMon)
 {
     RECT rcWorker, rcMonitor, rcWorkArea;
     
-    HMONITOR hMonPrimary = LSMonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+    HMONITOR hMonPrimary = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
     
     if (hMon != hMonPrimary)
     {
         MONITORINFO mi;
         mi.cbSize = sizeof(mi);
         
-        if (!LSGetMonitorInfo(hMon, &mi))
+        if (!GetMonitorInfo(hMon, &mi))
         {
             return;
         }
