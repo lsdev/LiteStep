@@ -1,8 +1,8 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.8
+    LiteStep 0.25.0
     Release Notes
     
-    Copyright (c) 2009 - LiteStep Development Team
+    Copyright (c) 2012 - LiteStep Development Team
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Contents:
@@ -186,7 +186,7 @@ Contents:
       line that starts with "shell=" in the "[boot]" section of the "system.ini"
       file, "shell=explorer.exe".  Save the file and reboot your system.
 
-  2. Win2K/XP
+  2. Win2K/XP/Vista/7/8
 
     - Note: If you are NOT an administrator, you will most likely NOT be able to
       set LiteStep as your shell.  The only exception to this is if your System
@@ -298,13 +298,6 @@ Contents:
   - lsapi.dll        LiteStep API for modules to use.  Loads and parses step.rc;
                      handles $evars$ and all other configuration.  Manages !bang
                      commands, includes core !bangs.
-
-  - hook.dll         The system shell hook used by some legacy LiteStep modules
-                     for receiving global system messages.
-
- LiteStep also depends on "libpng13.dll" and "zlib1.dll" for Portable Network
- Graphics (PNG) image support.  Those two files must exist in the same directory
- as "litestep.exe" or in the system path.
 
  LiteStep uses a text configuration file named "step.rc" which must exist in the
  same directory as "litestep.exe".
@@ -590,6 +583,9 @@ Contents:
       endsWith(string, string)
         Returns true if the second argument, converted to a string, is a suffix
         of the first argument, converted to a string.
+        
+      fileExists(string)
+        Returns true if the argument is a path to an existing file or directory.
 
       floor(number)
         Returns the floor (greatest lesser integer) of the argument, converted
@@ -907,7 +903,9 @@ Contents:
    Win2000
    Win2003
    Win2008
+   Win2012
    Win7
+   Win8
    Win95
    Win98
    WinME
@@ -1208,6 +1206,7 @@ ENDIF
  The Current Team:
  -----------------
  - Alexander Vermaat (Acidfire)
+ - Erik Welander (alur)
  - Chris Rempel (jugg)
  - Simon (ilmcuts)
  - Tobbe Lundberg (Tobbe)
@@ -1320,7 +1319,7 @@ ENDIF
  A) Documentation License Notice
  -------------------------------
 
- Copyright (c) 2005-2009 LiteStep Development Team
+ Copyright (c) 2005-2012 LiteStep Development Team
 
  Permission is granted to copy, distribute and/or modify this document under the
  terms of the GNU Free Documentation License, Version 1.2 or any later version
@@ -1334,7 +1333,7 @@ ENDIF
  LiteStep is a replacement shell for the standard Windows® Explorer shell.
 
  Copyright (C) 1997-1998  Francis Gastellu
- Copyright (C) 1998-2009  LiteStep Development Team
+ Copyright (C) 1998-2012  LiteStep Development Team
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
