@@ -49,7 +49,7 @@ static void AboutSysInfo(HWND hListView);
 // Utility
 static HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
 static int GetClientWidth(HWND hWnd);
-static void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer);
+static void FormatBytes(DWORDLONG stBytes, LPSTR pszBuffer, size_t cchBuffer);
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -722,8 +722,8 @@ static void AboutSysInfo(HWND hListView)
     
     // memory information
     DWORD dwMemoryLoad;
-    DWORD dwTotalPhys, dwAvailPhys;
-    DWORD dwTotalPageFile, dwAvailPageFile;
+    DWORDLONG dwTotalPhys, dwAvailPhys;
+    DWORDLONG dwTotalPageFile, dwAvailPageFile;
     
     typedef BOOL (WINAPI *GMSExFunctionType)(LPMEMORYSTATUSEX);
     GMSExFunctionType fpGlobalMemoryStatusEx = (GMSExFunctionType)GetProcAddress(
@@ -735,11 +735,11 @@ static void AboutSysInfo(HWND hListView)
         ms.dwLength = sizeof(MEMORYSTATUSEX);
         fpGlobalMemoryStatusEx(&ms);
         
-        dwMemoryLoad = ms.dwMemoryLoad;
-        dwTotalPhys = ms.ullTotalPhys > MAXDWORD ? MAXDWORD : (DWORD)ms.ullTotalPhys;
-        dwAvailPhys = ms.ullAvailPhys > MAXDWORD ? MAXDWORD : (DWORD)ms.ullAvailPhys;
-        dwTotalPageFile = ms.ullTotalPageFile > MAXDWORD ? MAXDWORD : (DWORD)ms.ullTotalPageFile;
-        dwAvailPageFile = ms.ullAvailPageFile > MAXDWORD ? MAXDWORD : (DWORD)ms.ullAvailPageFile;
+        dwMemoryLoad = (DWORD)ms.dwMemoryLoad;
+        dwTotalPhys = (DWORDLONG)ms.ullTotalPhys;
+        dwAvailPhys = (DWORDLONG)ms.ullAvailPhys;
+        dwTotalPageFile = (DWORDLONG)ms.ullTotalPageFile;
+        dwAvailPageFile = (DWORDLONG)ms.ullAvailPageFile;
     }
     else
     {
@@ -748,10 +748,10 @@ static void AboutSysInfo(HWND hListView)
         GlobalMemoryStatus(&ms);
         
         dwMemoryLoad = (DWORD)ms.dwMemoryLoad;
-        dwTotalPhys = (DWORD)ms.dwTotalPhys;
-        dwAvailPhys = (DWORD)ms.dwAvailPhys;
-        dwTotalPageFile = (DWORD)ms.dwTotalPageFile;
-        dwAvailPageFile = (DWORD)ms.dwAvailPageFile;
+        dwTotalPhys = (DWORDLONG)ms.dwTotalPhys;
+        dwAvailPhys = (DWORDLONG)ms.dwAvailPhys;
+        dwTotalPageFile = (DWORDLONG)ms.dwTotalPageFile;
+        dwAvailPageFile = (DWORDLONG)ms.dwAvailPageFile;
     }
     
     strcpy(text, "Memory Load");
@@ -846,12 +846,12 @@ static int GetClientWidth(HWND hWnd)
 // FormatBytes
 // Formats a byte count into a string suitable for display to the user
 //
-// Note: Max value of stBytes is 4 GB, so no need to be concerned of
+// Note: Max value of stBytes is 16 EB, so no need to be concerned of
 //       overrunning units[] index.
 //
-static LPCSTR units[] = { "bytes", "KB", "MB", "GB" };
+static LPCSTR units[] = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB" };
 
-static void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
+static void FormatBytes(DWORDLONG stBytes, LPSTR pszBuffer, size_t cchBuffer)
 {
     double dValue = (double)stBytes;
     unsigned int uUnit = 0;
@@ -862,7 +862,7 @@ static void FormatBytes(size_t stBytes, LPSTR pszBuffer, size_t cchBuffer)
         ++uUnit;
     }
     
-    if (uUnit == 3)
+    if (uUnit >= 3)
     {
         StringCchPrintf(
             pszBuffer, cchBuffer,
