@@ -1,0 +1,52 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    LiteStep 0.25.0
+    Visual Studio 2010 Developer Information
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+-- BUILD REQUIREMENTS ----------------------------------------------------------
+
+ - Visual C++ 2010 (Express)
+ - Microsoft Windows SDK for Windows 7 and .NET Framework 4 (ISO & Web Setup)
+
+ This is the configuration used during 0.25.0 development, it is quite possible
+ that other versions of the above packages can be used, but there's no
+ guarantee.
+
+
+-- BUILD SETUP -----------------------------------------------------------------
+
+ A. Install VC++ 2010 Express & The Platform SDK
+ -----------------------------------------------
+
+  1. If you don't have the build requirements installed, download them. Install
+     Visual C++ 2010 Express. Restart when asked and then install the SDK which
+     should register automatically with VC++. 
+
+  2. It is helpful to select "Expert Settings" in VC++ 2010 Express. See
+     Tools –> Settings –> Expert Settings. 
+
+-- BUILDING LITESTEP -----------------------------------------------------------
+
+ A. Deploy source code
+ ----------------------
+
+  1. Create a build directory for the source code (eg. C:\src\LiteStep).
+
+  2. Extract the source code into the build directory. So that the build
+     directory has the following structure:
+
+     \LiteStep
+         \litestep
+         \lsapi
+         \utility
+
+ B. Compile
+ ----------
+ 
+  1. Open "litestep_vc10.sln" in VC++ 2010.
+
+  2. Build either a debug or release build.
+
+  3. The output binaries will be off of the LiteStep source directory in
+     Release_VC10 or Debug_VC10 folders depending on the build type.
