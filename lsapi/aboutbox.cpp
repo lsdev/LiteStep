@@ -641,6 +641,7 @@ static HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
     case WINVER_WINXP:   pszTemp = _T("Windows XP");            break;
     case WINVER_VISTA:   pszTemp = _T("Windows Vista");         break;
     case WINVER_WIN7:    pszTemp = _T("Windows 7");             break;
+    case WINVER_WIN8:    pszTemp = _T("Windows 8");             break;
     case WINVER_WIN2003:
         if (GetSystemMetrics(SM_SERVERR2))
         {
@@ -653,6 +654,7 @@ static HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
         break;
     case WINVER_WHS:     pszTemp = _T("Windows Home Server");   break;
     case WINVER_WIN2008: pszTemp = _T("Windows Server 2008");   break;
+    case WINVER_WIN2012: pszTemp = _T("Windows Server 2012");   break;
     default:             pszTemp = _T("<Unknown Version>");     break;
     }
     

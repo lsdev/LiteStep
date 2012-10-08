@@ -631,7 +631,9 @@ UINT GetWindowsVersion()
             
             { 6,  0, WVM_WORKSTATION, WINVER_VISTA   },
             { 6,  0, WVM_SERVER,      WINVER_WIN2008 },
-            { 6,  1, WVM_ANY,         WINVER_WIN7    }
+            { 6,  1, WVM_ANY,         WINVER_WIN7    },
+            { 6,  2, WVM_SERVER,      WINVER_WIN2012 },
+            { 6,  2, WVM_ANY,         WINVER_WIN8    }
         };
         
         for (size_t idx = 0; idx < COUNTOF(versions); ++idx)

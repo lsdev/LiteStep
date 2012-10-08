@@ -241,10 +241,12 @@ void LSAPIInit::setLitestepVars()
         { WINVER_WINXP,     _T("WinXP")    },
         { WINVER_VISTA,     _T("WinVista") },
         { WINVER_WIN7,      _T("Win7")     },
+        { WINVER_WIN8,      _T("Win8")     },
         
         { WINVER_WIN2003,   _T("Win2003")  },
         { WINVER_WHS,       _T("Win2003")  },  // WHS is Win2003 in disguise
-        { WINVER_WIN2008,   _T("Win2008")  }
+        { WINVER_WIN2008,   _T("Win2008")  },
+        { WINVER_WIN2012,   _T("Win2012")  }
     };
     
     UINT uVersion = GetWindowsVersion();
