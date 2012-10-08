@@ -852,6 +852,22 @@ Contents:
    Usage:
     ThemeName "Elite-h/\x"
 
+  LSRunX
+  ---------
+   Sets the default X coordinate of the Windows Run dialog box, when displayed
+   using !Run.
+
+   Usage:
+    LSRunX 5 
+    
+  LSRunY
+  ---------
+   Sets the default Y coordinate of the Windows Run dialog box, when displayed
+   using !Run.
+
+   Usage:
+    LSRunY 5
+       
   LSLogLevel
   ----------
    (Deprecated)
@@ -1049,10 +1065,13 @@ Contents:
 
   !Run
   ----
-   Displays the Windows Run dialog box.
+   Displays the Windows Run dialog box.  If both an x and a y coordinate is
+   specified, the dialog box will appear to the bottom right of (x,y).  If no
+   coordinates are given, the dialog box will appear at the location indicated
+   by LSRunX and LSRunY.
 
    Usage:
-    !Run
+    !Run {x-coordinate} {y-coordinate}
 
   !ShowModules
   ------------

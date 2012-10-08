@@ -296,16 +296,32 @@ static void BangRestoreWindows(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 // BangRun(HWND hCaller, LPCSTR pszArgs)
 //
-static void BangRun(HWND /* hCaller */, LPCSTR /* pszArgs */)
+static void BangRun(HWND /* hCaller */, LPCSTR pszArgs)
 {
-    typedef VOID (WINAPI* RunDlgType)(HWND,HICON,LPCSTR,LPCSTR,LPCSTR,UINT);
+    typedef VOID (WINAPI* RunDlgType)(HWND,HICON,LPCWSTR,LPCWSTR,LPCWSTR,UINT);
+
+    char szX[MAX_LINE_LENGTH] = { 0 };
+    char szY[MAX_LINE_LENGTH] = { 0 };
+    LPSTR aszTokens[] = { szX, szY };
     
+    int nTokenCount = CommandTokenize(pszArgs, aszTokens, 2, NULL);
+    int nX = nTokenCount == 2 ? atoi(szX) : GetRCInt("LSRunX", 0);
+    int nY = nTokenCount == 2 ? atoi(szY) : GetRCInt("LSRunY", 0);
+
     RunDlgType RunDlg = (RunDlgType)GetProcAddress(
         GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003D));
-    
+
     if (RunDlg)
     {
-        RunDlg(NULL, NULL, NULL, NULL, NULL, 0);
+        HWND hParent = CreateWindowEx(WS_EX_TOOLWINDOW, "Static", "",
+            WS_POPUP, nX, nY, 1, 1, NULL, NULL, GetModuleHandle(NULL), NULL);
+
+        // RunDlg(parent, icon, ?, ?, Description, ?);
+        RunDlg(hParent, NULL, NULL, NULL, NULL, 0);
+
+        if (hParent) {
+            DestroyWindow(hParent);
+        }
     }
 }
 
