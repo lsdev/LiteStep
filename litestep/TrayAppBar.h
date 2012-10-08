@@ -30,24 +30,29 @@
 #define ABS_OVERLAPAUTOHIDE 0x00020000
 #define ABS_CLEANRECT       0x00040000
 
+// Maintains 32bit handles on 64bit builds
+typedef DWORD HANDLE32;
+typedef DWORD HWND32;
+typedef LONG LPARAM32;
+
 typedef struct _APPBARDATAV1
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uCallbackMessage;
     UINT uEdge;
     RECT rc;
-    LPARAM lParam;
+    LPARAM32 lParam;
 } APPBARDATAV1, *PAPPBARDATAV1;
 
 typedef struct _APPBARDATAV2
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uCallbackMessage;
     UINT uEdge;
     RECT rc;
-    LPARAM lParam;
+    LPARAM32 lParam;
     DWORD dw64BitAlign;
 } APPBARDATAV2, *PAPPBARDATAV2;
 
@@ -57,7 +62,7 @@ typedef struct _APPBARMSGDATAV1
     APPBARDATAV1 abd;
     /**/
     DWORD  dwMessage;
-    HANDLE hSharedMemory;
+    HANDLE32 hSharedMemory;
     DWORD  dwSourceProcessId;
     /**/
 } APPBARMSGDATAV1, *PAPPBARMSGDATAV1;
@@ -69,7 +74,7 @@ typedef struct _APPBARMSGDATAV2
     APPBARDATAV2 abd;
     /**/
     DWORD  dwMessage;
-    HANDLE hSharedMemory;
+    HANDLE32 hSharedMemory;
     DWORD  dwSourceProcessId;
     /**/
     DWORD dw64BitAlign;
@@ -85,7 +90,7 @@ typedef struct _APPBARMSGDATAV3
     DWORD  dwMessage;
     DWORD  dwPadding1;
     /**/
-    HANDLE hSharedMemory;
+    HANDLE32 hSharedMemory;
     DWORD  dwPadding2;
     /**/
     DWORD  dwSourceProcessId;

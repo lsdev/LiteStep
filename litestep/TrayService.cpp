@@ -460,6 +460,12 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                     }
                     break;
                     
+                case SH_TRAYINFO_DATA:
+                    {
+                        lResult = pTrayService->TrayInfoEvent(pcds->cbData, pcds->lpData);
+                    }
+                    break;
+                    
                 default:
                     {
                         TRACE("Unsupported tray message: %u", pcds->dwData);
@@ -649,6 +655,35 @@ HRESULT TrayService::HandleLoadInProc(REFCLSID clsid, DWORD dwMessage)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
+// TrayInfoEvent
+//
+// Handles tray info events
+//
+LRESULT TrayService::TrayInfoEvent(DWORD /*cbData*/, LPVOID lpData) // size, data
+{
+    LRESULT lr = 0;
+    LPNOTIFYICONIDENTIFIER_MSGV1 s = (LPNOTIFYICONIDENTIFIER_MSGV1)lpData;
+    SYSTRAYINFOEVENT sEvent;
+    
+    // Calling Shell_NotifyIconGetRect will cause two successive calls to this function. The first
+    // (dwMessage 1) should return the top left coordinate of the specified icon. The 2nd should
+    // return the width and height of the icon.
+
+    // Let registered listeners handle this.
+    sEvent.cbSize = sizeof(SYSTRAYINFOEVENT);
+    sEvent.dwEvent = s->dwMessage;
+    sEvent.guidItem = s->guidItem;
+    sEvent.hWnd = (HWND)s->hWnd;
+    sEvent.uID = s->uID;
+
+    SendMessage(m_hLiteStep, LM_SYSTRAYINFOEVENT, (WPARAM)&sEvent, (LPARAM)&lr);
+
+    return lr;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
 // HandleAppBarCopydata
 //
 LRESULT TrayService::HandleAppBarCopydata(DWORD cbData, LPVOID lpData)
@@ -663,14 +698,14 @@ LRESULT TrayService::HandleAppBarCopydata(DWORD cbData, LPVOID lpData)
             
             if (sizeof(APPBARDATAV2) != pamd->abd.cbSize)
             {
-                TRACE("PAPPBARMSGDATAV3 - Invalid ABD size: %u", pamd->abd.cbSize);
+                TRACE("APPBARMSGDATAV3 - Invalid ABD size: %u. Expected: %u", pamd->abd.cbSize, sizeof(APPBARDATAV2));
                 
                 break;
             }
             
             SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
             sbd.dwMessage = pamd->dwMessage;
-            sbd.hSharedMemory = pamd->hSharedMemory;
+            sbd.hSharedMemory = (HANDLE)pamd->hSharedMemory;
             sbd.dwSourceProcessId = pamd->dwSourceProcessId;
             
             lr = HandleAppBarMessage(&sbd);
@@ -683,14 +718,14 @@ LRESULT TrayService::HandleAppBarCopydata(DWORD cbData, LPVOID lpData)
             
             if (sizeof(APPBARDATAV2) != pamd->abd.cbSize)
             {
-                TRACE("APPBARMSGDATAV2 - Invalid ABD size: %u", pamd->abd.cbSize);
+                TRACE("APPBARMSGDATAV2 - Invalid ABD size: %u. Expected: %u", pamd->abd.cbSize, sizeof(APPBARDATAV2));
                 
                 break;
             }
             
             SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
             sbd.dwMessage = pamd->dwMessage;
-            sbd.hSharedMemory = pamd->hSharedMemory;
+            sbd.hSharedMemory = (HANDLE)pamd->hSharedMemory;
             sbd.dwSourceProcessId = pamd->dwSourceProcessId;
             
             lr = HandleAppBarMessage(&sbd);
@@ -703,14 +738,14 @@ LRESULT TrayService::HandleAppBarCopydata(DWORD cbData, LPVOID lpData)
             
             if (sizeof(APPBARDATAV1) != pamd->abd.cbSize)
             {
-                TRACE("APPBARMSGDATAV1 - Invalid ABD size: %u", pamd->abd.cbSize);
+                TRACE("APPBARMSGDATAV1 - Invalid ABD size: %u. Expected: %u", pamd->abd.cbSize, sizeof(APPBARDATAV1));
                 
                 break;
             }
             
             SHELLAPPBARDATA sbd((APPBARDATAV1&)(pamd->abd));
             sbd.dwMessage = pamd->dwMessage;
-            sbd.hSharedMemory = pamd->hSharedMemory;
+            sbd.hSharedMemory = (HANDLE)pamd->hSharedMemory;
             sbd.dwSourceProcessId = pamd->dwSourceProcessId;
             
             lr = HandleAppBarMessage(&sbd);
@@ -865,9 +900,9 @@ LRESULT TrayService::barCreate(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
     
-    if (IsWindow(abd.hWnd) && !isBar(abd.hWnd))
+    if (IsWindow((HWND)abd.hWnd) && !isBar((HWND)abd.hWnd))
     {
-        m_abVector.push_back(new AppBar(abd.hWnd, abd.uCallbackMessage));
+        m_abVector.push_back(new AppBar((HWND)abd.hWnd, abd.uCallbackMessage));
         lResult = 1;
     }
     
@@ -892,7 +927,7 @@ LRESULT TrayService::barDestroy(const APPBARDATAV1& abd)
     BarVector::iterator itBar;
     LRESULT lResult = 0;
     
-    if (getBar(abd.hWnd, itBar))
+    if (getBar((HWND)abd.hWnd, itBar))
     {
         lResult = 1;
         
@@ -937,7 +972,7 @@ LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
     {
         AppBar* p;
         
-        if (getBar(abd.hWnd, p))
+        if (getBar((HWND)abd.hWnd, p))
         {
             lResult = 1;
             
@@ -947,7 +982,7 @@ LRESULT TrayService::barQueryPos(PSHELLAPPBARDATA psad)
             }
             else
             {
-                modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, abd.hWnd);
+                modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, (HWND)abd.hWnd);
             }
         }
         
@@ -982,7 +1017,7 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
     {
         AppBar* p;
         
-        if (getBar(abd.hWnd, p))
+        if (getBar((HWND)abd.hWnd, p))
         {
             lResult = 1;
             
@@ -992,7 +1027,7 @@ LRESULT TrayService::barSetPos(PSHELLAPPBARDATA psad)
             }
             else
             {
-                modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, abd.hWnd);
+                modifyNormalBar(pabd->rc, abd.rc, abd.uEdge, (HWND)abd.hWnd);
                 
                 // If this is the first time to position the bar or if
                 // the new position is different than the previous, then
@@ -1134,7 +1169,7 @@ LRESULT TrayService::barActivate(const APPBARDATAV1& abd)
     LRESULT lResult = 0;
     AppBar* p;
     
-    if (getBar(abd.hWnd, p))
+    if (getBar((HWND)abd.hWnd, p))
     {
         lResult = 1;
         
@@ -1172,7 +1207,7 @@ LRESULT TrayService::barGetAutoHide(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
     BarVector::iterator itBar = findBar(
-        MonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
+        MonitorFromWindow((HWND)abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
         abd.uEdge, ABS_AUTOHIDE);
     
     if (itBar != m_abVector.end())
@@ -1204,9 +1239,9 @@ LRESULT TrayService::barSetAutoHide(const APPBARDATAV1& abd)
 {
     LRESULT lResult = 0;
     
-    BarVector::iterator itBar = findBar(abd.hWnd);
+    BarVector::iterator itBar = findBar((HWND)abd.hWnd);
     BarVector::iterator itAutoHideBar = findBar(
-        MonitorFromWindow(abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
+        MonitorFromWindow((HWND)abd.hWnd, MONITOR_DEFAULTTOPRIMARY),
         abd.uEdge, ABS_AUTOHIDE);
     
     if (abd.lParam) // Set Auto Hide
@@ -1278,7 +1313,7 @@ LRESULT TrayService::barPosChanged(const APPBARDATAV1& abd)
     LRESULT lResult = 0;
     AppBar* p;
     
-    if (getBar(abd.hWnd, p) && !p->IsAutoHide())
+    if (getBar((HWND)abd.hWnd, p) && !p->IsAutoHide())
     {
         lResult = 1;
         
@@ -2219,11 +2254,13 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
         case NID_6W_SIZE:
         case NID_5W_SIZE:
             lsnid.uVersion = ((NID_5W&)nid).uVersion;
+            (*it)->SetVersion(((NID_5W&)nid).uVersion);
             break;
             
         case NID_6A_SIZE:
         case NID_5A_SIZE:
             lsnid.uVersion = ((NID_5A&)nid).uVersion;
+            (*it)->SetVersion(((NID_5W&)nid).uVersion);
             break;
             
         default:
@@ -2239,47 +2276,44 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
-// FindIconPredicate
-//
-// Predicate for std::find_if, used by findIcon
-// Needs to be at global scope because of mingw issues
-//
-struct FindIconPredicate
-{
-    FindIconPredicate(HWND hWnd, UINT uID) :
-        m_hWnd(hWnd), m_uID(uID)
-    {
-        // do nothing
-    }
-    FindIconPredicate(const FindIconPredicate& copy) :
-        m_hWnd(copy.m_hWnd), m_uID(copy.m_uID)
-    {
-        // do nothing
-    }
-    
-    bool operator() (const NotifyIcon* pni) const
-    {
-        return (pni->GetHwnd() == m_hWnd && pni->GetuID() == m_uID);
-    }
-    
-private:
-    const HWND m_hWnd;
-    const UINT m_uID;
-    
-private:
-    // Not implemented
-    FindIconPredicate& operator=(const FindIconPredicate&);
-};
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
 // findIcon
 //
 // Looks up an icon in the SystrayIconList
 //
-IconVector::iterator TrayService::findIcon(HWND hWnd, UINT uId)
+IconVector::iterator TrayService::findIcon(const NID_XX& nid)
 {
-    return std::find_if(m_siVector.begin(),
-        m_siVector.end(), FindIconPredicate(hWnd, uId));
+    GUID guidItem;
+    
+    switch (nid.cbSize)
+    {
+    case NID_7W_SIZE:
+    case NID_6W_SIZE:
+        guidItem = ((NID_6W&)nid).guidItem;
+        break;
+            
+    case NID_6A_SIZE:
+        guidItem = ((NID_6A&)nid).guidItem;
+        break;
+            
+    default:
+        break;
+    }
+    
+    for (IconVector::iterator iter = m_siVector.begin(); iter != m_siVector.end(); iter++)
+    {
+        // If the GUID is valid, we ignore the uID and hWnd
+        if ((nid.uFlags & NIF_GUID) == NIF_GUID)
+        {
+            if (guidItem == (*iter)->GetGUID())
+            {
+                return iter;
+            }
+        }
+        else if((*iter)->GetuID() == nid.uID && (*iter)->GetHwnd() == (HWND)nid.hWnd)
+        {
+            return iter;
+        }
+    }
+    
+    return m_siVector.end();
 }

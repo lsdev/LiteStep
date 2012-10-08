@@ -58,7 +58,7 @@ NotifyIcon::IcVtr NotifyIcon::s_icVtr;
 //
 
 NotifyIcon::NotifyIcon(const NID_XX& nidSource)
-    :m_hWnd(nidSource.hWnd)
+    :m_hWnd((HWND)nidSource.hWnd)
     ,m_uID(nidSource.uID)
     ,m_uFlags(0)
     ,m_uCallbackMessage(0)
@@ -67,8 +67,10 @@ NotifyIcon::NotifyIcon(const NID_XX& nidSource)
     ,m_hOriginalIcon(NULL)
     ,m_hSharedWnd(NULL)
     ,m_uSharedID(0)
+    ,m_uVersion(0)
 {
     m_szTip[0] = 0;
+    ZeroMemory(&m_guidItem, sizeof(GUID));
     Update(nidSource);
     
     s_icVtr.push_back(this);
@@ -94,9 +96,37 @@ NotifyIcon::~NotifyIcon()
 
 void NotifyIcon::Update(const NID_XX& nidSource)
 {
+
+    // Check the size of nidSource if we are debuging.
+#ifdef _DEBUG
+    switch (nidSource.cbSize)
+    {
+    case NID_7W_SIZE:
+    case NID_6W_SIZE:
+    case NID_6A_SIZE:
+    case NID_5W_SIZE:
+    case NID_5A_SIZE:
+    case NID_4W_SIZE:
+    case NID_4A_SIZE:
+        {
+            // Do nothing
+        }
+        break;
+
+    default:
+        {
+            TRACE("NotifyIcon::Update - Unknown cbSize: %u", nidSource.cbSize);
+        }
+        break;
+    }
+#endif
+
     //
     // Copy persistent values only
     //
+    
+    // GUID
+    copy_guid(&nidSource);
     
     // state values
     copy_state(&nidSource);
@@ -109,6 +139,9 @@ void NotifyIcon::Update(const NID_XX& nidSource)
     
     // tool tip string
     copy_tip(&nidSource);
+
+    // version
+    copy_version(&nidSource);
 }
 
 
@@ -121,10 +154,51 @@ void NotifyIcon::copy_message(PCNID_XX pnidSource)
     }
 }
 
+void NotifyIcon::copy_version(PCNID_XX pnidSource)
+{
+    switch (pnidSource->cbSize)
+        {
+        case NID_7W_SIZE:
+        case NID_6W_SIZE:
+        case NID_5W_SIZE:
+            m_uVersion = ((NID_5W*)pnidSource)->uVersion;
+            break;
+            
+        case NID_6A_SIZE:
+        case NID_5A_SIZE:
+            m_uVersion = ((NID_5A*)pnidSource)->uVersion;
+            break;
+            
+        default:
+            break;
+    }
+}
+
+void NotifyIcon::copy_guid(PCNID_XX pnidSource)
+{
+    if ((pnidSource->uFlags & NIF_GUID) == NIF_GUID)
+    {
+        switch (pnidSource->cbSize)
+        {
+        case NID_7W_SIZE:
+        case NID_6W_SIZE:
+            m_guidItem = ((NID_6W*)pnidSource)->guidItem;
+            break;
+            
+        case NID_6A_SIZE:
+            m_guidItem = ((NID_6A*)pnidSource)->guidItem;
+            break;
+            
+        default:
+            break;
+        }
+    }
+}
+
 void NotifyIcon::copy_icon(PCNID_XX pnidSource)
 {
     // ignore if we are being told to use the same icon as before.
-    if (NIF_ICON & pnidSource->uFlags && m_hOriginalIcon != pnidSource->hIcon)
+    if (NIF_ICON & pnidSource->uFlags && m_hOriginalIcon != (HICON)pnidSource->hIcon)
     {
         HICON hNewIcon = NULL;
         
@@ -135,7 +209,7 @@ void NotifyIcon::copy_icon(PCNID_XX pnidSource)
             {
                 const NotifyIcon* p = *it;
                 
-                if (p->m_hOriginalIcon == pnidSource->hIcon)
+                if (p->m_hOriginalIcon == (HICON)pnidSource->hIcon)
                 {
                     m_hSharedWnd = (HANDLE)p->m_hWnd;
                     m_uSharedID = p->m_uID;
@@ -146,7 +220,7 @@ void NotifyIcon::copy_icon(PCNID_XX pnidSource)
         }
         else
         {
-            hNewIcon = CopyIcon(pnidSource->hIcon);
+            hNewIcon = CopyIcon((HICON)pnidSource->hIcon);
         }
         
         // Update if we have a new icon, or we were told
@@ -159,7 +233,7 @@ void NotifyIcon::copy_icon(PCNID_XX pnidSource)
             }
             
             m_hIcon = hNewIcon;
-            m_hOriginalIcon = pnidSource->hIcon;
+            m_hOriginalIcon = (HICON)pnidSource->hIcon;
         }
         
         if (!m_hIcon)
@@ -170,6 +244,29 @@ void NotifyIcon::copy_icon(PCNID_XX pnidSource)
         {
             m_uFlags |= NIF_ICON;
         }
+    }
+
+    switch (pnidSource->cbSize)
+    {
+    case NID_7W_SIZE:
+        {
+            HICON hBalloon = (HICON)((NID_7W*)pnidSource)->hBalloonIcon;
+            
+            if (m_hOriginalBalloonIcon != hBalloon)
+            {
+                // Not sure why the original icon is copied, but I set it up this way
+                // anyway.
+                m_hOriginalBalloonIcon = hBalloon;
+                m_hBalloonIcon = hBalloon;
+            }
+        }
+        break;
+
+    default:
+        {
+            // Do nothing
+        }
+        break;
     }
 }
 
@@ -320,7 +417,10 @@ void NotifyIcon::CopyLSNID(LSNOTIFYICONDATA * plsnid, UINT uFlagMask) const
     plsnid->cbSize = sizeof(LSNOTIFYICONDATA);
     plsnid->hWnd = m_hWnd;
     plsnid->uID = m_uID;
+    plsnid->guidItem = m_guidItem;
     plsnid->uFlags = 0;
+    plsnid->hBalloonIcon = m_hBalloonIcon;
+    plsnid->uVersion = m_uVersion;
     
     if (NIF_MESSAGE & m_uFlags & uFlagMask)
     {

@@ -72,6 +72,7 @@
 #define LM_SENDSYSTRAY              9213
 #define LM_SYSTRAY                  9214
 #define LM_SYSTRAYREADY             9215
+#define LM_SYSTRAYINFOEVENT         9216
 
 // Shell Hook Messages (obsolete!)
 #define LM_SHELLMESSAGE             9219
@@ -211,6 +212,14 @@ typedef struct _LMBANGCOMMANDW
 #define LMBANGCOMMAND               LMBANGCOMMANDA
 #define PLMBANGCOMMAND              PLMBANGCOMMANDA
 #endif // _UNICODE
+
+
+//-----------------------------------------------------------------------------
+// LM_SYSTRAYINFOEVENT DEFINES
+//-----------------------------------------------------------------------------
+#define TRAYEVENT_GETICONPOS        1
+#define TRAYEVENT_GETICONSIZE       2
+
 
 //-----------------------------------------------------------------------------
 // VWM DEFINES

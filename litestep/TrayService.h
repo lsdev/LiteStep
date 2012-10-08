@@ -33,11 +33,34 @@
 #define SH_APPBAR_DATA    (0)
 #define SH_TRAY_DATA      (1)
 #define SH_LOADPROC_DATA  (2)
+#define SH_TRAYINFO_DATA  (3)
 
 // internally posted AppBar messages
 #define ABP_NOTIFYPOSCHANGED   (WM_USER+350)
 #define ABP_NOTIFYSTATECHANGE  (WM_USER+351)
 #define ABP_RAISEAUTOHIDEHWND  (WM_USER+360)
+
+// data sent to TrayInfoEvent
+typedef struct _NOTIFYICONIDENTIFIER_MSGV1
+{
+    DWORD dwMagic;
+    DWORD dwMessage;
+    DWORD cbSize;
+    DWORD dwPadding;
+    HWND32 hWnd;
+    UINT uID;
+    GUID guidItem;
+} NOTIFYICONIDENTIFIER_MSGV1, *LPNOTIFYICONIDENTIFIER_MSGV1;
+
+// Used for LM_SYSTRAYINFOEVENT
+typedef struct _SYSTRAYINFOEVENT
+{
+    DWORD cbSize;
+    DWORD dwEvent;
+    HWND hWnd;
+    UINT uID;
+    GUID guidItem;
+} SYSTRAYINFOEVENT, *LPSYSTRAYINFOEVENT;
 
 // data sent by shell via Shell_NotifyIcon
 typedef struct _SHELLTRAYDATA
@@ -127,6 +150,9 @@ private:
     LRESULT HandleAppBarCopydata(DWORD cbData, LPVOID lpData);
     LRESULT HandleAppBarMessage(PSHELLAPPBARDATA psad);
     
+    // Handler for tray info event
+    LRESULT TrayInfoEvent(DWORD cbData, LPVOID lpData);
+    
     // Handler for system tray notifications
     BOOL HandleNotification(PSHELLTRAYDATA pstd);
     
@@ -195,14 +221,9 @@ private:
     void removeDeadIcons();
     
     //
-    // findIcon variants
+    // finds the icon which matches the specified nid
     //
-    IconVector::iterator findIcon(HWND hWnd, UINT uId);
-    
-    inline IconVector::iterator findIcon(const NID_XX& nid)
-    {
-        return findIcon(nid.hWnd, nid.uID);
-    }
+    IconVector::iterator findIcon(const NID_XX& nid);
     
     //
     //

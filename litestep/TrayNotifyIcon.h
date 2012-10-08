@@ -58,7 +58,10 @@ typedef struct
     DWORD dwInfoFlags;                           /* arbitrary  &     volatile */
     
     // new in XP:
-    GUID guidItem;                               /* ???? */
+    GUID guidItem;                               /* persistent & non volatile */
+
+    // new in Vista
+    HICON hBalloonIcon;                          /* arbitrary  &     volatile */
     /**/
 } LSNOTIFYICONDATA, *PLSNOTIFYICONDATA;
 typedef const LSNOTIFYICONDATA * PCLSNOTIFYICONDATA;
@@ -69,15 +72,20 @@ typedef const LSNOTIFYICONDATA * PCLSNOTIFYICONDATA;
 // NOTIFYICONDATA variants
 //
 
+// For 64bit builds.
+// Handles are 64bits on 64bit builds, while the structure we receive still contain 32bits.
+typedef DWORD HWND32;
+typedef DWORD HICON32;
+
 // Win9x
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     CHAR szTip[64];
 } NID_4A;
 
@@ -85,11 +93,11 @@ typedef struct
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     WCHAR szTip[64];
 } NID_4W;
 
@@ -97,11 +105,11 @@ typedef struct
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     CHAR szTip[128];
     DWORD dwState;
     DWORD dwStateMask;
@@ -119,11 +127,11 @@ typedef struct
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     WCHAR szTip[128];
     DWORD dwState;
     DWORD dwStateMask;
@@ -141,11 +149,11 @@ typedef struct
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     CHAR szTip[128];
     DWORD dwState;
     DWORD dwStateMask;
@@ -164,11 +172,11 @@ typedef struct
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     WCHAR szTip[128];
     DWORD dwState;
     DWORD dwStateMask;
@@ -187,11 +195,11 @@ typedef struct
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
     WCHAR szTip[128];
     DWORD dwState;
     DWORD dwStateMask;
@@ -204,18 +212,18 @@ typedef struct
     WCHAR szInfoTitle[64];
     DWORD dwInfoFlags;
     GUID guidItem;
-    HICON hBalloonIcon;
+    HICON32 hBalloonIcon;
 } NID_7W;
 
 // sub structure common to all others
 typedef struct
 {
     DWORD cbSize;
-    HWND hWnd;
+    HWND32 hWnd;
     UINT uID;
     UINT uFlags;
     UINT uCallbackMessage;
-    HICON hIcon;
+    HICON32 hIcon;
 } NID_XX, *PNID_XX;
 typedef const NID_XX * PCNID_XX;
 
@@ -283,24 +291,38 @@ public:
         return m_uID;
     }
     
+    inline GUID GetGUID() const
+    {
+        return m_guidItem;
+    }
+    
     inline void CopyLSNID(LSNOTIFYICONDATA * plsnid) const
     {
         CopyLSNID(plsnid, (UINT)-1);
+    }
+
+    inline void SetVersion(UINT uVersion)
+    {
+        this->m_uVersion = uVersion;
     }
     
     void CopyLSNID(LSNOTIFYICONDATA * plsnid, UINT uFlagMask) const;
     
 private:
+    void copy_guid(PCNID_XX pnidSource);
     void copy_message(PCNID_XX pnidSource);
     void copy_icon(PCNID_XX pnidSource);
     void copy_tip(PCNID_XX pnidSource);
     void copy_state(PCNID_XX pnidSource);
+    void copy_version(PCNID_XX pnidSource);
     
     void update_state(DWORD dwState, DWORD dwMask);
+    void set_version(UINT uVersion);
     
     // Preserved Notify Icon Data members
     const HWND  m_hWnd;                          /* persistent & non volatile */
     const UINT  m_uID;                           /* persistent & non volatile */
+    GUID  m_guidItem;                            /* persistent & non volatile */
     
     UINT  m_uFlags;                              /* persistent &     volatile */
     UINT  m_uCallbackMessage;                    /* persistent &     volatile */
@@ -308,9 +330,12 @@ private:
     CHAR  m_szTip[TRAY_MAX_TIP_LENGTH];          /* persistent &     volatile */
     
     DWORD m_dwState;                             /* persistent &     volatile */
+    HICON m_hBalloonIcon;                        /* persistent &     volatile */
+    UINT m_uVersion;                             /* persistent &     volatile */
     
     // Internal tracking
     HANDLE m_hOriginalIcon;
+    HANDLE m_hOriginalBalloonIcon;
     HANDLE m_hSharedWnd;
     UINT   m_uSharedID;
     
