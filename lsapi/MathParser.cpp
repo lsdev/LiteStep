@@ -105,6 +105,7 @@ static MathValue Math_boolean(const MathValueList& argList);
 static MathValue Math_ceil(const MathValueList& argList);
 static MathValue Math_contains(const MathValueList& argList);
 static MathValue Math_endsWith(const MathValueList& argList);
+static MathValue Math_fileExists(const MathValueList& argList);
 static MathValue Math_floor(const MathValueList& argList);
 static MathValue Math_if(const MathValueList& argList);
 static MathValue Math_integer(const MathValueList& argList);
@@ -130,6 +131,7 @@ struct FunctionTable
     { "ceil",         Math_ceil,             1 },
     { "contains",     Math_contains,         2 },
     { "endsWith",     Math_endsWith,         2 },
+    { "fileExists",   Math_fileExists,       1 },
     { "floor",        Math_floor,            1 },
     { "if",           Math_if,               3 },
     { "integer",      Math_integer,          1 },
@@ -724,6 +726,13 @@ MathValue Math_endsWith(const MathValueList& argList)
     }
     
     return (toSearch.find(toFind) == toSearch.length() - toFind.length());
+}
+
+
+// File Exists
+MathValue Math_fileExists(const MathValueList& argList)
+{
+    return GetFileAttributes(argList[0].ToString().c_str()) != INVALID_FILE_ATTRIBUTES;
 }
 
 
