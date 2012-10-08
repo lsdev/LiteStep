@@ -45,6 +45,7 @@ static void AboutLicense(HWND hEdit);
 static void AboutModules(HWND hListView);
 static void AboutRevIDs(HWND hListView);
 static void AboutSysInfo(HWND hListView);
+static void AboutPerformance(HWND hListView);
 
 // Utility
 static HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
@@ -63,6 +64,7 @@ enum
     ,ABOUT_DEVTEAM
     ,ABOUT_LICENSE
     ,ABOUT_MODULES
+    ,ABOUT_PERFORMANCE
     ,ABOUT_REVIDS
     ,ABOUT_SYSINFO
 };
@@ -74,12 +76,13 @@ struct AboutOptions
 }
 static const g_aboutOptions[] = \
 {
-     { "Bang Commands",      AboutBangs   }
-    ,{ "Development Team",   AboutDevTeam }
-    ,{ "License",            AboutLicense }
-    ,{ "Loaded Modules",     AboutModules }
-    ,{ "Revision IDs",       AboutRevIDs  }
-    ,{ "System Information", AboutSysInfo }
+     { "Bang Commands",      AboutBangs       }
+    ,{ "Development Team",   AboutDevTeam     }
+    ,{ "License",            AboutLicense     }
+    ,{ "Loaded Modules",     AboutModules     }
+    ,{ "Performance",        AboutPerformance }
+    ,{ "Revision IDs",       AboutRevIDs      }
+    ,{ "System Information", AboutSysInfo     }
 };
 
 
@@ -338,6 +341,7 @@ static INT_PTR OnCommand(
         case ABOUT_BANGS:
         case ABOUT_DEVTEAM:
         case ABOUT_MODULES:
+        case ABOUT_PERFORMANCE:
         case ABOUT_SYSINFO:
             // set the current display to the list view
             g_aboutOptions[i].function(hListView);
@@ -569,6 +573,69 @@ static void AboutModules(HWND hListView)
     ci.hListView = hListView;
     
     EnumLSData(ELD_MODULES, (FARPROC)ModulesCallback, (LPARAM)&ci);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// PerformanceCallback
+// Used by AboutPerformance
+//
+static BOOL CALLBACK PerformanceCallback(LPCSTR pszPath, DWORD dwLoadTime, LPARAM lParam)
+{
+    CallbackInfo* pCi = (CallbackInfo*)lParam;
+    
+    CHAR szModule[MAX_PATH] = { 0 };
+    strcpy(szModule, pszPath);
+    PathStripPath(szModule);
+    
+    LVITEM itemInfo;
+    itemInfo.mask = LVIF_TEXT;
+    itemInfo.iItem = pCi->nItem;
+    itemInfo.pszText = szModule;
+    itemInfo.iSubItem = 0;
+    
+    ListView_InsertItem(pCi->hListView, &itemInfo);
+    
+    sprintf(szModule, "%dms", dwLoadTime);
+    ListView_SetItemText(pCi->hListView, pCi->nItem, 1, szModule);
+    
+    ++pCi->nItem;
+    return TRUE;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// AboutPerformance
+//
+static void AboutPerformance(HWND hListView)
+{
+    LVCOLUMN columnInfo;
+    char text[32];
+    
+    int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
+    
+    strcpy(text, "Module");
+    columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+    columnInfo.fmt = LVCFMT_LEFT;
+    columnInfo.cx = width / 2;
+    columnInfo.pszText = text;
+    columnInfo.iSubItem = 0;
+    
+    ListView_InsertColumn(hListView, 0, &columnInfo);
+    
+    strcpy(text, "Load Time");
+    columnInfo.cx = width - columnInfo.cx;
+    columnInfo.pszText = text;
+    columnInfo.iSubItem = 1;
+    
+    ListView_InsertColumn(hListView, 1, &columnInfo);
+    
+    CallbackInfo ci = { 0 };
+    ci.hListView = hListView;
+    
+    EnumLSData(ELD_PERFORMANCE, (FARPROC)PerformanceCallback, (LPARAM)&ci);
 }
 
 

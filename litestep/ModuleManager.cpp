@@ -416,3 +416,22 @@ HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam)
     
     return hr;
 }
+
+
+HRESULT ModuleManager::EnumPerformance(LSENUMPERFORMANCEPROC pfnCallback, LPARAM lParam) const
+{
+    HRESULT hr = S_OK;
+    
+    for (ModuleQueue::const_iterator iter = m_ModuleQueue.begin();
+        iter != m_ModuleQueue.end(); ++iter)
+    {
+        if (!pfnCallback((*iter)->GetLocation(), (*iter)->GetLoadTime(),
+            lParam))
+        {
+            hr = S_FALSE;
+            break;
+        }
+    }
+    
+    return hr;
+}

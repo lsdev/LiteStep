@@ -129,6 +129,20 @@ public:
      */
     HRESULT EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam) const;
     
+    /**
+     * Enumerates performance statistics for loaded modules. Calls the callback
+     * function once for each loaded module. Continues until all modules have
+     * been enumerated or the callback function returns <code>FALSE</code>.
+     *
+     * @param  pfnCallback  pointer to callback function
+     * @param  lParam       application-defined value passed to the callback
+     *                      function
+     * @return <code>S_OK</code> if all modules were enumerated,
+     *         <code>S_FALSE</code> if the callback function returned
+     *         <code>FALSE</code>, or an error code
+     */
+    HRESULT EnumPerformance(LSENUMPERFORMANCEPROC pfnCallback, LPARAM lParam) const;
+    
 private:
     /**
      * Loads all the modules specified in <code>step.rc</code>.

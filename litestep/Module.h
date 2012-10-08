@@ -59,6 +59,9 @@ private:
     
     /** Flags used to load module */
     DWORD m_dwFlags;
+
+    /** The amount of time it took to load the module */
+    DWORD m_dwLoadTime;
     
     /**
      * Event that is triggered when a threaded module completes initialization
@@ -185,7 +188,15 @@ public:
     {
         return m_dwFlags;
     }
-    
+
+    /**
+     * Returns how long this module took to load.
+     */
+    DWORD GetLoadTime() const
+    {
+        return m_dwLoadTime;
+    }
+
     /**
      * Returns a pointer to this module's <code>quitModule</code> function.
      */

@@ -128,6 +128,7 @@
 #define LM_BANGCOMMAND              9420
 #define LM_ENUMREVIDS               9430
 #define LM_ENUMMODULES              9431
+#define LM_ENUMPERFORMANCE          9432
 #endif
 
 
@@ -270,6 +271,7 @@ typedef struct LSDESKTOPINFO
 #define ELD_MODULES                 2
 #define ELD_REVIDS                  3
 #define ELD_BANGS_V2                4
+#define ELD_PERFORMANCE             5
 
 // ELD_MODULES: possible dwFlags values
 #define LS_MODULE_THREADED          0x0001
@@ -279,5 +281,6 @@ typedef BOOL (CALLBACK* LSENUMBANGSPROC)(LPCSTR, LPARAM);
 typedef BOOL (CALLBACK* LSENUMBANGSV2PROC)(HINSTANCE, LPCSTR, LPARAM);
 typedef BOOL (CALLBACK* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
 typedef BOOL (CALLBACK* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
+typedef BOOL (CALLBACK* LSENUMPERFORMANCEPROC)(LPCSTR, DWORD, LPARAM);
 
 #endif // LSAPIDEFINES_H

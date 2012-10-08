@@ -715,6 +715,13 @@ HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
             }
             break;
             
+        case ELD_PERFORMANCE:
+            {
+                hr = (HRESULT)SendMessage(GetLitestepWnd(), LM_ENUMPERFORMANCE,
+                    (WPARAM)pfnCallback, lParam);
+            }
+            break;
+            
         default:
             {
                 // do nothing

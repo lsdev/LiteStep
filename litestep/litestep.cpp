@@ -40,6 +40,7 @@
 #include "../utility/core.hpp"
 #include <algorithm>
 #include <WtsApi32.h>
+#include <functional>
 
 
 // namespace stuff
@@ -875,6 +876,20 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             if (m_pModuleManager)
             {
                 hr = m_pModuleManager->EnumModules((LSENUMMODULESPROC)wParam,
+                    lParam);
+            }
+            
+            return hr;
+        }
+        break;
+        
+	case LM_ENUMPERFORMANCE:
+        {
+            HRESULT hr = E_FAIL;
+            
+            if (m_pModuleManager)
+            {
+                hr = m_pModuleManager->EnumPerformance((LSENUMPERFORMANCEPROC)wParam,
                     lParam);
             }
             
