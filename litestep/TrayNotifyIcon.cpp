@@ -139,9 +139,6 @@ void NotifyIcon::Update(const NID_XX& nidSource)
     
     // tool tip string
     copy_tip(&nidSource);
-
-    // version
-    copy_version(&nidSource);
 }
 
 
@@ -154,26 +151,6 @@ void NotifyIcon::copy_message(PCNID_XX pnidSource)
     }
 }
 
-void NotifyIcon::copy_version(PCNID_XX pnidSource)
-{
-    switch (pnidSource->cbSize)
-        {
-        case NID_7W_SIZE:
-        case NID_6W_SIZE:
-        case NID_5W_SIZE:
-            m_uVersion = ((NID_5W*)pnidSource)->uVersion;
-            break;
-            
-        case NID_6A_SIZE:
-        case NID_5A_SIZE:
-            m_uVersion = ((NID_5A*)pnidSource)->uVersion;
-            break;
-            
-        default:
-            break;
-    }
-}
-
 void NotifyIcon::copy_guid(PCNID_XX pnidSource)
 {
     if ((pnidSource->uFlags & NIF_GUID) == NIF_GUID)
@@ -183,10 +160,12 @@ void NotifyIcon::copy_guid(PCNID_XX pnidSource)
         case NID_7W_SIZE:
         case NID_6W_SIZE:
             m_guidItem = ((NID_6W*)pnidSource)->guidItem;
+            m_uFlags |= NIF_GUID;
             break;
             
         case NID_6A_SIZE:
             m_guidItem = ((NID_6A*)pnidSource)->guidItem;
+            m_uFlags |= NIF_GUID;
             break;
             
         default:
@@ -417,10 +396,14 @@ void NotifyIcon::CopyLSNID(LSNOTIFYICONDATA * plsnid, UINT uFlagMask) const
     plsnid->cbSize = sizeof(LSNOTIFYICONDATA);
     plsnid->hWnd = m_hWnd;
     plsnid->uID = m_uID;
-    plsnid->guidItem = m_guidItem;
     plsnid->uFlags = 0;
     plsnid->hBalloonIcon = m_hBalloonIcon;
-    plsnid->uVersion = m_uVersion;
+
+    if (NIF_GUID & m_uFlags & uFlagMask)
+    {
+        plsnid->guidItem = m_guidItem;
+        plsnid->uFlags |= NIF_GUID;
+    }
     
     if (NIF_MESSAGE & m_uFlags & uFlagMask)
     {

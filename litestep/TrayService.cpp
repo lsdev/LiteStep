@@ -1913,6 +1913,12 @@ HWND TrayService::SendSystemTray()
             (*it)->CopyLSNID(&lsnid);
             
             notify(NIM_ADD, &lsnid);
+
+            if ((*it)->GetVersion() != 0)
+            {
+                lsnid.uVersion = (*it)->GetVersion();
+                notify(NIM_SETVERSION, &lsnid);
+            }
         }
     }
     
@@ -2154,6 +2160,11 @@ bool TrayService::modifyIcon(const NID_XX& nid)
                 ,pni->GetuID()
                 ,0
             };
+            if ((nid.uFlags & NIF_GUID) == NIF_GUID)
+            {
+                lsnid.guidItem = (*it)->GetGUID();
+                lsnid.uFlags |= NIF_GUID;
+            }
             
             // This icon is no longer visible, remove
             notify(NIM_DELETE, &lsnid);
@@ -2186,6 +2197,11 @@ bool TrayService::deleteIcon(const NID_XX& nid)
             ,(*it)->GetuID()
             ,0
         };
+        if ((nid.uFlags & NIF_GUID) == NIF_GUID)
+        {
+            lsnid.guidItem = (*it)->GetGUID();
+            lsnid.uFlags |= NIF_GUID;
+        }
         
         notify(NIM_DELETE, &lsnid);
         
@@ -2219,6 +2235,11 @@ bool TrayService::setFocusIcon(const NID_XX& nid)
             ,(*it)->GetuID()
             ,0
         };
+        if ((nid.uFlags & NIF_GUID) == NIF_GUID)
+        {
+            lsnid.guidItem = (*it)->GetGUID();
+            lsnid.uFlags |= NIF_GUID;
+        }
         
         bReturn = notify(NIM_SETFOCUS, &lsnid);
     }
@@ -2260,7 +2281,7 @@ bool TrayService::setVersionIcon(const NID_XX& nid)
         case NID_6A_SIZE:
         case NID_5A_SIZE:
             lsnid.uVersion = ((NID_5A&)nid).uVersion;
-            (*it)->SetVersion(((NID_5W&)nid).uVersion);
+            (*it)->SetVersion(((NID_5A&)nid).uVersion);
             break;
             
         default:

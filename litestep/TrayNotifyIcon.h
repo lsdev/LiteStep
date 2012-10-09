@@ -281,6 +281,11 @@ public:
         return NIF_ICON == (NIF_ICON & m_uFlags);
     }
     
+    inline bool HasGUID() const
+    {
+        return NIF_GUID == (NIF_GUID & m_uFlags);
+    }
+    
     inline HWND GetHwnd() const
     {
         return m_hWnd;
@@ -294,6 +299,11 @@ public:
     inline GUID GetGUID() const
     {
         return m_guidItem;
+    }
+
+    inline UINT GetVersion() const
+    {
+        return m_uVersion;
     }
     
     inline void CopyLSNID(LSNOTIFYICONDATA * plsnid) const
@@ -314,7 +324,6 @@ private:
     void copy_icon(PCNID_XX pnidSource);
     void copy_tip(PCNID_XX pnidSource);
     void copy_state(PCNID_XX pnidSource);
-    void copy_version(PCNID_XX pnidSource);
     
     void update_state(DWORD dwState, DWORD dwMask);
     void set_version(UINT uVersion);
