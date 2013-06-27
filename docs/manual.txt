@@ -2,7 +2,7 @@
     LiteStep 0.25.0
     Release Notes
     
-    Copyright (c) 2012 - LiteStep Development Team
+    Copyright (c) 2013 - LiteStep Development Team
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Contents:
