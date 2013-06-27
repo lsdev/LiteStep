@@ -48,7 +48,7 @@ BEGIN
             VALUE "FileDescription", "LiteStep Module API"
             VALUE "FileVersion", "0.25.0 Alpha"
             VALUE "InternalName", "LiteStep API"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2012"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2013"
             VALUE "OriginalFilename", "lsapi.dll"
             VALUE "ProductName", "LiteStep"
             VALUE "ProductVersion", "0.25.0 Alpha"
