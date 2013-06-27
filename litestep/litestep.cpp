@@ -41,6 +41,7 @@
 #include <algorithm>
 #include <WtsApi32.h>
 #include <functional>
+#include <Psapi.h>
 
 
 // namespace stuff
@@ -323,6 +324,53 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     //
     // Check for another shell
     //
+    if (FindWindow("Shell_TrayWnd", NULL) != NULL)
+    {
+        if (GetRCBool("LSCloseExplorer", TRUE))
+        {
+            HWND hTrayWindow = FindWindow("Shell_TrayWnd", NULL);
+
+            // Determine the name of the current Shell
+            DWORD dwProcessID;
+            GetWindowThreadProcessId(hTrayWindow, &dwProcessID);
+            HANDLE hShellProc = OpenProcess(
+                PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | SYNCHRONIZE,
+                FALSE,
+                dwProcessID
+                );
+
+            if (hShellProc != NULL)
+            {
+                char szProcessPath[MAX_PATH];
+                GetModuleFileNameEx(hShellProc, NULL, szProcessPath, _countof(szProcessPath));
+                LPCSTR pszPathName = PathFindFileName(szProcessPath);
+
+                if (_stricmp(pszPathName, "explorer.exe") == 0)
+                {
+                    if (IsVistaOrAbove())
+                    {
+                        PostMessage(hTrayWindow, 0x5B4, 0, 0);
+                    }
+                    else if (IsOS(OS_XPORGREATER))
+                    {
+                        HWND hProgman = FindWindow("Progman", NULL);
+                        PostMessage(hProgman, WM_QUIT, 0, TRUE);
+                        PostMessage(hTrayWindow, WM_QUIT, 0, 0); 
+                    }
+                    else
+                    {
+                        // Not supported
+                    }
+
+                    // Wait for the process to exit
+                    WaitForSingleObject(hShellProc, 3000); // Wait for at most 3 seconds.
+                }
+
+                CloseHandle(hShellProc);
+            }
+        }
+    }
+    
     if (FindWindow("Shell_TrayWnd", NULL) != NULL)
     {
         if (GetRCBool("LSNoShellWarning", FALSE))
