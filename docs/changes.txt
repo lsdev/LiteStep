@@ -1,125 +1,219 @@
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    LiteStep 0.24.7
-    Changelog
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+                             LiteStep 0.25.0 Alpha
+                         Experimental Build 2013-06-27
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+This build requires the Visual C++ 2012 Redistributable Package
+http://www.microsoft.com/en-us/download/details.aspx?id=30679
 
 
--- NOTE ------------------------------------------------------------------------
+-- PREFACE --------------------------------------------------------------------
 
- The 0.24.7 code is based on the 2002-01-03 pre-0.24.6 source. Some of the
- functionality that was added to the 0.24.6 branch after this date (mostly Indie
- LS changes) was reimplemented in 0.24.7. See below for a list of these
- functions and for what is missing.
+After the release of 0.24.8, we're focussing on the next release, 0.25.0.
+This build is the current state of that code.
+
+  - WARNING -
+  This is experimental (alpha) code and will have bugs! If you don't know how
+  to edit step.rc files manually or you don't know how to recover if the shell
+  crashes, then do not try this build.
 
 
--- CHANGES SINCE 0.24.6 --------------------------------------------------------
+-- DEVELOPMENT TEAM -----------------------------------------------------------
 
- - Removed all COM.
+  - CONTACT -
+  Email:    devteam at lsdev.org
+  Website:  http://www.lsdev.org/
+  IRC:      #lsdev on irc.freenode.net
 
- - Cleaned up the code... this includes numerous fixes, formatting, and source 
-   beautifications.
+  - TEAM -
+  Active:   Acidfire, alur, ilmcuts, jugg, Tobbe
+  Inactive: Maduin, Rabidcow, Xjill
 
- - Massive improvements in StartupRunner and TrayService.  Visible items are:
-   * On NT systems, LiteStep detects if startup items have been run before or
-     not. This is the same method that Explorer uses to detect if it should
-     rerun startup items in the event that the shell crashes. Thus the
-     -nostartup switch is obsolete on NT systems.
-   * Added command line switch -startup to force running of the startup items.
-   * StartupRunner now has RunOnceEx support.
-   * TrayService rewrite enables support for the language indicator icon
-    (but not on WinXP) and fixes many other problematic icons.
 
- - Fixed XP logon delay
+-- CHANGE HIGHLIGHTS ----------------------------------------------------------
 
- - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core. It is now
-   called DDEService and loaded by default. Liteman.dll should no longer be
-   loaded.
+  1) Support for running on Vista, 7, 8, Server 2008/2012, and 64-Bit variants
+  2) No longer attempt to silently swallow module crashes
+  3) Improvements in full screen application detection on multi-monitor setups
+  4) Huge improvements in AppBar support, in particular on multi-monitor setups
+  5) Attempt to launch Explorer as shell in Safe Mode
+  6) Added "-explorer" command line switch to launch Explorer as shell
+  7) Switched from libpng to picoPNG, removing libpng13 and zlib1 dependencies
+  8) Fixed lack of screen lock/unlock sound on XP and up
+  9) Decided on official "LiteStep" spelling
 
- - Added "LSUseSystemDDE". This loads the Windows DDE server instead of the
-   DDEService. This may result in slightly larger memory usage but "proper" DDE
-   support. LSUseSystemDDE takes effect on startup only, not on !recycle.
-   Requires shdocvw.dll from IE.
 
- - Added !HideModules and !ShowModules to hide or show all module windows.
-   !ToggleModules is also available.
+-- CHANGES BY DATE ------------------------------------------------------------
 
- - If "LSAutoHideModules" is specified LS tries to automatically hide all module
-   windows if a full-screen app is detected. Once the full-screen app exits the
-   modules are redisplayed.
+The following lists the changes between nightly builds.
+See the next section for a cumulative changelog since 0.24.8.
+  - [2013-06-27] -
+    - The !Run dialog now supports !Bang commands.
+    - Added LSCloseExplorer, which will gracefully close the currently running
+      shell when LiteStep launches.
+    - Added LSRunX and LSRunY to position the !Run dialog.
+    - Fixed left click menu positioning for tray icons (also requires tray
+      module updates).
+    - Tray modules now need to register for and handle LM_SYSTRAYINFOEVENT.
+    - Added a fileExists() function.
+    - Added a performance page to !about, showing module load times.
+    - Added new enumeration type ELD_PERFORMANCE to EnumLSData
+    - !about's system information page will now show > 4GB of memory correctly.
+    - !about's system information page now supports Windows 8 and Windows Server
+      2012.
+    - Various 64bit compilation fixes.
 
- - LCOpen uses a separate SettingsMap for each file opened with LCOpen. This is
-   the thread-safe approach but makes it impossible for modules to use the
-   GetRC* APIs to retrieve settings from those files. For example this affects
-   Rabidvwm which can no longer read its settings directly from .box files. Put
-   the settings into step.rc instead or "include" the .box file(s) as a
-   workaround.
+  - [2009-04-04] -
+    - Added $Win64$ to identify Windows x64
+    - Added support for exiting LiteStep by holding CTRL+SHIFT+ALT and
+      canceling out of the Windows Shutdown dialog.
+    - Added multi-monitor support to AppBar implementation.
+    - Fixed LiteStep not running 64-Bit regkeys    
+    - Fixed AppBar support on Windows 7
+    - Fixed AppBar implementation not returning tray screen edge
+    - Fixed reentrant crashes in AppBar implementation
+    - Removed Win95 multimon compat functions
+    - Lots of small crash and correctness fixes
+    - Fixed MinGW builds
+    - Huge code format update
+    
+  - [2009-02-10] -
+    - Fixed fullscreen app detection
+      - Supports hiding modules only on the monitor the FS window is on
+      - Added support for handling more than one fullscreen window
+    - Fixed !about "System Information" to show memory amounts >2GB
+      - Also shows partial memory amounts
+    - Fixed !about not using default shell dialog font
+    - Fixed Unicode tooltips and balloon tips not always showing up
+    - Fixed picoPNG code mirroring images
+    - Switched from libpng to picoPNG, which is included in lsapi.dll.
+      - Removes libpng13.dll and zlib1.dll dependency
+    - Fixed LiteStep playing a default system sound if the sound was disabled
+    - Tweaked module loading error boxes
+      - Fixed module path getting cut off in the titles, now uses filename only
+      - Changed icon from warning icon to error icon
+    - Fixed minor potential crash bug
+    - Lots of internal code structure changes and code correctness fixes
+    - Removed VC6 as a supported compiler/development environment
+    - Added lots of debug TRACEs
+    - Removed comctl32 V6 manifest
+      - Replaced with custom activation context management
+      - (Hopefully) fixes module redraw issues
 
- - Added inform-sega's ShellExecute fix for .lnk files. This enables LSExecute()
-   to execute .lnk files.
+  - [2009-01-11] -
+    - Fixed dialogs showing generic icon in taskbar and ALT-TAB
+      - These dialogs now use the LiteStep icon
+      - Affects dialogs such as !about, !alert, or !confirm
+    - Added question mark icon to !confirm
+    - Added tooltips to AboutBox to show full text if otherwise cut off
+    - Added full row selection to AboutBox
+    - Fixed Windows Home Server detection
+    - Fixed LiteStep quitting too early if an app blocks shutdown
 
- - Removed support for PixmapPath (use LSImageFolder instead), ThemeFile,
-   LSThemeFile, and LSColorBGR.
+  - [2009-01-10] -
+    - Fixed LS skipping startup folders
+    - Added "module" column to !about bangs
+    - Fixed copyright date in !about license
+    - Removed lsapi.dll from !about revision IDs
+    - Added new enumeration type ELD_BANGS_V2 to EnumLSData
+    - Added missing changelog entries
+      - Added note about %LiteStepDir%
+      - Added note about fixed !shutdown bug (Vista)
+      - Added note about fixed tray tooltips (Vista)
+      - Added note about changed behavior with custom config files
+
+For earlier changes see the cumulative changelog below
+
+
+-- CHANGES SINCE 0.24.8 -------------------------------------------------------
+
+This is a list of selected changes since the (projected) 0.24.8 final build:
+
+  - ADDED -
+    - Added playing of appropriate system sounds on screen lock/unlock
+    - Added $WinVista$, $Win2008$, $Win7$
+    - Added $Win64$ to identify Windows x64
+    - In safe mode, LiteStep attempts to launch Explorer as shell
+      - If it fails, LiteStep launches as shell but skips running startup apps
+    - Added "-explorer" command line switch to launch Explorer in shell mode
+    - Added environment variable %LiteStepDir%
+      - Applications started by LS (directly or indirectly) will receive this
+      - Does NOT end with a backslash (unlike $LiteStepDir$) in order to be
+        consistent with other %variables% (like %windir%).
+    - Added "Module" column to !about "Bang Commands"
+    - Added new enumeration type ELD_BANGS_V2 to EnumLSData
+    - Added question mark icon to !confirm
+    - Added tooltips to AboutBox to show full text if otherwise cut off
+    - Added full row selection to AboutBox
+    - Added support for exiting LiteStep by holding CTRL+SHIFT+ALT and
+      canceling out of the Windows Shutdown dialog.
+    - Added multi-monitor support to AppBar implementation.
+
+
+  - VISTA & WIN7 & 64-BIT SUPPORT -
+    - Running on Windows Vista, Windows 7 and 64-Bit Windows now supported
+    - Fixed startup folder items running twice on Windows Vista
+    - Fixed startup detection on Vista
+    - Added playing of logon sound
+    - Fixed logon screen delay
+    - Fixed wallpaper not appearing
+    - Fixed loading of SSOs on Vista
+      - Enables the new Alt-Tab replacement
+      - Fixes lots of system tray icons (network, volume control, ...)
+    - Fixed tray icon tooltips not showing up
+    - Multiple fixes in AppBar support
+      - Including crash fixes and multi-monitor fixes
+    - Fixed LiteStep only launching 32-Bit versions of applications
+      - Modules must use LSExecute(Ex) instead of ShellExecute
+        to take advantage of this
+    - Fixed $quicklaunch$ not picking up folder path customization
+    - Fixed OS detection for !about and OS variables such as $WinVista$
+    - Fixed !shutdown crashing LiteStep on Vista
+    - Fixed LiteStep not running 64-Bit regkeys    
+
+
+  - FIXED -
+    - Fixed "LiteStep" spelling in a lot of places (see below)
+    - Fixed inconsistencies in error message handling
+    - Several robustness and correctness improvements
+      - Includes fixing several potential crash bugs
+    - Fixed dialogs showing generic icon in taskbar and ALT-TAB
+      - These dialogs now use the LiteStep icon
+      - Affects dialogs such as !about, !alert, or !confirm
+    - Fixed LiteStep returning an incorrect return value for SHLoadInProc
+    - Fixed !about not using default shell dialog font
+    - Fixed Unicode tooltips and balloon tips not always showing up
+    - Tweaked module loading error boxes
+      - Fixed module path getting cut off in the titles, now uses filename only
+      - Changed icon from warning icon to error icon
+
+
+  - REMOVED/CHANGED -
+    - The official spelling is now "LiteStep". There used to be a mix of
+      "Litestep" and "LiteStep".
+    - No more attempts to silently swallow exceptions (crashes) from modules.
+      Instead, LiteStep will just crash outright. Trying to continue leaves
+      LiteStep in a state which is prone to crash in a non-reproducible way.
+    - Streamlined error messages during LiteStep startup (core only). Removed
+      specialized error boxes e.g. from TrayService.
+    - Error message boxes are now consistenly "topmost". They no longer set
+      themselves as foreground window.
+    - Removed hook.dll (was never used)
+    - If a custom configuration file path is passed on the command line and the
+      file does not exist, LiteStep now shows a "file not found" error message
+      instead of falling back to the standard step.rc.
+    - Removed lsapi.dll from !about "Revision IDs"
+    - Switched from libpng to picoPNG, which is included in lsapi.dll.
+      - Removes libpng13.dll and zlib1.dll dependencies
+    - Removed Win95 multimon compat functions
  
- - Modules are loaded and unloaded asynchronously (at the same time) if
-   threaded. This should lead to faster start and recycle times if threading is
-   used. Specify a threaded module by:  LoadModule <file> threaded
-
- - All MessageBoxes (including !alert and !confirm) should now always have focus
-   and appear ontop of the active window.
  
- - The Recovery Menu cannot be closed permanently with ALT-F4 any more.
-
- - Improved handling of exceptions in threaded modules.
-
- - Improved handling of exceptions during !bang execution.
-
- - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
-
- - Added new step.rc setting "LSDisableTrayService". Setting this value disables
-   the core's system tray support.
-
- - LM_UN/RELOADMODULE can now un/reload modules by using the HINSTANCE of the
-   module as the wParam. Set the lParam to LMM_HINSTANCE in that case.
-   !Reloadmodule and !unloadmodule take advantage of this and should thus no
-   longer crash even if a module tries to un-/reload itself.
-
- - Removed -install and -uninstall.
-
- - Removed !ToggleWharf and !Popup from the core.
-
- - Added EnumLSData export to lsapi. This gives modules like lscp a consistent
-   interface to poll core data.
-
- - etc. etc.
-
-
--- INDIE LS CHANGES ADDED TO 0.24.7 --------------------------------------------
-
- - GetRCCoordinate and ParseCoordinate added to lsapi for reading coordinates
-   with negative and centered support.
-
- - Some typos in the string tables were corrected.
-
- - $windir$ is guaranteed to end with a backslash ('\').
-
- - Math evaluation in VarExpansion (can be disabled at compiletime).
-
- - Stubs in lsapi for the logging APIs (minimal logging support can be enabled
-   at compiletime) and for the Get-/SetVariable APIs.
-
- - Addition of $WinXP$, $compiledate$, and $quicklaunch$.
-
- - Removal of !ToggleWharf and !Popup from lsapi.
- 
- - c0atzin's RegisterShellHook() fix for Win9x.
-
-
--- INDIE LS CHANGES NOT ADDED TO 0.24.7 ----------------------------------------
-
- - All changes made to the recovery menu and the aboutbox.
-
- - !setvar, !emptytrashbin
-
- - system color / font variables, OS-* variables.
-
- - LSCP (including !lscp). This will have to be rewritten to work.
+  - INTERNAL -
+    - Lots of code consistency and correctness improvements
+    - Huge code format update
+    - Several small improvements in code structure
+    - Removed lots of unused code
+    - Several small fixes to support compiling as a 64-Bit application
+    - Several improvements for debug builds (e.g. thread names)
+    - Removed VC6 as a supported compiler/development environment
+    - Added lots of debug TRACEs

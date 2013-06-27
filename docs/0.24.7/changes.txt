@@ -1,0 +1,125 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    LiteStep 0.24.7
+    Changelog
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+-- NOTE ------------------------------------------------------------------------
+
+ The 0.24.7 code is based on the 2002-01-03 pre-0.24.6 source. Some of the
+ functionality that was added to the 0.24.6 branch after this date (mostly Indie
+ LS changes) was reimplemented in 0.24.7. See below for a list of these
+ functions and for what is missing.
+
+
+-- CHANGES SINCE 0.24.6 --------------------------------------------------------
+
+ - Removed all COM.
+
+ - Cleaned up the code... this includes numerous fixes, formatting, and source 
+   beautifications.
+
+ - Massive improvements in StartupRunner and TrayService.  Visible items are:
+   * On NT systems, LiteStep detects if startup items have been run before or
+     not. This is the same method that Explorer uses to detect if it should
+     rerun startup items in the event that the shell crashes. Thus the
+     -nostartup switch is obsolete on NT systems.
+   * Added command line switch -startup to force running of the startup items.
+   * StartupRunner now has RunOnceEx support.
+   * TrayService rewrite enables support for the language indicator icon
+    (but not on WinXP) and fixes many other problematic icons.
+
+ - Fixed XP logon delay
+
+ - Merged LiteMAN functionallity (i.e. DDE) into the LiteStep core. It is now
+   called DDEService and loaded by default. Liteman.dll should no longer be
+   loaded.
+
+ - Added "LSUseSystemDDE". This loads the Windows DDE server instead of the
+   DDEService. This may result in slightly larger memory usage but "proper" DDE
+   support. LSUseSystemDDE takes effect on startup only, not on !recycle.
+   Requires shdocvw.dll from IE.
+
+ - Added !HideModules and !ShowModules to hide or show all module windows.
+   !ToggleModules is also available.
+
+ - If "LSAutoHideModules" is specified LS tries to automatically hide all module
+   windows if a full-screen app is detected. Once the full-screen app exits the
+   modules are redisplayed.
+
+ - LCOpen uses a separate SettingsMap for each file opened with LCOpen. This is
+   the thread-safe approach but makes it impossible for modules to use the
+   GetRC* APIs to retrieve settings from those files. For example this affects
+   Rabidvwm which can no longer read its settings directly from .box files. Put
+   the settings into step.rc instead or "include" the .box file(s) as a
+   workaround.
+
+ - Added inform-sega's ShellExecute fix for .lnk files. This enables LSExecute()
+   to execute .lnk files.
+
+ - Removed support for PixmapPath (use LSImageFolder instead), ThemeFile,
+   LSThemeFile, and LSColorBGR.
+ 
+ - Modules are loaded and unloaded asynchronously (at the same time) if
+   threaded. This should lead to faster start and recycle times if threading is
+   used. Specify a threaded module by:  LoadModule <file> threaded
+
+ - All MessageBoxes (including !alert and !confirm) should now always have focus
+   and appear ontop of the active window.
+ 
+ - The Recovery Menu cannot be closed permanently with ALT-F4 any more.
+
+ - Improved handling of exceptions in threaded modules.
+
+ - Improved handling of exceptions during !bang execution.
+
+ - Optimized BitmapToRegion, LoadLSImage, LoadLSIcon, BitmapFromIcon.
+
+ - Added new step.rc setting "LSDisableTrayService". Setting this value disables
+   the core's system tray support.
+
+ - LM_UN/RELOADMODULE can now un/reload modules by using the HINSTANCE of the
+   module as the wParam. Set the lParam to LMM_HINSTANCE in that case.
+   !Reloadmodule and !unloadmodule take advantage of this and should thus no
+   longer crash even if a module tries to un-/reload itself.
+
+ - Removed -install and -uninstall.
+
+ - Removed !ToggleWharf and !Popup from the core.
+
+ - Added EnumLSData export to lsapi. This gives modules like lscp a consistent
+   interface to poll core data.
+
+ - etc. etc.
+
+
+-- INDIE LS CHANGES ADDED TO 0.24.7 --------------------------------------------
+
+ - GetRCCoordinate and ParseCoordinate added to lsapi for reading coordinates
+   with negative and centered support.
+
+ - Some typos in the string tables were corrected.
+
+ - $windir$ is guaranteed to end with a backslash ('\').
+
+ - Math evaluation in VarExpansion (can be disabled at compiletime).
+
+ - Stubs in lsapi for the logging APIs (minimal logging support can be enabled
+   at compiletime) and for the Get-/SetVariable APIs.
+
+ - Addition of $WinXP$, $compiledate$, and $quicklaunch$.
+
+ - Removal of !ToggleWharf and !Popup from lsapi.
+ 
+ - c0atzin's RegisterShellHook() fix for Win9x.
+
+
+-- INDIE LS CHANGES NOT ADDED TO 0.24.7 ----------------------------------------
+
+ - All changes made to the recovery menu and the aboutbox.
+
+ - !setvar, !emptytrashbin
+
+ - system color / font variables, OS-* variables.
+
+ - LSCP (including !lscp). This will have to be rewritten to work.
