@@ -150,7 +150,7 @@ BEGIN
             VALUE "FileDescription", "LiteStep"
             VALUE "FileVersion", "0.25.0 Alpha"
             VALUE "InternalName", "LiteStep Core"
-            VALUE "LegalCopyright", "Copyright © 1997 - 2009"
+            VALUE "LegalCopyright", "Copyright © 1997 - 2013"
             VALUE "OriginalFilename", "litestep.exe"
             VALUE "ProductName", "LiteStep"
             VALUE "ProductVersion", "0.25.0 Alpha"
