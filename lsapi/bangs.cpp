@@ -298,7 +298,14 @@ static void BangRestoreWindows(HWND /* hCaller */, LPCSTR /* pszArgs */)
 //
 static void BangRun(HWND /* hCaller */, LPCSTR pszArgs)
 {
-    typedef VOID (WINAPI* RunDlgType)(HWND,HICON,LPCWSTR,LPCWSTR,LPCWSTR,UINT);
+    // Flags
+    //  1 -- Removes the browse button.
+    //  2 -- No default text.
+    //  4 -- Calculates the working directory from the filename.
+    //  8 -- Hides the label to the left of the box.
+    // 32 -- Removes the Separate Memory Space check box (Windows NT only)
+    typedef VOID (WINAPI* RunDlgType)(HWND hwndOwner, HICON hIcon, LPCWSTR pwszDirectory,
+        LPCWSTR pwszTitle, LPCWSTR pwszDescription, UINT uFlags);
 
     char szX[MAX_LINE_LENGTH] = { 0 };
     char szY[MAX_LINE_LENGTH] = { 0 };
@@ -315,11 +322,57 @@ static void BangRun(HWND /* hCaller */, LPCSTR pszArgs)
     {
         HWND hParent = CreateWindowEx(WS_EX_TOOLWINDOW, "Static", "",
             WS_POPUP, nX, nY, 1, 1, NULL, NULL, GetModuleHandle(NULL), NULL);
+        if (hParent)
+        {
+            SetWindowLongPtr(hParent, GWLP_USERDATA, 0);
+            SetWindowLongPtr(hParent, GWLP_WNDPROC, (LONG_PTR)(WNDPROC) [] (HWND window, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT
+            {
+                if (message == WM_TIMER)
+                {
+                    HWND hDialog = GetWindow(window, GW_ENABLEDPOPUP);
+                    if (hDialog != nullptr)
+                    {
+                        KillTimer(window, 1);
 
-        // RunDlg(parent, icon, ?, ?, Description, ?);
+                        if (GetWindowLongPtr(window, GWLP_USERDATA) == 0)
+                        {
+                            SetWindowLongPtr(hDialog, GWLP_USERDATA, GetWindowLongPtr(hDialog, GWLP_WNDPROC));
+                            SetWindowLongPtr(hDialog, GWLP_WNDPROC, (LONG_PTR)(WNDPROC) [] (HWND window, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT
+                            {
+                                if (message == WM_COMMAND && LOWORD(wParam) == 1 && HIWORD(wParam) == 0)
+                                {
+                                    // Pressed OK, handle it ourselves and forward a cancel instead.
+                                    HWND hEditBox = GetDlgItem(window, 0x300A);
+                                    if (hEditBox != nullptr)
+                                    {
+                                        int nTextLength = GetWindowTextLength(hEditBox) + 1;
+                                        LPSTR pszText = (LPSTR)malloc(nTextLength*sizeof(char));
+                                        GetWindowText(hEditBox, pszText, nTextLength);
+
+                                        // Only handle bang commands ourselfs, as anything else will prevent the RunMRU from populating properly.
+                                        if (pszText[0] == '!')
+                                        {
+                                            LSExecute(nullptr, pszText, SW_SHOWNORMAL);
+                                            wParam = MAKEWPARAM(2, 0); // Click on cancel
+                                        }
+                                        free(pszText);
+                                    }
+                                }
+                                return WNDPROC(GetWindowLongPtr(window, GWLP_USERDATA))(window, message, wParam, lParam);
+                            });
+                            SetWindowLongPtr(window, GWLP_USERDATA, 1);
+                        }
+                    }
+                }
+                return DefWindowProc(window, message, wParam, lParam);
+            });
+            SetTimer(hParent, 1, 10, nullptr);
+        }
+
         RunDlg(hParent, NULL, NULL, NULL, NULL, 0);
 
-        if (hParent) {
+        if (hParent)
+        {
             DestroyWindow(hParent);
         }
     }
