@@ -8,7 +8,7 @@
 
  For build instructions, please review
 
-  - build_vc10.txt   (official supported method)
+  - build_vc11.txt   (official supported method)
   - build_mingw.txt
 
  The LiteStep source is segmented into separate code modules.  The source folder
