@@ -55,12 +55,7 @@ bool Module::_LoadDll()
         // First, make Windows display all errors
         UINT uOldMode = SetErrorMode(0);
         
-        m_hInstance = LoadLibrary(m_tzLocation.c_str());
-        
-        // Second, restore the old state
-        SetErrorMode(uOldMode);
-        
-        if (m_hInstance)
+        if ((m_hInstance = LoadLibrary(m_tzLocation.c_str())) != nullptr)
         {
             m_pInitEx = (initModuleExProc)GetProcAddress(
                 m_hInstance, "initModuleEx");
@@ -100,21 +95,36 @@ bool Module::_LoadDll()
                 bReturn = true;
             }
         }
-        else if (PathFileExists(m_tzLocation.c_str()))
-        {
-            RESOURCE_STR(NULL, IDS_MODULEDEPENDENCY_ERROR,
-                "Error: Could not load module.\n"
-                "\n"
-                "This is likely a case of a missing C Run-Time Library"
-                "or other dependency.");
-        }
         else
         {
-            RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
-                "Error: Could not locate module.\n"
-                "\n"
-                "Please check your configuration.");
+            HRESULT hrError = HrGetLastError();
+
+            if (PathFileExists(m_tzLocation.c_str()))
+            {
+                RESOURCE_STR(NULL, IDS_MODULEDEPENDENCY_ERROR,
+                    _T("Error: Could not load module.\n"
+                    "\n"
+                    "This is likely a case of a missing C Run-Time Library"
+                    "or other dependency."
+                    "\n"
+                    "Error Information:"
+                    "\n"));
+
+                size_t nLen = 0;
+                StringCchLength(resourceTextBuffer, _countof(resourceTextBuffer), &nLen);
+                DescriptionFromHR(hrError, resourceTextBuffer + nLen, _countof(resourceTextBuffer) - nLen);
+            }
+            else
+            {
+                RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
+                    _T("Error: Could not locate module.\n"
+                    "\n"
+                    "Please check your configuration."));
+            }
         }
+
+        // Second, restore the old state
+        SetErrorMode(uOldMode);
         
         if (!bReturn)
         {

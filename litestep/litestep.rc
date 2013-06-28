@@ -227,7 +227,7 @@ BEGIN
                             "Exception during bang command execution.\nPlease contact the module author.\n\nBang parameters: %s"
     IDS_LITESTEP_REGISTERCLASS_ERROR "Error registering window class."
     IDS_MODULEDEPENDENCY_ERROR 
-                            "Error: Could not load module.\nThis is likely a case of a missing C Run-Time Library or other dependency."
+    "Error: Could not load module.\nThis is likely a case of a missing C Run-Time Library or other dependency.\nError Information:\n"
     IDS_RECURSIVEVAR        "Error: Variable ""%s"" is defined recursively."
     IDS_MATHEXCEPTION       "Error in Expression:\n  %s\n\nDescription:\n  %s"
     IDS_LSAPI_INIT_ERROR    "Failed to initialize the LiteStep API."

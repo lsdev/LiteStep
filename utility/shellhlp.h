@@ -107,4 +107,6 @@ inline HRESULT HrGetLastError()
     return HRESULT_FROM_WIN32(GetLastError());
 }
 
+HRESULT DescriptionFromHR(HRESULT hr, LPTSTR buf, size_t cchBuf);
+
 #endif // SHELLHLP_H
