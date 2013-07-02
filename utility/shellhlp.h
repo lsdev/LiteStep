@@ -78,23 +78,26 @@ UINT GetWindowsVersion();
 #define WINVER_UNKNOWN  (UINT)-1
 
 // Win9x
-#define WINVER_WIN95    1
-#define WINVER_WIN98    2
-#define WINVER_WINME    3
+#define WINVER_WIN95        1
+#define WINVER_WIN98        2
+#define WINVER_WINME        3
 
 // Windows NT Workstation
-#define WINVER_WINNT4   4
-#define WINVER_WIN2000  5
-#define WINVER_WINXP    6
-#define WINVER_VISTA    7
-#define WINVER_WIN7     8
-#define WINVER_WIN8     9
+#define WINVER_WINNT4       4
+#define WINVER_WIN2000      5
+#define WINVER_WINXP        6
+#define WINVER_VISTA        7
+#define WINVER_WIN7         8
+#define WINVER_WIN8         9
+#define WINVER_WIN81        10
 
 // Windows NT Server
-#define WINVER_WIN2003 10
-#define WINVER_WHS     11
-#define WINVER_WIN2008 12
-#define WINVER_WIN2012 13
+#define WINVER_WIN2003      11
+#define WINVER_WHS          12
+#define WINVER_WIN2008      13
+#define WINVER_WIN2008R2    14
+#define WINVER_WIN2012      15
+#define WINVER_WIN2012R2    16
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

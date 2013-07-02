@@ -40,12 +40,14 @@ LSAPIInit::LSAPIInit()
     m_szRcPath[0] = '\0';
 }
 
+
 LSAPIInit::~LSAPIInit()
 {
     m_bIsInitialized = false;
     delete m_bmBangManager;
     delete m_smSettingsManager;
 }
+
 
 void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
 {
@@ -119,6 +121,7 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
     }
 }
 
+
 void LSAPIInit::ReloadBangs()
 {
     if (!IsInitialized())
@@ -129,6 +132,7 @@ void LSAPIInit::ReloadBangs()
     m_bmBangManager->ClearBangCommands();
     SetupBangs();
 }
+
 
 void LSAPIInit::ReloadSettings()
 {
@@ -157,6 +161,7 @@ void LSAPIInit::ReloadSettings()
     // Reload the default RC config file
     m_smSettingsManager->ParseFile(m_szRcPath);
 }
+
 
 void LSAPIInit::setLitestepVars()
 {
@@ -233,21 +238,24 @@ void LSAPIInit::setLitestepVars()
     }
     versions[] = \
     {
-        { WINVER_WIN95,     _T("Win95")    },
-        { WINVER_WIN98,     _T("Win98")    },
-        { WINVER_WINME,     _T("WinME")    },
+        { WINVER_WIN95,     _T("Win95")      },
+        { WINVER_WIN98,     _T("Win98")      },
+        { WINVER_WINME,     _T("WinME")      },
         
-        { WINVER_WINNT4,    _T("WinNT4")   },
-        { WINVER_WIN2000,   _T("Win2000")  },
-        { WINVER_WINXP,     _T("WinXP")    },
-        { WINVER_VISTA,     _T("WinVista") },
-        { WINVER_WIN7,      _T("Win7")     },
-        { WINVER_WIN8,      _T("Win8")     },
+        { WINVER_WINNT4,    _T("WinNT4")     },
+        { WINVER_WIN2000,   _T("Win2000")    },
+        { WINVER_WINXP,     _T("WinXP")      },
+        { WINVER_VISTA,     _T("WinVista")   },
+        { WINVER_WIN7,      _T("Win7")       },
+        { WINVER_WIN8,      _T("Win8")       },
+        { WINVER_WIN81,     _T("Win81")      },
         
-        { WINVER_WIN2003,   _T("Win2003")  },
-        { WINVER_WHS,       _T("Win2003")  },  // WHS is Win2003 in disguise
-        { WINVER_WIN2008,   _T("Win2008")  },
-        { WINVER_WIN2012,   _T("Win2012")  }
+        { WINVER_WIN2003,   _T("Win2003")    },
+        { WINVER_WHS,       _T("Win2003")    },  // WHS is Win2003 in disguise
+        { WINVER_WIN2008,   _T("Win2008")    },
+        { WINVER_WIN2008R2, _T("Win2008R2")  },
+        { WINVER_WIN2012,   _T("Win2012")    },
+        { WINVER_WIN2012R2, _T("Win2012R2")  }
     };
     
     UINT uVersion = GetWindowsVersion();
@@ -304,6 +312,7 @@ void LSAPIInit::setLitestepVars()
 #endif // LS_CUSTOM_INCLUDEFOLDER
 }
 
+
 bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
 {
     bool bSuccess = false;
@@ -320,6 +329,7 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
     
     return bSuccess;
 }
+
 
 // Gets the compiletime/date from the PE header
 //

@@ -620,20 +620,26 @@ UINT GetWindowsVersion()
         }
         versions[] = \
         {
-            { 4,  0, WVM_ANY,         WINVER_WINNT4  },
-            { 5,  0, WVM_ANY,         WINVER_WIN2000 },
-            { 5,  1, WVM_ANY,         WINVER_WINXP   }, // 32-Bit
+            { 4,  0, WVM_ANY,         WINVER_WINNT4    },
+            { 5,  0, WVM_ANY,         WINVER_WIN2000   },
+            { 5,  1, WVM_ANY,         WINVER_WINXP     }, // 32-Bit
             
             // WVM_HOMESERVER should also match WVM_SERVER, so list it first
-            { 5,  2, WVM_HOMESERVER,  WINVER_WHS     },
-            { 5,  2, WVM_SERVER,      WINVER_WIN2003 },
-            { 5,  2, WVM_WORKSTATION, WINVER_WINXP   }, // 64-Bit
+            { 5,  2, WVM_HOMESERVER,  WINVER_WHS       },
+            { 5,  2, WVM_SERVER,      WINVER_WIN2003   },
+            { 5,  2, WVM_WORKSTATION, WINVER_WINXP     }, // 64-Bit
+
+            { 6,  0, WVM_SERVER,      WINVER_WIN2008   },
+            { 6,  0, WVM_WORKSTATION, WINVER_VISTA     },
             
-            { 6,  0, WVM_WORKSTATION, WINVER_VISTA   },
-            { 6,  0, WVM_SERVER,      WINVER_WIN2008 },
-            { 6,  1, WVM_ANY,         WINVER_WIN7    },
-            { 6,  2, WVM_SERVER,      WINVER_WIN2012 },
-            { 6,  2, WVM_ANY,         WINVER_WIN8    }
+            { 6,  1, WVM_SERVER,      WINVER_WIN2008R2 },
+            { 6,  1, WVM_WORKSTATION, WINVER_WIN7      },
+
+            { 6,  2, WVM_SERVER,      WINVER_WIN2012   },
+            { 6,  2, WVM_WORKSTATION, WINVER_WIN8      },
+
+            { 6,  3, WVM_SERVER,      WINVER_WIN2012R2 },
+            { 6,  3, WVM_WORKSTATION, WINVER_WIN81     }
         };
         
         for (size_t idx = 0; idx < COUNTOF(versions); ++idx)
