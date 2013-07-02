@@ -23,6 +23,7 @@
 #include "lsapi.h"
 #include "../utility/core.hpp"
 #include <time.h>
+#include <algorithm>
 
 LSAPIInit g_LSAPIManager;
 
