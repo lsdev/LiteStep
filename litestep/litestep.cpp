@@ -518,7 +518,7 @@ int CLiteStep::Run()
         }
     }
     
-    TRACE("Left main message loop. Last message: 0x%.4X (%u, %u)",
+    TRACE("Left main message loop. Last message: 0x%.4X (%p, %p)",
         message.message, message.wParam, message.lParam);
     
     if (message.message == WM_QUIT)
