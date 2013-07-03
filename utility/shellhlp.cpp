@@ -353,20 +353,15 @@ HRESULT TryAllowSetForegroundWindow(HWND hWnd)
 //
 bool IsVistaOrAbove()
 {
-    bool bVistaOrAbove = false;
-    
-    OSVERSIONINFO ovi = { 0 };
+    OSVERSIONINFOEX ovi = { 0 };
     ovi.dwOSVersionInfoSize = sizeof(ovi);
-    
-    VERIFY(GetVersionEx(&ovi));
-    
-    if (ovi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-        ovi.dwMajorVersion >= 6)
-    {
-        bVistaOrAbove = true;
-    }
-    
-    return bVistaOrAbove;
+    ovi.dwMajorVersion = 6;
+    ovi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+
+    ULONGLONG uConditionMask = 0;
+    uConditionMask = VerSetConditionMask(uConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    uConditionMask = VerSetConditionMask(uConditionMask, VER_PLATFORMID, VER_EQUAL);
+    return VerifyVersionInfo(&ovi, VER_MAJORVERSION | VER_PLATFORMID, uConditionMask) != FALSE;
 }
 
 
@@ -642,13 +637,13 @@ UINT GetWindowsVersion()
             { 6,  3, WVM_WORKSTATION, WINVER_WIN81     }
         };
         
-        for (size_t idx = 0; idx < COUNTOF(versions); ++idx)
+        for (VerStringTable &version : versions)
         {
-            if (versions[idx].dwMajor == ovi.dwMajorVersion &&
-                versions[idx].dwMinor == ovi.dwMinorVersion &&
-                GetVersionMetric(versions[idx].metric))
+            if (version.dwMajor == ovi.dwMajorVersion &&
+                version.dwMinor == ovi.dwMinorVersion &&
+                GetVersionMetric(version.metric))
             {
-                uVersion = versions[idx].uVersion;
+                uVersion = version.uVersion;
                 break;
             }
         }
