@@ -41,6 +41,7 @@ BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
     return g_LSAPIManager.IsInitialized() ? TRUE : FALSE;
 }
 
+
 void LSAPIReloadBangs(VOID)
 {
     try
@@ -53,6 +54,7 @@ void LSAPIReloadBangs(VOID)
     }
 }
 
+
 void LSAPIReloadSettings(VOID)
 {
     try
@@ -64,6 +66,7 @@ void LSAPIReloadSettings(VOID)
         lse.Type();
     }
 }
+
 
 void LSAPISetLitestepWindow(HWND hLitestepWnd)
 {
@@ -462,12 +465,137 @@ int LCTokenize(LPCSTR szString, LPSTR *lpszBuffers, DWORD dwNumBuffers, LPSTR sz
 
 
 //
+// GetTokenW
+//
+BOOL GetTokenW(LPCWSTR pszString, LPWSTR pszToken, LPCWSTR* pszNextToken, BOOL bUseBrackets)
+{
+    LPCWSTR pszCurrent = pszString;
+    LPCWSTR pszStartMarker = nullptr;
+    int iBracketLevel = 0;
+    WCHAR cQuote = L'\0';
+    bool bIsToken = false;
+    bool bAppendNextToken = false;
+    
+    if (pszString)
+    {
+        if (pszToken)
+        {
+            pszToken[0] = '\0';
+        }
+        
+        if (pszNextToken)
+        {
+            *pszNextToken = nullptr;
+        }
+        
+        pszCurrent += wcsspn(pszCurrent, WHITESPACEW);
+        
+        for (; *pszCurrent; ++pszCurrent)
+        {
+            if (iswspace((wint_t)*pszCurrent) && !cQuote)
+            {
+                break;
+            }
+            
+            if (bUseBrackets && wcschr(L"[]", *pszCurrent) &&
+                (!wcschr(L"\'\"", cQuote) || !cQuote))
+            {
+                if (*pszCurrent == L'[')
+                {
+                    if (bIsToken && !cQuote)
+                    {
+                        break;
+                    }
+                    
+                    ++iBracketLevel;
+                    cQuote = L'[';
+                    
+                    if (iBracketLevel == 1)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    --iBracketLevel;
+                    
+                    if (iBracketLevel <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            
+            if (wcschr(L"\'\"", *pszCurrent) && (cQuote != L'['))
+            {
+                if (!cQuote)
+                {
+                    if (bIsToken)
+                    {
+                        bAppendNextToken = true;
+                        break;
+                    }
+                    
+                    cQuote = *pszCurrent;
+                    continue;
+                }
+                else if (*pszCurrent == cQuote)
+                {
+                    break;
+                }
+            }
+            
+            if (!bIsToken)
+            {
+                bIsToken = true;
+                pszStartMarker = pszCurrent;
+            }
+        }
+        
+        if (pszStartMarker && pszToken)
+        {
+            wcsncpy(pszToken, pszStartMarker, pszCurrent - pszStartMarker);
+            pszToken[pszCurrent - pszStartMarker] = L'\0';
+        }
+        
+        if (!bAppendNextToken && *pszCurrent)
+        {
+            ++pszCurrent;
+        }
+        
+        pszCurrent += wcsspn(pszCurrent, WHITESPACEW);
+        
+        if (*pszCurrent && pszNextToken)
+        {
+            *pszNextToken = pszCurrent;
+        }
+        
+        if (bAppendNextToken && *pszCurrent)
+        {
+            LPWSTR pszNewToken = pszToken;
+            
+            if (pszNewToken)
+            {
+                pszNewToken += wcslen(pszToken);
+            }
+            
+            GetTokenW(pszCurrent, pszNewToken, pszNextToken, bUseBrackets);
+        }
+        
+        return pszStartMarker != nullptr;
+    }
+    
+    return FALSE;
+}
+
+
+//
 // GetToken
 //
 BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseBrackets)
 {
     LPCSTR pszCurrent = pszString;
-    LPCSTR pszStartMarker = NULL;
+    LPCSTR pszStartMarker = nullptr;
     int iBracketLevel = 0;
     CHAR cQuote = '\0';
     bool bIsToken = false;
@@ -482,10 +610,10 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
         
         if (pszNextToken)
         {
-            *pszNextToken = NULL;
+            *pszNextToken = nullptr;
         }
         
-        pszCurrent += strspn(pszCurrent, WHITESPACE);
+        pszCurrent += strspn(pszCurrent, WHITESPACEA);
         
         for (; *pszCurrent; ++pszCurrent)
         {
@@ -560,7 +688,7 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
             ++pszCurrent;
         }
         
-        pszCurrent += strspn(pszCurrent, WHITESPACE);
+        pszCurrent += strspn(pszCurrent, WHITESPACEA);
         
         if (*pszCurrent && pszNextToken)
         {
@@ -579,7 +707,7 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
             GetToken(pszCurrent, pszNewToken, pszNextToken, bUseBrackets);
         }
         
-        return pszStartMarker != NULL;
+        return pszStartMarker != nullptr;
     }
     
     return FALSE;

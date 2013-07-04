@@ -91,7 +91,8 @@ extern "C"
     LSAPI void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate);
     LSAPI void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString);
     
-    LSAPI BOOL GetToken(LPCSTR szString, LPSTR szToken, LPCSTR * szNextToken, BOOL useBrackets);
+    LSAPI BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR * pszNextToken, BOOL useBrackets);
+    LSAPI BOOL GetTokenW(LPCWSTR pszString, LPWSTR pszToken, LPCWSTR * pszNextToken, BOOL useBrackets);
     LSAPI void Frame3D(HDC dc, RECT rect, COLORREF TopColor, COLORREF BottomColor, int Width);
     LSAPI void SetDesktopArea(int left, int top, int right, int bottom);
     
