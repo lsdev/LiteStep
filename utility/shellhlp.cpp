@@ -22,6 +22,7 @@
 #include "shellhlp.h"
 #include "core.hpp"
 #include <MMSystem.h>
+#include <VersionHelpers.h>
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -535,12 +536,12 @@ HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
 // GetVersionMetric
 // Helper for GetWindowsVersion
 //
-enum WINVER_METRIC
+enum class WINVER_METRIC
 {
-    WVM_ANY,
-    WVM_SERVER,
-    WVM_WORKSTATION,
-    WVM_HOMESERVER
+    ANY,
+    SERVER,
+    WORKSTATION,
+    HOMESERVER
 };
 
 
@@ -548,29 +549,34 @@ BOOL GetVersionMetric(WINVER_METRIC metric)
 {
     // NB: OSVERSIONINFOEX is not supported on very early platforms but
     //     those don't require such a "metric"
-    OSVERSIONINFOEX ovi = { 0 };
+    OSVERSIONINFOEXW ovi = { 0 };
     ovi.dwOSVersionInfoSize = sizeof(ovi);
-    
-    if (GetVersionEx((LPOSVERSIONINFO)&ovi))
+
+    ULONGLONG dwlConditionMask = 0;
+
+    switch (metric)
     {
-        switch (metric)
-        {
-        case WVM_ANY:
+        case WINVER_METRIC::ANY:
             return TRUE;
             
-        case WVM_SERVER:
-            return (ovi.wProductType != VER_NT_WORKSTATION);
+        case WINVER_METRIC::SERVER:
+            ovi.wProductType = VER_NT_WORKSTATION;
+            dwlConditionMask = VerSetConditionMask(dwlConditionMask, VER_PRODUCT_TYPE, VER_EQUAL);
+            return VerifyVersionInfoW(&ovi, VER_PRODUCT_TYPE, dwlConditionMask) == FALSE;
             
-        case WVM_WORKSTATION:
-            return (ovi.wProductType == VER_NT_WORKSTATION);
+        case WINVER_METRIC::WORKSTATION:
+            ovi.wProductType = VER_NT_WORKSTATION;
+            dwlConditionMask = VerSetConditionMask(dwlConditionMask, VER_PRODUCT_TYPE, VER_EQUAL);
+            return VerifyVersionInfoW(&ovi, VER_PRODUCT_TYPE, dwlConditionMask) != FALSE;
             
-        case WVM_HOMESERVER:
-            return (ovi.wSuiteMask == VER_SUITE_WH_SERVER);
+        case WINVER_METRIC::HOMESERVER:
+            ovi.wSuiteMask = VER_SUITE_WH_SERVER;
+            dwlConditionMask = VerSetConditionMask(dwlConditionMask, VER_SUITENAME, VER_EQUAL);
+            return VerifyVersionInfoW(&ovi, VER_SUITENAME, dwlConditionMask) != FALSE;
             
         default:
             ASSERT(false);
             break;
-        }
     }
     
     return FALSE;
@@ -584,68 +590,45 @@ BOOL GetVersionMetric(WINVER_METRIC metric)
 UINT GetWindowsVersion()
 {
     UINT uVersion = WINVER_UNKNOWN;
-    
-    OSVERSIONINFO ovi = { 0 };
-    ovi.dwOSVersionInfoSize = sizeof(ovi);
-    GetVersionEx(&ovi);
-    
-    if (ovi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+
+    struct VerStringTable
     {
-        if (ovi.dwMinorVersion >= 90)
-        {
-            uVersion = WINVER_WIN95;
-        }
-        else if (ovi.dwMinorVersion >= 10)
-        {
-            uVersion = WINVER_WIN98;
-        }
-        else
-        {
-            uVersion = WINVER_WINME;
-        }
+        WORD dwMajor;
+        WORD dwMinor;
+        WINVER_METRIC metric;
+        UINT uVersion;
     }
-    else
+    versions[] = \
     {
-        struct VerStringTable
-        {
-            DWORD dwMajor;
-            DWORD dwMinor;
-            WINVER_METRIC metric;
-            UINT uVersion;
-        }
-        versions[] = \
-        {
-            { 4,  0, WVM_ANY,         WINVER_WINNT4    },
-            { 5,  0, WVM_ANY,         WINVER_WIN2000   },
-            { 5,  1, WVM_ANY,         WINVER_WINXP     }, // 32-Bit
+        { 6,  3, WINVER_METRIC::SERVER,      WINVER_WIN2012R2 },
+        { 6,  3, WINVER_METRIC::WORKSTATION, WINVER_WIN81     },
+
+        { 6,  2, WINVER_METRIC::SERVER,      WINVER_WIN2012   },
+        { 6,  2, WINVER_METRIC::WORKSTATION, WINVER_WIN8      },
             
-            // WVM_HOMESERVER should also match WVM_SERVER, so list it first
-            { 5,  2, WVM_HOMESERVER,  WINVER_WHS       },
-            { 5,  2, WVM_SERVER,      WINVER_WIN2003   },
-            { 5,  2, WVM_WORKSTATION, WINVER_WINXP     }, // 64-Bit
+        { 6,  1, WINVER_METRIC::SERVER,      WINVER_WIN2008R2 },
+        { 6,  1, WINVER_METRIC::WORKSTATION, WINVER_WIN7      },
 
-            { 6,  0, WVM_SERVER,      WINVER_WIN2008   },
-            { 6,  0, WVM_WORKSTATION, WINVER_VISTA     },
+        { 6,  0, WINVER_METRIC::SERVER,      WINVER_WIN2008   },
+        { 6,  0, WINVER_METRIC::WORKSTATION, WINVER_VISTA     },
             
-            { 6,  1, WVM_SERVER,      WINVER_WIN2008R2 },
-            { 6,  1, WVM_WORKSTATION, WINVER_WIN7      },
+        // WVM_HOMESERVER should also match WVM_SERVER, so list it first
+        { 5,  2, WINVER_METRIC::HOMESERVER,  WINVER_WHS       },
+        { 5,  2, WINVER_METRIC::SERVER,      WINVER_WIN2003   },
+        { 5,  2, WINVER_METRIC::WORKSTATION, WINVER_WINXP     }, // 64-Bit
 
-            { 6,  2, WVM_SERVER,      WINVER_WIN2012   },
-            { 6,  2, WVM_WORKSTATION, WINVER_WIN8      },
-
-            { 6,  3, WVM_SERVER,      WINVER_WIN2012R2 },
-            { 6,  3, WVM_WORKSTATION, WINVER_WIN81     }
-        };
+        { 5,  1, WINVER_METRIC::ANY,         WINVER_WINXP     }, // 32-Bit
+        { 5,  0, WINVER_METRIC::ANY,         WINVER_WIN2000   },
+        { 4,  0, WINVER_METRIC::ANY,         WINVER_WINNT4    }
+    };
         
-        for (VerStringTable &version : versions)
+    for (VerStringTable &version : versions)
+    {
+        if (IsWindowsVersionOrGreater(version.dwMajor, version.dwMinor, 0) &&
+            GetVersionMetric(version.metric))
         {
-            if (version.dwMajor == ovi.dwMajorVersion &&
-                version.dwMinor == ovi.dwMinorVersion &&
-                GetVersionMetric(version.metric))
-            {
-                uVersion = version.uVersion;
-                break;
-            }
+            uVersion = version.uVersion;
+            break;
         }
     }
     
