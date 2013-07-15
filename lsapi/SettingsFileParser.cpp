@@ -51,8 +51,8 @@ FileParser::~FileParser()
 //
 void FileParser::ParseFile(LPCTSTR ptzFileName)
 {
-    ASSERT(NULL == m_phFile);
-    ASSERT(NULL != ptzFileName);
+    ASSERT(nullptr == m_phFile);
+    ASSERT(nullptr != ptzFileName);
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
     
@@ -60,7 +60,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     PathUnquoteSpaces(tzExpandedPath);
     
     DWORD dwLen = GetFullPathName(
-        tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, NULL);
+        tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, nullptr);
     
     if (0 == dwLen || dwLen > MAX_PATH_LENGTH)
     {
@@ -68,9 +68,9 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
         return;
     }
     
-    m_phFile = _tfopen(m_tzFullPath, _T("r"));
+    _tfopen_s(&m_phFile, m_tzFullPath, _T("r"));
     
-    if (NULL == m_phFile)
+    if (nullptr == m_phFile)
     {
         TRACE("Error: Can not open file \"%s\" (Defined as \"%s\").",
             m_tzFullPath, ptzFileName);
@@ -86,15 +86,71 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     m_uLineNumber = 0;
     
+    _ReadNextLine(m_tzReadAhead);
     while (_ReadLineFromFile(tzKey, tzValue))
     {
         _ProcessLine(tzKey, tzValue);
     }
     
     fclose(m_phFile);
-    m_phFile = NULL;
+    m_phFile = nullptr;
     
     TRACE("Finished Parsing \"%s\"", m_tzFullPath);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// _ReadLineFromFile
+//
+// ptzBuffer must be MAX_LINE_LENGTH size
+//
+bool FileParser::_ReadNextLine(LPTSTR ptzBuffer)
+{
+    ASSERT(nullptr != m_phFile);
+    ASSERT(nullptr != ptzBuffer);
+
+    TCHAR tzBuffer[MAX_LINE_LENGTH];
+    bool bReturn = false;
+
+    ptzBuffer[0] = _T('\0');
+
+    while (!feof(m_phFile) && !bReturn)
+    {
+        if (!_fgetts(tzBuffer, MAX_LINE_LENGTH, m_phFile))
+        {
+            // End Of File or an Error occured. We don't care which.
+            break;
+        }
+        
+        ++m_uLineNumber;
+
+        LPTSTR ptzCurrent = tzBuffer;
+
+        // Jump over any initial whitespace
+        ptzCurrent += _tcsspn(ptzCurrent, WHITESPACE);
+        
+        // Ignore empty lines, and comments
+        if (ptzCurrent[0] != '\0' && ptzCurrent[0] != _T(';'))
+        {
+            // End on first reserved character or whitespace
+            size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE RESERVEDCHARS);
+            
+            // If the character is not whitespace or a comment
+            // then the line has an invalid format.  Ignore it.
+            if (_tcschr(WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
+            {
+                TRACE("Syntax Error (%s, %d): Invalid line format",
+                    m_tzFullPath, m_uLineNumber);
+                continue;
+            }
+
+            StringCchCopy(ptzBuffer, MAX_LINE_LENGTH, ptzCurrent);
+            bReturn = true;
+        }
+    }
+
+    return bReturn;
 }
 
 
@@ -110,42 +166,51 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
     ASSERT(NULL != m_phFile);
     ASSERT(NULL != ptzName);
     
-    TCHAR tzBuffer[MAX_LINE_LENGTH];
     bool bReturn = false;
-    
-    while (!feof(m_phFile) && !bReturn)
+
+    if (m_tzReadAhead[0] == '}')
     {
-        if (!_fgetts(tzBuffer, MAX_LINE_LENGTH, m_phFile))
+        if (m_stPrefixes.empty())
         {
-            // End Of File or an Error occured. We don't care which.
-            break;
+            TRACE("Syntax Error (%s, %d): Unexpected }",
+                m_tzFullPath, m_uLineNumber);
+        }
+        else
+        {
+            m_stPrefixes.pop();
         }
         
-        ++m_uLineNumber;
+        // Skip this line
+        _ReadNextLine(m_tzReadAhead);
+        bReturn = _ReadLineFromFile(ptzName, ptzValue);
+    }
+    else if (m_tzReadAhead[0] != _T('\0'))
+    {
+        LPTSTR ptzCurrent = m_tzReadAhead;
+
+        // End on first reserved character or whitespace
+        size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE RESERVEDCHARS);
         
-        LPTSTR ptzCurrent = tzBuffer;
-        
-        // Jump over any initial whitespace
-        ptzCurrent += _tcsspn(ptzCurrent, WHITESPACE);
-        
-        // Ignore empty lines, and comments
-        if (ptzCurrent[0] && ptzCurrent[0] != _T(';'))
+        if (stEndConfig != 0)
         {
-            // End on first reserved character or whitespace
-            size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE RESERVEDCHARS);
-            
-            // If the character is not whitespace or a comment
-            // then the line has an invalid format.  Ignore it.
-            if (_tcschr(WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
+            ptzName[0] = _T('\0');
+
+            // Apply any prefix, as necesary
+            if (!m_stPrefixes.empty())
             {
-                TRACE("Syntax Error (%s, %d): Invalid line format",
-                    m_tzFullPath, m_uLineNumber);
-                continue;
+                // Don't apply prefixes to special keywords
+                if (!( _tcsnicmp(ptzCurrent, _T("if"), stEndConfig) == 0
+                    || _tcsnicmp(ptzCurrent, _T("else"), stEndConfig) == 0
+                    || _tcsnicmp(ptzCurrent, _T("elseif"), stEndConfig) == 0
+                    || _tcsnicmp(ptzCurrent, _T("endif"), stEndConfig) == 0
+                    ))
+                {
+                    StringCchCopy(ptzName, MAX_RCCOMMAND, m_stPrefixes.top().tzString);
+                }
             }
             
             // Copy directive name to ptzName.
-            if (stEndConfig && SUCCEEDED(StringCchCopyN(
-                ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
+            if (SUCCEEDED(StringCchCatN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
             {
                 // If ptzValue is NULL, then the caller doesn't want the value,
                 // however, we still will return TRUE.  If the caller does want
@@ -166,6 +231,19 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                 }
                 
                 bReturn = true;
+
+                // Reads the next line
+                if (_ReadNextLine(m_tzReadAhead))
+                {
+                    if (m_tzReadAhead[0] == '{')
+                    {
+                        m_stPrefixes.push(TCStack(ptzName));
+
+                        // Skip these 2 lines.
+                        _ReadNextLine(m_tzReadAhead);
+                        bReturn = _ReadLineFromFile(ptzName, ptzValue);
+                    }
+                }
             }
         }
     }

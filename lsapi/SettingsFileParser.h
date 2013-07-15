@@ -24,6 +24,8 @@
 
 #include "settingsdefines.h"
 #include "lsapidefines.h"
+#include <stack>
+#include <strsafe.h>
 
 
 /**
@@ -64,6 +66,25 @@ private:
     
     /** Full path to configuration file */
     TCHAR m_tzFullPath[MAX_PATH_LENGTH];
+    
+    /** Contains an RC key */
+    struct TCStack {
+        TCStack(LPCTSTR tzString) {
+            StringCchCopy(this->tzString, _countof(this->tzString), tzString);
+        }
+        TCHAR tzString[MAX_RCCOMMAND];
+    };
+
+    /** Stack of prefixes. */
+    std::stack<TCStack> m_stPrefixes;
+
+    /** The next line to be parsed by _ReadLineFromFile */
+    TCHAR m_tzReadAhead[MAX_LINE_LENGTH];
+
+    /**
+     * Reads the next line from the current file.
+     */
+    bool _ReadNextLine(LPTSTR ptzBuffer);
     
     /**
      * Reads the next line from current file. The line is split into a setting
