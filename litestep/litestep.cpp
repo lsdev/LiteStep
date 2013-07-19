@@ -1114,6 +1114,8 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     lParam = (LPARAM)wExtraBits;
                 }
             }
+
+            bool bHandled = false;
             
             // WM_APP, LM_XYZ, and registered messages are all >= WM_USER
             if (uMsg >= WM_USER)
@@ -1123,7 +1125,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     lReturn = \
                         m_pMessageManager->SendMessage(uMsg, wParam, lParam);
-                    break;
+                    bHandled = true;
                 }
             }
 
@@ -1132,7 +1134,10 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             // those messages, thus undoing any auto-hide done here.
             _HandleShellHooks(uMsg, wParam, lParam);
 
-            lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
+            if (!bHandled)
+            {
+                lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
+            }
         }
         break;
     }
