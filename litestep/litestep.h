@@ -31,6 +31,7 @@
 // forward declarations
 class IService;
 class TrayService;
+class FullscreenMonitor;
 class DataStore;
 class MessageManager;
 class ModuleManager;
@@ -130,6 +131,7 @@ private:
     // Service Related
     //
     TrayService* m_pTrayService; // = NULL;
+    FullscreenMonitor* m_pFullscreenMonitor; // = nullptr;
     std::vector<IService*> m_Services;
     
     HRESULT _InitServices();

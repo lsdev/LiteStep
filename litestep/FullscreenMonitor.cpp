@@ -30,6 +30,7 @@
 //
 FullscreenMonitor::FullscreenMonitor()
 {
+    m_bIsRunning = false;
 }
 
 
@@ -38,6 +39,10 @@ FullscreenMonitor::FullscreenMonitor()
 //
 FullscreenMonitor::~FullscreenMonitor()
 {
+    if (m_bIsRunning)
+    {
+        Stop();
+    }
 }
 
 
@@ -186,10 +191,48 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
     // List of all currently living known fullscreen windows
     std::list<FSWindow> fullscreenWindows;
 
+    // On startup, find any existing fullscreen windows.
+    EnumDesktopWindows(nullptr, [] (HWND hWnd, LPARAM lParam) -> BOOL {
+        HMONITOR hMonitor = IsFullscreenWindow(hWnd);
+        std::list<FSWindow> *fullscreenWindows = (std::list<FSWindow>*)lParam;
+        if (hMonitor)
+        {
+            // If the modules on this monitor are not already hidden, hide them.
+            bool bAlreadyHidden = false;
+            for (FSWindow window : *fullscreenWindows)
+            {
+                if (window.hMonitor == hMonitor)
+                {
+                    bAlreadyHidden = true;
+                    break;
+                }
+            }
+            if (!bAlreadyHidden)
+            {
+                ParseBangCommand((HWND)hMonitor, "!HideModules", nullptr);
+            }
+
+            // And add it to the list of fullscreen windows.
+            fullscreenWindows->push_back(FSWindow(hWnd, hMonitor));
+        }
+        return TRUE;
+    }, (LPARAM)&fullscreenWindows);
+
+    // Main Loop
     while (pFullscreenMonitor->m_bRun.load())
     {
         HWND hwndForeGround = GetForegroundWindow();
         bool bCheckedForeGround = false;
+
+        // Re-Hide modules on all monitors
+        if (pFullscreenMonitor->m_bReHide.load())
+        {
+            pFullscreenMonitor->m_bReHide.store(false);
+            for (FSWindow window : fullscreenWindows)
+            {
+                ParseBangCommand((HWND)window.hMonitor, "!HideModules", nullptr);
+            }
+        }
 
         // Verify that all currently known fullscreen windows are still fullscreen.
         std::list<FSWindow>::iterator iter = fullscreenWindows.begin();
@@ -268,6 +311,12 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
         //
         std::this_thread::sleep_for(sleepDuration);
     }
+
+    // We are stoping, if there are any current fullscreen windows, show all modules.
+    if (!fullscreenWindows.empty())
+    {
+        ParseBangCommand(nullptr, "!ShowModules", nullptr);
+    }
 }
 
 
@@ -276,8 +325,16 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
 //
 HRESULT FullscreenMonitor::Start()
 {
-    m_bRun.store(true);
-    m_fullscreenMonitorThread = std::thread(ThreadProc, this);
+    if (!m_bIsRunning)
+    {
+        m_bIsRunning = true;
+        m_bRun.store(true);
+        m_fullscreenMonitorThread = std::thread(ThreadProc, this);
+    }
+    else
+    {
+        m_bReHide.store(true);
+    }
 
     return S_OK;
 }
@@ -288,8 +345,12 @@ HRESULT FullscreenMonitor::Start()
 //
 HRESULT FullscreenMonitor::Stop()
 {
-    m_bRun.store(false);
-    m_fullscreenMonitorThread.join();
+    if (m_bIsRunning)
+    {
+        m_bIsRunning = false;
+        m_bRun.store(false);
+        m_fullscreenMonitorThread.join();
+    }
 
     return S_OK;
 }

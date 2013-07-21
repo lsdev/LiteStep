@@ -45,6 +45,8 @@ private:
 private:
     std::thread m_fullscreenMonitorThread;
     std::atomic<bool> m_bRun;
+    std::atomic<bool> m_bReHide;
+    bool m_bIsRunning;
 };
 
 #endif // FULLSCREENMONITOR_H

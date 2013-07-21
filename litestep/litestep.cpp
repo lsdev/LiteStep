@@ -252,18 +252,19 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
 // CLiteStep()
 //
 CLiteStep::CLiteStep()
-: m_pRecoveryMenu(NULL),
-  m_pRegisterShellHook(NULL),
-  m_hWtsDll(NULL)
+: m_pRecoveryMenu(nullptr),
+  m_pRegisterShellHook(nullptr),
+  m_hWtsDll(nullptr)
 {
-    m_hInstance = NULL;
-    m_hMainWindow = NULL;
+    m_hInstance = nullptr;
+    m_hMainWindow = nullptr;
     WM_ShellHook = 0;
-    m_pModuleManager = NULL;
-    m_pDataStoreManager = NULL;
-    m_pMessageManager = NULL;
+    m_pModuleManager = nullptr;
+    m_pDataStoreManager = nullptr;
+    m_pMessageManager = nullptr;
     m_bSignalExit = false;
-    m_pTrayService = NULL;
+    m_pTrayService = nullptr;
+    m_pFullscreenMonitor = nullptr;
     m_BlockRecycle = 0;
 }
 
@@ -1194,11 +1195,11 @@ HRESULT CLiteStep::_InitServices()
     //
     if (GetRCBool("LSAutoHideModules", TRUE))
     {
-        pService = new (std::nothrow) FullscreenMonitor();
+        m_pFullscreenMonitor = new (std::nothrow) FullscreenMonitor();
 
-        if (pService)
+        if (m_pFullscreenMonitor)
         {
-            m_Services.push_back(pService);
+            m_Services.push_back(m_pFullscreenMonitor);
         }
         else
         {
@@ -1354,6 +1355,16 @@ void CLiteStep::_Recycle()
     // Re-initialize the bang and settings manager in LSAPI
     LSAPIReloadBangs();
     LSAPIReloadSettings();
+
+    // Start/Stop the FullscreenMonitor service
+    if (GetRCBool("LSAutoHideModules", TRUE))
+    {
+        m_pFullscreenMonitor->Start();
+    }
+    else
+    {
+        m_pFullscreenMonitor->Stop();
+    }
     
     _StartManagers();
 }
