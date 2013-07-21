@@ -48,5 +48,6 @@
 
   2. Build either a debug or release build.
 
-  3. The output binaries will be off of the LiteStep source directory in
-     Release_VC11_32 or Debug_VC11_32 folders depending on the build type.
+  3. The output binaries will be off of the LiteStep source directory in the
+     Release_VC11_32, Release_VC11_64, Debug_VC11_32, or Debug_VC11_64 folder
+     depending on the build type.

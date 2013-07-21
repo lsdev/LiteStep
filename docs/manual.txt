@@ -368,7 +368,7 @@ Contents:
     way use the reserved characters of the step.rc parsers except in the special
     case of * character.  The following characters are reserved:
 
-    ! $ & * ( ) - + = [ ] ; " ' < > , /
+    ! $ & * ( ) - + = [ ] ; " ' < > , / { }
 
     Furthermore it is recommended that you do not use @, #, or | (vertical bar),
     because these characters may become reserved in the future.
@@ -384,7 +384,7 @@ Contents:
 
   1. Step.rc File Parser
 
-    - The step.rc File Parser uses these reserved characters: ;[]"'
+    - The step.rc File Parser uses these reserved characters: ;[]"'{}
 
       ;  Used at the beginning of a textual line to delineate a comment.
          Comments are lines that are ignored by the Directive Parser.  A comment
@@ -403,7 +403,14 @@ Contents:
       ElseIf
       Else
       Endif
-
+      
+    - Surrounding Statements within curly braces like this will cause any
+      command within the braces to have the prefix prefixed to it.
+      
+      Prefix
+      {
+      }
+    
   2. Step.rc Directive Parser
 
     - The step.rc Directive Parser uses these reserved characters: *$[]"'

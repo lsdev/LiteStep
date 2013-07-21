@@ -47,6 +47,15 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
+  - [2013-xx-xx] -
+    - Modified the .RC file syntax to allow for settings prefixes. This change
+      is backwards compatible.
+    - Added detection of Windows 8.1 and Server 2012 R2.
+    - LSAutoHideModules is now more reliable, and will hide modules on a 
+      monitor as long as there is a fullscreen window on that monitor.
+    - Added more details to the error message that is shown when a module fails
+      to load.
+
   - [2013-06-27] -
     - The !Run dialog now supports !Bang commands.
     - Added LSCloseExplorer, which will gracefully close the currently running
@@ -131,7 +140,8 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
 
   - ADDED -
     - Added playing of appropriate system sounds on screen lock/unlock
-    - Added $WinVista$, $Win2008$, $Win7$
+    - Added $WinVista$, $Win2008$, $Win7$, $Win2008R2$, $Win8$, $Win2012$,
+      $Win2012R2$, and $Win81$.
     - Added $Win64$ to identify Windows x64
     - In safe mode, LiteStep attempts to launch Explorer as shell
       - If it fails, LiteStep launches as shell but skips running startup apps
@@ -148,10 +158,21 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - Added support for exiting LiteStep by holding CTRL+SHIFT+ALT and
       canceling out of the Windows Shutdown dialog.
     - Added multi-monitor support to AppBar implementation.
+    - New .RC construct, { }, allowing for the specification of settings
+      prefixes. Allows for tidier configs.
+    - Added a performance page to !about, showing module load times.
+    - Added a fileExists() function.
+    - Support for version 4 tray icons on Windows 7 and Windows 8. Tray modules
+      now need to handle LM_SYSTRAYINFOEVENT in order to support this.
+    - The !Run dialog will now execute !Bang commands.
+    - LSRunX and LSRunY settings to position the !Run dialog.
+    - LSCloseExplorer, a setting which causes the explorer shell to gracefully
+      terminate if it is running as shell when litestep starts.
 
 
   - VISTA & WIN7 & 64-BIT SUPPORT -
-    - Running on Windows Vista, Windows 7 and 64-Bit Windows now supported
+    - Running on Windows Vista, Windows 7, Windows 8 and 64-Bit Windows now
+      supported
     - Fixed startup folder items running twice on Windows Vista
     - Fixed startup detection on Vista
     - Added playing of logon sound
@@ -186,6 +207,10 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - Tweaked module loading error boxes
       - Fixed module path getting cut off in the titles, now uses filename only
       - Changed icon from warning icon to error icon
+    - Improved LSAutoHideModules's behavior. It is now more accurate and
+      responsive. It will also keep modules on a monitor hidden as long as there
+      is a fullscreen window on that monitor.
+    - !about's system information page will now show > 4GB of memory correctly
 
 
   - REMOVED/CHANGED -
@@ -206,6 +231,8 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - Switched from libpng to picoPNG, which is included in lsapi.dll.
       - Removes libpng13.dll and zlib1.dll dependencies
     - Removed Win95 multimon compat functions
+    - Added more details to the error message that is shown when a module fails
+      to load.
  
  
   - INTERNAL -
