@@ -80,6 +80,7 @@ EXEOBJS = \
 	litestep\$(OUTPUT)\DDEService.o \
 	litestep\$(OUTPUT)\DDEStub.o \
 	litestep\$(OUTPUT)\DDEWorker.o \
+	litestep\$(OUTPUT)\FullscreenMonitor.o \
 	litestep\$(OUTPUT)\litestep.o \
 	litestep\$(OUTPUT)\MessageManager.o \
 	litestep\$(OUTPUT)\Module.o \
