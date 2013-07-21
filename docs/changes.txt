@@ -1,6 +1,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                              LiteStep 0.25.0 Alpha
-                         Experimental Build 2013-06-27
+                         Experimental Build 2013-07-21
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 This build requires the Visual C++ 2012 Redistributable Package
@@ -47,7 +47,7 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
-  - [2013-xx-xx] -
+  - [2013-07-21] -
     - Modified the .RC file syntax to allow for settings prefixes. This change
       is backwards compatible.
     - Added detection of Windows 8.1 and Server 2012 R2.
