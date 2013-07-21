@@ -26,6 +26,7 @@
 #include "DDEStub.h"
 #include "RecoveryMenu.h"
 #include "TrayService.h"
+#include "FullscreenMonitor.h"
 
 // Managers
 #include "MessageManager.h"
@@ -256,8 +257,6 @@ CLiteStep::CLiteStep()
   m_hWtsDll(NULL)
 {
     m_hInstance = NULL;
-    m_bAutoHideModules = false;
-    m_hFullScreenMonitor = NULL;
     m_hMainWindow = NULL;
     WM_ShellHook = 0;
     m_pModuleManager = NULL;
@@ -316,8 +315,6 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     {
         wStartFlags &= ~LSF_RUN_STARTUPAPPS;
     }
-    
-    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
     
     bool bUnderExplorer = false;
     
@@ -842,15 +839,6 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         }
         break;
         
-    case WM_TIMER:
-        {
-            if (LT_RUDEAPP == wParam)
-            {
-                KillTimer(hWnd, wParam);
-                HMONITOR hMonFS = _FullScreenGetMonitor(GetForegroundWindow());
-                _FullScreenHandler(hMonFS);
-            }
-        }
         break;
         
     case LM_SYSTRAYREADY:
@@ -1095,7 +1083,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 
                 // Convert to an LM_SHELLHOOK message
                 uMsg = LM_SHELLHOOK + wHookCode;
-                
+
                 if (uMsg == LM_APPCOMMAND)
                 {
                     wParam = NULL;
@@ -1115,8 +1103,6 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 }
             }
 
-            bool bHandled = false;
-            
             // WM_APP, LM_XYZ, and registered messages are all >= WM_USER
             if (uMsg >= WM_USER)
             {
@@ -1125,19 +1111,10 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     lReturn = \
                         m_pMessageManager->SendMessage(uMsg, wParam, lParam);
-                    bHandled = true;
+                    break;
                 }
             }
-
-            // Handle shell hook messages *after* relaying them to modules.
-            // A module may show or hide some parts of its UI in response to
-            // those messages, thus undoing any auto-hide done here.
-            _HandleShellHooks(uMsg, wParam, lParam);
-
-            if (!bHandled)
-            {
-                lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
-            }
+            lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
         }
         break;
     }
@@ -1170,7 +1147,7 @@ LRESULT CLiteStep::_HandleSessionChange(DWORD dwCode, DWORD /* dwSession */)
 //
 HRESULT CLiteStep::_InitServices()
 {
-    IService* pService = NULL;
+    IService* pService = nullptr;
     
     //
     // DDE Service
@@ -1178,12 +1155,12 @@ HRESULT CLiteStep::_InitServices()
     if (GetRCBool("LSUseSystemDDE", TRUE))
     {
         // M$ DDE
-        pService = new DDEStub();
+        pService = new (std::nothrow) DDEStub();
     }
     else
     {
         // liteman
-        pService = new DDEService();
+        pService = new (std::nothrow) DDEService();
     }
     
     if (pService)
@@ -1200,7 +1177,7 @@ HRESULT CLiteStep::_InitServices()
     //
     if (GetRCBool("LSDisableTrayService", FALSE))
     {
-        m_pTrayService = new TrayService();
+        m_pTrayService = new (std::nothrow) TrayService();
         
         if (m_pTrayService)
         {
@@ -1211,6 +1188,24 @@ HRESULT CLiteStep::_InitServices()
             return E_OUTOFMEMORY;
         }
     }
+
+    //
+    // FullscreenMonitor service
+    //
+    if (GetRCBool("LSAutoHideModules", TRUE))
+    {
+        pService = new (std::nothrow) FullscreenMonitor();
+
+        if (pService)
+        {
+            m_Services.push_back(pService);
+        }
+        else
+        {
+            return E_OUTOFMEMORY;
+        }
+    }
+
     
     return S_OK;
 }
@@ -1275,7 +1270,7 @@ HRESULT CLiteStep::_InitManagers()
 HRESULT CLiteStep::_StartManagers()
 {
     HRESULT hr = S_OK;
-    
+
     // Load modules
     m_pModuleManager->Start(this);
     
@@ -1298,7 +1293,7 @@ HRESULT CLiteStep::_StopManagers()
     
     // Clean up as modules might not have
     m_pMessageManager->ClearMessages();
-    
+
     // Note:
     // - The DataStore manager is persistent.
     // - The Message manager can not be "stopped", just cleared.
@@ -1360,9 +1355,6 @@ void CLiteStep::_Recycle()
     LSAPIReloadBangs();
     LSAPIReloadSettings();
     
-    /* Read in our locally affected settings */
-    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) ? true : false;
-    
     _StartManagers();
 }
 
@@ -1399,227 +1391,4 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
     }
     
     return hr;
-}
-
-//
-// _FullScreenGetMonitorHelper
-//
-HMONITOR CLiteStep::_FullScreenGetMonitorHelper(HWND hWnd)
-{
-    if (!IsWindow(hWnd) || !IsWindowVisible(hWnd) || IsIconic(hWnd))
-    {
-        return NULL;
-    }
-    
-    HMONITOR hMonFS = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
-    
-    if (NULL == hMonFS)
-    {
-        return NULL;
-    }
-    
-    RECT rScreen = { 0 };
-    
-    if (NULL != hMonFS)
-    {
-        MONITORINFO miFS;
-        miFS.cbSize = sizeof(MONITORINFO);
-        
-        if (GetMonitorInfo(hMonFS, &miFS))
-        {
-            VERIFY(CopyRect(&rScreen, &miFS.rcMonitor));
-        }
-        else
-        {
-            rScreen.left = 0;
-            rScreen.top = 0;
-            rScreen.right = GetSystemMetrics(SM_CXSCREEN);
-            rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-            
-            hMonFS = MonitorFromRect(&rScreen, MONITOR_DEFAULTTOPRIMARY);
-        }
-    }
-    
-    RECT rWnd;
-    VERIFY(GetClientRect(hWnd, &rWnd));
-    
-    LONG width = rWnd.right - rWnd.left;
-    LONG height = rWnd.bottom - rWnd.top;
-    
-    POINT pt = { rWnd.left, rWnd.top };
-    VERIFY(ClientToScreen(hWnd, &pt));
-    
-    rWnd.left = pt.x;
-    rWnd.top = pt.y;
-    rWnd.right = pt.x + width;
-    rWnd.bottom = pt.y + height;
-    
-    // If the client area is the size of the screen, then consider it to be
-    // a full screen window.
-    if (EqualRect(&rScreen, &rWnd))
-    {
-        return hMonFS;
-    }
-    
-    DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
-
-    // Check Window Rect if WS_CAPTION or WS_THICKFRAME is part of the style.
-    // As long as at least one of them is not set, then we can check if the
-    // window is full screen or not: http://support.microsoft.com/kb/q179363/
-    if (WS_CAPTION != (WS_CAPTION & dwStyle) ||
-        WS_THICKFRAME != (WS_THICKFRAME & dwStyle))
-    {
-        VERIFY(GetWindowRect(hWnd, &rWnd));
-        
-        if (EqualRect(&rScreen, &rWnd))
-        {
-            return hMonFS;
-        }
-    }
-    
-    return NULL;
-}
-
-//
-// _EnumThreadFSWnd
-//
-BOOL CALLBACK CLiteStep::_EnumThreadFSWnd(HWND hWnd, LPARAM lParam)
-{
-    HMONITOR hMonFS = _FullScreenGetMonitorHelper(hWnd);
-    
-    if (NULL != hMonFS)
-    {
-        *(HMONITOR*)lParam = hMonFS;
-        return FALSE;
-    }
-    
-    return TRUE;
-}
-
-//
-// _FullScreenGetMonitor
-//
-HMONITOR CLiteStep::_FullScreenGetMonitor(HWND hWnd) const
-{
-    if (!IsWindow(hWnd))
-    {
-        return NULL;
-    }
-    
-    DWORD dwProcessID;
-    DWORD dwThreadID = GetWindowThreadProcessId(hWnd, &dwProcessID);
-    
-    DWORD dwLSProcessID;
-    GetWindowThreadProcessId(GetLitestepWnd(), &dwLSProcessID);
-    
-    HMONITOR hMonFS = NULL;
-    
-    if (dwProcessID != dwLSProcessID)
-    {
-        EnumThreadWindows(dwThreadID, _EnumThreadFSWnd, (LPARAM)&hMonFS);
-    }
-    
-    return hMonFS;
-}
-
-//
-// _FullScreenHandler
-//
-void CLiteStep::_FullScreenHandler(HMONITOR hMonFullScreen)
-{
-    if (m_hFullScreenMonitor == hMonFullScreen)
-    {
-        return;
-    }
-    
-    m_hFullScreenMonitor = hMonFullScreen;
-    
-    if (m_pTrayService)
-    {
-        m_pTrayService->NotifyRudeApp(m_hFullScreenMonitor);
-    }
-    
-    if (m_bAutoHideModules)
-    {
-        if (NULL != m_hFullScreenMonitor)
-        {
-            // Must first show all modules on all monitors
-            ParseBangCommand(NULL, "!ShowModules", NULL);
-            // Pass m_hFullScreenMonitor, so that !HideModules can support only
-            // hiding modules on the same monitor as the full screen app.
-            ParseBangCommand((HWND)m_hFullScreenMonitor, "!HideModules", NULL);
-        }
-        else
-        {
-            ParseBangCommand(NULL, "!ShowModules", NULL);
-        }
-    }
-}
-
-//
-// _HandleShellHooks
-//
-void CLiteStep::_HandleShellHooks(UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    switch (uMsg)
-    {
-    case LM_WINDOWACTIVATED:
-        {
-            //
-            // Note: The ShellHook will always set the HighBit when there
-            // is any full screen app on the desktop, even if it does not
-            // have focus.  Because of this, we have no easy way to tell
-            // if the currently activated app is full screen or not.
-            //
-            // This is worked around by checking the window's actual size
-            // against the screen size.  The correct behavior for this is
-            // to hide when a full screen app is active, and to show when
-            // a non full screen app is active.
-            //
-            KillTimer(m_hMainWindow, LT_RUDEAPP);
-            
-            if (0 != (0x8000 & lParam)) // rudeapp bit
-            {
-                // If the rudeapp bit is set then check to see if we have an
-                // active full screen app and handle it.
-                HMONITOR hMonFS = _FullScreenGetMonitor((HWND)wParam);
-                _FullScreenHandler(hMonFS);
-                
-                // If we have been told there is a rudeapp, but we did not
-                // detect one, then wait a second, and check the window in the
-                // foreground at that time.
-                if (NULL == m_hFullScreenMonitor)
-                {
-                    SetTimer(m_hMainWindow, LT_RUDEAPP, 1000, NULL);
-                }
-            }
-            else if (NULL != m_hFullScreenMonitor)
-            {
-                // If we have previously detected a full screen app and the
-                // rudeapp bit is no longer set then remove the handler.
-                _FullScreenHandler(NULL);
-            }
-        }
-        break;
-        
-    case LM_WINDOWDESTROYED:
-        {
-            // If we have previously detected a full screen app then remove the
-            // handler if it was just destroyed.
-            if (NULL != m_hFullScreenMonitor)
-            {
-                if (NULL == _FullScreenGetMonitor(GetForegroundWindow()))
-                {
-                    _FullScreenHandler(NULL);
-                }
-            }
-        }
-        break;
-        
-    default:
-        {
-            // do nothing
-        }
-        break;
-    }
 }

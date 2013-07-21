@@ -360,12 +360,12 @@ void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
     lsapitime = (time_t)(ntheader->FileHeader.TimeDateStamp);
     
     compiletime = std::max(lsexetime, lsapitime);
-    tm* timeStruct = gmtime(&compiletime);
+    tm timeStruct;
     
-    if (timeStruct)
+    if (gmtime_s(&timeStruct, &compiletime) == 0)
     {
         _tcsftime(pszValue, cchValue,
-            _T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), timeStruct);
+            _T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), &timeStruct);
     }
     else
     {

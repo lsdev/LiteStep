@@ -277,7 +277,7 @@ HINSTANCE LSExecute(HWND hOwner, LPCSTR pszCommand, int nShowCmd)
                 char szDir[_MAX_DIR];
                 char szFullDir[_MAX_DIR + _MAX_DRIVE];
                 
-                _splitpath(szCommand, szFullDir, szDir, NULL, NULL);
+                _splitpath_s(szCommand, szFullDir, _countof(szFullDir), szDir, _countof(szDir), nullptr, 0, nullptr, 0);
                 StringCchCat(szFullDir, _MAX_DIR + _MAX_DRIVE, szDir);
                 
                 hResult = LSExecuteEx(hOwner, NULL, szCommand, pszArgs,
@@ -679,6 +679,7 @@ BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR* pszNextToken, BOOL bUseB
         
         if (pszStartMarker && pszToken)
         {
+            //StringCchCopyNA(pszToken, cchToken, pszStartMarker, pszCurrent - pszStartMarker);
             strncpy(pszToken, pszStartMarker, pszCurrent - pszStartMarker);
             pszToken[pszCurrent - pszStartMarker] = '\0';
         }

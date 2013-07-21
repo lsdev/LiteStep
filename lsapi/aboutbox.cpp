@@ -24,6 +24,7 @@
 #include <CommCtrl.h>
 #include <WindowsX.h>
 #include <math.h>
+#include <strsafe.h>
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -455,7 +456,7 @@ static void AboutBangs(HWND hListView)
     
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     
-    strcpy(text, "Bang Command");
+    StringCchCopy(text, _countof(text), "Bang Command");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 2;
@@ -464,7 +465,7 @@ static void AboutBangs(HWND hListView)
     
     ListView_InsertColumn(hListView, 0, &columnInfo);
     
-    strcpy(text, "Module");
+    StringCchCopy(text, _countof(text), "Module");
     columnInfo.cx = width - columnInfo.cx;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -488,7 +489,7 @@ static void AboutDevTeam(HWND hListView)
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     char text[32];
     
-    strcpy(text, "Nick");
+    StringCchCopy(text, _countof(text), "Nick");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 3;
@@ -497,7 +498,7 @@ static void AboutDevTeam(HWND hListView)
     
     ListView_InsertColumn(hListView, 0, &columnInfo);
     
-    strcpy(text, "Real Name");
+    StringCchCopy(text, _countof(text), "Real Name");
     columnInfo.cx = (2 * width) / 3;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -560,7 +561,7 @@ static void AboutModules(HWND hListView)
     LVCOLUMN columnInfo;
     char text[32];
     
-    strcpy(text, "Module");
+    StringCchCopy(text, _countof(text), "Module");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
@@ -586,7 +587,7 @@ static BOOL CALLBACK PerformanceCallback(LPCSTR pszPath, DWORD dwLoadTime, LPARA
     CallbackInfo* pCi = (CallbackInfo*)lParam;
     
     CHAR szModule[MAX_PATH] = { 0 };
-    strcpy(szModule, pszPath);
+    StringCchCopy(szModule, _countof(szModule), pszPath);
     PathStripPath(szModule);
     
     LVITEM itemInfo;
@@ -597,7 +598,7 @@ static BOOL CALLBACK PerformanceCallback(LPCSTR pszPath, DWORD dwLoadTime, LPARA
     
     ListView_InsertItem(pCi->hListView, &itemInfo);
     
-    sprintf(szModule, "%dms", dwLoadTime);
+    StringCchPrintf(szModule, _countof(szModule), "%dms", dwLoadTime);
     ListView_SetItemText(pCi->hListView, pCi->nItem, 1, szModule);
     
     ++pCi->nItem;
@@ -616,7 +617,7 @@ static void AboutPerformance(HWND hListView)
     
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     
-    strcpy(text, "Module");
+    StringCchCopy(text, _countof(text), "Module");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 2;
@@ -625,7 +626,7 @@ static void AboutPerformance(HWND hListView)
     
     ListView_InsertColumn(hListView, 0, &columnInfo);
     
-    strcpy(text, "Load Time");
+    StringCchCopy(text, _countof(text), "Load Time");
     columnInfo.cx = width - columnInfo.cx;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -669,7 +670,7 @@ static void AboutRevIDs(HWND hListView)
     LVCOLUMN columnInfo;
     char text[32];
     
-    strcpy(text, "Revision ID");
+    StringCchCopy(text, _countof(text), "Revision ID");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
@@ -759,7 +760,7 @@ static void AboutSysInfo(HWND hListView)
     
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     
-    strcpy(text, "Name");
+    StringCchCopy(text, _countof(text), "Name");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 3 + width / 8;
@@ -771,7 +772,7 @@ static void AboutSysInfo(HWND hListView)
     /* Using this odd size, keeps the columns aligned with
      * the other list views, and also gives the text a little
      * more room to keep from being truncated. */
-    strcpy(text, "Value");
+    StringCchCopy(text, _countof(text), "Value");
     columnInfo.cx = (2 * width) / 3 - width / 8;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -779,7 +780,7 @@ static void AboutSysInfo(HWND hListView)
     ListView_InsertColumn(hListView, 1, &columnInfo);
     
     // operating system and version
-    strcpy(text, "Operating System");
+    StringCchCopy(text, _countof(text), "Operating System");
     itemInfo.mask = LVIF_TEXT;
     itemInfo.iItem = i;
     itemInfo.pszText = text;
@@ -824,7 +825,7 @@ static void AboutSysInfo(HWND hListView)
         dwAvailPageFile = (DWORDLONG)ms.dwAvailPageFile;
     }
     
-    strcpy(text, "Memory Load");
+    StringCchCopy(text, _countof(text), "Memory Load");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -833,7 +834,7 @@ static void AboutSysInfo(HWND hListView)
     StringCchPrintf(buffer, MAX_PATH, "%d%%", dwMemoryLoad);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    strcpy(text, "Physical Memory Total");
+    StringCchCopy(text, _countof(text), "Physical Memory Total");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -842,7 +843,7 @@ static void AboutSysInfo(HWND hListView)
     FormatBytes(dwTotalPhys, buffer, 64);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    strcpy(text, "Physical Memory Available");
+    StringCchCopy(text, _countof(text), "Physical Memory Available");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -851,7 +852,7 @@ static void AboutSysInfo(HWND hListView)
     FormatBytes(dwAvailPhys, buffer, 64);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    strcpy(text, "Swap Space Total");
+    StringCchCopy(text, _countof(text), "Swap Space Total");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -860,7 +861,7 @@ static void AboutSysInfo(HWND hListView)
     FormatBytes(dwTotalPageFile, buffer, 64);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    strcpy(text, "Swap Space Available");
+    StringCchCopy(text, _countof(text), "Swap Space Available");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     

@@ -42,8 +42,6 @@ class ModuleManager;
 #define RSH_PROGMAN     2
 #define RSH_TASKMAN     3
 
-#define LT_RUDEAPP 0xBEAF
-
 // Program Options
 const char szMainWindowClass[] = "TApplication";
 const char szMainWindowTitle[] = "LiteStep";
@@ -99,15 +97,6 @@ private:
     // Recovery Menu
     // This is a special service that is not kept in the services array
     IService* m_pRecoveryMenu;
-    
-    // LSAutoHideModules helpers
-    bool m_bAutoHideModules;
-    HMONITOR m_hFullScreenMonitor; // = NULL;
-    static HMONITOR _FullScreenGetMonitorHelper(HWND hWnd);
-    static BOOL CALLBACK _EnumThreadFSWnd(HWND hWnd, LPARAM lParam);
-    HMONITOR _FullScreenGetMonitor(HWND hWnd) const;
-    void _FullScreenHandler(HMONITOR hMonFullScreen);
-    void _HandleShellHooks(UINT uMsg, WPARAM wParam, LPARAM lParam);
     
     // Windows
     HWND m_hMainWindow; // = NULL;

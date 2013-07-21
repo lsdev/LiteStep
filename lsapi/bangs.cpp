@@ -487,15 +487,19 @@ static void EMPHandler(HWND hWnd, PEMPCONFIG pEMPCfg)
         else if ((lUserData == HIDEmagicDWord) &&
                  (pEMPCfg->uMode == EMP_SHOW || pEMPCfg->uMode == EMP_TOGGLE))
         {
-            SetWindowLongPtr(hWnd, GWLP_USERDATA, magicDWord);
-            pEMPCfg->hDwp = DeferWindowPos(
-                 pEMPCfg->hDwp
-                ,hWnd
-                ,NULL
-                ,0 ,0
-                ,0 ,0
-                ,SWP_SHOWWINDOW | DEFAULT_FLAGS
-            );
+            if (NULL == pEMPCfg->hMon || MonitorFromWindow(
+                hWnd, MONITOR_DEFAULTTONULL) == pEMPCfg->hMon)
+            {
+                SetWindowLongPtr(hWnd, GWLP_USERDATA, magicDWord);
+                pEMPCfg->hDwp = DeferWindowPos(
+                     pEMPCfg->hDwp
+                    ,hWnd
+                    ,NULL
+                    ,0 ,0
+                    ,0 ,0
+                    ,SWP_SHOWWINDOW | DEFAULT_FLAGS
+                );
+            }
         }
     }
 }
@@ -540,10 +544,22 @@ static void BangHideModules(HWND hCaller, LPCSTR /* pszArgs */)
 //
 // BangShowModules(HWND hCaller, LPCSTR pszArgs)
 //
-static void BangShowModules(HWND /* hCaller */, LPCSTR /* pszArgs */)
+static void BangShowModules(HWND hCaller, LPCSTR /* pszArgs */)
 {
     EMPCONFIG EMPCfg = { 0 };
     
+    // A hack to support showing modules on a specific monitor.
+    if (NULL != hCaller && !IsWindow(hCaller))
+    {
+        // Check to see if this is a valid monitor handle
+        MONITORINFO mi;
+        mi.cbSize = sizeof(MONITORINFO);
+        if (GetMonitorInfo((HMONITOR)hCaller, &mi))
+        {
+            EMPCfg.hMon = (HMONITOR)hCaller;
+        }
+    }
+
     EMPCfg.uMode = EMP_SHOW;
     EMPCfg.hDwp = BeginDeferWindowPos(10);
     EnumWindows(EnumModulesProc, (LPARAM)&EMPCfg);
