@@ -342,6 +342,28 @@ BEGIN
     IDS_LITESTEP_SHUTDOWNWIN "&Stäng av..."
 END
 
+STRINGTABLE 
+BEGIN
+    IDS_MODULENOTFOUND_ERROR 
+                            "Fel: Modulen kunde inte hittas.\Kontrollera dina inställningar."
+    IDS_INITMODULEEXNOTFOUND_ERROR 
+                            "Fel: Kunde inte hitta initModuleEx() i modulen.\n\Kontrollera att DLL filen är en LiteStep modul."
+    IDS_QUITMODULENOTFOUND_ERROR 
+                            "Fel: Kunde inte hitta ().\n\nPlease conirm that the dll is a LiteStep module."
+    IDS_MODULEINITEXCEPTION_ERROR 
+                            "Ett fel inträffade under modul initialiseringen.\n\nKontakta modulens skapare."
+    IDS_LITESTEP_CREATEWINDOW_ERROR "Misslyckades med att skapa fönstret."
+    IDS_LITESTEP_BANGEXCEPTION 
+                            "Ett fel inträffade under exekvering av ett bang kommando.\nKontakta modulens skapare.\n\nBang parameterar: %s"
+    IDS_LITESTEP_REGISTERCLASS_ERROR "Misslyckades med att registrera fönter klassen."
+    IDS_MODULEDEPENDENCY_ERROR 
+    "Fel: Kunde inte ladda modulen.\nTroligen saknas ett exekveringsbibliotek.\n\n"
+    IDS_RECURSIVEVAR        "Fel: Variabeln ""%s"" är rekursivt definierad."
+    IDS_MATHEXCEPTION       "Fel i uttrycket:\n  %s\n\nDescription:\n  %s"
+    IDS_LSAPI_INIT_ERROR    "Initaliseringen av LiteStep's API misslyckades."
+    IDS_LITESTEP_INIT_ERROR "Initaliseringen av LiteStep misslyckades.\n\nFel kod: 0x%.8X"
+END
+
 #endif    // Swedish resources
 /////////////////////////////////////////////////////////////////////////////
 
