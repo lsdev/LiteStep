@@ -734,7 +734,7 @@ static HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
     
     if (SUCCEEDED(hr))
     {
-#if !defined(WIN64)
+#if !defined(_WIN64)
         if (IsOS(OS_WOW6432))
 #endif
         {
