@@ -198,6 +198,14 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
             // Apply any prefix, as necesary
             if (!m_stPrefixes.empty())
             {
+                // If the key starts with a *, put that * at the begining
+                if (*ptzCurrent == _T('*'))
+                {
+                    StringCchCat(ptzName, MAX_RCCOMMAND, _T("*"));
+                    ++ptzCurrent;
+                    --stEndConfig;
+                }
+
                 // Don't apply prefixes to special keywords
                 if (!( _tcsnicmp(ptzCurrent, _T("if"), stEndConfig) == 0
                     || _tcsnicmp(ptzCurrent, _T("else"), stEndConfig) == 0
@@ -205,10 +213,17 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     || _tcsnicmp(ptzCurrent, _T("endif"), stEndConfig) == 0
                     ))
                 {
-                    StringCchCopy(ptzName, MAX_RCCOMMAND, m_stPrefixes.top().tzString);
+                    StringCchCat(ptzName, MAX_RCCOMMAND, m_stPrefixes.top().tzString);
+                }
+
+                // If the keyname is simply -, ignore it.
+                if (_tcsnicmp(ptzCurrent, _T("-"), stEndConfig) == 0)
+                {
+                    ++ptzCurrent;
+                    stEndConfig = 0;
                 }
             }
-            
+
             // Copy directive name to ptzName.
             if (SUCCEEDED(StringCchCatN(ptzName, MAX_RCCOMMAND, ptzCurrent, stEndConfig)))
             {
