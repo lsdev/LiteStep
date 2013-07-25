@@ -24,15 +24,18 @@
 HMODULE DDEStub::m_hShDocVw = NULL;
 DDEStub::ShellDDEFunc DDEStub::m_pShellDDEInit = NULL;
 
+
 DDEStub::DDEStub()
 {
     // do nothing
 }
 
+
 DDEStub::~DDEStub()
 {
     // do nothing
 }
+
 
 HRESULT DDEStub::Start()
 {
@@ -68,6 +71,7 @@ HRESULT DDEStub::Start()
     return hr;
 }
 
+
 HRESULT DDEStub::Stop()
 {
     if (m_pShellDDEInit)
@@ -80,5 +84,11 @@ HRESULT DDEStub::Stop()
         FreeLibrary(m_hShDocVw);
     }
     
+    return S_OK;
+}
+
+
+HRESULT DDEStub::Recycle()
+{
     return S_OK;
 }

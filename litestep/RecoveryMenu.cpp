@@ -142,6 +142,16 @@ HRESULT RecoveryMenu::Stop()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
+// Recycle
+//
+HRESULT RecoveryMenu::Recycle()
+{
+    return S_OK;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
 // ThreadThunk
 //
 DWORD WINAPI RecoveryMenu::ThreadThunk(LPVOID pParam)

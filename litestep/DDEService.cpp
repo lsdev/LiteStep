@@ -121,6 +121,13 @@ HRESULT DDEService::Stop()
     return hr;
 }
 
+
+HRESULT DDEService::Recycle()
+{
+    return S_OK;
+}
+
+
 bool DDEService::_DoStart()
 {
     bool bReturn = false;

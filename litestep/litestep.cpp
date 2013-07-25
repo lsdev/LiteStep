@@ -1351,16 +1351,9 @@ void CLiteStep::_Recycle()
     // Re-initialize the bang and settings manager in LSAPI
     LSAPIReloadBangs();
     LSAPIReloadSettings();
-    
-    // Start/Stop the FullscreenMonitor service
-    if (GetRCBool("LSAutoHideModules", TRUE))
-    {
-        m_pFullscreenMonitor->Start();
-    }
-    else
-    {
-        m_pFullscreenMonitor->Stop();
-    }
+
+    // Call service's Recycle function
+    for_each(m_Services.begin(), m_Services.end(), mem_fun(&IService::Recycle));
 
     _StartManagers();
 }

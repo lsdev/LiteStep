@@ -34,6 +34,7 @@ public:
     
     HRESULT Start();
     HRESULT Stop();
+    HRESULT Recycle();
     
     static HDDEDATA CALLBACK DdeCallback(
         UINT wType, UINT wFmt, HCONV hConv, HSZ hszTopic,

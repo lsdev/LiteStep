@@ -124,6 +124,7 @@ public:
     //
     virtual HRESULT Start();
     virtual HRESULT Stop();
+    virtual HRESULT Recycle();
     
     // resend all icon data
     HWND SendSystemTray();

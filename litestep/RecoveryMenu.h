@@ -47,6 +47,7 @@ public:
     //
     HRESULT Start();
     HRESULT Stop();
+    HRESULT Recycle();
     
 private:
     static DWORD WINAPI ThreadThunk(LPVOID pParam);

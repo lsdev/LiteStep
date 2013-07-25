@@ -32,6 +32,7 @@ public:
     
     HRESULT Start();
     HRESULT Stop();
+    HRESULT Recycle();
     
 private:
     typedef void (WINAPI* ShellDDEFunc)(BOOL);

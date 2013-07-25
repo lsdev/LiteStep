@@ -172,6 +172,16 @@ HRESULT TrayService::Stop()
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //
+// Recycle()
+//
+HRESULT TrayService::Recycle()
+{
+    return S_OK;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//
 // createWindows
 //
 HRESULT TrayService::createWindows()

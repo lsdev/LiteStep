@@ -20,7 +20,6 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "FullscreenMonitor.h"
-#include <list>
 #include "../lsapi/lsapi.h"
 #include "../utility/debug.hpp"
 
@@ -28,9 +27,9 @@
 //
 // FullscreenMonitor
 //
-FullscreenMonitor::FullscreenMonitor()
+FullscreenMonitor::FullscreenMonitor() :
+    m_workerSleepDuration(100)
 {
-    m_bIsRunning = false;
     m_bReHide = false;
 }
 
@@ -40,10 +39,6 @@ FullscreenMonitor::FullscreenMonitor()
 //
 FullscreenMonitor::~FullscreenMonitor()
 {
-    if (m_bIsRunning)
-    {
-        Stop();
-    }
 }
 
 
@@ -172,9 +167,35 @@ HMONITOR FullscreenMonitor::IsFullscreenWindow(HWND hWnd)
 
 
 //
+// ShowModules
+//
+void FullscreenMonitor::ShowModules(HMONITOR hMonitor)
+{
+    if (m_bAutoHideModules)
+    {
+        ParseBangCommand((HWND)hMonitor, "!ShowModules", nullptr);
+    }
+    PostMessage(GetLitestepWnd(), LM_FULLSCREENDEACTIVATED, (WPARAM) hMonitor, 0);
+}
+
+
+//
+// HideModules
+//
+void FullscreenMonitor::HideModules(HMONITOR hMonitor, HWND hWnd)
+{
+    if (m_bAutoHideModules)
+    {
+        ParseBangCommand((HWND)hMonitor, "!HideModules", nullptr);
+    }
+    PostMessage(GetLitestepWnd(), LM_FULLSCREENACTIVATED, (WPARAM) hMonitor, (LPARAM) hWnd);
+}
+
+
+//
 // ThreadProc
 //
-void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
+void FullscreenMonitor::ThreadProc()
 {
     //
     struct FSWindow {
@@ -186,52 +207,52 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
         HMONITOR hMonitor;
     };
 
-    // How long to sleep for
-    std::chrono::milliseconds sleepDuration(100);
-
     // List of all currently living known fullscreen windows
     std::list<FSWindow> fullscreenWindows;
 
+    // The monitors which currently have modules hidden
+    std::unordered_multiset<HMONITOR> hiddenMonitors;
+
     // On startup, find any existing fullscreen windows.
-    EnumDesktopWindows(nullptr, [] (HWND hWnd, LPARAM lParam) -> BOOL {
+    EnumDesktopWindows(nullptr, [] (HWND hWnd, LPARAM lParam) -> BOOL
+    {
         HMONITOR hMonitor = IsFullscreenWindow(hWnd);
         std::list<FSWindow> *fullscreenWindows = (std::list<FSWindow>*)lParam;
         if (hMonitor)
         {
-            // If the modules on this monitor are not already hidden, hide them.
-            bool bAlreadyHidden = false;
-            for (FSWindow window : *fullscreenWindows)
-            {
-                if (window.hMonitor == hMonitor)
-                {
-                    bAlreadyHidden = true;
-                    break;
-                }
-            }
-            if (!bAlreadyHidden)
-            {
-                ParseBangCommand((HWND)hMonitor, "!HideModules", nullptr);
-            }
-
             // And add it to the list of fullscreen windows.
             fullscreenWindows->push_back(FSWindow(hWnd, hMonitor));
         }
         return TRUE;
     }, (LPARAM)&fullscreenWindows);
 
+    // Hide modules on any monitor we found
+    for (FSWindow window : fullscreenWindows)
+    {
+        hiddenMonitors.insert(window.hMonitor);
+        if (hiddenMonitors.count(window.hMonitor) == 1)
+        {
+            HideModules(window.hMonitor, window.hWnd);
+        }
+    }
+
     // Main Loop
-    while (pFullscreenMonitor->m_bRun.load())
+    while (m_bRun.load())
     {
         HWND hwndForeGround = GetForegroundWindow();
         bool bCheckedForeGround = false;
 
         // Re-Hide modules on all monitors
-        if (pFullscreenMonitor->m_bReHide.load())
+        if (m_bReHide.load())
         {
-            pFullscreenMonitor->m_bReHide.store(false);
+            hiddenMonitors.clear();
             for (FSWindow window : fullscreenWindows)
             {
-                ParseBangCommand((HWND)window.hMonitor, "!HideModules", nullptr);
+                hiddenMonitors.insert(window.hMonitor);
+                if (hiddenMonitors.count(window.hMonitor) == 1)
+                {
+                    HideModules(window.hMonitor, window.hWnd);
+                }
             }
         }
 
@@ -250,26 +271,23 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
             // 
             if (hNewMonitor != iter->hMonitor)
             {
-                // Check if there are any other fullscreen windows on this monitor.
-                __int8 nFSWindows = 0;
-                for (FSWindow window : fullscreenWindows)
+                hiddenMonitors.erase(iter->hMonitor);
+
+                // If there are no fullscreen windows left on the monitor, show the modules
+                if (hiddenMonitors.count(iter->hMonitor) == 0)
                 {
-                    if (window.hMonitor == iter->hMonitor)
-                    {
-                        ++nFSWindows;
-                    }
-                }
-                // If not, show the modules on it.
-                if (nFSWindows < 2)
-                {
-                    ParseBangCommand((HWND)iter->hMonitor, "!ShowModules", nullptr);
+                    ShowModules(iter->hMonitor);
                 }
 
                 // Check if the window moved to another monitor (and stayed fullscreen)
                 if (hNewMonitor)
                 {
                     iter->hMonitor = hNewMonitor;
-                    ParseBangCommand((HWND)hNewMonitor, "!HideModules", nullptr);
+                    hiddenMonitors.insert(hNewMonitor);
+                    if (hiddenMonitors.count(hNewMonitor) == 1)
+                    {
+                        HideModules(hNewMonitor, iter->hWnd);
+                    }
                 }
                 else
                 {
@@ -287,36 +305,20 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
             HMONITOR hMonitor = IsFullscreenWindow(hwndForeGround);
             if (hMonitor)
             {
-                // Check if we already know of a fullscreen window on this monitor.
-                bool bKnownWindow = false;
-                for (FSWindow window : fullscreenWindows)
-                {
-                    if (window.hMonitor == hMonitor)
-                    {
-                        bKnownWindow = true;
-                        break;
-                    }
-                }
-
                 // Add the window to the list of known foreground windows.
                 fullscreenWindows.push_back(FSWindow(hwndForeGround, hMonitor));
+                hiddenMonitors.insert(hMonitor);
 
                 // If we didn't know about any fullscreen windows on this monitor before, hide the modules on it.
-                if (!bKnownWindow)
+                if (hiddenMonitors.count(hMonitor) == 1)
                 {
-                    ParseBangCommand((HWND)hMonitor, "!HideModules", nullptr);
+                    HideModules(hMonitor, hwndForeGround);
                 }
             }
         }
 
-        //
-        std::this_thread::sleep_for(sleepDuration);
-    }
-
-    // We are stoping, if there are any current fullscreen windows, show all modules.
-    if (!fullscreenWindows.empty())
-    {
-        ParseBangCommand(nullptr, "!ShowModules", nullptr);
+        // Avoid using excesive amounts of CPU time
+        std::this_thread::sleep_for(m_workerSleepDuration);
     }
 }
 
@@ -326,22 +328,9 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
 //
 HRESULT FullscreenMonitor::Start()
 {
-    // Ugly hack
-    if (GetRCBool("LSAutoHideModules", TRUE) == FALSE)
-    {
-        return S_OK;
-    }
-
-    if (!m_bIsRunning)
-    {
-        m_bIsRunning = true;
-        m_bRun.store(true);
-        m_fullscreenMonitorThread = std::thread(ThreadProc, this);
-    }
-    else
-    {
-        m_bReHide.store(true);
-    }
+    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) != FALSE;
+    m_bRun.store(true);
+    m_fullscreenMonitorThread = std::thread(std::bind(&FullscreenMonitor::ThreadProc, this));
 
     return S_OK;
 }
@@ -352,13 +341,29 @@ HRESULT FullscreenMonitor::Start()
 //
 HRESULT FullscreenMonitor::Stop()
 {
-    if (m_bIsRunning)
+    m_bRun.store(false);
+    m_fullscreenMonitorThread.join();
+
+    return S_OK;
+}
+
+
+//
+// IService::Recycle
+//
+HRESULT FullscreenMonitor::Recycle()
+{
+    bool bAlreadyHidden = m_bAutoHideModules;
+    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) != FALSE;
+
+    // We need to show the modules that were hidden before
+    if (bAlreadyHidden && !m_bAutoHideModules)
     {
-        m_bIsRunning = false;
-        m_bRun.store(false);
-        m_fullscreenMonitorThread.join();
-        m_bReHide.store(false);
+        // TODO::We could possibly just show the modules on monitors with fullscreen windows. 
+        ParseBangCommand(nullptr, "!ShowModules", nullptr);
     }
+
+    m_bReHide.store(true);
 
     return S_OK;
 }

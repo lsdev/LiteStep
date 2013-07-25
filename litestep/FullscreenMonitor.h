@@ -26,6 +26,8 @@
 #include "../utility/IService.h"
 #include <thread>
 #include <atomic>
+#include <list>
+#include <unordered_set>
 
 class FullscreenMonitor: public IService
 {
@@ -35,18 +37,29 @@ public:
     
     HRESULT Start();
     HRESULT Stop();
+    HRESULT Recycle();
 
 private:
     static HMONITOR _FullScreenGetMonitorHelper(HWND hWnd);
     static BOOL CALLBACK _EnumThreadFSWnd(HWND hWnd, LPARAM lParam);
     static HMONITOR IsFullscreenWindow(HWND hwnd);
-    static void ThreadProc(FullscreenMonitor* pFullscreenMonitor);
+    void ThreadProc();
+    void ShowModules(HMONITOR hMonitor);
+    void HideModules(HMONITOR hMonitor, HWND hWnd);
 
+    // LS thread only
 private:
     std::thread m_fullscreenMonitorThread;
+    
+    // Shared
+private:
     std::atomic<bool> m_bRun;
     std::atomic<bool> m_bReHide;
-    bool m_bIsRunning;
+    std::atomic<bool> m_bAutoHideModules;
+
+    // Worker thread only
+private:
+    std::chrono::milliseconds m_workerSleepDuration;
 };
 
 #endif // FULLSCREENMONITOR_H

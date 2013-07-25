@@ -404,12 +404,26 @@ Contents:
       Else
       Endif
       
-    - Surrounding Statements within curly braces like this will cause any
-      command within the braces to have the prefix prefixed to it.
+    - Surrounding Statements within curly braces as shown below like will cause
+      any command within the braces to have the specified prefix prefixed to it.
+      Within prefix braces, the key - is evaluated to just the prefix.
+      Keys starting with a * are treated specially, and the begining * is put at
+      the begining of the final key name.
+      
+      This:
       
       Prefix
       {
+        - Value
+        Key Value
+        *Event Value
       }
+    
+      Is equivalent to this:
+      
+      Prefix Value
+      PrefixKey Value
+      *PrefixEvent Value
     
   2. Step.rc Directive Parser
 

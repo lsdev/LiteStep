@@ -27,6 +27,7 @@
 class IService : public CountedBase
 {
 public:
+    virtual HRESULT Recycle() = 0;
     virtual HRESULT Start() = 0;
     virtual HRESULT Stop() = 0;
 };

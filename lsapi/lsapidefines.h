@@ -149,6 +149,10 @@
 #define LM_WINDOWREPLACING          (LM_SHELLHOOK + HSHELL_WINDOWREPLACING)
 #define LM_MONITORCHANGED           (LM_SHELLHOOK + HSHELL_MONITORCHANGED)
 
+// 
+#define LM_FULLSCREENACTIVATED      32768
+#define LM_FULLSCREENDEACTIVATED    32769
+
 
 //-----------------------------------------------------------------------------
 // CONSTANT DEFINES
