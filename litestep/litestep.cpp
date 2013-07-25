@@ -1193,18 +1193,15 @@ HRESULT CLiteStep::_InitServices()
     //
     // FullscreenMonitor service
     //
-    if (GetRCBool("LSAutoHideModules", TRUE))
-    {
-        m_pFullscreenMonitor = new (std::nothrow) FullscreenMonitor();
+    m_pFullscreenMonitor = new (std::nothrow) FullscreenMonitor();
 
-        if (m_pFullscreenMonitor)
-        {
-            m_Services.push_back(m_pFullscreenMonitor);
-        }
-        else
-        {
-            return E_OUTOFMEMORY;
-        }
+    if (m_pFullscreenMonitor)
+    {
+        m_Services.push_back(m_pFullscreenMonitor);
+    }
+    else
+    {
+        return E_OUTOFMEMORY;
     }
 
     
@@ -1342,7 +1339,6 @@ void CLiteStep::_Recycle()
     {
         return;
     }
-    
     _StopManagers();
     
     if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
@@ -1355,7 +1351,7 @@ void CLiteStep::_Recycle()
     // Re-initialize the bang and settings manager in LSAPI
     LSAPIReloadBangs();
     LSAPIReloadSettings();
-
+    
     // Start/Stop the FullscreenMonitor service
     if (GetRCBool("LSAutoHideModules", TRUE))
     {
@@ -1365,7 +1361,7 @@ void CLiteStep::_Recycle()
     {
         m_pFullscreenMonitor->Stop();
     }
-    
+
     _StartManagers();
 }
 

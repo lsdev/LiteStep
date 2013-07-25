@@ -31,6 +31,7 @@
 FullscreenMonitor::FullscreenMonitor()
 {
     m_bIsRunning = false;
+    m_bReHide = false;
 }
 
 
@@ -325,6 +326,12 @@ void FullscreenMonitor::ThreadProc(FullscreenMonitor* pFullscreenMonitor)
 //
 HRESULT FullscreenMonitor::Start()
 {
+    // Ugly hack
+    if (GetRCBool("LSAutoHideModules", TRUE) == FALSE)
+    {
+        return S_OK;
+    }
+
     if (!m_bIsRunning)
     {
         m_bIsRunning = true;
@@ -350,6 +357,7 @@ HRESULT FullscreenMonitor::Stop()
         m_bIsRunning = false;
         m_bRun.store(false);
         m_fullscreenMonitorThread.join();
+        m_bReHide.store(false);
     }
 
     return S_OK;
