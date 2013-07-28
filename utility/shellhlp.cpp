@@ -665,6 +665,7 @@ UINT GetWindowsVersion()
 //
 BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue)
 {
+#ifndef _WIN64
     typedef BOOL (WINAPI* Wow64DisableWow64FsRedirectionProc)(PVOID*);
     
     HMODULE hKernel32 = GetModuleHandle(_T("kernel32.dll"));
@@ -681,6 +682,10 @@ BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue)
     }
     
     return bResult;
+#else
+    UNREFERENCED_PARAMETER(ppvOldValue);
+    return TRUE;
+#endif
 }
 
 
@@ -690,6 +695,7 @@ BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue)
 //
 BOOL LSRevertWow64FsRedirection(PVOID pvOldValue)
 {
+#ifndef _WIN64
     typedef BOOL (WINAPI* Wow64RevertWow64FsRedirectionProc)(PVOID);
     
     HMODULE hKernel32 = GetModuleHandle(_T("kernel32.dll"));
@@ -706,6 +712,10 @@ BOOL LSRevertWow64FsRedirection(PVOID pvOldValue)
     }
     
     return bResult;
+#else
+    UNREFERENCED_PARAMETER(pvOldValue);
+    return TRUE;
+#endif
 }
 
 
@@ -715,7 +725,7 @@ BOOL LSRevertWow64FsRedirection(PVOID pvOldValue)
 //
 BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo)
 {
-    PVOID pvOldValue = NULL;
+    PVOID pvOldValue = nullptr;
     LSDisableWow64FsRedirection(&pvOldValue);
     
     BOOL bReturn = ShellExecuteEx(lpExecInfo);
@@ -732,9 +742,9 @@ BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo)
 HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
                           LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow)
 {
-    PVOID pvOldValue = NULL;
+    PVOID pvOldValue = nullptr;
     LSDisableWow64FsRedirection(&pvOldValue);
-    
+
     HINSTANCE hinstResult = ShellExecute(
         hwnd, lpOperation, lpFile, lpParameters, lpDirectory, nShow);
     
