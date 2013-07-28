@@ -482,11 +482,11 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     // ShellExecuteEx is used. That's really ugly but it *should* work.
     //
     TCHAR tzToken[MAX_LINE_LENGTH] = { 0 };
-    LPCTSTR ptzArgs = NULL;
-    
+    LPCTSTR ptzArgs = nullptr;
+
     GetToken(ptzCommandLine, tzToken, &ptzArgs, FALSE);
     
-    HANDLE hProcess = NULL;
+    HANDLE hProcess = nullptr;
     
     if (strchr(tzToken, _T('\\')) || strchr(tzToken, _T(':')))
     {
@@ -497,7 +497,7 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
         hProcess = _ShellExecuteEx(tzToken, ptzArgs);
     }
     
-    if (hProcess != NULL)
+    if (hProcess != nullptr)
     {
         if (dwFlags & ERK_WAITFOR_QUIT)
         {
@@ -510,10 +510,15 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
         
         CloseHandle(hProcess);
     }
+#ifdef _DEBUG
     else
     {
-        TRACE("StartupRunner failed to launch '%s'", ptzCommandLine);
+        TCHAR tzError[4096];
+        DescriptionFromHR(HrGetLastError(), tzError, _countof(tzError));
+        TRACE("StartupRunner failed to launch '%s', %s", ptzCommandLine, tzError);
+
     }
+#endif
 }
 
 
