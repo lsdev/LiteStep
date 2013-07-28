@@ -361,7 +361,14 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
                     }
 
                     // Wait for the process to exit
-                    WaitForSingleObject(hShellProc, 3000); // Wait for at most 3 seconds.
+                    if (WaitForSingleObject(hShellProc, 3000) != WAIT_OBJECT_0) // Wait for at most 3 seconds.
+                    {
+                        // At this point, forcibly terminate the proc
+                        TerminateProcess(hShellProc, 0);
+
+                        // Wait another 3 seconds, max
+                        WaitForSingleObject(hShellProc, 3000);
+                    }
                 }
 
                 CloseHandle(hShellProc);
