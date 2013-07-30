@@ -232,6 +232,9 @@ BEGIN
     IDS_MATHEXCEPTION       "Error in Expression:\n  %s\n\nDescription:\n  %s"
     IDS_LSAPI_INIT_ERROR    "Failed to initialize the LiteStep API."
     IDS_LITESTEP_INIT_ERROR "Failed to initialize LiteStep.\nPlease contact the LiteStep development team.\n\nError code: 0x%.8X"
+    
+    IDS_MODULEWRONGARCH32_ERROR "Error: Could not load module.\n\nThe module seems to compiled for 64-bit LiteStep. This is a 32-bit version of LiteStep, which can only load 32-bit modules."
+    IDS_MODULEWRONGARCH64_ERROR "Error: Could not load module.\n\nThe module seems to compiled for 32-bit LiteStep. This is a 64-bit version of LiteStep, which can only load 64-bit modules."
 END
 
 #endif    // English (U.S.) resources

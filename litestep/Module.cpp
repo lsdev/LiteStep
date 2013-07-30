@@ -41,6 +41,31 @@ Module::Module(const std::string& sLocation, DWORD dwFlags)
 }
 
 
+static WORD GetModuleArchitecture(LPCTSTR tzModuleName)
+{
+    WORD wRet = 0;
+    HANDLE hFile = CreateFile(tzModuleName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if (hFile != INVALID_HANDLE_VALUE)
+    {
+        HANDLE hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+        if (hFileMapping != nullptr)
+        {
+            LPVOID lpFileBase = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
+            if (lpFileBase != nullptr)
+            {
+                PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)lpFileBase;
+                PIMAGE_NT_HEADERS pNTHeader = (PIMAGE_NT_HEADERS)((LPBYTE)pDosHeader + pDosHeader->e_lfanew);
+                wRet = pNTHeader->OptionalHeader.Magic;
+                UnmapViewOfFile(lpFileBase);
+            }
+            CloseHandle(hFileMapping);
+        }
+        CloseHandle(hFile);
+    }
+    return wRet;
+}
+
+
 bool Module::_LoadDll()
 {
     bool bReturn = false;
@@ -54,7 +79,7 @@ bool Module::_LoadDll()
         // disabled them via SetErrorMode. We force their display here.
         // First, make Windows display all errors
         UINT uOldMode = SetErrorMode(0);
-        
+
         if ((m_hInstance = LoadLibrary(m_tzLocation.c_str())) != nullptr)
         {
             m_pInitEx = (initModuleExProc)GetProcAddress(
@@ -99,7 +124,24 @@ bool Module::_LoadDll()
         {
             HRESULT hrError = HrGetLastError();
 
-            if (PathFileExists(m_tzLocation.c_str()))
+#if defined(_WIN64)
+            if (GetModuleArchitecture(m_tzLocation.c_str()) == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+            {
+                RESOURCE_STR(NULL, IDS_MODULEWRONGARCH64_ERROR,
+                    _T("Error: Could not load module.\n"
+                    "\n"
+                    "The module seems to compiled for 32-bit LiteStep. This is a 64-bit version of LiteStep, which can only load 64-bit modules."));
+            }
+#else
+            if (GetModuleArchitecture(m_tzLocation.c_str()) == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+            {
+                RESOURCE_STR(NULL, IDS_MODULEWRONGARCH32_ERROR,
+                    _T("Error: Could not load module.\n"
+                    "\n"
+                    "The module seems to compiled for 64-bit LiteStep. This is a 32-bit version of LiteStep, which can only load 32-bit modules."));
+            }
+#endif
+            else if (PathFileExists(m_tzLocation.c_str()))
             {
                 RESOURCE_STR(NULL, IDS_MODULEDEPENDENCY_ERROR,
                     _T("Error: Could not load module.\n"
