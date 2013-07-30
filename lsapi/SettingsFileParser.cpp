@@ -22,6 +22,8 @@
 #include "SettingsFileParser.h"
 #include "MathEvaluate.h"
 #include "../utility/core.hpp"
+#include <algorithm>
+#include <vector>
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -422,11 +424,17 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         
         // Looking in tzFilter for data :)
         HANDLE hSearch = FindFirstFile(tzFilter, &findData);
+
+        // List of found files
+        std::vector<std::string> foundFiles;
+
+        //
+        auto fileComparer = [] (const std::string s1, const std::string s2) -> bool {
+            return (_stricmp(s1.c_str(), s2.c_str()) > 0);
+        };
         
         if (INVALID_HANDLE_VALUE != hSearch)
         {
-            BOOL FoundNextFile;
-            
             do
             {
                 // stripping out directories, system and hidden files as
@@ -438,24 +446,31 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
                 
                 if (0 == (dwAttrib & findData.dwFileAttributes))
                 {
-                    // Processing the valid cFileName data now.
-                    TCHAR tzFile[MAX_PATH_LENGTH];
-                    
-                    // adding (like above) filename to tzPath to set tzFile
-                    // for opening.
-                    if (tzFile == PathCombine(tzFile, tzPath, findData.cFileName))
-                    {
-                        TRACE("Found and including: \"%s\"", tzFile);
-                        
-                        FileParser fpParser(m_pSettingsMap);
-                        fpParser.ParseFile(tzFile);
-                    }
+                    foundFiles.push_back(findData.cFileName);
+                    std::push_heap(foundFiles.begin(), foundFiles.end(), fileComparer);
                 }
-                
-                FoundNextFile = FindNextFile(hSearch, &findData);
-            } while (FoundNextFile);
+            } while (FindNextFile(hSearch, &findData) != FALSE);
             
             FindClose(hSearch);
+        }
+
+        while (!foundFiles.empty())
+        {
+            // Processing the valid cFileName data now.
+            TCHAR tzFile[MAX_PATH_LENGTH];
+                    
+            // adding (like above) filename to tzPath to set tzFile
+            // for opening.
+            if (tzFile == PathCombine(tzFile, tzPath, foundFiles.begin()->c_str()))
+            {
+                TRACE("Found and including: \"%s\"", tzFile);
+                
+                FileParser fpParser(m_pSettingsMap);
+                fpParser.ParseFile(tzFile);
+            }
+
+            std::pop_heap(foundFiles.begin(), foundFiles.end(), fileComparer);
+            foundFiles.pop_back();
         }
         
         TRACE("Done searching IncludeFolder (%s, line %d): \"%s\"",
