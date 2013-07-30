@@ -213,6 +213,9 @@ void FullscreenMonitor::ThreadProc()
     // The monitors which currently have modules hidden
     std::unordered_multiset<HMONITOR> hiddenMonitors;
 
+    DWORD dwLiteStepProcID;
+    GetWindowThreadProcessId(GetLitestepWnd(), &dwLiteStepProcID);
+
     // On startup, find any existing fullscreen windows.
     EnumDesktopWindows(nullptr, [] (HWND hWnd, LPARAM lParam) -> BOOL
     {
@@ -302,17 +305,35 @@ void FullscreenMonitor::ThreadProc()
         // Check if the currently active window is a fullscreen window.
         if (!bCheckedForeGround)
         {
-            HMONITOR hMonitor = IsFullscreenWindow(hwndForeGround);
-            if (hMonitor)
+            // If the currently active window belongs to litestep, show all modules.
+            DWORD dwProcID;
+            GetWindowThreadProcessId(hwndForeGround, &dwProcID);
+            if (dwProcID == dwLiteStepProcID)
             {
-                // Add the window to the list of known foreground windows.
-                fullscreenWindows.push_back(FSWindow(hwndForeGround, hMonitor));
-                hiddenMonitors.insert(hMonitor);
-
-                // If we didn't know about any fullscreen windows on this monitor before, hide the modules on it.
-                if (hiddenMonitors.count(hMonitor) == 1)
+                if (!hiddenMonitors.empty())
                 {
-                    HideModules(hMonitor, hwndForeGround);
+                    for (HMONITOR hMonitor : hiddenMonitors)
+                    {
+                        ShowModules(hMonitor);
+                    }
+                    hiddenMonitors.clear();
+                    fullscreenWindows.clear();
+                }
+            }
+            else
+            {
+                HMONITOR hMonitor = IsFullscreenWindow(hwndForeGround);
+                if (hMonitor)
+                {
+                    // Add the window to the list of known foreground windows.
+                    fullscreenWindows.push_back(FSWindow(hwndForeGround, hMonitor));
+                    hiddenMonitors.insert(hMonitor);
+
+                    // If we didn't know about any fullscreen windows on this monitor before, hide the modules on it.
+                    if (hiddenMonitors.count(hMonitor) == 1)
+                    {
+                        HideModules(hMonitor, hwndForeGround);
+                    }
                 }
             }
         }
