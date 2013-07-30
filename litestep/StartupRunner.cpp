@@ -478,23 +478,46 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     // Note that 'App.exe' may contain spaces too
     //
     // CreateProcess handles 1 and 2, ShellExecuteEx handles 1 and 3.
-    // So if the first token doesn't contain path characters (':' or '\')
-    // ShellExecuteEx is used. That's really ugly but it *should* work.
+    //
+    // ShellExecuteEx works with UAC. CreateProcess does not.
+    // Therefore, we have to attempt to emulate CreateProcess's path parsing
+    // when we detect case 2.
     //
     TCHAR tzToken[MAX_LINE_LENGTH] = { 0 };
-    LPCTSTR ptzArgs = nullptr;
+    LPTSTR ptzArgs = nullptr;
 
-    GetToken(ptzCommandLine, tzToken, &ptzArgs, FALSE);
+    GetToken(ptzCommandLine, tzToken, const_cast<LPCSTR*>(&ptzArgs), FALSE);
     
     HANDLE hProcess = nullptr;
-    
-    if (strchr(tzToken, _T('\\')) || strchr(tzToken, _T(':')))
+
+    // If the first character is a quote, assume that the first token is the complete path.
+    // If the first token does not contain a \ or the first token does not contain a :, assume it's a relative path.
+    if (*_tcsspnp(ptzCommandLine, _T(" \t")) == _T('"') || !_tcschr(tzToken, _T('\\')) || !_tcschr(tzToken, _T(':')))
     {
-        hProcess = _CreateProcess(ptzCommandLine);
+        hProcess = _ShellExecuteEx(tzToken, ptzArgs);
     }
     else
     {
-        hProcess = _ShellExecuteEx(tzToken, ptzArgs);
+        // This is an approximation of how CreateProcess determines which file to launch.
+        ptzArgs = ptzCommandLine;
+        do
+        {
+            ptzArgs = _tcschr(ptzArgs, _T(' '));
+            if (ptzArgs != nullptr)
+            {
+                *ptzArgs++ = _T('\0');
+            }
+            if (PathFileExists(ptzCommandLine) && PathIsDirectory(ptzCommandLine) == FALSE)
+            {
+                hProcess = _ShellExecuteEx(ptzCommandLine, ptzArgs);
+                break;
+            }
+            if (ptzArgs != nullptr)
+            {
+                *(ptzArgs-1) = _T(' ');
+            }
+
+        } while (ptzArgs != nullptr);
     }
     
     if (hProcess != nullptr)
@@ -516,30 +539,8 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
         TCHAR tzError[4096];
         DescriptionFromHR(HrGetLastError(), tzError, _countof(tzError));
         TRACE("StartupRunner failed to launch '%s', %s", ptzCommandLine, tzError);
-
     }
 #endif
-}
-
-
-HANDLE StartupRunner::_CreateProcess(LPTSTR ptzCommandLine)
-{
-    HANDLE hReturn = NULL;
-    
-    STARTUPINFO suInfo = { 0 };
-    PROCESS_INFORMATION procInfo = { 0 };
-    
-    suInfo.cb = sizeof(suInfo);
-    
-    if (CreateProcess(NULL, ptzCommandLine, NULL, NULL, FALSE,
-        CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS,
-        NULL, NULL, &suInfo, &procInfo))
-    {
-        CloseHandle(procInfo.hThread);
-        hReturn = procInfo.hProcess;
-    }
-    
-    return hReturn;
 }
 
 

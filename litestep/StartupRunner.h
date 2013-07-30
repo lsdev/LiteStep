@@ -33,7 +33,7 @@ public:
     static void Run(BOOL bForce);
     static bool IsFirstRunThisSession(LPCTSTR pszSubkey);
     
-private:
+public:
     static DWORD WINAPI _ThreadProc(LPVOID lpData);
     static HKEY _CreateSessionInfoKey();
     static void _RunRegKeys(HKEY hkParent, LPCTSTR ptzSubKey, DWORD dwFlags);
@@ -42,7 +42,6 @@ private:
     static void _RunStartupMenu();
     static void _RunShellFolderContents(int nFolder);
     static void _SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags);
-    static HANDLE _CreateProcess(LPTSTR ptzCommandLine);
     static HANDLE _ShellExecuteEx(LPCTSTR ptzExecutable, LPCTSTR ptzArgs);
 };
 
