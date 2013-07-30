@@ -35,9 +35,9 @@ public:
     FullscreenMonitor();
     ~FullscreenMonitor();
     
-    HRESULT Start();
-    HRESULT Stop();
-    HRESULT Recycle();
+    HRESULT Start() override;
+    HRESULT Stop() override;
+    HRESULT Recycle() override;
 
 private:
     static HMONITOR _FullScreenGetMonitorHelper(HWND hWnd);

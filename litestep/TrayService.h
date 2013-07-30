@@ -122,9 +122,9 @@ public:
     //
     // IService methods
     //
-    virtual HRESULT Start();
-    virtual HRESULT Stop();
-    virtual HRESULT Recycle();
+    virtual HRESULT Start() override;
+    virtual HRESULT Stop() override;
+    virtual HRESULT Recycle() override;
     
     // resend all icon data
     HWND SendSystemTray();

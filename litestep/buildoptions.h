@@ -51,12 +51,16 @@
 // Adds support for IncludeFolder Directive (all .rc files in specified folder
 // will be included - order not guaranteed).  This was added by the LDE(X) team.
 // Thanks Phil!
-// 0.25.0 default: DISABLED
-//#define LS_CUSTOM_INCLUDEFOLDER
+// 0.25.0 default: ENABLED
+#define LS_CUSTOM_INCLUDEFOLDER
 
 // Makes lsapi use picoPNG instead of zlib+libpng
 // 0.25.0 default: ENABLED
 #define LS_USE_PICOPNG
+
+// Makes LiteStep run Explorer's window procedure when set as shell. 
+// 0.25.0 default: ENABLED
+//#define LS_USE_EXPLORER_SERVICE
 
 // Makes LCReadNextConfig conform to pre 0.24.7 API
 // 0.25.0 default: DISABLED

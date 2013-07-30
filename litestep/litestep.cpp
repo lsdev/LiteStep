@@ -26,6 +26,7 @@
 #include "DDEStub.h"
 #include "RecoveryMenu.h"
 #include "TrayService.h"
+#include "ExplorerService.h"
 #include "FullscreenMonitor.h"
 
 // Managers
@@ -215,7 +216,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     VERIFY(SetEnvironmentVariable(_T("LitestepDir"), szAppPath));
     
     int nReturn = 0;
-    
+
     CLiteStep liteStep;
     HRESULT hr = liteStep.Start(hInst, wStartFlags);
     
@@ -407,11 +408,8 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     }
     
     if (SUCCEEDED(hr))
-    {
-        bool bSetAsShell =
-            (!bUnderExplorer && GetRCBool("LSSetAsShell", TRUE));
-        
-        hr = CreateMainWindow(bSetAsShell);
+    {   
+        hr = CreateMainWindow();
     }
     
     //
@@ -419,7 +417,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     //
     if (SUCCEEDED(hr))
     {
-        hr = _InitServices();
+        hr = _InitServices(!bUnderExplorer && GetRCBool("LSSetAsShell", TRUE));
         
         if (SUCCEEDED(hr))
         {
@@ -539,7 +537,7 @@ int CLiteStep::Run()
 //
 // CreateMainWindow
 //
-HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
+HRESULT CLiteStep::CreateMainWindow()
 {
     HRESULT hr = E_FAIL;
     
@@ -578,25 +576,6 @@ HRESULT CLiteStep::CreateMainWindow(bool bSetAsShell)
         LSAPISetLitestepWindow(m_hMainWindow);
         
         _RegisterShellNotifications(m_hMainWindow);
-        
-        // Set Shell Window
-        if (bSetAsShell)
-        {
-            typedef BOOL (WINAPI* SETSHELLWINDOWPROC)(HWND);
-            
-            SETSHELLWINDOWPROC fnSetShellWindow =
-                (SETSHELLWINDOWPROC)GetProcAddress(
-                GetModuleHandle(_T("USER32.DLL")), "SetShellWindow");
-            
-            if (fnSetShellWindow)
-            {
-                fnSetShellWindow(m_hMainWindow);
-            }
-            else
-            {
-                TRACE("SetShellWindow() not found");
-            }
-        }
         
         hr = S_OK;
     }
@@ -1153,7 +1132,7 @@ LRESULT CLiteStep::_HandleSessionChange(DWORD dwCode, DWORD /* dwSession */)
 //
 // _InitServies()
 //
-HRESULT CLiteStep::_InitServices()
+HRESULT CLiteStep::_InitServices(bool bSetAsShell)
 {
     IService* pService = nullptr;
     
@@ -1195,6 +1174,27 @@ HRESULT CLiteStep::_InitServices()
         {
             return E_OUTOFMEMORY;
         }
+    }
+
+    //
+    // Explorer service
+    //
+    if (bSetAsShell)
+    {
+#if defined(LS_USE_EXPLORER_SERVICE)
+        pService = new (std::nothrow) ExplorerService();
+
+        if (pService)
+        {
+            m_Services.push_back(pService);
+        }
+        else
+        {
+            return E_OUTOFMEMORY;
+        }
+#else
+        _SetShellWindow(m_hMainWindow);
+#endif
     }
 
     //
@@ -1398,4 +1398,29 @@ HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) cons
     }
     
     return hr;
+}
+
+
+//
+// _SetShellWindow
+//
+BOOL CLiteStep::_SetShellWindow(HWND hWnd) {
+    typedef BOOL (WINAPI* SETSHELLWINDOWPROC)(HWND);
+            
+    SETSHELLWINDOWPROC fnSetShellWindow =
+        (SETSHELLWINDOWPROC)GetProcAddress(
+        GetModuleHandle(_T("USER32.DLL")), "SetShellWindow");
+    
+    BOOL bRet = FALSE;
+
+    if (fnSetShellWindow)
+    {
+        bRet = fnSetShellWindow(hWnd);
+    }
+    else
+    {
+        TRACE("SetShellWindow() not found");
+    }
+
+    return bRet;
 }

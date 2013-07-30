@@ -80,7 +80,7 @@ public:
 private:
     void MessageHandler(MSG &message);
     
-    HRESULT CreateMainWindow(bool bSetAsShell);
+    HRESULT CreateMainWindow();
     HRESULT DestroyMainWindow();
     
     void _RegisterShellNotifications(HWND hWnd);
@@ -91,6 +91,7 @@ private:
     
     void _Recycle();
     HRESULT _EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const;
+    static BOOL _SetShellWindow(HWND hWnd);
     
     // Application instance
     HINSTANCE m_hInstance;
@@ -134,7 +135,7 @@ private:
     FullscreenMonitor* m_pFullscreenMonitor; // = nullptr;
     std::vector<IService*> m_Services;
     
-    HRESULT _InitServices();
+    HRESULT _InitServices(bool bSetAsShell);
     HRESULT _StartServices();
     HRESULT _StopServices();
     void _CleanupServices();

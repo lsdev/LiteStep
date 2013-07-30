@@ -2,7 +2,6 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1998 (e)
 // Copyright (C) 1997-2013  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
@@ -20,44 +19,36 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#if !defined(DDESERVICE_H)
-#define DDESERVICE_H
+#if !defined(EXPLORERSERVICE_H)
+#define EXPLORERSERVICE_H
 
-#include "DDEWorker.h"
+#include "ExplorerService.h"
+#include "../utility/common.h"
 #include "../utility/IService.h"
+#include <thread>
 
-class DDEService: public IService
+
+class ExplorerService : public IService
 {
 public:
-    DDEService();
-    ~DDEService();
+    ~ExplorerService();
+    ExplorerService();
     
+    //
+    // IService methods
+    //
+public:
     HRESULT Start() override;
     HRESULT Stop() override;
     HRESULT Recycle() override;
-    
-    static HDDEDATA CALLBACK DdeCallback(
-        UINT wType, UINT wFmt, HCONV hConv, HSZ hszTopic,
-        HSZ hszItem, HDDEDATA hData, DWORD lData1, DWORD lData2);
-    
+
 private:
-    HRESULT _RegisterDDE();
-    
-    bool _DoStart();
-    void _DoStop();
-    
-    static DWORD WINAPI _DDEThreadProc(LPVOID pvService);
-    
-    static DWORD m_idThread;
-    static HANDLE m_hThread;
-    static HANDLE m_hStartEvent;
-    
-    static DDEWorker m_DDEWorker;
-    static HSZ m_hszProgman;
-    static HSZ m_hszGroups;
-    static HSZ m_hszFolders;
-    static HSZ m_hszAppProperties;
-    static DWORD m_dwDDEInst;
+    static DWORD WINAPI ExplorerThread(LPVOID);
+
+private:
+    DWORD m_dwThreadID;
+    HANDLE m_hExplorerThread;
 };
 
-#endif // DDESERVICE_H
+
+#endif // EXPLORERSERVICE_H
