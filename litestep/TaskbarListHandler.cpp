@@ -110,7 +110,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 50:
         {
             // wParam = 0, lParam = hWnd
-            SendMessage(m_hLiteStep, LM_TASKMARKASACTIVE, lParam, 0);
+            SendMessage(m_hLiteStep, LM_TASK_MARKASACTIVE, lParam, 0);
         }
         return 0;
 
@@ -129,7 +129,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwnd
             // lParam = progress, 0 = 0%, 0xFFFE = 100%
-            SendMessage(m_hLiteStep, LM_TASKSETPROGRESSVALUE, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_SETPROGRESSVALUE, wParam, lParam);
         }
         return 0;
 
@@ -138,7 +138,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwnd
             // lParam = tbpFlags
-            SendMessage(m_hLiteStep, LM_TASKSETPROGRESSSTATE, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_SETPROGRESSSTATE, wParam, lParam);
         }
         return 0;
 
@@ -147,7 +147,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = hwndMDI
-            SendMessage(m_hLiteStep, LM_TASKREGISTERTAB, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_REGISTERTAB, wParam, lParam);
         }
         return 0;
         
@@ -156,7 +156,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = 0
-            SendMessage(m_hLiteStep, LM_TASKUNREGISTERTAB, wParam, 0);
+            SendMessage(m_hLiteStep, LM_TASK_UNREGISTERTAB, wParam, 0);
         }
         return 0;
 
@@ -165,7 +165,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = hwndInsertBefore
-            SendMessage(m_hLiteStep, LM_TASKSETTABORDER, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_SETTABORDER, wParam, lParam);
         }
         return 0;
 
@@ -174,7 +174,16 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = 0 ???
-            SendMessage(m_hLiteStep, LM_TASKSETACTIVETAB, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_SETACTIVETAB, wParam, lParam);
+        }
+        return 0;
+
+        // Mysterious message, sent by control panel windows
+    case WM_USER + 75:
+        {
+            // wParam = hwnd of the control panel
+            // lParam = 0 ?
+
         }
         return 0;
 
@@ -187,7 +196,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             THUMBBUTTONLIST thumbList;
             thumbList.cButtons = pData[0];
             thumbList.pButton = (THUMBBUTTON*)&pData[1];
-            SendMessage(m_hLiteStep, LM_TASKADDBUTTONS, wParam, (LPARAM)&thumbList);
+            SendMessage(m_hLiteStep, LM_TASK_THUMBBARADDBUTTONS, wParam, (LPARAM)&thumbList);
             SHUnlockShared(pData);
         }
         return 0;
@@ -201,7 +210,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             THUMBBUTTONLIST thumbList;
             thumbList.cButtons = pData[0];
             thumbList.pButton = (THUMBBUTTON*)&pData[1];
-            SendMessage(m_hLiteStep, LM_TASKUPDATEBUTTONS, wParam, (LPARAM)&thumbList);
+            SendMessage(m_hLiteStep, LM_TASK_THUMBBARUPDATEBUTTONS, wParam, (LPARAM)&thumbList);
             SHUnlockShared(pData);
         }
         return 0;
@@ -212,7 +221,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             // wParam = hwnd
             // lParam = SHSharedAlloc(himl)
             HIMAGELIST hImageList = (HIMAGELIST)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
-            SendMessage(m_hLiteStep, LM_TASKSETIMAGELIST, wParam, (LPARAM)hImageList);
+            SendMessage(m_hLiteStep, LM_TASK_THUMBBARSETIMAGELIST, wParam, (LPARAM)hImageList);
             if (hImageList) {
                 SHUnlockShared(hImageList);
             }
@@ -224,7 +233,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwnd
             // lParam = hicon
-            SendMessage(m_hLiteStep, LM_TASKSETOVERLAYICON, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_SETOVERLAYICON, wParam, lParam);
         }
         return 0;
 
@@ -234,7 +243,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             // wParam = hwnd
             // lParam = SHSharedAlloc(pszTip)
             LPWSTR pwzTip = (LPWSTR)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
-            SendMessage(m_hLiteStep, LM_TASKSETTHUMBNAILTOOLTIP, wParam, (LPARAM)pwzTip);
+            SendMessage(m_hLiteStep, LM_TASK_SETTHUMBNAILTOOLTIP, wParam, (LPARAM)pwzTip);
             if (pwzTip) {
                 SHUnlockShared(pwzTip);
             }
@@ -247,7 +256,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             // wParam = hwnd
             // lParam = SHSharedAlloc(prcClip)
             LPRECT prcClip = (LPRECT)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
-            SendMessage(m_hLiteStep, LM_TASKSETTHUMBNAILCLIP, wParam, (LPARAM)prcClip);
+            SendMessage(m_hLiteStep, LM_TASK_SETTHUMBNAILCLIP, wParam, (LPARAM)prcClip);
             if (prcClip) {
                 SHUnlockShared(prcClip);
             }
@@ -260,7 +269,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             // wParam = hwnd
             // lParam = SHSharedAlloc(pszDescription)
             LPWSTR pwzDescription = (LPWSTR)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
-            SendMessage(m_hLiteStep, LM_TASKSETOVERLAYICONDESC, wParam, (LPARAM)pwzDescription);
+            SendMessage(m_hLiteStep, LM_TASK_SETOVERLAYICONDESC, wParam, (LPARAM)pwzDescription);
             if (pwzDescription) {
                 SHUnlockShared(pwzDescription);
             }
@@ -272,7 +281,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = stpFlags
-            SendMessage(m_hLiteStep, LM_TASKSETTABPROPERTIES, wParam, lParam);
+            SendMessage(m_hLiteStep, LM_TASK_SETTABPROPERTIES, wParam, lParam);
         }
         return 0;
 

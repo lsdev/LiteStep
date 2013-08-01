@@ -56,12 +56,12 @@ See the next section for a cumulative changelog since 0.24.8.
     - Fixed some startup apps would not run with UAC on.
     - Enabled the IncludeFolder directive by default.
     - Added support for all ITaskbarList* interfaces. The core will now send
-      LM_TASKSETPROGRESSSTATE, LM_TASKSETPROGRESSVALUE, LM_TASKMARKASACTIVE, 
-      LM_TASKREGISTERTAB, LM_TASKUNREGISTERTAB, LM_TASKSETACTIVETAB, 
-      LM_TASKSETTABORDER, LM_TASKSETTABPROPERTIES, LM_TASKSETOVERLAYICON, 
-      LM_TASKSETOVERLAYICONDESC, LM_TASKSETTHUMBNAILTOOLTIP,
-      LM_TASKSETTHUMBNAILCLIP, LM_TASKADDBUTTONS, LM_TASKUPDATEBUTTONS, and
-      LM_TASKSETIMAGELIST. All taskbar modules should register for and handle
+      LM_TASK_SETPROGRESSSTATE, LM_TASK_SETPROGRESSVALUE, LM_TASK_MARKASACTIVE, 
+      LM_TASK_REGISTERTAB, LM_TASK_UNREGISTERTAB, LM_TASK_SETACTIVETAB, 
+      LM_TASK_SETTABORDER, LM_TASK_SETTABPROPERTIES, LM_TASK_SETOVERLAYICON, 
+      LM_TASK_SETOVERLAYICONDESC, LM_TASK_SETTHUMBNAILTOOLTIP,
+      LM_TASK_SETTHUMBNAILCLIP, LM_TASK_ADDBUTTONS, LM_TASK_UPDATEBUTTONS, and
+      LM_TASK_SETIMAGELIST. All taskbar modules should register for and handle
       these messages.
 
   - [2013-07-24] -
@@ -189,6 +189,7 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - LSRunX and LSRunY settings to position the !Run dialog.
     - LSCloseExplorer, a setting which causes the explorer shell to gracefully
       terminate if it is running as shell when litestep starts.
+    - IncludeFolder directive, to include every .RC file in a folder.
 
 
   - VISTA & WIN7 & 64-BIT SUPPORT -
@@ -232,6 +233,7 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
       responsive. It will also keep modules on a monitor hidden as long as there
       is a fullscreen window on that monitor.
     - !about's system information page will now show > 4GB of memory correctly
+    - Added support for all ITaskbarList* interfaces. 
 
 
   - REMOVED/CHANGED -
