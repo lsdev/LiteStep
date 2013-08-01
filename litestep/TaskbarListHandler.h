@@ -34,8 +34,10 @@ private:
     ATOM m_aWndClass;
     
     HWND m_hLiteStep;
+    DWORD m_dwLiteStepProc;
     HINSTANCE m_hInstance;
-    UINT WM_ShellHook; // = 0;
+    UINT WM_ShellHook;
+
 
     LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
     static LRESULT WINAPI WindowProcedure(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);

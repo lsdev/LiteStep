@@ -33,6 +33,7 @@
 */
 
 #include "../utility/common.h"
+#include <ShlObj.h>
 
 
 //-----------------------------------------------------------------------------
@@ -149,9 +150,41 @@
 #define LM_WINDOWREPLACING          (LM_SHELLHOOK + HSHELL_WINDOWREPLACING)
 #define LM_MONITORCHANGED           (LM_SHELLHOOK + HSHELL_MONITORCHANGED)
 
-// 
+// FullscreenMonitor events
 #define LM_FULLSCREENACTIVATED      32768
 #define LM_FULLSCREENDEACTIVATED    32769
+
+// ITaskbarList* messages
+#define LM_TASKSETPROGRESSSTATE     33024
+#define LM_TASKSETPROGRESSVALUE     33025
+#define LM_TASKMARKASACTIVE         33026
+#define LM_TASKREGISTERTAB          33027
+#define LM_TASKUNREGISTERTAB        33028
+#define LM_TASKSETACTIVETAB         33029
+#define LM_TASKSETTABORDER          33030
+#define LM_TASKSETTABPROPERTIES     33031
+#define LM_TASKSETOVERLAYICON       33032
+#define LM_TASKSETOVERLAYICONDESC   33033
+#define LM_TASKSETTHUMBNAILTOOLTIP  33034
+#define LM_TASKSETTHUMBNAILCLIP     33035
+#define LM_TASKADDBUTTONS           33036
+#define LM_TASKUPDATEBUTTONS        33037
+#define LM_TASKSETIMAGELIST         33038
+
+
+//-----------------------------------------------------------------------------
+// ITaskbarList DEFINES
+//-----------------------------------------------------------------------------
+
+// Min and max progress values sent by LM_TASKSETPROGRESSVALUE
+#define TASKSETPROGRESSVALUE_MIN  0
+#define TASKSETPROGRESSVALUE_MAX  0xFFFE
+
+// Sent by LM_TASKADDBUTTONS and LM_TASKUPDATEBUTTONS
+typedef struct THUMBBUTTONLIST {
+    DWORD cButtons;
+    LPTHUMBBUTTON pButton;
+} *LPTHUMBBUTTONLIST;
 
 
 //-----------------------------------------------------------------------------

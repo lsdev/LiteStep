@@ -33,7 +33,8 @@ TaskbarListHandler::TaskbarListHandler() :
         m_aWndClass(0),
         m_hLiteStep(nullptr),
         m_hInstance(nullptr),
-        WM_ShellHook(0)
+        WM_ShellHook(0),
+        m_dwLiteStepProc(0)
 {
 }
 
@@ -45,6 +46,7 @@ HRESULT TaskbarListHandler::Start(HWND hWndTray) {
     HRESULT hr = E_FAIL;
     
     m_hLiteStep = GetLitestepWnd();
+    GetWindowThreadProcessId(m_hLiteStep, &m_dwLiteStepProc);
     m_hInstance = GetModuleHandle(NULL);
 
     WNDCLASSEX wndClass;
@@ -101,7 +103,6 @@ HRESULT TaskbarListHandler::Stop() {
 //
 LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     DbgTraceWindowMessage("ITaskbarList", uMsg, wParam, lParam);
-
     switch (uMsg)
     {
         // Sent by ITaskbarList::ActivateTab and ITaskbarList::SetActiveAlt
@@ -109,7 +110,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 50:
         {
             // wParam = 0, lParam = hWnd
-
+            SendMessage(m_hLiteStep, LM_TASKMARKASACTIVE, lParam, 0);
         }
         return 0;
 
@@ -118,6 +119,8 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = 1 to mark as fullscreen, 0 to remove marking
             // lParam = hWnd
+
+            // TODO::This should be sent to the fullscreen monitor
         }
         return 0;
 
@@ -126,6 +129,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwnd
             // lParam = progress, 0 = 0%, 0xFFFE = 100%
+            SendMessage(m_hLiteStep, LM_TASKSETPROGRESSVALUE, wParam, lParam);
         }
         return 0;
 
@@ -134,6 +138,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwnd
             // lParam = tbpFlags
+            SendMessage(m_hLiteStep, LM_TASKSETPROGRESSSTATE, wParam, lParam);
         }
         return 0;
 
@@ -142,6 +147,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = hwndMDI
+            SendMessage(m_hLiteStep, LM_TASKREGISTERTAB, wParam, lParam);
         }
         return 0;
         
@@ -150,6 +156,25 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
         {
             // wParam = hwndTab
             // lParam = 0
+            SendMessage(m_hLiteStep, LM_TASKUNREGISTERTAB, wParam, 0);
+        }
+        return 0;
+
+        // Sent by ITaskbarList3::SetTabOrder
+    case WM_USER + 71:
+        {
+            // wParam = hwndTab
+            // lParam = hwndInsertBefore
+            SendMessage(m_hLiteStep, LM_TASKSETTABORDER, wParam, lParam);
+        }
+        return 0;
+
+        // Sent by ITaskbarList3::SetTabActive
+    case WM_USER + 72:
+        {
+            // wParam = hwndTab
+            // lParam = 0 ???
+            SendMessage(m_hLiteStep, LM_TASKSETACTIVETAB, wParam, lParam);
         }
         return 0;
 
@@ -157,7 +182,13 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 76:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = SHSharedAlloc(cButtons, pButton) (first 4 bytes is cButtons)
+            LPUINT pData = (LPUINT)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
+            THUMBBUTTONLIST thumbList;
+            thumbList.cButtons = pData[0];
+            thumbList.pButton = (THUMBBUTTON*)&pData[1];
+            SendMessage(m_hLiteStep, LM_TASKADDBUTTONS, wParam, (LPARAM)&thumbList);
+            SHUnlockShared(pData);
         }
         return 0;
         
@@ -165,7 +196,13 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 77:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = SHSharedAlloc(cButtons, pButton) (first 4 bytes is cButtons)
+            LPUINT pData = (LPUINT)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
+            THUMBBUTTONLIST thumbList;
+            thumbList.cButtons = pData[0];
+            thumbList.pButton = (THUMBBUTTON*)&pData[1];
+            SendMessage(m_hLiteStep, LM_TASKUPDATEBUTTONS, wParam, (LPARAM)&thumbList);
+            SHUnlockShared(pData);
         }
         return 0;
 
@@ -173,7 +210,12 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 78:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = SHSharedAlloc(himl)
+            HIMAGELIST hImageList = (HIMAGELIST)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
+            SendMessage(m_hLiteStep, LM_TASKSETIMAGELIST, wParam, (LPARAM)hImageList);
+            if (hImageList) {
+                SHUnlockShared(hImageList);
+            }
         }
         return 0;
 
@@ -181,7 +223,8 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 79:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = hicon
+            SendMessage(m_hLiteStep, LM_TASKSETOVERLAYICON, wParam, lParam);
         }
         return 0;
 
@@ -189,7 +232,12 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 80:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = SHSharedAlloc(pszTip)
+            LPWSTR pwzTip = (LPWSTR)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
+            SendMessage(m_hLiteStep, LM_TASKSETTHUMBNAILTOOLTIP, wParam, (LPARAM)pwzTip);
+            if (pwzTip) {
+                SHUnlockShared(pwzTip);
+            }
         }
         return 0;
 
@@ -197,7 +245,12 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 81:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = SHSharedAlloc(prcClip)
+            LPRECT prcClip = (LPRECT)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
+            SendMessage(m_hLiteStep, LM_TASKSETTHUMBNAILCLIP, wParam, (LPARAM)prcClip);
+            if (prcClip) {
+                SHUnlockShared(prcClip);
+            }
         }
         return 0;
 
@@ -205,13 +258,30 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
     case WM_USER + 85:
         {
             // wParam = hwnd
-            // lParam = ?? (some kind of ATOM)
+            // lParam = SHSharedAlloc(pszDescription)
+            LPWSTR pwzDescription = (LPWSTR)SHLockShared((HANDLE)lParam, m_dwLiteStepProc);
+            SendMessage(m_hLiteStep, LM_TASKSETOVERLAYICONDESC, wParam, (LPARAM)pwzDescription);
+            if (pwzDescription) {
+                SHUnlockShared(pwzDescription);
+            }
+        }
+        return 0;
+
+        // Sent by ITaskbarList4::SetTabProperties
+    case WM_USER + 87:
+        {
+            // wParam = hwndTab
+            // lParam = stpFlags
+            SendMessage(m_hLiteStep, LM_TASKSETTABPROPERTIES, wParam, lParam);
         }
         return 0;
 
     default:
         {
             // AddTab, DeleteTab, and ActivateTab will send WM_ShellHook
+            // TODO::We should consider distinguishing between these and actual WM_SHELLHOOK messages
+            // we may wish to remember that a certain window has been "marked" as deleted, so that we
+            // don't accidentally recreate it (when activated, or on recycles).
             if (uMsg == WM_ShellHook)
             {
                 return SendMessage(m_hLiteStep, uMsg, wParam, lParam);
