@@ -182,7 +182,7 @@
 
 // Sent by LM_TASKADDBUTTONS and LM_TASKUPDATEBUTTONS
 typedef struct THUMBBUTTONLIST {
-    DWORD cButtons;
+    UINT cButtons;
     LPTHUMBBUTTON pButton;
 } *LPTHUMBBUTTONLIST;
 
