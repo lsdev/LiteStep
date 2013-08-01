@@ -544,13 +544,25 @@ void GetLSBitmapSize(HBITMAP hBitmap, LPINT nWidth, LPINT nHeight)
     
     if (!GetObject(hBitmap, sizeof(hbmBitmap), (LPSTR) & hbmBitmap))
     {
-        *nWidth = 0;
-        *nHeight = 0;
+        if (nWidth)
+        {
+            *nWidth = 0;
+        }
+        if (nHeight)
+        {
+            *nHeight = 0;
+        }
     }
     else
     {
-        *nWidth = hbmBitmap.bmWidth;
-        *nHeight = hbmBitmap.bmHeight;
+        if (nWidth)
+        {
+            *nWidth = hbmBitmap.bmWidth;
+        }
+        if (nHeight)
+        {
+            *nHeight = hbmBitmap.bmHeight;
+        }
     }
 }
 
