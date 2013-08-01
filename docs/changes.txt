@@ -52,6 +52,7 @@ See the next section for a cumulative changelog since 0.24.8.
       with *, and made - refer to the current prefix.
     - The core will now send LM_FULLSCREENACTIVATED and LM_FULLSCREENDEACTIVATED
       to modules that have registered for those messages.
+    - Fixed some startup apps would not run with UAC on.
 
   - [2013-07-24] -
     - Fixed crash on !Recycle introduced in the 2013-07-21 build when
