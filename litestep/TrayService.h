@@ -24,6 +24,7 @@
 
 #include "TrayNotifyIcon.h"
 #include "TrayAppBar.h"
+#include "TaskbarListHandler.h"
 #include "../utility/common.h"
 #include "../utility/IService.h"
 #include <ObjBase.h>
@@ -240,6 +241,7 @@ private:
     SsoVector m_ssoVector;
     IconVector m_siVector;
     BarVector m_abVector;
+    TaskbarListHandler m_taskbarListHandler;
 };
 
 #endif // TRAYSERVICE_H

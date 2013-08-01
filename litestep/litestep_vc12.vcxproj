@@ -239,6 +239,7 @@
     <ClCompile Include="RecoveryMenu.cpp" />
     <ClCompile Include="ShellDesktopTray.cpp" />
     <ClCompile Include="StartupRunner.cpp" />
+    <ClCompile Include="TaskbarListHandler.cpp" />
     <ClCompile Include="TrayNotifyIcon.cpp" />
     <ClCompile Include="TrayService.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="RecoveryMenu.h" />
     <ClInclude Include="ShellDesktopTray.h" />
     <ClInclude Include="StartupRunner.h" />
+    <ClInclude Include="TaskbarListHandler.h" />
     <ClInclude Include="TrayAppBar.h" />
     <ClInclude Include="TrayNotifyIcon.h" />
     <ClInclude Include="TrayService.h" />

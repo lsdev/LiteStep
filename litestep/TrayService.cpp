@@ -116,6 +116,9 @@ HRESULT TrayService::Start()
             // tell apps to reregister their icons
             SendNotifyMessage(HWND_BROADCAST,
                 RegisterWindowMessage(_T("TaskbarCreated")), 0, 0);
+
+            // tell ITaskbarList which window to communicate with
+            m_taskbarListHandler.Start(m_hTrayWnd);
             
             if (IsVistaOrAbove())
             {
@@ -144,6 +147,7 @@ HRESULT TrayService::Stop()
     HRESULT hr = S_OK;
     
     unloadShellServiceObjects();
+    m_taskbarListHandler.Stop();
     destroyWindows();
     
     while (!m_siVector.empty())
