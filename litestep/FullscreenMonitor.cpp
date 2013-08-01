@@ -149,18 +149,8 @@ HMONITOR FullscreenMonitor::IsFullscreenWindow(HWND hWnd)
         return nullptr;
     }
     
-    DWORD dwProcessID;
-    DWORD dwThreadID = GetWindowThreadProcessId(hWnd, &dwProcessID);
-    
-    DWORD dwLSProcessID;
-    GetWindowThreadProcessId(GetLitestepWnd(), &dwLSProcessID);
-    
     HMONITOR hMonFS = nullptr;
-    
-    if (dwProcessID != dwLSProcessID)
-    {
-        EnumThreadWindows(dwThreadID, _EnumThreadFSWnd, (LPARAM)&hMonFS);
-    }
+    EnumThreadWindows(GetWindowThreadProcessId(hWnd, nullptr), _EnumThreadFSWnd, (LPARAM)&hMonFS);
     
     return hMonFS;
 }
