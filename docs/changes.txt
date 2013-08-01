@@ -1,6 +1,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                              LiteStep 0.25.0 Alpha
-                         Experimental Build 2013-07-25
+                         Experimental Build 2013-08-01
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 This build requires the Visual C++ 2012 Redistributable Package
@@ -41,18 +41,28 @@ This build is the current state of that code.
   7) Switched from libpng to picoPNG, removing libpng13 and zlib1 dependencies
   8) Fixed lack of screen lock/unlock sound on XP and up
   9) Decided on official "LiteStep" spelling
+ 10) Support for ITaskbarList* interfaces
 
 
 -- CHANGES BY DATE ------------------------------------------------------------
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
-  - [2013-07-25] -
+  - [2013-08-01] -
     - Modified the .RC prefix syntax, added special handling of keys starting
-      with *, and made - refer to the current prefix.
+      with *, and made -, as a key, refer to the current prefix.
     - The core will now send LM_FULLSCREENACTIVATED and LM_FULLSCREENDEACTIVATED
       to modules that have registered for those messages.
     - Fixed some startup apps would not run with UAC on.
+    - Enabled the IncludeFolder directive by default.
+    - Added support for all ITaskbarList* interfaces. The core will now send
+      LM_TASKSETPROGRESSSTATE, LM_TASKSETPROGRESSVALUE, LM_TASKMARKASACTIVE, 
+      LM_TASKREGISTERTAB, LM_TASKUNREGISTERTAB, LM_TASKSETACTIVETAB, 
+      LM_TASKSETTABORDER, LM_TASKSETTABPROPERTIES, LM_TASKSETOVERLAYICON, 
+      LM_TASKSETOVERLAYICONDESC, LM_TASKSETTHUMBNAILTOOLTIP,
+      LM_TASKSETTHUMBNAILCLIP, LM_TASKADDBUTTONS, LM_TASKUPDATEBUTTONS, and
+      LM_TASKSETIMAGELIST. All taskbar modules should register for and handle
+      these messages.
 
   - [2013-07-24] -
     - Fixed crash on !Recycle introduced in the 2013-07-21 build when
