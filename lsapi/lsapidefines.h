@@ -283,6 +283,7 @@ typedef struct LSDESKTOPINFO
 #define LR_LOGOFF                   1
 #define LR_QUIT                     2
 #define LR_MSSHUTDOWN               3
+#define LR_EXPLORER                 4
 
 
 //-----------------------------------------------------------------------------

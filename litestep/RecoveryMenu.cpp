@@ -37,6 +37,8 @@
 #define ID_TERMINATE 3
 #define ID_RUN 4
 #define ID_SHUTDOWN 5
+#define ID_EXPLORER 6
+#define ID_ABOUT 7
 
 const TCHAR szRecoveryMenuWndClass[] = _T("RecoveryMenuWndClass");
 
@@ -56,8 +58,10 @@ rgMenuCommands[] = \
      { IDS_LITESTEP_RECYCLELS,   ID_RECYCLE,   "Re&cycle LiteStep"            }
     ,{ IDS_LITESTEP_QUITLS,      ID_QUIT,      "&Quit LiteStep"               }
     ,{ IDS_LITESTEP_TERMINATELS, ID_TERMINATE, "Forcibly &Terminate LiteStep" }
+    ,{ IDS_LITESTEP_ABOUTLS,     ID_ABOUT,     "&About LiteStep"              }
     ,{ 0,                        -1,           ""                             }
     ,{ IDS_LITESTEP_RUN,         ID_RUN,       "&Run..."                      }
+    ,{ IDS_LITESTEP_EXPLORER,    ID_EXPLORER,  "&Start Explorer as shell"     }
     ,{ 0,                        -1,           ""                             }
     ,{ IDS_LITESTEP_SHUTDOWNWIN, ID_SHUTDOWN,  "Sh&utdown Windows..."         }
 };
@@ -352,6 +356,18 @@ void RecoveryMenu::HandleMenuCommand(int nCommand) const
         {
             // ditto
             PostMessage(GetLitestepWnd(), LM_RECYCLE, LR_QUIT, 0);
+        }
+        break;
+
+    case ID_ABOUT:
+        {
+            LSExecute(nullptr, "!about", SW_SHOW);
+        }
+        break;
+
+    case ID_EXPLORER:
+        {
+            PostMessage(GetLitestepWnd(), LM_RECYCLE, LR_EXPLORER, 0);
         }
         break;
         

@@ -210,6 +210,8 @@ BEGIN
     IDS_LITESTEP_RUN        "&Run..."
     IDS_LITESTEP_SHUTDOWNWIN "Sh&utdown Windows..."
     IDS_MODULEQUIT_ERROR    "Exception while quitting module."
+    IDS_LITESTEP_ABOUTLS    "&About LiteStep"
+    IDS_LITESTEP_EXPLORER   "&Start Explorer as shell"
 END
 
 STRINGTABLE 

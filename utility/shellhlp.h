@@ -71,6 +71,18 @@ void   LSDeactivateActCtx(HANDLE hActCtx, ULONG_PTR* pulCookie);
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
+// LiteStep Return Values (LRV)
+//
+#define LRV_NO_APP_PATH        -1
+#define LRV_OK                  0 // is also S_OK from WinError
+#define LRV_SHUTDOWN_DLG        1
+#define LRV_NO_STEP             2
+#define LRV_LSAPI_FAIL          3
+#define LRV_EXPLORER_START      4
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
 // Windows Versions
 //
 UINT GetWindowsVersion();

@@ -280,7 +280,8 @@ Contents:
  key combination: CTRL+ALT+F1 that is, press and hold the CTRL key and the ALT
  key then depress the F1 key and release all three.  A popup menu will appear at
  your mouse cursor location.  This menu can be used recover from a broken
- configuration.
+ configuration. Note that launching Explorer might not always work if there is
+ already an Explorer file manager window open.
 
  A) LiteStep Structure
  ---------------------

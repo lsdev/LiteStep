@@ -400,7 +400,7 @@ void LSShutdownDialog(HWND hWnd)
             (GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
             (GetAsyncKeyState(VK_MENU) & 0x8000))
         {
-            PostQuitMessage(1);
+            PostQuitMessage(LRV_SHUTDOWN_DLG);
         }
     }
 }
