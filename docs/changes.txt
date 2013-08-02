@@ -63,6 +63,7 @@ See the next section for a cumulative changelog since 0.24.8.
       LM_TASK_SETTHUMBNAILCLIP, LM_TASK_ADDBUTTONS, LM_TASK_UPDATEBUTTONS, and
       LM_TASK_SETIMAGELIST. All taskbar modules should register for and handle
       these messages.
+    - Added "About LiteStep" and "Start Explorer as shell" to the recovery menu.
 
   - [2013-07-24] -
     - Fixed crash on !Recycle introduced in the 2013-07-21 build when
@@ -190,6 +191,8 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - LSCloseExplorer, a setting which causes the explorer shell to gracefully
       terminate if it is running as shell when litestep starts.
     - IncludeFolder directive, to include every .RC file in a folder.
+    - Added Added "About LiteStep" and "Start Explorer as shell" to the recovery
+      menu.
 
 
   - VISTA & WIN7 & 64-BIT SUPPORT -
