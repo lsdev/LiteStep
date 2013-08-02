@@ -90,13 +90,13 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 
         *trail = _T('\0');
         *line = _T('\0');
-        for (auto file : m_trail)
+        for (; check != m_trail.end(); ++check)
         {
             StringCchCat(trail, _countof(trail), _T("\""));
-            StringCchCat(trail, _countof(trail), file.ptzPath);
+            StringCchCat(trail, _countof(trail), check->ptzPath);
             StringCchCat(trail, _countof(trail), _T("\""));
             StringCchCat(trail, _countof(trail), line);
-            StringCchPrintf(line, _countof(line), _T(" on line %d"), file.uLine);
+            StringCchPrintf(line, _countof(line), _T(" on line %d"), check->uLine);
             StringCchCat(trail, _countof(trail), _T("\nIncludes "));
         }
         StringCchCat(trail, _countof(trail), _T("\""));
