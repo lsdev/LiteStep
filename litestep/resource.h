@@ -33,6 +33,7 @@
 #define IDS_MODULEWRONGARCH64_ERROR         29
 #define IDS_LITESTEP_ABOUTLS                30
 #define IDS_LITESTEP_EXPLORER               31
+#define IDS_RECURSIVEINCLUDE                32
 #define IDI_LS                              101
 #define IDB_LS                              102
 #define IDD_ABOUTBOX                        103

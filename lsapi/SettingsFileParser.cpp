@@ -22,6 +22,7 @@
 #include "SettingsFileParser.h"
 #include "MathEvaluate.h"
 #include "../utility/core.hpp"
+#include "../utility/macros.h"
 #include <algorithm>
 #include <vector>
 
@@ -31,7 +32,18 @@
 // FileParser constructor
 //
 FileParser::FileParser(SettingsMap* pSettingsMap) :
-    m_pSettingsMap(pSettingsMap), m_phFile(NULL)
+    m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_trail(m_baseTrail)
+{
+    ASSERT(NULL != m_pSettingsMap);
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// FileParser constructor
+//
+FileParser::FileParser(SettingsMap* pSettingsMap, std::list<TrailItem> &trail) :
+    m_pSettingsMap(pSettingsMap), m_phFile(NULL), m_trail(trail)
 {
     ASSERT(NULL != m_pSettingsMap);
 }
@@ -69,6 +81,39 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
         TRACE("Error: Can not get full path for \"%s\"", tzExpandedPath);
         return;
     }
+
+    std::list<TrailItem>::iterator check = std::find(m_trail.begin(), m_trail.end(), TrailItem(0, m_tzFullPath));
+    if (check != m_trail.end())
+    {
+        TCHAR trail[MAX_LINE_LENGTH];
+        TCHAR line[MAX_LINE_LENGTH];
+
+        *trail = _T('\0');
+        *line = _T('\0');
+        for (auto file : m_trail)
+        {
+            StringCchCat(trail, _countof(trail), _T("\""));
+            StringCchCat(trail, _countof(trail), file.ptzPath);
+            StringCchCat(trail, _countof(trail), _T("\""));
+            StringCchCat(trail, _countof(trail), line);
+            StringCchPrintf(line, _countof(line), _T(" on line %d"), file.uLine);
+            StringCchCat(trail, _countof(trail), _T("\nIncludes "));
+        }
+        StringCchCat(trail, _countof(trail), _T("\""));
+        StringCchCat(trail, _countof(trail), m_tzFullPath);
+        StringCchCat(trail, _countof(trail), _T("\""));
+        StringCchCat(trail, _countof(trail), line);
+
+        RESOURCE_STREX(
+            GetModuleHandle(NULL), IDS_RECURSIVEINCLUDE,
+            resourceTextBuffer, MAX_LINE_LENGTH,
+            "Error: Reursive include detected!\n %s.",
+            trail);
+                            
+        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
+
+        return;
+    }
     
     _tfopen_s(&m_phFile, m_tzFullPath, _T("r"));
     
@@ -80,6 +125,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     }
     
     TRACE("Parsing \"%s\"", m_tzFullPath);
+    m_trail.push_back(TrailItem(0, m_tzFullPath));
     
     fseek(m_phFile, 0, SEEK_SET);
     
@@ -96,6 +142,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     fclose(m_phFile);
     m_phFile = nullptr;
+    m_trail.pop_back();
     
     TRACE("Finished Parsing \"%s\"", m_tzFullPath);
 }
@@ -396,7 +443,8 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         TRACE("Include (%s, line %d): \"%s\"",
             m_tzFullPath, m_uLineNumber, tzPath);
         
-        FileParser fpParser(m_pSettingsMap);
+        m_trail.back().uLine = m_uLineNumber;
+        FileParser fpParser(m_pSettingsMap, m_trail);
         fpParser.ParseFile(tzPath);
     }
 #if defined(LS_CUSTOM_INCLUDEFOLDER)
@@ -461,11 +509,12 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
                     
             // adding (like above) filename to tzPath to set tzFile
             // for opening.
+            m_trail.back().uLine = m_uLineNumber;
             if (tzFile == PathCombine(tzFile, tzPath, foundFiles.begin()->c_str()))
             {
                 TRACE("Found and including: \"%s\"", tzFile);
                 
-                FileParser fpParser(m_pSettingsMap);
+                FileParser fpParser(m_pSettingsMap, m_trail);
                 fpParser.ParseFile(tzFile);
             }
 
