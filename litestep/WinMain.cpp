@@ -336,7 +336,6 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
                 {
                     // User wants Explorer as shell anyway
                     wStartFlags |= LSF_RUN_EXPLORER;
-                    StartExplorerShell(EXPLORER_WAIT_TIMEOUT);
                 }
             }
 
