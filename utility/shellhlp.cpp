@@ -366,7 +366,7 @@ bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
         // GetModuleFileName doesn't null-terminate the buffer if it is too
         // small. Make sure that even in this error case the buffer is properly
         // terminated - some people don't check return values.
-        pszBuffer[cchBuffer-1] = '\0';
+        pszBuffer[cchBuffer-1] = L'\0';
     }
     else if (cchCopied > 0 && cchCopied < cchBuffer)
     {
@@ -374,6 +374,36 @@ bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
     }
     
     return bSuccess;
+}
+
+
+//
+// LSGetModuleFileNameEx
+//
+// Wrapper around GetModuleFileNameEx, dealing with that it moved from
+// psapi to Kernel32 with Windows 7.
+//
+DWORD LSGetModuleFileNameEx(HANDLE hProcess, HMODULE hModule, LPTSTR pszBuffer, DWORD cchBuffer)
+{
+    typedef DWORD(*GetModuleProc)(HANDLE hProcess, HMODULE hModule, LPTSTR pszBuffer, DWORD cchBuffer);
+    static GetModuleProc proc = nullptr;
+
+    if (proc == nullptr)
+    {
+        proc = (GetModuleProc)GetProcAddress(GetModuleHandle(_T("Kernel32.dll")), "GetModuleFileNameExW");
+        if (proc == nullptr)
+        {
+            // Try pre Windows 7
+            proc = (GetModuleProc)GetProcAddress(GetModuleHandle(_T("Psapi.dll")), "GetModuleFileNameExW");
+        }
+    }
+
+    if (proc)
+    {
+        return proc(hProcess, hModule, pszBuffer, cchBuffer);
+    }
+
+    return 0;
 }
 
 

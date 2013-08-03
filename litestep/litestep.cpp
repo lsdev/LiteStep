@@ -341,7 +341,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             if (hShellProc != NULL)
             {
                 TCHAR szProcessPath[MAX_PATH];
-                GetModuleFileNameEx(hShellProc, NULL, szProcessPath, _countof(szProcessPath));
+                LSGetModuleFileNameEx(hShellProc, NULL, szProcessPath, _countof(szProcessPath));
                 LPCTSTR pszPathName = PathFindFileName(szProcessPath);
 
                 if (_tcsicmp(pszPathName, _T("explorer.exe")) == 0)

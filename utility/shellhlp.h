@@ -41,6 +41,8 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
 HRESULT PathAddBackslashExA(LPSTR pszPath, size_t cchPath);
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer);
 bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer);
+DWORD LSGetModuleFileNameEx(HANDLE hProcess, HMODULE hModule,
+    LPTSTR pszBuffer, DWORD cchBuffer);
 HRESULT TryAllowSetForegroundWindow(HWND hWnd);
 bool IsVistaOrAbove();
 void LSShutdownDialog(HWND hWnd);

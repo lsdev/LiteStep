@@ -62,6 +62,10 @@ extern "C"
     
     LSAPI int GetRCIntA(LPCSTR lpKeyName, int nDefault);
     LSAPI int GetRCIntW(LPCWSTR lpKeyName, int nDefault);
+    LSAPI float GetRCFloatA(LPCSTR lpKeyName, float fDefault);
+    LSAPI float GetRCFloatW(LPCWSTR lpKeyName, float fDefault);
+    LSAPI double GetRCDoubleA(LPCSTR lpKeyName, double dDefault);
+    LSAPI double GetRCDoubleW(LPCWSTR lpKeyName, double dDefault);
     LSAPI BOOL GetRCStringA(LPCSTR lpKeyName, LPSTR value, LPCSTR defStr, int maxLen);
     LSAPI BOOL GetRCStringW(LPCWSTR lpKeyName, LPWSTR value, LPCWSTR defStr, int maxLen);
     LSAPI BOOL GetRCBoolA(LPCSTR lpKeyName, BOOL ifFound);
