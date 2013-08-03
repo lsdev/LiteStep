@@ -333,7 +333,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             DWORD dwProcessID;
             GetWindowThreadProcessId(hTrayWindow, &dwProcessID);
             HANDLE hShellProc = OpenProcess(
-                PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | SYNCHRONIZE,
+                PROCESS_QUERY_INFORMATION | SYNCHRONIZE,
                 FALSE,
                 dwProcessID
                 );
@@ -341,7 +341,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             if (hShellProc != NULL)
             {
                 TCHAR szProcessPath[MAX_PATH];
-                LSGetModuleFileNameEx(hShellProc, NULL, szProcessPath, _countof(szProcessPath));
+                LSGetProcessImageFileName(hShellProc, szProcessPath, _countof(szProcessPath));
                 LPCTSTR pszPathName = PathFindFileName(szProcessPath);
 
                 if (_tcsicmp(pszPathName, _T("explorer.exe")) == 0)

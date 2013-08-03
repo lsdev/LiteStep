@@ -385,22 +385,52 @@ bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer)
 //
 DWORD LSGetModuleFileNameEx(HANDLE hProcess, HMODULE hModule, LPTSTR pszBuffer, DWORD cchBuffer)
 {
-    typedef DWORD(*GetModuleProc)(HANDLE hProcess, HMODULE hModule, LPTSTR pszBuffer, DWORD cchBuffer);
+    typedef DWORD(WINAPI * GetModuleProc)(HANDLE hProcess, HMODULE hModule, LPTSTR pszBuffer, DWORD cchBuffer);
     static GetModuleProc proc = nullptr;
 
     if (proc == nullptr)
     {
-        proc = (GetModuleProc)GetProcAddress(GetModuleHandle(_T("Kernel32.dll")), "GetModuleFileNameExW");
+        proc = (GetModuleProc)GetProcAddress(GetModuleHandle(_T("Kernel32.dll")), "K32GetModuleFileNameExW");
         if (proc == nullptr)
         {
             // Try pre Windows 7
-            proc = (GetModuleProc)GetProcAddress(GetModuleHandle(_T("Psapi.dll")), "GetModuleFileNameExW");
+            proc = (GetModuleProc)GetProcAddress(LoadLibrary(_T("Psapi.dll")), "GetModuleFileNameExW");
         }
     }
 
     if (proc)
     {
         return proc(hProcess, hModule, pszBuffer, cchBuffer);
+    }
+
+    return 0;
+}
+
+
+//
+// LSGetProcessImageFileName
+//
+// Wrapper around GetProcessImageFileName, dealing with that it moved from
+// psapi to Kernel32 with Windows 7.
+//
+DWORD LSGetProcessImageFileName(HANDLE hProcess, LPTSTR pszBuffer, DWORD cchBuffer)
+{
+    typedef DWORD(WINAPI * GetImageNameProc)(HANDLE hProcess,  LPTSTR pszBuffer, DWORD cchBuffer);
+    static GetImageNameProc proc = nullptr;
+
+    if (proc == nullptr)
+    {
+        proc = (GetImageNameProc)GetProcAddress(GetModuleHandle(_T("Kernel32.dll")), "K32GetProcessImageFileNameW");
+        if (proc == nullptr)
+        {
+            // Try pre Windows 7
+            proc = (GetImageNameProc)GetProcAddress(LoadLibrary(_T("Psapi.dll")), "GetProcessImageFileNameW");
+        }
+    }
+
+    if (proc)
+    {
+        return proc(hProcess, pszBuffer, cchBuffer);
     }
 
     return 0;
