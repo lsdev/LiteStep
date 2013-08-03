@@ -38,12 +38,13 @@ bool GetShellFolderPath(int nFolder, LPTSTR ptzPath, size_t cchPath);
 
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer);
 HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath);
+HRESULT PathAddBackslashExA(LPSTR pszPath, size_t cchPath);
 HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer);
 bool LSGetModuleFileName(HINSTANCE hInst, LPTSTR pszBuffer, DWORD cchBuffer);
 HRESULT TryAllowSetForegroundWindow(HWND hWnd);
 bool IsVistaOrAbove();
 void LSShutdownDialog(HWND hWnd);
-BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias);
+BOOL LSPlaySystemSound(LPCWSTR pwzSoundAlias);
 HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
                       LPVOID lpParameter, LPDWORD pdwThreadId);
 
@@ -55,9 +56,9 @@ HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
 BOOL LSDisableWow64FsRedirection(PVOID* ppvOldValue);
 BOOL LSRevertWow64FsRedirection(PVOID pvOldValue);
 
-BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo);
-HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
-                         LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow);
+BOOL LSShellExecuteEx(LPSHELLEXECUTEINFOW lpExecInfo);
+HINSTANCE LSShellExecute(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile,
+                         LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShow);
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -122,6 +123,6 @@ inline HRESULT HrGetLastError()
     return HRESULT_FROM_WIN32(GetLastError());
 }
 
-HRESULT DescriptionFromHR(HRESULT hr, LPTSTR buf, size_t cchBuf);
+HRESULT DescriptionFromHR(HRESULT hr, LPWSTR buf, size_t cchBuf);
 
 #endif // SHELLHLP_H

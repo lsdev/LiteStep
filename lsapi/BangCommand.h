@@ -25,6 +25,7 @@
 #include "../utility/base.h"
 #include "lsapidefines.h"
 #include <string>
+#include <functional>
 
 
 /**
@@ -38,10 +39,19 @@ public:
      *
      * @param  dwThread    thread that owns this bang command
      * @param  pfnBang     callback function
-     * @param  pszCommand  bang command name
+     * @param  pwzCommand  bang command name
      */
-    Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand);
-    
+    Bang(DWORD dwThread, BangCommandA pfnBang, LPCWSTR pwzCommand);
+
+    /**
+     * Constructs a bang command.
+     *
+     * @param  dwThread    thread that owns this bang command
+     * @param  pfnBang     callback function
+     * @param  pwzCommand  bang command name
+     */
+    Bang(DWORD dwThread, BangCommandW pfnBang, LPCWSTR pwzCommand);
+
     /**
      * Constructs a bang command whose callback function takes the bang
      * command name as a parameter.
@@ -51,7 +61,18 @@ public:
      *                     name as a parameter
      * @param  pszCommand  bang command name
      */
-    Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand);
+    Bang(DWORD dwThread, BangCommandExA pfnBang, LPCWSTR pwzCommand);
+
+    /**
+     * Constructs a bang command whose callback function takes the bang
+     * command name as a parameter.
+     *
+     * @param  dwThread    thread that owns this bang command
+     * @param  pfnBang     callback function which takes the bang command
+     *                     name as a parameter
+     * @param  pwzCommand  bang command name
+     */
+    Bang(DWORD dwThread, BangCommandExW pfnBang, LPCWSTR pwzCommand);
     
     /**
      * Destructor.
@@ -65,9 +86,9 @@ public:
      *
      * @param  hCaller    window handle belonging to caller. The bang
      *                    typically uses this as an owner for dialog boxes.
-     * @param  pszParams  parameters for the bang command
+     * @param  pwzParams  parameters for the bang command
      */
-    void Execute(HWND hCaller, LPCSTR pszParams);
+    void Execute(HWND hCaller, LPCWSTR pwzParams);
     
     HINSTANCE GetModule() const;
     
@@ -80,15 +101,18 @@ private:
      * function
      */
     bool m_bEX;
+
+    /** The address of the callback function, inside the module */
+    LPVOID m_pAddress;
     
     /** Callback function */
-    BangCommand m_bBang;
+    std::function<void (HWND hwndOwner, LPCWSTR pwzArgs)> m_bBang;
     
     /** Callback function that takes the bang command name as a parameter */
-    BangCommandEx m_bBangEX;
+    std::function<void (HWND hwndOwner, LPCWSTR pwzBangCommandName, LPCWSTR pwzArgs)> m_bBangEX;
     
     /** Name of this bang command */
-    std::string m_szCommand;
+    std::wstring m_sCommand;
 };
 
 #endif // BANGCOMMAND_H

@@ -37,48 +37,48 @@ public:
      * with the given file.
      *
      * @param  pSettingsMap  SettingsMap to iterate over
-     * @param  szPath        Path to configuration file
+     * @param  sPath        Path to configuration file
      */
-    SettingsIterator(SettingsMap* pSettingsMap, const std::string& szPath);
+    SettingsIterator(SettingsMap* pSettingsMap, const std::wstring& sPath);
     
     /**
      * Retrieve the next value.
      *
-     * @param   pszValue  buffer to receive value
+     * @param   pwzValue  buffer to receive value
      * @param   cchValue  size of buffer
      * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code>
      *          if there are no more values to retrieve
      */
-    BOOL ReadNextLine(LPSTR pszValue, size_t cchValue);
+    BOOL ReadNextLine(LPWSTR pwzValue, size_t cchValue);
     
     /**
      * Retrieve the next value that does not start with an '*'.
      *
-     * @param   pszValue  buffer to receive value
+     * @param   pwzValue  buffer to receive value
      * @param   cchValue  size of buffer
      * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code>
      *          if there are no more values to retrieve
      */
-    BOOL ReadNextCommand(LPSTR pszValue, size_t cchValue);
+    BOOL ReadNextCommand(LPWSTR pwzValue, size_t cchValue);
     
     /**
      * Retrieve the next value with the specified setting name that starts
      * with an '*'.
      *
-     * @param   pszConfig  setting name
-     * @param   pszValue   buffer to receive value
+     * @param   pwzConfig  setting name
+     * @param   pwzValue   buffer to receive value
      * @param   cchValue   size of buffer
      * @return  <code>TRUE</code> if operation succeeded or <code>FALSE</code>
      *          if there are no more values to retrieve
      */
-    BOOL ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
+    BOOL ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pszValue, size_t cchValue);
     
     /**
      * Returns path to configuration file.
      */
-    std::string getPath()
+    std::wstring getPath()
     {
-        return m_Path;
+        return m_sPath;
     }
     
 private:
@@ -92,7 +92,7 @@ private:
     IteratorMap m_Iterators;
     
     /** Path to configuration file */
-    std::string m_Path;
+    std::wstring m_sPath;
 };
 
 

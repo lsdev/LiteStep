@@ -1,6 +1,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                              LiteStep 0.25.0 Alpha
-                         Experimental Build 2013-08-01
+                         Experimental Build 2013-08-??
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 This build requires the Visual C++ 2012 Redistributable Package
@@ -48,6 +48,9 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
+  - [2013-08-??] -
+    - Fixed crash with recursive includes.
+  
   - [2013-08-01] -
     - Modified the .RC prefix syntax, added special handling of keys starting
       with *, and made -, as a key, refer to the current prefix.

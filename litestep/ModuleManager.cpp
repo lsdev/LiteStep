@@ -49,13 +49,13 @@ HRESULT ModuleManager::Start(ILiteStep *pILiteStep)
         m_pILiteStep = pILiteStep;
         m_pILiteStep->AddRef();
         
-        char szAppPath[MAX_PATH] = { 0 };
+        wchar_t wzAppPath[MAX_PATH] = { 0 };
         
         m_hLiteStep = GetLitestepWnd();
         
-        if (m_hLiteStep && LSGetLitestepPath(szAppPath, MAX_PATH))
+        if (m_hLiteStep && LSGetLitestepPathW(wzAppPath, MAX_PATH))
         {
-            m_sAppPath = szAppPath;
+            m_sAppPath = wzAppPath;
             
             _LoadModules();
             
@@ -112,9 +112,9 @@ UINT ModuleManager::_LoadModules()
     ASSERT(m_ModuleQueue.empty());
     
     UINT uReturn = 0;
-    char szLine[MAX_LINE_LENGTH];
+    wchar_t wzLine[MAX_LINE_LENGTH];
     
-    LPVOID f = LCOpen(NULL);
+    LPVOID f = LCOpenW(nullptr);
     
     if (f)
     {
@@ -127,20 +127,20 @@ UINT ModuleManager::_LoadModules()
 #elif defined(LS_COMPAT_LCREADNEXTCONFIG)
         while (LCReadNextCommand(f, szLine, MAX_LINE_LENGTH))
 #else
-        while (LCReadNextConfig(f, "LoadModule", szLine, MAX_LINE_LENGTH))
+        while (LCReadNextConfigW(f, L"LoadModule", wzLine, MAX_LINE_LENGTH))
 #endif
         {
-            char szCommand[MAX_RCCOMMAND] = { 0 };
-            char szToken1[MAX_LINE_LENGTH] = { 0 };
-            char szToken2[MAX_LINE_LENGTH] = { 0 };
+            wchar_t wzCommand[MAX_RCCOMMAND] = { 0 };
+            wchar_t wzToken1[MAX_LINE_LENGTH] = { 0 };
+            wchar_t wzToken2[MAX_LINE_LENGTH] = { 0 };
             
             // first buffer takes the "LoadModule" token
-            LPSTR lpszBuffers[] = { szCommand, szToken1, szToken2 };
+            LPWSTR lpwzBuffers[] = { wzCommand, wzToken1, wzToken2 };
             
-            if (LCTokenize(szLine, lpszBuffers, 3, NULL) >= 2)
+            if (LCTokenizeW(wzLine, lpwzBuffers, 3, nullptr) >= 2)
             {
 #if defined(LS_COMPAT_LCREADNEXTCONFIG)
-                if (_stricmp(szCommand, "LoadModule"))
+                if (_wcsicmp(wzCommand, L"LoadModule"))
                 {
                     continue;
                 }
@@ -148,12 +148,12 @@ UINT ModuleManager::_LoadModules()
                 
                 DWORD dwFlags = 0;
                 
-                if (_stricmp(szToken2, "threaded") == 0)
+                if (_wcsicmp(wzToken2, L"threaded") == 0)
                 {
                     dwFlags |= LS_MODULE_THREADED;
                 }
                 
-                Module* pModule = _MakeModule(szToken1, dwFlags);
+                Module* pModule = _MakeModule(wzToken1, dwFlags);
                 
                 if (pModule)
                 {
@@ -171,11 +171,11 @@ UINT ModuleManager::_LoadModules()
 }
 
 
-BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
+BOOL ModuleManager::LoadModule(LPCWSTR pwzLocation, DWORD dwFlags)
 {
     BOOL bReturn = FALSE;
     
-    Module* pModule = _MakeModule(pszLocation, dwFlags);
+    Module* pModule = _MakeModule(pwzLocation, dwFlags);
     
     if (pModule)
     {
@@ -187,9 +187,9 @@ BOOL ModuleManager::LoadModule(LPCSTR pszLocation, DWORD dwFlags)
 }
 
 
-Module* ModuleManager::_MakeModule(LPCSTR pszLocation, DWORD dwFlags)
+Module* ModuleManager::_MakeModule(LPCWSTR pwzLocation, DWORD dwFlags)
 {
-    return new Module(pszLocation, dwFlags);
+    return new Module(pwzLocation, dwFlags);
 }
 
 
@@ -324,11 +324,11 @@ BOOL ModuleManager::QuitModule(HINSTANCE hModule)
 }
 
 
-BOOL ModuleManager::QuitModule(LPCSTR pszLocation)
+BOOL ModuleManager::QuitModule(LPCWSTR pwzLocation)
 {
     BOOL bReturn = FALSE;
     
-    ModuleQueue::iterator iter = _FindModule(pszLocation);
+    ModuleQueue::iterator iter = _FindModule(pwzLocation);
     
     if (iter != m_ModuleQueue.end() && *iter)
     {
@@ -347,7 +347,7 @@ BOOL ModuleManager::ReloadModule(HINSTANCE hModule)
     
     if (iter != m_ModuleQueue.end())
     {
-        std::string sLocation = (*iter)->GetLocation();
+        std::wstring sLocation = (*iter)->GetLocation();
         DWORD dwFlags = (*iter)->GetFlags();
         
         QuitModule(hModule);
@@ -358,10 +358,10 @@ BOOL ModuleManager::ReloadModule(HINSTANCE hModule)
 }
 
 
-ModuleQueue::iterator ModuleManager::_FindModule(LPCSTR pszLocation)
+ModuleQueue::iterator ModuleManager::_FindModule(LPCWSTR pwzLocation)
 {
     return std::find_if(m_ModuleQueue.begin(), m_ModuleQueue.end(),
-        IsLocationEqual(pszLocation));
+        IsLocationEqual(pwzLocation));
 }
 
 
@@ -399,7 +399,7 @@ void ModuleManager::_WaitForModules(const HANDLE* pHandles, size_t stCount) cons
 }
 
 
-HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam) const
+HRESULT ModuleManager::EnumModules(LSENUMMODULESPROCW pfnCallback, LPARAM lParam) const
 {
     HRESULT hr = S_OK;
     
@@ -418,7 +418,7 @@ HRESULT ModuleManager::EnumModules(LSENUMMODULESPROC pfnCallback, LPARAM lParam)
 }
 
 
-HRESULT ModuleManager::EnumPerformance(LSENUMPERFORMANCEPROC pfnCallback, LPARAM lParam) const
+HRESULT ModuleManager::EnumPerformance(LSENUMPERFORMANCEPROCW pfnCallback, LPARAM lParam) const
 {
     HRESULT hr = S_OK;
     

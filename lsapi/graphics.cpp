@@ -22,6 +22,7 @@
 #include "png_support.h"
 #include "../utility/core.hpp"
 #include <algorithm>
+#include "../utility/stringutility.h"
 
 
 static void TransparentBltLSWorker(
@@ -234,28 +235,28 @@ HRGN BitmapToRegion(
 
 
 //
-// HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
+// HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
 //
 // Takes strings of the form:
 //   File.bmp
 //   .extract
 //   .extract=file.exe[,3]
-HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
+HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
 {
     HBITMAP hbmReturn = NULL;
     
-    if (pszImage != NULL)
+    if (pwzImage != NULL)
     {
-        if (_stricmp(pszImage, ".none") != 0)
+        if (_wcsicmp(pwzImage, L".none") != 0)
         {
-            char szImage[MAX_PATH];
-            StringCchCopy(szImage, MAX_PATH, pszImage);
+            wchar_t wzImage[MAX_PATH];
+            StringCchCopyW(wzImage, _countof(wzImage), pwzImage);
             
             // Bitmap merging by Thedd
             //  Thedd - pic1.bmp|pic2.bmp merges the images. Works recursively,
             //  so pic1.bmp|.extract=whatever.dll,3|pic2.bmp also works etc...
             // bitmap merging by grd
-            LPSTR pszSecondImage = strchr(szImage, '|');
+            LPWSTR pszSecondImage = wcschr(wzImage, L'|');
             if (pszSecondImage)
             {
                 HDC hdcFirst, hdcSecond, hdcResult;
@@ -273,8 +274,8 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
                 ++pszSecondImage;
                 
                 // load the two bitmaps
-                hbmFirst = LoadLSImage(szImage, pszFile);
-                hbmSecond = LoadLSImage(pszSecondImage, pszFile);
+                hbmFirst = LoadLSImageW(wzImage, pwzFile);
+                hbmSecond = LoadLSImageW(pszSecondImage, pwzFile);
                 
                 // if the second one is NULL, then there's no merging to do and
                 if (hbmSecond != NULL)
@@ -352,11 +353,11 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
             }
             else
             {
-                if (!_strnicmp(szImage, ".extract", 8 /*strlen(".extract")*/))
+                if (!_wcsnicmp(wzImage, L".extract", 8 /*wcslen(L".extract")*/))
                 {
                     HICON hIcon = NULL;
                     
-                    hIcon = LoadLSIcon(szImage, pszFile);
+                    hIcon = LoadLSIconW(wzImage, pwzFile);
                     
                     if (hIcon)
                     {
@@ -368,20 +369,20 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
                 {
                     // Append the image name to the LiteStep image path and
                     // attempt to load the image.
-                    char szExpandedImage[MAX_PATH];
+                    wchar_t wzExpandedImage[MAX_PATH];
                     
-                    VarExpansionEx(szExpandedImage, szImage, MAX_PATH);
-                    LSGetImagePath(szImage, MAX_PATH);
-                    PathAppend(szImage, szExpandedImage);
+                    VarExpansionExW(wzExpandedImage, wzImage, _countof(wzExpandedImage));
+                    LSGetImagePathW(wzImage, _countof(wzImage));
+                    PathAppendW(wzImage, wzExpandedImage);
                     
-                    if (PathMatchSpec(szImage, "*.png"))
+                    if (PathMatchSpecW(wzImage, L"*.png"))
                     {
-                        hbmReturn = LoadFromPNG(szImage);
+                        hbmReturn = LoadFromPNG(wzImage);
                     }
                     else
                     {
-                        hbmReturn = (HBITMAP)LoadImage(
-                            NULL, szImage, IMAGE_BITMAP, 0, 0,
+                        hbmReturn = (HBITMAP)LoadImageW(
+                            NULL, wzImage, IMAGE_BITMAP, 0, 0,
                             LR_DEFAULTCOLOR | LR_LOADFROMFILE);
                     }
                     
@@ -389,14 +390,14 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
                     // and try loading it
                     if (hbmReturn == NULL)
                     {
-                        if (PathMatchSpec(szExpandedImage, "*.png"))
+                        if (PathMatchSpecW(wzExpandedImage, L"*.png"))
                         {
-                            hbmReturn = LoadFromPNG(szExpandedImage);
+                            hbmReturn = LoadFromPNG(wzExpandedImage);
                         }
                         else
                         {
-                            hbmReturn = (HBITMAP)LoadImage(
-                                NULL, szExpandedImage, IMAGE_BITMAP, 0, 0,
+                            hbmReturn = (HBITMAP)LoadImageW(
+                                NULL, wzExpandedImage, IMAGE_BITMAP, 0, 0,
                                 LR_DEFAULTCOLOR | LR_LOADFROMFILE);
                         }
                     }
@@ -406,6 +407,18 @@ HBITMAP LoadLSImage(LPCSTR pszImage, LPCSTR pszFile)
     }
     
     return hbmReturn;
+}
+
+
+//
+// LoadLSImageA
+//
+HBITMAP LoadLSImageA(LPCSTR pszImage, LPCSTR pszFile)
+{
+    return LoadLSImageW(
+        std::unique_ptr<wchar_t>(WCSFromMBS(pszImage)).get(),
+        std::unique_ptr<wchar_t>(WCSFromMBS(pszFile)).get()
+        );
 }
 
 
@@ -440,7 +453,7 @@ HBITMAP BitmapFromIcon(HICON hIcon)
 
 
 //
-// LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
+// LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
 //
 // Takes strings of the form:
 //   File.ico
@@ -448,17 +461,17 @@ HBITMAP BitmapFromIcon(HICON hIcon)
 //   c:\path\     <- icon extraction for path out of desktop.ini
 //   .extract
 //   .extract=file.exe[,3]  ... and returns an icon
-HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
+HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
 {
     HICON hIcon = NULL;
     
-    if (pszIconPath != NULL)
+    if (pwzIconPath != NULL)
     {
-        if (_stricmp(pszIconPath, ".none") != 0)
+        if (_wcsicmp(pwzIconPath, L".none") != 0)
         {
-            char szIconPath[MAX_PATH];
-            char szIconLSImagePath[MAX_PATH];
-            LPSTR pszIconFile = (LPSTR)pszIconPath;
+            wchar_t wzIconPath[MAX_PATH];
+            wchar_t wzIconLSImagePath[MAX_PATH];
+            LPWSTR pwzIconFile = (LPWSTR)pwzIconPath;
             int nIcon = 0;
             
             // here comes a large block which does nothing but turning it into
@@ -467,61 +480,61 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
             // if .extract but nothing else is there...
             // then take the file specified as an icon (could probably be done
             // earlier, but anyhow)
-            if (_stricmp(pszIconPath, ".extract") == 0)
+            if (_wcsicmp(pwzIconPath, L".extract") == 0)
             {
-                pszIconFile = (LPSTR)pszFile;
+                pwzIconFile = (LPWSTR)pwzFile;
             }
-            else if (_strnicmp(pszIconPath, ".extract=", 9) == 0)
+            else if (_wcsnicmp(pwzIconPath, L".extract=", 9) == 0)
             {
                 // remove ".extract=" (as we won't use it anyway)
-                pszIconFile = (LPSTR)pszIconPath + 9;
+                pwzIconFile = (LPWSTR)pwzIconPath + 9;
             }
             
-            VarExpansionEx(szIconPath, pszIconFile, MAX_PATH);
+            VarExpansionExW(wzIconPath, pwzIconFile, _countof(wzIconPath));
             
-            if (PathIsRelative(szIconPath))
+            if (PathIsRelativeW(wzIconPath))
             {
-                LSGetImagePath(szIconLSImagePath, MAX_PATH);
-                PathAppend(szIconLSImagePath, szIconPath);
-                pszIconFile = szIconLSImagePath;
+                LSGetImagePathW(wzIconLSImagePath, _countof(wzIconLSImagePath));
+                PathAppendW(wzIconLSImagePath, wzIconPath);
+                pwzIconFile = wzIconLSImagePath;
             }
             else
             {
-                pszIconFile = szIconPath;
+                pwzIconFile = wzIconPath;
             }
             
             // large block ends here, now time to separate path and index (if we
             // have an index)
-            nIcon = PathParseIconLocation(pszIconFile);
+            nIcon = PathParseIconLocationW(pwzIconFile);
             
             // now we have the two vars we would like, and the loading can begin
             // well not really, if it's a path, where we're going to get the
             // icon form desktop.ini there is just a little bit more we have to
             // do before we can start loading
-            if (PathIsDirectory(pszIconFile))
+            if (PathIsDirectoryW(pwzIconFile))
             {
-                char szTemp[MAX_PATH];
+                wchar_t wzTemp[MAX_PATH];
                 
-                PathAppend(pszIconFile, "desktop.ini");
-                nIcon = GetPrivateProfileInt(".ShellClassInfo", "IconIndex",
-                    0, pszIconFile);
+                PathAppendW(pwzIconFile, L"desktop.ini");
+                nIcon = GetPrivateProfileIntW(L".ShellClassInfo", L"IconIndex",
+                    0, pwzIconFile);
                 
-                GetPrivateProfileString(".ShellClassInfo", "IconFile",
-                    "", szTemp, MAX_PATH, pszIconFile);
-                StringCchCopy(pszIconFile, MAX_PATH, szTemp);
+                GetPrivateProfileStringW(L".ShellClassInfo", L"IconFile",
+                    L"", wzTemp, _countof(wzTemp), pwzIconFile);
+                StringCchCopyW(pwzIconFile, MAX_PATH, wzTemp);
             }
             
             // okay, now it's really time to load the icon... if it's an .ico
             // file we want to do an LoadImage() thing, otherwise it's
             // extracticon so lets find out the extension
-            if (PathMatchSpec(pszIconFile, "*.ico"))
+            if (PathMatchSpecW(pwzIconFile, L"*.ico"))
             {
-                hIcon = (HICON)LoadImage(
-                    NULL, pszIconFile, IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+                hIcon = (HICON)LoadImageW(
+                    NULL, pwzIconFile, IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
             }
             else
             {
-                hIcon = ExtractIcon(GetModuleHandle(NULL), pszIconFile, nIcon);
+                hIcon = ExtractIconW(GetModuleHandle(NULL), pwzIconFile, nIcon);
                 
                 if (hIcon == (HICON)1)
                 {
@@ -532,6 +545,18 @@ HICON LoadLSIcon(LPCSTR pszIconPath, LPCSTR pszFile)
     }
     
     return hIcon;
+}
+
+
+//
+// LoadLSIconA
+//
+HICON LoadLSIconA(LPCSTR pszIconPath, LPCSTR pszFile)
+{
+    return LoadLSIconW(
+        std::unique_ptr<wchar_t>(WCSFromMBS(pszIconPath)).get(),
+        std::unique_ptr<wchar_t>(WCSFromMBS(pszFile)).get()
+        );
 }
 
 

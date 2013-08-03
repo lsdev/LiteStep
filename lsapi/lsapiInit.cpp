@@ -36,8 +36,8 @@ LSAPIInit::LSAPIInit()
 {
     m_dwMainThreadID = GetCurrentThreadId();
     
-    m_szLitestepPath[0] = '\0';
-    m_szRcPath[0] = '\0';
+    m_wzLitestepPath[0] = L'\0';
+    m_wzRcPath[0] = L'\0';
 }
 
 
@@ -49,7 +49,7 @@ LSAPIInit::~LSAPIInit()
 }
 
 
-void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
+void LSAPIInit::Initialize(LPCWSTR pwzLitestepPath, LPCWSTR pwzRcPath)
 {
     try
     {
@@ -66,12 +66,12 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
         }
         
         // Copy over the strings
-        if (FAILED(StringCchCopy(m_szLitestepPath, MAX_PATH, pszLitestepPath)))
+        if (FAILED(StringCchCopyW(m_wzLitestepPath, MAX_PATH, pwzLitestepPath)))
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
         
-        if (FAILED(StringCchCopy(m_szRcPath, MAX_PATH, pszRcPath)))
+        if (FAILED(StringCchCopyW(m_wzRcPath, MAX_PATH, pwzRcPath)))
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
@@ -100,7 +100,7 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
         setLitestepVars();
         
         // Load the default RC config file
-        m_smSettingsManager->ParseFile(m_szRcPath);
+        m_smSettingsManager->ParseFile(m_wzRcPath);
         
         // Add our internal bang commands to the Bang Manager.
         SetupBangs();
@@ -112,9 +112,9 @@ void LSAPIInit::Initialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath)
             m_bIsInitialized = false;
             
             delete m_smSettingsManager;
-            m_smSettingsManager = NULL;
+            m_smSettingsManager = nullptr;
             delete m_bmBangManager;
-            m_bmBangManager = NULL;
+            m_bmBangManager = nullptr;
         }
         
         throw; //rethrow
@@ -159,74 +159,74 @@ void LSAPIInit::ReloadSettings()
     setLitestepVars();
     
     // Reload the default RC config file
-    m_smSettingsManager->ParseFile(m_szRcPath);
+    m_smSettingsManager->ParseFile(m_wzRcPath);
 }
 
 
 void LSAPIInit::setLitestepVars()
 {
-    char szTemp[MAX_PATH];
+    wchar_t wzTemp[MAX_PATH];
     DWORD dwLength = MAX_PATH;
     
     // just using a shorter name, no real reason to re-assign.
     SettingsManager *pSM = m_smSettingsManager;
     
     // Set the variable "litestepdir" since it was never set
-    if (SUCCEEDED(StringCchCopy(szTemp, MAX_PATH, m_szLitestepPath)))
+    if (SUCCEEDED(StringCchCopyW(wzTemp, MAX_PATH, m_wzLitestepPath)))
     {
-        PathAddBackslashEx(szTemp, MAX_PATH);
-        PathQuoteSpaces(szTemp);
-        pSM->SetVariable("litestepdir", szTemp);
+        PathAddBackslashEx(wzTemp, MAX_PATH);
+        PathQuoteSpacesW(wzTemp);
+        pSM->SetVariable(L"litestepdir", wzTemp);
     }
     
-    if (GetWindowsDirectory(szTemp, MAX_PATH))
+    if (GetWindowsDirectoryW(wzTemp, MAX_PATH))
     {
-        PathAddBackslashEx(szTemp, MAX_PATH);
-        pSM->SetVariable("windir", szTemp);
+        PathAddBackslashEx(wzTemp, MAX_PATH);
+        pSM->SetVariable(L"windir", wzTemp);
     }
     
-    if (GetUserName(szTemp, &dwLength))
+    if (GetUserNameW(wzTemp, &dwLength))
     {
-        PathQuoteSpaces(szTemp);
-        pSM->SetVariable("username", szTemp);
+        PathQuoteSpacesW(wzTemp);
+        pSM->SetVariable(L"username", wzTemp);
     }
     
-    pSM->SetVariable("bitbucket", "::{645FF040-5081-101B-9F08-00AA002F954E}");
-    pSM->SetVariable("documents", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
-    pSM->SetVariable("drives", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
-    pSM->SetVariable("network", "::{208D2C60-3AEA-1069-A2D7-08002B30309D}");
-    pSM->SetVariable("controls", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
-    pSM->SetVariable("dialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{992CFFA0-F557-101A-88EC-00DD010CCC48}");
-    pSM->SetVariable("networkanddialup", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
-    pSM->SetVariable("printers", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{2227A280-3AEA-1069-A2DE-08002B30309D}");
-    pSM->SetVariable("scheduled", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
-    pSM->SetVariable("admintools", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
+    pSM->SetVariable(L"bitbucket", L"::{645FF040-5081-101B-9F08-00AA002F954E}");
+    pSM->SetVariable(L"documents", L"::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
+    pSM->SetVariable(L"drives", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
+    pSM->SetVariable(L"network", L"::{208D2C60-3AEA-1069-A2D7-08002B30309D}");
+    pSM->SetVariable(L"controls", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+    pSM->SetVariable(L"dialup", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{992CFFA0-F557-101A-88EC-00DD010CCC48}");
+    pSM->SetVariable(L"networkanddialup", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+    pSM->SetVariable(L"printers", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{2227A280-3AEA-1069-A2DE-08002B30309D}");
+    pSM->SetVariable(L"scheduled", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
+    pSM->SetVariable(L"admintools", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
     
-    setShellFolderVariable("quicklaunch", LS_CSIDL_QUICKLAUNCH);
-    setShellFolderVariable("commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
-    setShellFolderVariable("commonfavorites", CSIDL_COMMON_FAVORITES);
-    setShellFolderVariable("commonprograms", CSIDL_COMMON_PROGRAMS);
-    setShellFolderVariable("commonstartmenu", CSIDL_COMMON_STARTMENU);
-    setShellFolderVariable("commonstartup", CSIDL_COMMON_STARTUP);
-    setShellFolderVariable("cookies", CSIDL_COOKIES);
-    setShellFolderVariable("desktop", CSIDL_DESKTOP);
-    setShellFolderVariable("desktopdir", CSIDL_DESKTOPDIRECTORY);
-    setShellFolderVariable("favorites", CSIDL_FAVORITES);
-    setShellFolderVariable("fonts", CSIDL_FONTS);
-    setShellFolderVariable("history", CSIDL_HISTORY);
-    setShellFolderVariable("internet", CSIDL_INTERNET);
-    setShellFolderVariable("internetcache", CSIDL_INTERNET_CACHE);
-    setShellFolderVariable("nethood", CSIDL_NETHOOD);
-    setShellFolderVariable("documentsdir", CSIDL_PERSONAL);
-    setShellFolderVariable("printhood", CSIDL_PRINTHOOD);
-    setShellFolderVariable("programs", CSIDL_PROGRAMS);
-    setShellFolderVariable("recent", CSIDL_RECENT);
-    setShellFolderVariable("sendto", CSIDL_SENDTO);
-    setShellFolderVariable("startmenu", CSIDL_STARTMENU);
-    setShellFolderVariable("startup", CSIDL_STARTUP);
-    setShellFolderVariable("templates", CSIDL_TEMPLATES);
-    setShellFolderVariable("commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
-    setShellFolderVariable("admintoolsdir", CSIDL_ADMINTOOLS);
+    setShellFolderVariable(L"quicklaunch", LS_CSIDL_QUICKLAUNCH);
+    setShellFolderVariable(L"commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
+    setShellFolderVariable(L"commonfavorites", CSIDL_COMMON_FAVORITES);
+    setShellFolderVariable(L"commonprograms", CSIDL_COMMON_PROGRAMS);
+    setShellFolderVariable(L"commonstartmenu", CSIDL_COMMON_STARTMENU);
+    setShellFolderVariable(L"commonstartup", CSIDL_COMMON_STARTUP);
+    setShellFolderVariable(L"cookies", CSIDL_COOKIES);
+    setShellFolderVariable(L"desktop", CSIDL_DESKTOP);
+    setShellFolderVariable(L"desktopdir", CSIDL_DESKTOPDIRECTORY);
+    setShellFolderVariable(L"favorites", CSIDL_FAVORITES);
+    setShellFolderVariable(L"fonts", CSIDL_FONTS);
+    setShellFolderVariable(L"history", CSIDL_HISTORY);
+    setShellFolderVariable(L"internet", CSIDL_INTERNET);
+    setShellFolderVariable(L"internetcache", CSIDL_INTERNET_CACHE);
+    setShellFolderVariable(L"nethood", CSIDL_NETHOOD);
+    setShellFolderVariable(L"documentsdir", CSIDL_PERSONAL);
+    setShellFolderVariable(L"printhood", CSIDL_PRINTHOOD);
+    setShellFolderVariable(L"programs", CSIDL_PROGRAMS);
+    setShellFolderVariable(L"recent", CSIDL_RECENT);
+    setShellFolderVariable(L"sendto", CSIDL_SENDTO);
+    setShellFolderVariable(L"startmenu", CSIDL_STARTMENU);
+    setShellFolderVariable(L"startup", CSIDL_STARTUP);
+    setShellFolderVariable(L"templates", CSIDL_TEMPLATES);
+    setShellFolderVariable(L"commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
+    setShellFolderVariable(L"admintoolsdir", CSIDL_ADMINTOOLS);
     
     //
     // Set version identification variables
@@ -234,28 +234,28 @@ void LSAPIInit::setLitestepVars()
     struct VersionToVariable
     {
         UINT uVersion;
-        LPCTSTR pszVariable;
+        LPCWSTR pszVariable;
     }
     versions[] = \
     {
-        { WINVER_WIN95,     _T("Win95")      },
-        { WINVER_WIN98,     _T("Win98")      },
-        { WINVER_WINME,     _T("WinME")      },
+        { WINVER_WIN95,     L"Win95"      },
+        { WINVER_WIN98,     L"Win98"      },
+        { WINVER_WINME,     L"WinME"      },
         
-        { WINVER_WINNT4,    _T("WinNT4")     },
-        { WINVER_WIN2000,   _T("Win2000")    },
-        { WINVER_WINXP,     _T("WinXP")      },
-        { WINVER_VISTA,     _T("WinVista")   },
-        { WINVER_WIN7,      _T("Win7")       },
-        { WINVER_WIN8,      _T("Win8")       },
-        { WINVER_WIN81,     _T("Win81")      },
+        { WINVER_WINNT4,    L"WinNT4"     },
+        { WINVER_WIN2000,   L"Win2000"    },
+        { WINVER_WINXP,     L"WinXP"      },
+        { WINVER_VISTA,     L"WinVista"   },
+        { WINVER_WIN7,      L"Win7"       },
+        { WINVER_WIN8,      L"Win8"       },
+        { WINVER_WIN81,     L"Win81"      },
         
-        { WINVER_WIN2003,   _T("Win2003")    },
-        { WINVER_WHS,       _T("Win2003")    },  // WHS is Win2003 in disguise
-        { WINVER_WIN2008,   _T("Win2008")    },
-        { WINVER_WIN2008R2, _T("Win2008R2")  },
-        { WINVER_WIN2012,   _T("Win2012")    },
-        { WINVER_WIN2012R2, _T("Win2012R2")  }
+        { WINVER_WIN2003,   L"Win2003"    },
+        { WINVER_WHS,       L"Win2003"    },  // WHS is Win2003 in disguise
+        { WINVER_WIN2008,   L"Win2008"    },
+        { WINVER_WIN2008R2, L"Win2008R2"  },
+        { WINVER_WIN2012,   L"Win2012"    },
+        { WINVER_WIN2012R2, L"Win2012R2"  }
     };
     
     UINT uVersion = GetWindowsVersion();
@@ -264,66 +264,66 @@ void LSAPIInit::setLitestepVars()
     {
         if (versions[idx].uVersion == uVersion)
         {
-            pSM->SetVariable(versions[idx].pszVariable, "true");
+            pSM->SetVariable(versions[idx].pszVariable, L"true");
         }
         else
         {
-            pSM->SetVariable(versions[idx].pszVariable, "false");
+            pSM->SetVariable(versions[idx].pszVariable, L"false");
         }
     }
     
     if (IsOS(OS_NT))
     {
-        pSM->SetVariable("Win9x", "false");
-        pSM->SetVariable("WinNT", "true");
+        pSM->SetVariable(L"Win9x", L"false");
+        pSM->SetVariable(L"WinNT", L"true");
     }
     else
     {
-        pSM->SetVariable("Win9x", "true");
-        pSM->SetVariable("WinNT", "false");
+        pSM->SetVariable(L"Win9x", L"true");
+        pSM->SetVariable(L"WinNT", L"false");
     }
 
 #if defined(_WIN64)
-    pSM->SetVariable("Win64", "true");
+    pSM->SetVariable(L"Win64", L"true");
 #else
     if (IsOS(OS_WOW6432))
     {
-        pSM->SetVariable("Win64", "true");
+        pSM->SetVariable(L"Win64", L"true");
     }
     else
     {
-        pSM->SetVariable("Win64", "false");
+        pSM->SetVariable(L"Win64", L"false");
     }
 #endif
     
     // screen resolution
-    StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CXSCREEN));
-    pSM->SetVariable("ResolutionX", szTemp);
+    StringCchPrintfW(wzTemp, MAX_PATH, L"%d", GetSystemMetrics(SM_CXSCREEN));
+    pSM->SetVariable(L"ResolutionX", wzTemp);
     
-    StringCchPrintf(szTemp, MAX_PATH, "%d", GetSystemMetrics(SM_CYSCREEN));
-    pSM->SetVariable("ResolutionY", szTemp);
+    StringCchPrintfW(wzTemp, MAX_PATH, L"%d", GetSystemMetrics(SM_CYSCREEN));
+    pSM->SetVariable(L"ResolutionY", wzTemp);
     
     // build date/time from PE headers
-    getCompileTime(szTemp, MAX_PATH);
-    pSM->SetVariable("CompileDate", szTemp);
+    getCompileTime(wzTemp, MAX_PATH);
+    pSM->SetVariable(L"CompileDate", wzTemp);
     
 #if defined(LS_CUSTOM_INCLUDEFOLDER)
-    pSM->SetVariable("IncludeFolder", "1");
+    pSM->SetVariable(L"IncludeFolder", L"1");
 #endif // LS_CUSTOM_INCLUDEFOLDER
 }
 
 
-bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
+bool LSAPIInit::setShellFolderVariable(LPCWSTR pwzVariable, int nFolder)
 {
     bool bSuccess = false;
-    char szPath[MAX_PATH] = { 0 };
+    wchar_t wzPath[MAX_PATH] = { 0 };
     
-    if (GetShellFolderPath(nFolder, szPath, MAX_PATH))
+    if (GetShellFolderPath(nFolder, wzPath, MAX_PATH))
     {
-        PathAddBackslashEx(szPath, MAX_PATH);
-        PathQuoteSpaces(szPath);
+        PathAddBackslashEx(wzPath, MAX_PATH);
+        PathQuoteSpacesW(wzPath);
         
-        m_smSettingsManager->SetVariable(pszVariable, szPath);
+        m_smSettingsManager->SetVariable(pwzVariable, wzPath);
         bSuccess = true;
     }
     
@@ -335,7 +335,7 @@ bool LSAPIInit::setShellFolderVariable(LPCSTR pszVariable, int nFolder)
 //
 #define MakePtr(cast, ptr, addValue) \
     (cast)((DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
-void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
+void LSAPIInit::getCompileTime(LPWSTR pwzValue, size_t cchValue)
 {
     IMAGE_DOS_HEADER* dosheader;
     IMAGE_NT_HEADERS* ntheader;
@@ -364,12 +364,12 @@ void LSAPIInit::getCompileTime(LPSTR pszValue, size_t cchValue)
     
     if (gmtime_s(&timeStruct, &compiletime) == 0)
     {
-        _tcsftime(pszValue, cchValue,
-            _T("\"Compiled on %b %d %Y at %H:%M:%S UTC\""), &timeStruct);
+        wcsftime(pwzValue, cchValue,
+            L"\"Compiled on %b %d %Y at %H:%M:%S UTC\"", &timeStruct);
     }
     else
     {
-        StringCchPrintf(pszValue, cchValue,
-            "\"Compiled at an unknown time\"");
+        StringCchPrintfW(pwzValue, cchValue,
+            L"\"Compiled at an unknown time\"");
     }
 }

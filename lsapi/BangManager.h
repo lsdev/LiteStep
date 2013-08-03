@@ -36,7 +36,7 @@ class BangManager
 {
 private:
     /** Maps bang command names to Bang objects. */
-    typedef std::map<std::string, Bang*, stringicmp> BangMap;
+    typedef std::map<std::wstring, Bang*, stringicmp> BangMap;
     
     /** List of bang commands indexed by name */
     BangMap bang_map;
@@ -58,21 +58,21 @@ public:
     /**
      * Adds a bang command to the list.
      *
-     * @param  pszName  bang command name
+     * @param  pwzName  bang command name
      * @param  pbbBang  Bang object that implements the bang command
      * @return <code>TRUE</code> if the operation succeeds or
      *         <code>FALSE</code> otherwise
      */
-    BOOL AddBangCommand(LPCSTR pszName, Bang *pbbBang);
+    BOOL AddBangCommand(LPCWSTR pszName, Bang *pbbBang);
     
     /**
      * Removes a bang command from the list.
      *
-     * @param   pszName  bang command name
+     * @param   pwzName  bang command name
      * @return  <code>TRUE</code> if the operation succeeds or
      *          <code>FALSE</code> otherwise
      */
-    BOOL RemoveBangCommand(LPCSTR pszName);
+    BOOL RemoveBangCommand(LPCWSTR pwzName);
     
     /**
      * Removes all bang commands from the list.
@@ -82,13 +82,13 @@ public:
     /**
      * Executes a bang command with the specified parameters.
      *
-     * @param  pszName     bang command name
+     * @param  pwzName     bang command name
      * @param  hCaller     handle to owner window
-     * @param  pszParams   command-line arguments
+     * @param  pwzParams   command-line arguments
      * @return <code>TRUE</code> if the operation succeeds or
      *         <code>FALSE</code> otherwise
      */
-    BOOL ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams);
+    BOOL ExecuteBangCommand(LPCWSTR pwzName, HWND hCaller, LPCWSTR pwzParams);
     
     /**
      * Calls a callback function once for each bang command in the list.
@@ -100,7 +100,7 @@ public:
      *          <code>S_FALSE</code> if the callback function returned
      *          <code>FALSE</code>, or an error code
      */
-    HRESULT EnumBangs(LSENUMBANGSV2PROC pfnCallback, LPARAM lParam) const;
+    HRESULT EnumBangs(LSENUMBANGSV2PROCW pfnCallback, LPARAM lParam) const;
 };
 
 #endif // BANGMANAGER_H

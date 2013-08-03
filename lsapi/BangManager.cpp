@@ -36,11 +36,11 @@ BangManager::~BangManager()
 
 
 // Add a bang command to the manager
-BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
+BOOL BangManager::AddBangCommand(LPCWSTR pwzName, Bang *pbbBang)
 {
     Lock lock(m_cs);
     
-    BangMap::iterator iter = bang_map.find(pszName);
+    BangMap::iterator iter = bang_map.find(pwzName);
     
     if (iter != bang_map.end())
     {
@@ -48,7 +48,7 @@ BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
         bang_map.erase(iter);
     }
     
-    bang_map.insert(BangMap::value_type(pszName, pbbBang));
+    bang_map.insert(BangMap::value_type(pwzName, pbbBang));
     pbbBang->AddRef();
     
     return TRUE;
@@ -56,13 +56,13 @@ BOOL BangManager::AddBangCommand(LPCSTR pszName, Bang *pbbBang)
 
 
 // Remove a bang command from the manager
-BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
+BOOL BangManager::RemoveBangCommand(LPCWSTR pwzName)
 {
     Lock lock(m_cs);
     BOOL bReturn = FALSE;
     
-    ASSERT(pszName != NULL);
-    BangMap::iterator iter = bang_map.find(pszName);
+    ASSERT(pwzName != nullptr);
+    BangMap::iterator iter = bang_map.find(pwzName);
     
     if (iter != bang_map.end())
     {
@@ -77,10 +77,10 @@ BOOL BangManager::RemoveBangCommand(LPCSTR pszName)
 
 
 // Execute named bang command, passing params, getting result
-BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszParams)
+BOOL BangManager::ExecuteBangCommand(LPCWSTR pszName, HWND hCaller, LPCWSTR pwzParams)
 {
     BOOL bReturn = FALSE;
-    Bang* pToExec = NULL;
+    Bang* pToExec = nullptr;
     
     // Acquiring lock manually to allow manual release below
     m_cs.Acquire();
@@ -99,7 +99,7 @@ BOOL BangManager::ExecuteBangCommand(LPCSTR pszName, HWND hCaller, LPCSTR pszPar
     
     if (pToExec)
     {
-        pToExec->Execute(hCaller, pszParams);
+        pToExec->Execute(hCaller, pwzParams);
         pToExec->Release();
         
         bReturn = TRUE;
@@ -125,7 +125,7 @@ void BangManager::ClearBangCommands()
 }
 
 
-HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROC pfnCallback, LPARAM lParam) const
+HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROCW pfnCallback, LPARAM lParam) const
 {
     Lock lock(m_cs);
     

@@ -71,7 +71,7 @@
 #define LM_RESTORESYSTRAY           9211 // Deprecated
 #define LM_CHECKFORAPPBAR           9212 // Deprecated
 #define LM_SENDSYSTRAY              9213
-#define LM_SYSTRAY                  9214
+#define LM_SYSTRAYA                 9214
 #define LM_SYSTRAYREADY             9215
 #define LM_SYSTRAYINFOEVENT         9216
 
@@ -91,9 +91,9 @@
 #define LM_RECYCLE                  9260
 #define LM_REGISTERMESSAGE          9263
 #define LM_UNREGISTERMESSAGE        9264
-#define LM_GETREVID                 9265
-#define LM_UNLOADMODULE             9266
-#define LM_RELOADMODULE             9267
+#define LM_GETREVIDA                9265
+#define LM_UNLOADMODULEA            9266
+#define LM_RELOADMODULEA            9267
 #define LM_REGISTERHOOKMESSAGE      9268  // Deprecated
 #define LM_UNREGISTERHOOKMESSAGE    9269  // Deprecated
 #define LM_SHADETOGGLE              9300
@@ -126,7 +126,7 @@
 #define LM_WINDOWLIST               9401 // Deprecated
 #define LM_DATASTORE                9410 // Deprecated
 #define LM_MESSAGEMANAGER           9411 // Deprecated
-#define LM_BANGCOMMAND              9420
+#define LM_BANGCOMMANDA             9420
 #define LM_ENUMREVIDS               9430
 #define LM_ENUMMODULES              9431
 #define LM_ENUMPERFORMANCE          9432
@@ -170,6 +170,13 @@
 #define LM_TASK_THUMBBARADDBUTTONS    33036
 #define LM_TASK_THUMBBARUPDATEBUTTONS 33037
 #define LM_TASK_THUMBBARSETIMAGELIST  33038
+
+//
+#define LM_UNLOADMODULEW              33281
+#define LM_RELOADMODULEW              33282
+#define LM_GETREVIDW                  33283
+#define LM_BANGCOMMANDW               33284
+#define LM_SYSTRAYW                   33285
 
 
 //-----------------------------------------------------------------------------
@@ -217,16 +224,20 @@ typedef struct THUMBBUTTONLIST {
 //-----------------------------------------------------------------------------
 // MODULE ENTRY POINTS DEFINES
 //-----------------------------------------------------------------------------
-typedef int  (__cdecl* initModuleExProc)(HWND, HINSTANCE, LPCSTR);
+typedef int  (__cdecl* initModuleProc)(HWND, HINSTANCE, LPCWSTR);
+typedef int  (__cdecl* initModuleProcA)(HWND, HINSTANCE, LPCSTR);
 typedef void (__cdecl* quitModuleProc)(HINSTANCE);
 
 
 //-----------------------------------------------------------------------------
 // BANG COMMAND DEFINES
 //-----------------------------------------------------------------------------
-typedef void (__cdecl *BangCommand)(HWND hSender, LPCSTR pszArgs);
-typedef void (__cdecl *BangCommandEx) \
+typedef void (__cdecl *BangCommandA)(HWND hSender, LPCSTR pszArgs);
+typedef void (__cdecl *BangCommandW)(HWND hSender, LPCWSTR pszArgs);
+typedef void (__cdecl *BangCommandExA) \
     (HWND hSender, LPCSTR pszCommand, LPCSTR pszArgs);
+typedef void (__cdecl *BangCommandExW) \
+    (HWND hSender, LPCWSTR pszCommand, LPCWSTR pszArgs);
 
 typedef struct _LMBANGCOMMANDA
 {
@@ -315,10 +326,15 @@ typedef struct LSDESKTOPINFO
 #define LS_MODULE_THREADED          0x0001
 //      LS_MODULE_NOTPUMPED         0x0002    no longer used
 
-typedef BOOL (CALLBACK* LSENUMBANGSPROC)(LPCSTR, LPARAM);
-typedef BOOL (CALLBACK* LSENUMBANGSV2PROC)(HINSTANCE, LPCSTR, LPARAM);
-typedef BOOL (CALLBACK* LSENUMREVIDSPROC)(LPCSTR, LPARAM);
-typedef BOOL (CALLBACK* LSENUMMODULESPROC)(LPCSTR, DWORD, LPARAM);
-typedef BOOL (CALLBACK* LSENUMPERFORMANCEPROC)(LPCSTR, DWORD, LPARAM);
+typedef BOOL (CALLBACK* LSENUMBANGSPROCA)(LPCSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMBANGSPROCW)(LPCWSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMBANGSV2PROCA)(HINSTANCE, LPCSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMBANGSV2PROCW)(HINSTANCE, LPCWSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMREVIDSPROCA)(LPCSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMREVIDSPROCW)(LPCWSTR, LPARAM);
+typedef BOOL (CALLBACK* LSENUMMODULESPROCA)(LPCSTR, DWORD, LPARAM);
+typedef BOOL (CALLBACK* LSENUMMODULESPROCW)(LPCWSTR, DWORD, LPARAM);
+typedef BOOL (CALLBACK* LSENUMPERFORMANCEPROCA)(LPCSTR, DWORD, LPARAM);
+typedef BOOL (CALLBACK* LSENUMPERFORMANCEPROCW)(LPCWSTR, DWORD, LPARAM);
 
 #endif // LSAPIDEFINES_H

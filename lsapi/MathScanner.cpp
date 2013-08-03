@@ -28,18 +28,18 @@ using namespace std;
 
 
 // Reserved words
-struct ReservedWordTable { const char *str; int type; } gReservedWords[] = \
+struct ReservedWordTable { const wchar_t *str; int type; } gReservedWords[] = \
 {
-    { "false",    TT_FALSE    },
-    { "true",     TT_TRUE     },
-    { "infinity", TT_INFINITY },
-    { "nan",      TT_NAN      },
-    { "defined",  TT_DEFINED  },
-    { "div",      TT_DIV      },
-    { "mod",      TT_MOD      },
-    { "and",      TT_AND      },
-    { "or",       TT_OR       },
-    { "not",      TT_NOT      }
+    { L"false",    TT_FALSE    },
+    { L"true",     TT_TRUE     },
+    { L"infinity", TT_INFINITY },
+    { L"nan",      TT_NAN      },
+    { L"defined",  TT_DEFINED  },
+    { L"div",      TT_DIV      },
+    { L"mod",      TT_MOD      },
+    { L"and",      TT_AND      },
+    { L"or",       TT_OR       },
+    { L"not",      TT_NOT      }
 };
 
 const int gNumReservedWords = sizeof(gReservedWords) / sizeof(gReservedWords[0]);
@@ -48,29 +48,29 @@ const int gNumReservedWords = sizeof(gReservedWords) / sizeof(gReservedWords[0])
 // Operators and punctuation
 // Checked in this order so for example "<=" must precede "<". Must have enough
 // lookahead to recognize the longest symbol.
-struct SymbolTable { const char *str; int length; int type; } gSymbols[] = \
+struct SymbolTable { const wchar_t *str; int length; int type; } gSymbols[] = \
 {
-    { "(",  1, TT_LPAREN    },
-    { ")",  1, TT_RPAREN    },
-    { ",",  1, TT_COMMA     },
-    { "+",  1, TT_PLUS      },
-    { "-",  1, TT_MINUS     },
-    { "*",  1, TT_STAR      },
-    { "/",  1, TT_SLASH     },
-    { "&",  1, TT_AMPERSAND },
-    { "=",  1, TT_EQUAL     },
-    { ">=", 2, TT_GREATEREQ },
-    { ">",  1, TT_GREATER   },
-    { "<>", 2, TT_NOTEQUAL  },
-    { "<=", 2, TT_LESSEQ    },
-    { "<",  1, TT_LESS      },
-    { "!=", 2, TT_NOTEQUAL  }
+    { L"(",  1, TT_LPAREN    },
+    { L")",  1, TT_RPAREN    },
+    { L",",  1, TT_COMMA     },
+    { L"+",  1, TT_PLUS      },
+    { L"-",  1, TT_MINUS     },
+    { L"*",  1, TT_STAR      },
+    { L"/",  1, TT_SLASH     },
+    { L"&",  1, TT_AMPERSAND },
+    { L"=",  1, TT_EQUAL     },
+    { L">=", 2, TT_GREATEREQ },
+    { L">",  1, TT_GREATER   },
+    { L"<>", 2, TT_NOTEQUAL  },
+    { L"<=", 2, TT_LESSEQ    },
+    { L"<",  1, TT_LESS      },
+    { L"!=", 2, TT_NOTEQUAL  }
 };
 
 const int gNumSymbols = sizeof(gSymbols) / sizeof(gSymbols[0]);
 
 
-MathScanner::MathScanner(const string& expression) :
+MathScanner::MathScanner(const wstring& expression) :
     mStream(expression)
 {
     // Fill the lookahead buffer
@@ -83,7 +83,7 @@ MathToken MathScanner::NextToken()
     // Skip past whitespace
     SkipSpace();
     
-    if (mLookahead[0] < 0)
+    if (mLookahead[0] == WEOF)
     {
         // End of input
         return MathToken(TT_END);
@@ -98,7 +98,7 @@ MathToken MathScanner::NextToken()
         // Numeric literal
         return ScanNumber();
     }
-    else if (mLookahead[0] == '\"' || mLookahead[0] == '\'')
+    else if (mLookahead[0] == L'\"' || mLookahead[0] == L'\'')
     {
         // String literal
         return ScanString();
@@ -126,15 +126,15 @@ MathToken MathScanner::NextToken()
     }
     
     // Error
-    throw MathException("Illegal character");
+    throw MathException(L"Illegal character");
 }
 
 
-MathToken MathScanner::CheckReservedWord(const string& identifier)
+MathToken MathScanner::CheckReservedWord(const wstring& identifier)
 {
     for (int i = 0; i < gNumReservedWords; ++i)
     {
-        if (_stricmp(identifier.c_str(), gReservedWords[i].str) == 0)
+        if (_wcsicmp(identifier.c_str(), gReservedWords[i].str) == 0)
         {
             // It's a reserved word
             return MathToken(gReservedWords[i].type);
@@ -157,7 +157,7 @@ void MathScanner::Next(int count)
         
         if (!mStream.get(mLookahead[LOOKAHEAD - 1]))
         {
-            mLookahead[LOOKAHEAD - 1] = EOF;
+            mLookahead[LOOKAHEAD - 1] = WEOF;
         }
     }
 }
@@ -165,7 +165,7 @@ void MathScanner::Next(int count)
 
 MathToken MathScanner::ScanIdentifier()
 {
-    ostringstream value;
+    wostringstream value;
     
     while (IsNameChar(mLookahead[0]))
     {
@@ -179,7 +179,7 @@ MathToken MathScanner::ScanIdentifier()
 
 MathToken MathScanner::ScanNumber()
 {
-    ostringstream value;
+    wostringstream value;
     
     while (IsDigit(mLookahead[0]))
     {
@@ -187,7 +187,7 @@ MathToken MathScanner::ScanNumber()
         Next();
     }
     
-    if (mLookahead[0] == '.')
+    if (mLookahead[0] == L'.')
     {
         value.put(mLookahead[0]);
         Next();
@@ -205,33 +205,33 @@ MathToken MathScanner::ScanNumber()
 
 MathToken MathScanner::ScanString()
 {
-    ostringstream value;
-    char quote = mLookahead[0];
+    wostringstream value;
+    wchar_t quote = mLookahead[0];
     Next();
     
-    while (mLookahead[0] != EOF && mLookahead[0] != quote)
+    while (mLookahead[0] != WEOF && mLookahead[0] != quote)
     {
-        if (mLookahead[0] == '\\')
+        if (mLookahead[0] == L'\\')
         {
             // Escape sequence
             Next();
             
             switch (mLookahead[0])
             {
-            case '\\':
-                value.put('\\');
+            case L'\\':
+                value.put(L'\\');
                 break;
                 
-            case '\"':
-                value.put('\"');
+            case L'\"':
+                value.put(L'\"');
                 break;
                 
-            case '\'':
-                value.put('\'');
+            case L'\'':
+                value.put(L'\'');
                 break;
                 
             default:
-                throw MathException("Illegal string escape sequence");
+                throw MathException(L"Illegal string escape sequence");
             }
         }
         else
@@ -243,9 +243,9 @@ MathToken MathScanner::ScanString()
         Next();
     }
     
-    if (mLookahead[0] == EOF)
+    if (mLookahead[0] == WEOF)
     {
-        throw MathException("Unterminated string literal");
+        throw MathException(L"Unterminated string literal");
     }
     
     Next();
@@ -262,48 +262,48 @@ void MathScanner::SkipSpace()
 }
 
 
-bool MathScanner::IsDigit(char ch)
+bool MathScanner::IsDigit(wchar_t ch)
 {
-    return (ch >= '0' && ch <= '9');
+    return (ch >= L'0' && ch <= L'9');
 }
 
 
-bool MathScanner::IsFirstNameChar(char ch)
+bool MathScanner::IsFirstNameChar(wchar_t ch)
 {
     return !IsDigit(ch) && IsNameChar(ch);
 }
 
 
-bool MathScanner::IsNameChar(char ch)
+bool MathScanner::IsNameChar(wchar_t ch)
 {
-    if (ch < 0 || IsSpace(ch))
+    if (ch == WEOF || IsSpace(ch))
     {
         return false;
     }
     
     switch (ch)
     {
-    case '!':
+    case L'!':
     // case '@':  Will be reserved in 0.25
     // case '#':  Will be reserved in 0.25
-    case '$':
-    case '&':
-    case '*':
-    case '(':
-    case ')':
-    case '-':
-    case '+':
-    case '=':
-    case '[':
-    case ']':
+    case L'$':
+    case L'&':
+    case L'*':
+    case L'(':
+    case L')':
+    case L'-':
+    case L'+':
+    case L'=':
+    case L'[':
+    case L']':
     // case '|':  Will be reserved in 0.25
-    case ';':
-    case '"':
-    case '\'':
-    case '<':
-    case '>':
-    case ',':
-    case '/':
+    case L';':
+    case L'"':
+    case L'\'':
+    case L'<':
+    case L'>':
+    case L',':
+    case L'/':
         return false;
     }
     
@@ -311,7 +311,7 @@ bool MathScanner::IsNameChar(char ch)
 }
 
 
-bool MathScanner::IsSpace(char ch)
+bool MathScanner::IsSpace(wchar_t ch)
 {
-    return (ch == ' ' || ch == '\t'); // More than this?
+    return (ch == L' ' || ch == L'\t'); // More than this?
 }

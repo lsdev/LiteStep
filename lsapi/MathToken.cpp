@@ -25,37 +25,37 @@ using namespace std;
 
 
 // Mapping of token types to names
-struct TokenTypeTable { int type; const char *name; } gTokenTypes[] = \
+struct TokenTypeTable { int type; const wchar_t *name; } gTokenTypes[] = \
 {
-    { TT_INVALID,   "INVALID"   },
-    { TT_ID,        "ID"        },
-    { TT_FALSE,     "FALSE"     },
-    { TT_TRUE,      "TRUE"      },
-    { TT_NUMBER,    "NUMBER"    },
-    { TT_INFINITY,  "INFINITY"  },
-    { TT_NAN,       "NAN"       },
-    { TT_STRING,    "STRING"    },
-    { TT_LPAREN,    "LPAREN"    },
-    { TT_RPAREN,    "RPAREN"    },
-    { TT_DEFINED,   "DEFINED"   },
-    { TT_COMMA,     "COMMA"     },
-    { TT_PLUS,      "PLUS"      },
-    { TT_MINUS,     "MINUS"     },
-    { TT_STAR,      "STAR"      },
-    { TT_SLASH,     "SLASH"     },
-    { TT_DIV,       "DIV"       },
-    { TT_MOD,       "MOD"       },
-    { TT_AMPERSAND, "AMPERSAND" },
-    { TT_AND,       "AND"       },
-    { TT_OR,        "OR"        },
-    { TT_NOT,       "NOT"       },
-    { TT_EQUAL,     "EQUAL"     },
-    { TT_GREATER,   "GREATER"   },
-    { TT_GREATEREQ, "GREATEREQ" },
-    { TT_LESS,      "LESS"      },
-    { TT_LESSEQ,    "LESSEQ"    },
-    { TT_NOTEQUAL,  "NOTEQUAL"  },
-    { TT_END,       "END"       }
+    { TT_INVALID,   L"INVALID"   },
+    { TT_ID,        L"ID"        },
+    { TT_FALSE,     L"FALSE"     },
+    { TT_TRUE,      L"TRUE"      },
+    { TT_NUMBER,    L"NUMBER"    },
+    { TT_INFINITY,  L"INFINITY"  },
+    { TT_NAN,       L"NAN"       },
+    { TT_STRING,    L"STRING"    },
+    { TT_LPAREN,    L"LPAREN"    },
+    { TT_RPAREN,    L"RPAREN"    },
+    { TT_DEFINED,   L"DEFINED"   },
+    { TT_COMMA,     L"COMMA"     },
+    { TT_PLUS,      L"PLUS"      },
+    { TT_MINUS,     L"MINUS"     },
+    { TT_STAR,      L"STAR"      },
+    { TT_SLASH,     L"SLASH"     },
+    { TT_DIV,       L"DIV"       },
+    { TT_MOD,       L"MOD"       },
+    { TT_AMPERSAND, L"AMPERSAND" },
+    { TT_AND,       L"AND"       },
+    { TT_OR,        L"OR"        },
+    { TT_NOT,       L"NOT"       },
+    { TT_EQUAL,     L"EQUAL"     },
+    { TT_GREATER,   L"GREATER"   },
+    { TT_GREATEREQ, L"GREATEREQ" },
+    { TT_LESS,      L"LESS"      },
+    { TT_LESSEQ,    L"LESSEQ"    },
+    { TT_NOTEQUAL,  L"NOTEQUAL"  },
+    { TT_END,       L"END"       }
 };
 
 const int gNumTokenTypes = sizeof(gTokenTypes) / sizeof(gTokenTypes[0]);
@@ -75,24 +75,24 @@ MathToken::MathToken(int type) :
 }
 
 
-MathToken::MathToken(int type, const string& value) :
+MathToken::MathToken(int type, const wstring& value) :
     mType(type), mValue(value)
 {
     // do nothing
 }
 
 
-string MathToken::GetTypeName() const
+wstring MathToken::GetTypeName() const
 {
     for (int i = 0; i < gNumTokenTypes; ++i)
     {
         if (gTokenTypes[i].type == mType)
         {
-            return string(gTokenTypes[i].name);
+            return wstring(gTokenTypes[i].name);
         }
     }
     
-    return string();
+    return wstring();
 }
 
 
@@ -102,7 +102,7 @@ void MathToken::SetType(int type)
 }
 
 
-void MathToken::SetValue(const string& value)
+void MathToken::SetValue(const wstring& value)
 {
     mValue = value;
 }

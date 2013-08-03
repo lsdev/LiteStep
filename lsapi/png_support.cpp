@@ -29,7 +29,7 @@
 #include <fstream>
 
 //designed for loading files from hard disk in an std::vector
-void loadFile(std::vector<unsigned char>& buffer, const std::string& filename)
+void loadFile(std::vector<unsigned char>& buffer, const std::wstring& filename)
 {
     std::ifstream file(filename.c_str(),
         std::ios::in|std::ios::binary|std::ios::ate);
@@ -61,9 +61,9 @@ void loadFile(std::vector<unsigned char>& buffer, const std::string& filename)
     }
 }
 
-HBITMAP LoadFromPNG(LPCSTR pszFilename)
+HBITMAP LoadFromPNG(LPCWSTR pwzFilename)
 {
-    if (pszFilename == NULL)
+    if (pwzFilename == NULL)
     {
         return NULL;
     }
@@ -71,7 +71,7 @@ HBITMAP LoadFromPNG(LPCSTR pszFilename)
     //load and decode
     std::vector<unsigned char> buffer, image, palette;
     
-    loadFile(buffer, pszFilename);
+    loadFile(buffer, pwzFilename);
     
     if (buffer.empty())
     {
@@ -176,7 +176,7 @@ void ls_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 // passing a FILE* into libpng, isn't reliable because it crashes if libpng was
 // compiled with a different CRT than lsapi.dll
 //
-HBITMAP LoadFromPNG(LPCSTR pszFilename)
+HBITMAP LoadFromPNG(LPCWSTR pwzFilename)
 {
     HBITMAP hDibSection = NULL;
     

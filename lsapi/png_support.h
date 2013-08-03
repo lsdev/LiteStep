@@ -24,6 +24,6 @@
 
 #include "../utility/common.h"
 
-HBITMAP LoadFromPNG(LPCSTR pszFilename);
+HBITMAP LoadFromPNG(LPCWSTR pwzFilename);
 
 #endif // PNG_SUPPORT_H

@@ -44,8 +44,8 @@ class ModuleManager;
 #define RSH_TASKMAN     3
 
 // Program Options
-const char szMainWindowClass[] = "TApplication";
-const char szMainWindowTitle[] = "LiteStep";
+const TCHAR szMainWindowClass[] = _T("TApplication");
+const TCHAR szMainWindowTitle[] = _T("LiteStep");
 
 #define GWL_CLASSPOINTER 0
 
@@ -90,7 +90,7 @@ private:
     LRESULT _HandleSessionChange(DWORD dwCode, DWORD dwSession);
     
     void _Recycle();
-    HRESULT _EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const;
+    HRESULT _EnumRevIDs(LSENUMREVIDSPROCW pfnCallback, LPARAM lParam) const;
     static BOOL _SetShellWindow(HWND hWnd);
     
     // Application instance

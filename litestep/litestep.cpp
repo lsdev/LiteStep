@@ -160,7 +160,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     }
     else
     {
-        PathCombine(szRcPath, szAppPath, "step.rc");
+        PathCombine(szRcPath, szAppPath, L"step.rc");
     }
     
     if (IsVistaOrAbove())
@@ -194,10 +194,10 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     {
         RESOURCE_STREX(
             hInst, IDS_LITESTEP_ERROR2, resourceTextBuffer, MAX_LINE_LENGTH,
-            "Unable to find the file \"%s\".\n"
-            "Please verify the location of the file, and try again.", szRcPath);
+            L"Unable to find the file \"%ls\".\n"
+            L"Please verify the location of the file, and try again.", szRcPath);
         
-        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
+        RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
         
         return LRV_NO_STEP;
     }
@@ -207,7 +207,7 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     if (!LSAPIInitialize(szAppPath, szRcPath))
     {
         RESOURCE_MSGBOX(hInst, IDS_LSAPI_INIT_ERROR,
-            "Failed to initialize the LiteStep API.", "LiteStep");
+            L"Failed to initialize the LiteStep API.", L"LiteStep");
         
         return LRV_LSAPI_FAIL;
     }
@@ -233,11 +233,11 @@ int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile)
     {
         RESOURCE_STREX(hInst, IDS_LITESTEP_INIT_ERROR,
             resourceTextBuffer, MAX_LINE_LENGTH,
-            "Failed to initialize LiteStep.\n"
-            "Please contact the LiteStep Development Team.\n\n"
-            "Error code: 0x%.8X", hr);
+            L"Failed to initialize LiteStep.\n"
+            L"Please contact the LiteStep Development Team.\n\n"
+            L"Error code: 0x%.8X", hr);
         
-        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
+        RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
     }
     
     if (FAILED(hr))
@@ -312,7 +312,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     
     // Order of precedence: 1) shift key, 2) command line flags, 3) step.rc
     if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
-        (GetRCBool("LSNoStartup", TRUE) &&
+        (GetRCBoolW(L"LSNoStartup", TRUE) &&
         !(wStartFlags & LSF_FORCE_STARTUPAPPS)))
     {
         wStartFlags &= ~LSF_RUN_STARTUPAPPS;
@@ -323,11 +323,11 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     //
     // Check for another shell
     //
-    if (FindWindow("Shell_TrayWnd", NULL) != NULL)
+    if (FindWindow(L"Shell_TrayWnd", NULL) != NULL)
     {
-        if (GetRCBool("LSCloseExplorer", TRUE))
+        if (GetRCBoolW(L"LSCloseExplorer", TRUE))
         {
-            HWND hTrayWindow = FindWindow("Shell_TrayWnd", NULL);
+            HWND hTrayWindow = FindWindow(L"Shell_TrayWnd", NULL);
 
             // Determine the name of the current Shell
             DWORD dwProcessID;
@@ -340,11 +340,11 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
 
             if (hShellProc != NULL)
             {
-                char szProcessPath[MAX_PATH];
+                TCHAR szProcessPath[MAX_PATH];
                 GetModuleFileNameEx(hShellProc, NULL, szProcessPath, _countof(szProcessPath));
-                LPCSTR pszPathName = PathFindFileName(szProcessPath);
+                LPCTSTR pszPathName = PathFindFileName(szProcessPath);
 
-                if (_stricmp(pszPathName, "explorer.exe") == 0)
+                if (_tcsicmp(pszPathName, _T("explorer.exe")) == 0)
                 {
                     if (IsVistaOrAbove())
                     {
@@ -352,7 +352,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
                     }
                     else if (IsOS(OS_XPORGREATER))
                     {
-                        HWND hProgman = FindWindow("Progman", NULL);
+                        HWND hProgman = FindWindow(_T("Progman"), NULL);
                         PostMessage(hProgman, WM_QUIT, 0, TRUE);
                         PostMessage(hTrayWindow, WM_QUIT, 0, 0); 
                     }
@@ -377,25 +377,25 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
         }
     }
     
-    if (FindWindow("Shell_TrayWnd", NULL) != NULL)
+    if (FindWindow(L"Shell_TrayWnd", NULL) != NULL)
     {
-        if (GetRCBool("LSNoShellWarning", FALSE))
+        if (GetRCBoolW(L"LSNoShellWarning", FALSE))
         {
             RESOURCE_STR(hInstance, IDS_LITESTEP_ERROR3,
-                "LiteStep is not able to load as the system shell.\n"
-                "Another shell is already active.\n"
-                "\n"
-                "Continuing to load LiteStep will disable specific system\n"
-                "shell functions of LiteStep and some features will not\n"
-                "function properly such as icon notifications (systray),\n"
-                "the desktop and some task managers.\n"
-                "\n"
-                "To disable this message, place 'LSNoShellWarning' in\n"
-                "your step.rc.\n"
-                "\n"
-                "Continue to load LiteStep?\n");
+                L"LiteStep is not able to load as the system shell.\n"
+                L"Another shell is already active.\n"
+                L"\n"
+                L"Continuing to load LiteStep will disable specific system\n"
+                L"shell functions of LiteStep and some features will not\n"
+                L"function properly such as icon notifications (systray),\n"
+                L"the desktop and some task managers.\n"
+                L"\n"
+                L"To disable this message, place 'LSNoShellWarning' in\n"
+                L"your step.rc.\n"
+                L"\n"
+                L"Continue to load LiteStep?\n");
             
-            RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, "Warning");
+            RESOURCE_TITLE(hInstance, IDS_LITESTEP_TITLE_WARNING, L"Warning");
             
             if (RESOURCE_MSGBOX_F(
                 resourceTitleBuffer, MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
@@ -417,7 +417,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     //
     if (SUCCEEDED(hr))
     {
-        hr = _InitServices(!bUnderExplorer && GetRCBool("LSSetAsShell", TRUE));
+        hr = _InitServices(!bUnderExplorer && GetRCBoolW(L"LSSetAsShell", TRUE));
         
         if (SUCCEEDED(hr))
         {
@@ -448,7 +448,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
             if (IsVistaOrAbove() && StartupRunner::IsFirstRunThisSession(
                 _T("LogonSoundHasBeenPlayed")))
             {
-                LSPlaySystemSound(_T("WindowsLogon"));
+                LSPlaySystemSound(L"WindowsLogon");
             }
             
             // Undocumented call: Shell Loading Finished
@@ -691,7 +691,7 @@ void CLiteStep::_RegisterShellNotifications(HWND hWnd)
     //
     // Register for shell hook notifications
     //
-    WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
+    WM_ShellHook = RegisterWindowMessage(L"SHELLHOOK");
     
     m_pRegisterShellHook = (RSHPROC)GetProcAddress(
         GetModuleHandle(_T("SHELL32.DLL")), (LPCSTR)((long)0x00B5));
@@ -813,7 +813,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             case LM_SHUTDOWN:
             case SC_CLOSE:
                 {
-                    ParseBangCommand(hWnd, "!ShutDown", NULL);
+                    ParseBangCommandW(hWnd, L"!ShutDown", NULL);
                 }
                 break;
                 
@@ -885,7 +885,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             
             if (m_pMessageManager)
             {
-                hr = _EnumRevIDs((LSENUMREVIDSPROC)wParam, lParam);
+                hr = _EnumRevIDs((LSENUMREVIDSPROCW)wParam, lParam);
             }
             
             return hr;
@@ -898,7 +898,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             
             if (m_pModuleManager)
             {
-                hr = m_pModuleManager->EnumModules((LSENUMMODULESPROC)wParam,
+                hr = m_pModuleManager->EnumModules((LSENUMMODULESPROCW)wParam,
                     lParam);
             }
             
@@ -912,7 +912,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             
             if (m_pModuleManager)
             {
-                hr = m_pModuleManager->EnumPerformance((LSENUMPERFORMANCEPROC)wParam,
+                hr = m_pModuleManager->EnumPerformance((LSENUMPERFORMANCEPROCW)wParam,
                     lParam);
             }
             
@@ -960,7 +960,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         }
         break;
         
-    case LM_RELOADMODULE:
+    case LM_RELOADMODULEA:
         {
             if (m_pModuleManager)
             {
@@ -974,17 +974,42 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     LPCSTR pszPath = (LPCSTR)wParam;
                     
-                    if (pszPath != NULL)
+                    if (pszPath != nullptr)
                     {
-                        m_pModuleManager->QuitModule(pszPath);
-                        m_pModuleManager->LoadModule(pszPath, (DWORD)lParam);
+                        std::unique_ptr<wchar_t> wzPath(WCSFromMBS(pszPath));
+                        m_pModuleManager->QuitModule(wzPath.get());
+                        m_pModuleManager->LoadModule(wzPath.get(), (DWORD)lParam);
                     }
                 }
             }
         }
         break;
         
-    case LM_UNLOADMODULE:
+    case LM_RELOADMODULEW:
+        {
+            if (m_pModuleManager)
+            {
+                if (lParam & LMM_HINSTANCE)
+                {
+                    // not sure if this feature is needed... if a module
+                    // wants to reload it shouldn't need the core to do that
+                    m_pModuleManager->ReloadModule((HINSTANCE)wParam);
+                }
+                else  // (lParam & LMM_PATH)
+                {
+                    LPCWSTR pwzPath = (LPCWSTR)wParam;
+                    
+                    if (pwzPath != nullptr)
+                    {
+                        m_pModuleManager->QuitModule(pwzPath);
+                        m_pModuleManager->LoadModule(pwzPath, (DWORD)lParam);
+                    }
+                }
+            }
+        }
+        break;
+        
+    case LM_UNLOADMODULEA:
         {
             if (m_pModuleManager)
             {
@@ -996,25 +1021,61 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 {
                     LPCSTR pszPath = (LPCSTR)wParam;
                     
-                    if (pszPath != NULL)
+                    if (pszPath != nullptr)
                     {
-                        m_pModuleManager->QuitModule(pszPath);
+                        m_pModuleManager->QuitModule(MBSTOWCS(pszPath));
                     }
                 }
             }
         }
         break;
         
-    case LM_BANGCOMMAND:
+    case LM_UNLOADMODULEW:
         {
-            PLMBANGCOMMAND plmbc = (PLMBANGCOMMAND)lParam;
-            
-            if (plmbc != NULL)
+            if (m_pModuleManager)
             {
-                if (plmbc->cbSize == sizeof(LMBANGCOMMAND))
+                if (lParam & LMM_HINSTANCE)
                 {
-                    lReturn = ParseBangCommand(plmbc->hWnd,
+                    m_pModuleManager->QuitModule((HINSTANCE)wParam);
+                }
+                else // (lParam & LMM_PATH)
+                {
+                    LPCWSTR pwzPath = (LPCWSTR)wParam;
+                    
+                    if (pwzPath != nullptr)
+                    {
+                        m_pModuleManager->QuitModule(pwzPath);
+                    }
+                }
+            }
+        }
+        break;
+        
+    case LM_BANGCOMMANDA:
+        {
+            PLMBANGCOMMANDA plmbc = (PLMBANGCOMMANDA)lParam;
+            
+            if (plmbc != nullptr)
+            {
+                if (plmbc->cbSize == sizeof(LMBANGCOMMANDA))
+                {
+                    lReturn = ParseBangCommandA(plmbc->hWnd,
                         plmbc->szCommand, plmbc->szArgs);
+                }
+            }
+        }
+        break;
+        
+    case LM_BANGCOMMANDW:
+        {
+            PLMBANGCOMMANDW plmbc = (PLMBANGCOMMANDW)lParam;
+            
+            if (plmbc != nullptr)
+            {
+                if (plmbc->cbSize == sizeof(LMBANGCOMMANDW))
+                {
+                    lReturn = ParseBangCommandW(plmbc->hWnd,
+                        plmbc->wzCommand, plmbc->wzArgs);
                 }
             }
         }
@@ -1026,9 +1087,16 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             
             switch (pcds->dwData)
             {
-            case LM_BANGCOMMAND:
+            case LM_BANGCOMMANDA:
                 {
-                    lReturn = SendMessage(hWnd, LM_BANGCOMMAND,
+                    lReturn = SendMessage(hWnd, LM_BANGCOMMANDA,
+                        0, (LPARAM)pcds->lpData);
+                }
+                break;
+
+            case LM_BANGCOMMANDW:
+                {
+                    lReturn = SendMessage(hWnd, LM_BANGCOMMANDW,
                         0, (LPARAM)pcds->lpData);
                 }
                 break;
@@ -1107,7 +1175,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     break;
                 }
             }
-            lReturn = DefWindowProc (hWnd, uMsg, wParam, lParam);
+            lReturn = DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
         break;
     }
@@ -1124,11 +1192,11 @@ LRESULT CLiteStep::_HandleSessionChange(DWORD dwCode, DWORD /* dwSession */)
 {
     if (dwCode == WTS_SESSION_LOCK)
     {
-        LSPlaySystemSound(_T("WindowsLogoff"));
+        LSPlaySystemSound(L"WindowsLogoff");
     }
     else if (dwCode == WTS_SESSION_UNLOCK)
     {
-        LSPlaySystemSound(_T("WindowsLogon"));
+        LSPlaySystemSound(L"WindowsLogon");
     }
     
     return 0;
@@ -1145,7 +1213,7 @@ HRESULT CLiteStep::_InitServices(bool bSetAsShell)
     //
     // DDE Service
     //
-    if (GetRCBool("LSUseSystemDDE", TRUE))
+    if (GetRCBoolW(L"LSUseSystemDDE", TRUE))
     {
         // M$ DDE
         pService = new (std::nothrow) DDEStub();
@@ -1168,7 +1236,7 @@ HRESULT CLiteStep::_InitServices(bool bSetAsShell)
     //
     // Tray Service
     //
-    if (GetRCBool("LSDisableTrayService", FALSE))
+    if (GetRCBoolW(L"LSDisableTrayService", FALSE))
     {
         m_pTrayService = new (std::nothrow) TrayService();
         
@@ -1357,8 +1425,8 @@ void CLiteStep::_Recycle()
     if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
     {
         RESOURCE_MSGBOX(m_hInstance, IDS_LITESTEP_ERROR6,
-            "Recycle has been paused, click OK to continue.",
-            "LiteStep");
+            L"Recycle has been paused, click OK to continue.",
+            L"LiteStep");
     }
     
     // Re-initialize the bang and settings manager in LSAPI
@@ -1375,26 +1443,44 @@ void CLiteStep::_Recycle()
 //
 // _EnumRevIDs
 //
-HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROC pfnCallback, LPARAM lParam) const
+HRESULT CLiteStep::_EnumRevIDs(LSENUMREVIDSPROCW pfnCallback, LPARAM lParam) const
 {
     HRESULT hr = E_FAIL;
     
-    MessageManager::windowSetT setWindows;
+    MessageManager::windowSetT setWindowsW, setWindowsA;
     
-    if (m_pMessageManager->GetWindowsForMessage(LM_GETREVID, setWindows))
+    if (m_pMessageManager->GetWindowsForMessage(LM_GETREVIDA, setWindowsA) ||
+        m_pMessageManager->GetWindowsForMessage(LM_GETREVIDW, setWindowsW))
     {
         hr = S_OK;
         
-        for (MessageManager::windowSetT::iterator iter = setWindows.begin();
-            iter != setWindows.end(); ++iter)
+        for (MessageManager::windowSetT::iterator iter = setWindowsW.begin();
+            iter != setWindowsW.end(); ++iter)
+        {
+            // Using MAX_LINE_LENGTH to be on the safe side. Modules
+            // should assume a length of 64 or so.
+            wchar_t wzBuffer[MAX_LINE_LENGTH] = { 0 };
+            
+            if (SendMessage(*iter, LM_GETREVIDW, 0, (LPARAM)&wzBuffer) > 0)
+            {
+                if (!pfnCallback(wzBuffer, lParam))
+                {
+                    hr = S_FALSE;
+                    break;
+                }
+            }
+        }
+
+        for (MessageManager::windowSetT::iterator iter = setWindowsA.begin();
+            iter != setWindowsA.end(); ++iter)
         {
             // Using MAX_LINE_LENGTH to be on the safe side. Modules
             // should assume a length of 64 or so.
             char szBuffer[MAX_LINE_LENGTH] = { 0 };
             
-            if (SendMessage(*iter, LM_GETREVID, 0, (LPARAM)&szBuffer) > 0)
+            if (SendMessage(*iter, LM_GETREVIDA, 0, (LPARAM)&szBuffer) > 0)
             {
-                if (!pfnCallback(szBuffer, lParam))
+                if (!pfnCallback(MBSTOWCS(szBuffer), lParam))
                 {
                     hr = S_FALSE;
                     break;

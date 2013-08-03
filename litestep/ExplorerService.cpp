@@ -49,7 +49,7 @@ HRESULT ExplorerService::Stop()
 {
     if (m_dwThreadID)
     {
-        HWND hProgman = FindWindow("Progman", NULL);
+        HWND hProgman = FindWindow(_T("Progman"), NULL);
         SendMessage(hProgman, 0x44D, 0, 0);
         PostMessage(hProgman, WM_QUIT, 0, 1);
     }

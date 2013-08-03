@@ -49,9 +49,9 @@ static void AboutSysInfo(HWND hListView);
 static void AboutPerformance(HWND hListView);
 
 // Utility
-static HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold);
+static HFONT CreateSimpleFont(LPCWSTR pszName, int nSizeInPoints, bool bBold);
 static int GetClientWidth(HWND hWnd);
-static void FormatBytes(DWORDLONG stBytes, LPSTR pszBuffer, size_t cchBuffer);
+static void FormatBytes(DWORDLONG stBytes, LPWSTR pszBuffer, size_t cchBuffer);
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -72,18 +72,18 @@ enum
 
 struct AboutOptions
 {
-    const char* option;
+    const wchar_t *option;
     AboutFunction function;
 }
 static const g_aboutOptions[] = \
 {
-     { "Bang Commands",      AboutBangs       }
-    ,{ "Development Team",   AboutDevTeam     }
-    ,{ "License",            AboutLicense     }
-    ,{ "Loaded Modules",     AboutModules     }
-    ,{ "Performance",        AboutPerformance }
-    ,{ "Revision IDs",       AboutRevIDs      }
-    ,{ "System Information", AboutSysInfo     }
+     { L"Bang Commands",      AboutBangs       }
+    ,{ L"Development Team",   AboutDevTeam     }
+    ,{ L"License",            AboutLicense     }
+    ,{ L"Loaded Modules",     AboutModules     }
+    ,{ L"Performance",        AboutPerformance }
+    ,{ L"Revision IDs",       AboutRevIDs      }
+    ,{ L"System Information", AboutSysInfo     }
 };
 
 
@@ -93,19 +93,19 @@ static const g_aboutOptions[] = \
 //
 struct TheDevTeam
 {
-    const char *nick;
-    const char *realName;
+    const wchar_t *nick;
+    const wchar_t *realName;
 }
 static const g_theDevTeam[] = \
 {
-     { "Acidfire",      "Alexander Vermaat" }
-    ,{ "alur",          "Erik Welander"     }
-    ,{ "ilmcuts",       "Simon"             }
-    ,{ "jugg",          "Chris Rempel"      }
-    ,{ "Maduin",        "Kevin Schaffer"    }
-    ,{ "RabidCow",      "Joshua Seagoe"     }
-    ,{ "Tobbe",         "Tobbe Lundberg"    }
-    ,{ "Xjill",         "Vidar T. Fauske"   }
+     { L"Acidfire",      L"Alexander Vermaat" }
+    ,{ L"alur",          L"Erik Welander"     }
+    ,{ L"ilmcuts",       L"Simon"             }
+    ,{ L"jugg",          L"Chris Rempel"      }
+    ,{ L"Maduin",        L"Kevin Schaffer"    }
+    ,{ L"RabidCow",      L"Joshua Seagoe"     }
+    ,{ L"Tobbe",         L"Tobbe Lundberg"    }
+    ,{ L"Xjill",         L"Vidar T. Fauske"   }
 };
 
 
@@ -113,27 +113,27 @@ static const g_theDevTeam[] = \
 //
 // LiteStep License Notice
 //
-static const CHAR g_szLicense[] = \
- "LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
- "\r\n"
- "Copyright (C) 1997-1998  Francis Gastellu\r\n"
- "Copyright (C) 1998-2013  LiteStep Development Team\r\n"
- "\r\n"
- "This program is free software; you can redistribute it and/or modify it "
- "under the terms of the GNU General Public License as published by the Free "
- "Software Foundation; either version 2 of the License, or (at your option) "
- "any later version.\r\n"
- "\r\n"
- "This program is distributed in the hope that it will be useful, but WITHOUT "
- "ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
- "FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for "
- "more details.\r\n"
- "\r\n"
- "You should have received a copy of the GNU General Public License along with "
- "this program; if not, write to the Free Software Foundation, Inc., 51 "
- "Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\r\n"
- "\r\n"
- "http://www.lsdev.org/";
+static const WCHAR g_wzLicense[] = \
+ L"LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
+ L"\r\n"
+ L"Copyright (C) 1997-1998  Francis Gastellu\r\n"
+ L"Copyright (C) 1998-2013  LiteStep Development Team\r\n"
+ L"\r\n"
+ L"This program is free software; you can redistribute it and/or modify it "
+ L"under the terms of the GNU General Public License as published by the Free "
+ L"Software Foundation; either version 2 of the License, or (at your option) "
+ L"any later version.\r\n"
+ L"\r\n"
+ L"This program is distributed in the hope that it will be useful, but WITHOUT "
+ L"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+ L"FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for "
+ L"more details.\r\n"
+ L"\r\n"
+ L"You should have received a copy of the GNU General Public License along with "
+ L"this program; if not, write to the Free Software Foundation, Inc., 51 "
+ L"Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\r\n"
+ L"\r\n"
+ L"http://www.lsdev.org/";
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -147,7 +147,7 @@ struct CallbackInfo
 };
 
 // Global handle to the running AboutBox instance (if any)
-static HWND g_hAboutbox = NULL;
+static HWND g_hAboutbox = nullptr;
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -197,23 +197,23 @@ static BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
     //
     HWND hwndTitle = GetDlgItem(hwndDialog, IDC_TITLE);
     
-    HFONT hTitleFont = CreateSimpleFont("Verdana", 14, false);
+    HFONT hTitleFont = CreateSimpleFont(L"Verdana", 14, false);
     SetWindowFont(hwndTitle, hTitleFont, FALSE);
     
-    Static_SetText(hwndTitle, "LiteStep 0.25.0 Alpha");
+    SetWindowTextW(hwndTitle, L"LiteStep 0.25.0 Alpha");
     
     //
     // Initialize theme info
     //
-    char themeAuthor[16] = { 0 };
-    char themeName[21] = { 0 };
-    char themeOut[MAX_LINE_LENGTH] = { 0 };
+    wchar_t themeAuthor[16] = { 0 };
+    wchar_t themeName[21] = { 0 };
+    wchar_t themeOut[MAX_LINE_LENGTH] = { 0 };
     
-    GetRCString("ThemeAuthor", themeAuthor, "(unknown)", COUNTOF(themeAuthor));
-    GetRCString("ThemeName", themeName, "(unknown", COUNTOF(themeName));
+    GetRCStringW(L"ThemeAuthor", themeAuthor, L"(unknown)", COUNTOF(themeAuthor));
+    GetRCStringW(L"ThemeName", themeName, L"(unknown)", COUNTOF(themeName));
     
-    if (SUCCEEDED(StringCchPrintf(themeOut, COUNTOF(themeOut),
-        "Theme: %s by %s", themeName, themeAuthor)))
+    if (SUCCEEDED(StringCchPrintfW(themeOut, COUNTOF(themeOut),
+        L"Theme: %ls by %ls", themeName, themeAuthor)))
     {
         SetDlgItemText(hwndDialog, IDC_THEME_INFO, themeOut);
     }
@@ -221,14 +221,14 @@ static BOOL OnInitDialog(HWND hwndDialog, HWND hwndFocus, LPARAM lParam)
     //
     // Initialize compile time
     //
-    char compileTime[42] = { 0 };
-    LSGetVariableEx("CompileDate", compileTime, 42);
+    wchar_t compileTime[42] = { 0 };
+    LSGetVariableExW(L"CompileDate", compileTime, 42);
     SetDlgItemText(hwndDialog, IDC_COMPILETIME, compileTime);
     
     //
     // Initialize edit control (license notice)
     //
-    SetDlgItemText(hwndDialog, IDC_EDIT, g_szLicense);
+    SetDlgItemTextW(hwndDialog, IDC_EDIT, g_wzLicense);
     
     //
     // Initialize ComboBox
@@ -382,7 +382,7 @@ static INT_PTR OnCommand(
         DWORD dwStart = 0;
         SendMessage(hwndCtl, EM_GETSEL, (WPARAM)&dwStart, 0);
         
-        Edit_SetText(hwndCtl, g_szLicense);
+        SetWindowTextW(hwndCtl, g_wzLicense);
         Edit_SetSel(hwndCtl, dwStart-1, dwStart-1);
         
         bHandled = TRUE;
@@ -420,19 +420,19 @@ DWORD WINAPI AboutBoxThread(LPVOID /* lpParameter */)
 // Used by AboutBangs
 //
 static BOOL CALLBACK BangCallback(
-    HMODULE hModule, LPCSTR pszName, LPARAM lParam)
+    HMODULE hModule, LPCWSTR pszName, LPARAM lParam)
 {
     CallbackInfo* pCi = (CallbackInfo*)lParam;
     
     LVITEM itemInfo;
     itemInfo.mask = LVIF_TEXT;
     itemInfo.iItem = pCi->nItem;
-    itemInfo.pszText = (char*)pszName;
+    itemInfo.pszText = (wchar_t*)pszName;
     itemInfo.iSubItem = 0;
     
     ListView_InsertItem(pCi->hListView, &itemInfo);
     
-    CHAR szModule[MAX_PATH] = { 0 };
+    wchar_t szModule[MAX_PATH] = { 0 };
     
     if (LSGetModuleFileName(hModule, szModule, COUNTOF(szModule)))
     {
@@ -452,11 +452,11 @@ static BOOL CALLBACK BangCallback(
 static void AboutBangs(HWND hListView)
 {
     LVCOLUMN columnInfo;
-    char text[32];
+    wchar_t text[32];
     
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     
-    StringCchCopy(text, _countof(text), "Bang Command");
+    StringCchCopy(text, _countof(text), L"Bang Command");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 2;
@@ -465,7 +465,7 @@ static void AboutBangs(HWND hListView)
     
     ListView_InsertColumn(hListView, 0, &columnInfo);
     
-    StringCchCopy(text, _countof(text), "Module");
+    StringCchCopy(text, _countof(text), L"Module");
     columnInfo.cx = width - columnInfo.cx;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -475,7 +475,7 @@ static void AboutBangs(HWND hListView)
     CallbackInfo ci = { 0 };
     ci.hListView = hListView;
     
-    EnumLSData(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&ci);
+    EnumLSDataW(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&ci);
 }
 
 
@@ -487,9 +487,9 @@ static void AboutDevTeam(HWND hListView)
 {
     LVCOLUMN columnInfo;
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
-    char text[32];
+    wchar_t text[32];
     
-    StringCchCopy(text, _countof(text), "Nick");
+    StringCchCopy(text, _countof(text), L"Nick");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 3;
@@ -498,7 +498,7 @@ static void AboutDevTeam(HWND hListView)
     
     ListView_InsertColumn(hListView, 0, &columnInfo);
     
-    StringCchCopy(text, _countof(text), "Real Name");
+    StringCchCopy(text, _countof(text), L"Real Name");
     columnInfo.cx = (2 * width) / 3;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -511,11 +511,11 @@ static void AboutDevTeam(HWND hListView)
         
         itemInfo.mask = LVIF_TEXT;
         itemInfo.iItem = i;
-        itemInfo.pszText = (char*)g_theDevTeam[i].nick;
+        itemInfo.pszText = (wchar_t*)g_theDevTeam[i].nick;
         itemInfo.iSubItem = 0;
         
         ListView_InsertItem(hListView, &itemInfo);
-        ListView_SetItemText(hListView, i, 1, (char*)g_theDevTeam[i].realName);
+        ListView_SetItemText(hListView, i, 1, (wchar_t*)g_theDevTeam[i].realName);
     }
 }
 
@@ -536,14 +536,14 @@ static void AboutLicense(HWND /* hEdit */)
 // ModulesCallback
 // Used by AboutModules
 //
-static BOOL CALLBACK ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
+static BOOL CALLBACK ModulesCallback(LPCWSTR pszPath, DWORD /* dwFlags */, LPARAM lParam)
 {
     CallbackInfo* pCi = (CallbackInfo*)lParam;
     
     LVITEM itemInfo;
     itemInfo.mask = LVIF_TEXT;
     itemInfo.iItem = pCi->nItem++;
-    itemInfo.pszText = (char*)pszPath;
+    itemInfo.pszText = (wchar_t*)pszPath;
     itemInfo.iSubItem = 0;
     
     ListView_InsertItem(pCi->hListView, &itemInfo);
@@ -559,9 +559,9 @@ static BOOL CALLBACK ModulesCallback(LPCSTR pszPath, DWORD /* dwFlags */, LPARAM
 static void AboutModules(HWND hListView)
 {
     LVCOLUMN columnInfo;
-    char text[32];
+    wchar_t text[32];
     
-    StringCchCopy(text, _countof(text), "Module");
+    StringCchCopy(text, _countof(text), L"Module");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
@@ -573,7 +573,7 @@ static void AboutModules(HWND hListView)
     CallbackInfo ci = { 0 };
     ci.hListView = hListView;
     
-    EnumLSData(ELD_MODULES, (FARPROC)ModulesCallback, (LPARAM)&ci);
+    EnumLSDataW(ELD_MODULES, (FARPROC)ModulesCallback, (LPARAM)&ci);
 }
 
 
@@ -582,11 +582,11 @@ static void AboutModules(HWND hListView)
 // PerformanceCallback
 // Used by AboutPerformance
 //
-static BOOL CALLBACK PerformanceCallback(LPCSTR pszPath, DWORD dwLoadTime, LPARAM lParam)
+static BOOL CALLBACK PerformanceCallback(LPCWSTR pszPath, DWORD dwLoadTime, LPARAM lParam)
 {
     CallbackInfo* pCi = (CallbackInfo*)lParam;
     
-    CHAR szModule[MAX_PATH] = { 0 };
+    wchar_t szModule[MAX_PATH] = { 0 };
     StringCchCopy(szModule, _countof(szModule), pszPath);
     PathStripPath(szModule);
     
@@ -598,7 +598,7 @@ static BOOL CALLBACK PerformanceCallback(LPCSTR pszPath, DWORD dwLoadTime, LPARA
     
     ListView_InsertItem(pCi->hListView, &itemInfo);
     
-    StringCchPrintf(szModule, _countof(szModule), "%dms", dwLoadTime);
+    StringCchPrintf(szModule, _countof(szModule), L"%dms", dwLoadTime);
     ListView_SetItemText(pCi->hListView, pCi->nItem, 1, szModule);
     
     ++pCi->nItem;
@@ -613,11 +613,11 @@ static BOOL CALLBACK PerformanceCallback(LPCSTR pszPath, DWORD dwLoadTime, LPARA
 static void AboutPerformance(HWND hListView)
 {
     LVCOLUMN columnInfo;
-    char text[32];
+    wchar_t text[32];
     
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     
-    StringCchCopy(text, _countof(text), "Module");
+    StringCchCopy(text, _countof(text), L"Module");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 2;
@@ -626,7 +626,7 @@ static void AboutPerformance(HWND hListView)
     
     ListView_InsertColumn(hListView, 0, &columnInfo);
     
-    StringCchCopy(text, _countof(text), "Load Time");
+    StringCchCopy(text, _countof(text), L"Load Time");
     columnInfo.cx = width - columnInfo.cx;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -636,7 +636,7 @@ static void AboutPerformance(HWND hListView)
     CallbackInfo ci = { 0 };
     ci.hListView = hListView;
     
-    EnumLSData(ELD_PERFORMANCE, (FARPROC)PerformanceCallback, (LPARAM)&ci);
+    EnumLSDataW(ELD_PERFORMANCE, (FARPROC)PerformanceCallback, (LPARAM)&ci);
 }
 
 
@@ -645,14 +645,14 @@ static void AboutPerformance(HWND hListView)
 // RevIDCallback
 // Used by AboutRevIDs
 //
-static BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
+static BOOL CALLBACK RevIDCallback(LPCWSTR pszRevID, LPARAM lParam)
 {
     CallbackInfo* pCi = (CallbackInfo*)lParam;
     
     LVITEM itemInfo;
     itemInfo.mask = LVIF_TEXT;
     itemInfo.iItem = pCi->nItem++;
-    itemInfo.pszText = (char*)pszRevID;
+    itemInfo.pszText = (wchar_t*)pszRevID;
     itemInfo.iSubItem = 0;
     
     ListView_InsertItem(pCi->hListView, &itemInfo);
@@ -668,9 +668,9 @@ static BOOL CALLBACK RevIDCallback(LPCSTR pszRevID, LPARAM lParam)
 static void AboutRevIDs(HWND hListView)
 {
     LVCOLUMN columnInfo;
-    char text[32];
+    wchar_t text[32];
     
-    StringCchCopy(text, _countof(text), "Revision ID");
+    StringCchCopy(text, _countof(text), L"Revision ID");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
@@ -683,7 +683,7 @@ static void AboutRevIDs(HWND hListView)
     ci.hListView = hListView;
     ci.nItem = 0;
     
-    EnumLSData(ELD_REVIDS, (FARPROC)RevIDCallback, (LPARAM)&ci);
+    EnumLSDataW(ELD_REVIDS, (FARPROC)RevIDCallback, (LPARAM)&ci);
 }
 
 
@@ -692,45 +692,45 @@ static void AboutRevIDs(HWND hListView)
 // GetWinVerString
 // Helper for AboutSysInfo
 //
-static HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
+static HRESULT GetWinVerString(LPWSTR pwzVersion, DWORD cchVersion)
 {
-    ASSERT(pszVersion != NULL);
+    ASSERT(pwzVersion != nullptr);
     
     UINT uVersion = GetWindowsVersion();
     
-    LPCSTR pszTemp = NULL;
+    LPCWSTR pwzTemp = nullptr;
     
     switch (uVersion)
     {
-    case WINVER_WIN95:   pszTemp = _T("Windows 95");            break;
-    case WINVER_WIN98:   pszTemp = _T("Windows 98");            break;
-    case WINVER_WINME:   pszTemp = _T("Windows ME");            break;
-    case WINVER_WINNT4:  pszTemp = _T("Windows NT 4.0");        break;
-    case WINVER_WIN2000: pszTemp = _T("Windows 2000");          break;
-    case WINVER_WINXP:   pszTemp = _T("Windows XP");            break;
-    case WINVER_VISTA:   pszTemp = _T("Windows Vista");         break;
-    case WINVER_WIN7:    pszTemp = _T("Windows 7");             break;
-    case WINVER_WIN8:    pszTemp = _T("Windows 8");             break;
-    case WINVER_WIN81:   pszTemp = _T("Windows 8.1");           break;
+    case WINVER_WIN95:   pwzTemp = L"Windows 95";            break;
+    case WINVER_WIN98:   pwzTemp = L"Windows 98";            break;
+    case WINVER_WINME:   pwzTemp = L"Windows ME";            break;
+    case WINVER_WINNT4:  pwzTemp = L"Windows NT 4.0";        break;
+    case WINVER_WIN2000: pwzTemp = L"Windows 2000";          break;
+    case WINVER_WINXP:   pwzTemp = L"Windows XP";            break;
+    case WINVER_VISTA:   pwzTemp = L"Windows Vista";         break;
+    case WINVER_WIN7:    pwzTemp = L"Windows 7";             break;
+    case WINVER_WIN8:    pwzTemp = L"Windows 8";             break;
+    case WINVER_WIN81:   pwzTemp = L"Windows 8.1";           break;
     case WINVER_WIN2003:
         if (GetSystemMetrics(SM_SERVERR2))
         {
-            pszTemp = _T("Windows Server 2003 R2");
+            pwzTemp = L"Windows Server 2003 R2";
         }
         else
         {
-            pszTemp = _T("Windows Server 2003");
+            pwzTemp = L"Windows Server 2003";
         }
         break;
-    case WINVER_WHS:       pszTemp = _T("Windows Home Server");     break;
-    case WINVER_WIN2008:   pszTemp = _T("Windows Server 2008");     break;
-    case WINVER_WIN2008R2: pszTemp = _T("Windows Server 2008 R2");  break;
-    case WINVER_WIN2012:   pszTemp = _T("Windows Server 2012");     break;
-    case WINVER_WIN2012R2: pszTemp = _T("Windows Server 2012 R2");  break;
-    default:               pszTemp = _T("<Unknown Version>");       break;
+    case WINVER_WHS:       pwzTemp = L"Windows Home Server";     break;
+    case WINVER_WIN2008:   pwzTemp = L"Windows Server 2008";     break;
+    case WINVER_WIN2008R2: pwzTemp = L"Windows Server 2008 R2";  break;
+    case WINVER_WIN2012:   pwzTemp = L"Windows Server 2012";     break;
+    case WINVER_WIN2012R2: pwzTemp = L"Windows Server 2012 R2";  break;
+    default:               pwzTemp = L"<Unknown Version>";       break;
     }
     
-    HRESULT hr = StringCchCopy(pszVersion, cchVersion, pszTemp);
+    HRESULT hr = StringCchCopyW(pwzVersion, cchVersion, pwzTemp);
     
     if (SUCCEEDED(hr))
     {
@@ -738,7 +738,7 @@ static HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
         if (IsOS(OS_WOW6432))
 #endif
         {
-            StringCchCat(pszVersion, cchVersion, _T(" (64-Bit)"));
+            StringCchCatW(pwzVersion, cchVersion, L" (64-Bit)");
         }
     }
     
@@ -752,15 +752,15 @@ static HRESULT GetWinVerString(LPTSTR pszVersion, DWORD cchVersion)
 //
 static void AboutSysInfo(HWND hListView)
 {
-    LVCOLUMN columnInfo;
-    LVITEM itemInfo;
+    LVCOLUMNW columnInfo;
+    LVITEMW itemInfo;
     int i = 0;
-    char buffer[MAX_PATH];
-    char text[32];
+    wchar_t buffer[MAX_PATH];
+    wchar_t text[32];
     
     int width = GetClientWidth(hListView) - GetSystemMetrics(SM_CXVSCROLL);
     
-    StringCchCopy(text, _countof(text), "Name");
+    StringCchCopyW(text, _countof(text), L"Name");
     columnInfo.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
     columnInfo.fmt = LVCFMT_LEFT;
     columnInfo.cx = width / 3 + width / 8;
@@ -772,7 +772,7 @@ static void AboutSysInfo(HWND hListView)
     /* Using this odd size, keeps the columns aligned with
      * the other list views, and also gives the text a little
      * more room to keep from being truncated. */
-    StringCchCopy(text, _countof(text), "Value");
+    StringCchCopyW(text, _countof(text), L"Value");
     columnInfo.cx = (2 * width) / 3 - width / 8;
     columnInfo.pszText = text;
     columnInfo.iSubItem = 1;
@@ -780,7 +780,7 @@ static void AboutSysInfo(HWND hListView)
     ListView_InsertColumn(hListView, 1, &columnInfo);
     
     // operating system and version
-    StringCchCopy(text, _countof(text), "Operating System");
+    StringCchCopyW(text, _countof(text), L"Operating System");
     itemInfo.mask = LVIF_TEXT;
     itemInfo.iItem = i;
     itemInfo.pszText = text;
@@ -798,7 +798,7 @@ static void AboutSysInfo(HWND hListView)
     
     typedef BOOL (WINAPI *GMSExFunctionType)(LPMEMORYSTATUSEX);
     GMSExFunctionType fpGlobalMemoryStatusEx = (GMSExFunctionType)GetProcAddress(
-        GetModuleHandle("KERNEL32.DLL"), "GlobalMemoryStatusEx");
+        GetModuleHandleW(L"KERNEL32.DLL"), "GlobalMemoryStatusEx");
     
     if (fpGlobalMemoryStatusEx)
     {
@@ -825,16 +825,16 @@ static void AboutSysInfo(HWND hListView)
         dwAvailPageFile = (DWORDLONG)ms.dwAvailPageFile;
     }
     
-    StringCchCopy(text, _countof(text), "Memory Load");
+    StringCchCopyW(text, _countof(text), L"Memory Load");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
     ListView_InsertItem(hListView, &itemInfo);
     
-    StringCchPrintf(buffer, MAX_PATH, "%d%%", dwMemoryLoad);
+    StringCchPrintfW(buffer, MAX_PATH, L"%d%%", dwMemoryLoad);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    StringCchCopy(text, _countof(text), "Physical Memory Total");
+    StringCchCopyW(text, _countof(text), L"Physical Memory Total");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -843,7 +843,7 @@ static void AboutSysInfo(HWND hListView)
     FormatBytes(dwTotalPhys, buffer, 64);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    StringCchCopy(text, _countof(text), "Physical Memory Available");
+    StringCchCopyW(text, _countof(text), L"Physical Memory Available");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -852,7 +852,7 @@ static void AboutSysInfo(HWND hListView)
     FormatBytes(dwAvailPhys, buffer, 64);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    StringCchCopy(text, _countof(text), "Swap Space Total");
+    StringCchCopyW(text, _countof(text), L"Swap Space Total");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -861,7 +861,7 @@ static void AboutSysInfo(HWND hListView)
     FormatBytes(dwTotalPageFile, buffer, 64);
     ListView_SetItemText(hListView, i++, 1, buffer);
     
-    StringCchCopy(text, _countof(text), "Swap Space Available");
+    StringCchCopyW(text, _countof(text), L"Swap Space Available");
     itemInfo.iItem = i;
     itemInfo.pszText = text;
     
@@ -877,25 +877,25 @@ static void AboutSysInfo(HWND hListView)
 // CreateSimpleFont
 // Simplified version of CreateFont
 //
-static HFONT CreateSimpleFont(LPCSTR pszName, int nSizeInPoints, bool bBold)
+static HFONT CreateSimpleFont(LPCWSTR pwzName, int nSizeInPoints, bool bBold)
 {
-    ASSERT(NULL != pszName); ASSERT(nSizeInPoints > 0);
+    ASSERT(nullptr != pwzName); ASSERT(nSizeInPoints > 0);
     
     // convert size from points to pixels
-    HDC hDC = GetDC(NULL);
+    HDC hDC = GetDC(nullptr);
     int sizeInPixels = -MulDiv(nSizeInPoints,
         GetDeviceCaps(hDC, LOGPIXELSY), 72);
     
-    ReleaseDC(NULL, hDC);
+    ReleaseDC(nullptr, hDC);
     
     // fill in LOGFONT structure
-    LOGFONT lf = { 0 };
+    LOGFONTW lf = { 0 };
     lf.lfHeight = sizeInPixels;
     lf.lfWeight = bBold ? FW_BOLD : FW_NORMAL;
-    StringCchCopy(lf.lfFaceName, LF_FACESIZE, pszName);
+    StringCchCopyW(lf.lfFaceName, LF_FACESIZE, pwzName);
     
     // create it
-    return CreateFontIndirect(&lf);
+    return CreateFontIndirectW(&lf);
 }
 
 
@@ -920,11 +920,11 @@ static int GetClientWidth(HWND hWnd)
 // Note: Max value of stBytes is 16 EB, so no need to be concerned of
 //       overrunning units[] index.
 //
-static LPCSTR units[] = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB" };
+static LPCWSTR units[] = { L"bytes", L"KB", L"MB", L"GB", L"TB", L"PB", L"EB" };
 
-static void FormatBytes(DWORDLONG stBytes, LPSTR pszBuffer, size_t cchBuffer)
+static void FormatBytes(DWORDLONG stBytes, LPWSTR pwzBuffer, size_t cchBuffer)
 {
-    double dValue = (double)stBytes;
+    long double dValue = (long double) stBytes;
     unsigned int uUnit = 0;
     
     while ((dValue >= 1024) && (uUnit < COUNTOF(units) - 1))
@@ -935,16 +935,16 @@ static void FormatBytes(DWORDLONG stBytes, LPSTR pszBuffer, size_t cchBuffer)
     
     if (uUnit >= 3)
     {
-        StringCchPrintf(
-            pszBuffer, cchBuffer,
-            "%.2f %s",
+        StringCchPrintfW(
+            pwzBuffer, cchBuffer,
+            L"%.2Lf %ls",
             dValue, units[uUnit]);
     }
     else
     {
-        StringCchPrintf(
-            pszBuffer, cchBuffer,
-            "%d %s",
+        StringCchPrintfW(
+            pwzBuffer, cchBuffer,
+            L"%d %ls",
             (int)floor(dValue + 0.5), units[uUnit]);
     }
 }

@@ -21,22 +21,52 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "BangCommand.h"
 #include "ThreadedBangCommand.h"
+#include <memory>
+#include "../utility/stringutility.h"
 
 
-Bang::Bang(DWORD dwThread, BangCommand pfnBang, LPCSTR pszCommand) :
-    m_szCommand(pszCommand)
+Bang::Bang(DWORD dwThread, BangCommandW pfnBang, LPCWSTR pwzCommand) :
+    m_sCommand(pwzCommand)
 {
     m_bEX = false;
     m_bBang = pfnBang;
+    m_pAddress = pfnBang;
     m_dwThreadID = dwThread;
 }
 
 
-Bang::Bang(DWORD dwThread, BangCommandEx pfnBang, LPCSTR pszCommand) :
-    m_szCommand(pszCommand)
+Bang::Bang(DWORD dwThread, BangCommandA pfnBang, LPCWSTR pwzCommand) :
+    m_sCommand(pwzCommand)
+{
+    m_bEX = false;
+    m_bBang = [pfnBang] (HWND hOwner, LPCWSTR pwzArgs) -> void {
+        pfnBang(hOwner, std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
+    };
+    m_pAddress = pfnBang;
+    m_dwThreadID = dwThread;
+}
+
+
+Bang::Bang(DWORD dwThread, BangCommandExW pfnBang, LPCWSTR pwzCommand) :
+    m_sCommand(pwzCommand)
 {
     m_bEX = true;
     m_bBangEX = pfnBang;
+    m_pAddress = pfnBang;
+    m_dwThreadID = dwThread;
+}
+
+
+Bang::Bang(DWORD dwThread, BangCommandExA pfnBang, LPCWSTR pwzCommand) :
+    m_sCommand(pwzCommand)
+{
+    m_bEX = true;
+    m_bBangEX = [pfnBang] (HWND hOwner, LPCWSTR pwzCommand, LPCWSTR pwzArgs) -> void {
+        pfnBang(hOwner,
+            std::unique_ptr<char>(MBSFromWCS(pwzCommand)).get(),
+            std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
+    };;
+    m_pAddress = pfnBang;
     m_dwThreadID = dwThread;
 }
 
@@ -47,19 +77,19 @@ Bang::~Bang()
 }
 
 
-void Bang::Execute(HWND hCaller, LPCSTR pszParams)
+void Bang::Execute(HWND hCaller, LPCWSTR pwzParams)
 {
     DWORD dwThreadID = GetCurrentThreadId();
     
     if (dwThreadID != m_dwThreadID)
     {
         ThreadedBangCommand * pInfo = new ThreadedBangCommand(hCaller,
-            m_szCommand.c_str(), pszParams);
+            m_sCommand.c_str(), pwzParams);
         
-        if (pInfo != NULL)
+        if (pInfo != nullptr)
         {
             // target thread releases pInfo
-            PostThreadMessage(m_dwThreadID, LM_THREAD_BANGCOMMAND,
+            PostThreadMessageW(m_dwThreadID, LM_THREAD_BANGCOMMAND,
                 (WPARAM)pInfo, 0);
         }
     }
@@ -67,11 +97,11 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
     {
         if (m_bEX)
         {
-            m_bBangEX(hCaller, m_szCommand.c_str(), pszParams);
+            m_bBangEX(hCaller, m_sCommand.c_str(), pwzParams);
         }
         else
         {
-            m_bBang(hCaller, pszParams);
+            m_bBang(hCaller, pwzParams);
         }
     }
 }
@@ -79,18 +109,8 @@ void Bang::Execute(HWND hCaller, LPCSTR pszParams)
 
 HINSTANCE Bang::GetModule() const
 {
-    HINSTANCE hModule = NULL;
-    LPVOID pAddress = NULL;
-    
-    if (m_bEX)
-    {
-        pAddress = (LPVOID)m_bBangEX;
-    }
-    else
-    {
-        pAddress = (LPVOID)m_bBang;
-    }
-    
+    HINSTANCE hModule = nullptr;
+
     //
     // Given the BangProc's address, VirtualQuery can
     // figure out the module's HMODULE
@@ -98,7 +118,7 @@ HINSTANCE Bang::GetModule() const
     MEMORY_BASIC_INFORMATION mbi = { 0 };
     size_t cbBuffer = sizeof(mbi);
     
-    if (VirtualQuery(pAddress, &mbi, cbBuffer) == cbBuffer)
+    if (VirtualQuery(m_pAddress, &mbi, cbBuffer) == cbBuffer)
     {
         hModule = (HINSTANCE)mbi.AllocationBase;
     }

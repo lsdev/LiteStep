@@ -62,22 +62,22 @@ WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, DWORD cchFile)
     // By default, run LiteStep and startup apps
     WORD wStartFlags = LSF_RUN_LITESTEP | LSF_RUN_STARTUPAPPS;
     
-    char szToken[MAX_LINE_LENGTH] = { 0 };
-    LPCSTR pszNextToken = pszCommandLine;
+    TCHAR szToken[MAX_LINE_LENGTH] = { 0 };
+    LPCTSTR pszNextToken = pszCommandLine;
     
-    while (GetToken(pszNextToken, szToken, &pszNextToken, FALSE))
+    while (GetTokenW(pszNextToken, szToken, &pszNextToken, FALSE))
     {
         if (szToken[0] == '-')
         {
-            if (!_stricmp(szToken, "-nostartup"))
+            if (!_tcsicmp(szToken, _T("-nostartup")))
             {
                 wStartFlags &= ~LSF_RUN_STARTUPAPPS;
             }
-            else if (!_stricmp(szToken, "-startup"))
+            else if (!_tcsicmp(szToken, _T("-startup")))
             {
                 wStartFlags |= LSF_FORCE_STARTUPAPPS;
             }
-            else if (!_stricmp(szToken, "-explorer"))
+            else if (!_tcsicmp(szToken, _T("-explorer")))
             {
                 wStartFlags &= ~LSF_RUN_LITESTEP;
                 wStartFlags |= LSF_RUN_EXPLORER;
@@ -120,17 +120,17 @@ bool SendCommandLineBang(LPCTSTR pszCommand, LPCTSTR pszArgs)
         bangCommand.hWnd = NULL;
         
         HRESULT hr = StringCchCopy(
-            bangCommand.szCommand, MAX_BANGCOMMAND, pszCommand);
+            bangCommand.wzCommand, MAX_BANGCOMMAND, pszCommand);
         
         if (SUCCEEDED(hr))
         {
             if (pszArgs)
             {
-                hr = StringCchCopy(bangCommand.szArgs, MAX_BANGARGS, pszArgs);
+                hr = StringCchCopy(bangCommand.wzArgs, MAX_BANGARGS, pszArgs);
             }
             else
             {
-                bangCommand.szArgs[0] = '\0';
+                bangCommand.wzArgs[0] = '\0';
             }
         }
         
@@ -143,7 +143,7 @@ bool SendCommandLineBang(LPCTSTR pszCommand, LPCTSTR pszArgs)
             COPYDATASTRUCT cds = { 0 };
             
             cds.cbData = sizeof(LMBANGCOMMAND);
-            cds.dwData = LM_BANGCOMMAND;
+            cds.dwData = LM_BANGCOMMANDW;
             cds.lpData = &bangCommand;
             
             if (SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds))
@@ -305,13 +305,13 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE, LPTSTR lpCmdLine, int)
                     // Mode 3a: Other LiteStep instance already running
                     //
                     RESOURCE_STR(hInst, IDS_LITESTEP_ERROR1,
-                        "A previous instance of LiteStep was detected.\n"
-                        "Are you sure you want to continue?");
+                        L"A previous instance of LiteStep was detected.\n"
+                        L"Are you sure you want to continue?");
                 
                     // Can show a MessageBox here since the other instance
                     // should have closed the welcome screen already
                     INT idConfirm =  RESOURCE_MSGBOX_F(
-                        "LiteStep", MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2);
+                        L"LiteStep", MB_ICONINFORMATION | MB_YESNO | MB_DEFBUTTON2);
                 
                     if (idConfirm == IDNO)
                     {

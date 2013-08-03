@@ -25,6 +25,7 @@
 #include "../lsapi/lsapidefines.h"
 #include "../utility/common.h"
 #include <string>
+#include <functional>
 
 
 /**
@@ -46,13 +47,13 @@ private:
     DWORD m_dwThreadID;
     
     /** Path to module's DLL */
-    std::basic_string<TCHAR> m_tzLocation;
+    std::basic_string<WCHAR> m_wzLocation;
     
     /** Path to LiteStep's root directory */
-    std::basic_string<TCHAR> m_tzAppPath;
+    std::basic_string<WCHAR> m_wzAppPath;
     
     /** Pointer to <code>initModuleEx</code> function */
-    initModuleExProc m_pInitEx;
+    std::function<int __cdecl (HWND, HINSTANCE, LPCWSTR)> m_pInit;
     
     /** Pointer to <code>quitModule</code> function */
     quitModuleProc m_pQuit;
@@ -76,7 +77,7 @@ public:
      * @param  sLocation  path to the module's DLL
      * @param  dwFlags    set of flags that control how the module is loaded
      */
-    Module(const std::string& sLocation, DWORD dwFlags);
+    Module(const std::wstring& sLocation, DWORD dwFlags);
     
     /**
      * Destructor.
@@ -94,7 +95,7 @@ public:
      * @param  sAppPath     path to LiteStep's root directory
      * @return <code>true</code> if successful or <code>false</code> otherwise
      */
-    bool Init(HWND hMainWindow, const std::string& sAppPath);
+    bool Init(HWND hMainWindow, const std::wstring& sAppPath);
     
     /**
      * Shuts down the module and unloads it. If the module was loaded in its
@@ -145,7 +146,7 @@ public:
     HANDLE TakeThread()
     {
         HANDLE hTemp = m_hThread;
-        m_hThread = NULL;
+        m_hThread = nullptr;
         
         return hTemp;
     }
@@ -168,7 +169,7 @@ public:
     HANDLE TakeInitEvent()
     {
         HANDLE hTemp = m_hInitEvent;
-        m_hInitEvent = NULL;
+        m_hInitEvent = nullptr;
         
         return hTemp;
     }
@@ -176,9 +177,9 @@ public:
     /**
      * Returns the path to this module's DLL.
      */
-    LPCTSTR GetLocation() const
+    LPCWSTR GetLocation() const
     {
-        return m_tzLocation.c_str();
+        return m_wzLocation.c_str();
     }
     
     /**
@@ -200,7 +201,7 @@ public:
     /**
      * Returns a pointer to this module's <code>quitModule</code> function.
      */
-    quitModuleProc GetQuit() const
+    decltype(m_pQuit) GetQuit() const
     {
         return m_pQuit;
     }
@@ -208,9 +209,9 @@ public:
     /**
      * Returns a pointer to this module's <code>initModuleEx</code> function.
      */
-    initModuleExProc GetInitEx() const
+    decltype(m_pInit) GetInit() const
     {
-        return m_pInitEx;
+        return m_pInit;
     }
     
 private:

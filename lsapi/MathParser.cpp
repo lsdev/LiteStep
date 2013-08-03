@@ -124,34 +124,34 @@ static MathValue Math_upperCase(const MathValueList& argList);
 // Mapping of names to predefined functions
 struct FunctionTable
 {
-    const char *name; MathFunction function; unsigned int numArgs;
+    const wchar_t *name; MathFunction function; unsigned int numArgs;
 } gFunctions[] = {
-    { "abs",          Math_abs,              1 },
-    { "boolean",      Math_boolean,          1 },
-    { "ceil",         Math_ceil,             1 },
-    { "contains",     Math_contains,         2 },
-    { "endsWith",     Math_endsWith,         2 },
-    { "fileExists",   Math_fileExists,       1 },
-    { "floor",        Math_floor,            1 },
-    { "if",           Math_if,               3 },
-    { "integer",      Math_integer,          1 },
-    { "length",       Math_length,           1 },
-    { "lowerCase",    Math_lowerCase,        1 },
-    { "max",          Math_max,              2 },
-    { "min",          Math_min,              2 },
-    { "number",       Math_number,           1 },
-    { "pow",          Math_pow,              2 },
-    { "round",        Math_round,            1 },
-    { "startsWith",   Math_startsWith,       2 },
-    { "string",       Math_string,           1 },
-    { "sqrt",         Math_sqrt,             1 },
-    { "upperCase",    Math_upperCase,        1 }
+    { L"abs",          Math_abs,              1 },
+    { L"boolean",      Math_boolean,          1 },
+    { L"ceil",         Math_ceil,             1 },
+    { L"contains",     Math_contains,         2 },
+    { L"endsWith",     Math_endsWith,         2 },
+    { L"fileExists",   Math_fileExists,       1 },
+    { L"floor",        Math_floor,            1 },
+    { L"if",           Math_if,               3 },
+    { L"integer",      Math_integer,          1 },
+    { L"length",       Math_length,           1 },
+    { L"lowerCase",    Math_lowerCase,        1 },
+    { L"max",          Math_max,              2 },
+    { L"min",          Math_min,              2 },
+    { L"number",       Math_number,           1 },
+    { L"pow",          Math_pow,              2 },
+    { L"round",        Math_round,            1 },
+    { L"startsWith",   Math_startsWith,       2 },
+    { L"string",       Math_string,           1 },
+    { L"sqrt",         Math_sqrt,             1 },
+    { L"upperCase",    Math_upperCase,        1 }
 };
 
 const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
 
 
-MathParser::MathParser(const SettingsMap& context, const string& expression, const StringSet& recursiveVarSet, unsigned int flags) :
+MathParser::MathParser(const SettingsMap& context, const wstring& expression, const StringSet& recursiveVarSet, unsigned int flags) :
     mContext(context), mScanner(expression), mRecursiveVarSet(recursiveVarSet), mFlags(flags)
 {
     // Fill the token buffer
@@ -168,19 +168,19 @@ MathValue MathParser::Evaluate()
 }
 
 
-MathValue MathParser::CallFunction(const string& name, const MathValueList& argList) const
+MathValue MathParser::CallFunction(const wstring& name, const MathValueList& argList) const
 {
     for (int i = 0; i < gNumFunctions; ++i)
     {
-        if (_stricmp(name.c_str(), gFunctions[i].name) == 0)
+        if (_wcsicmp(name.c_str(), gFunctions[i].name) == 0)
         {
             if (argList.size() != gFunctions[i].numArgs)
             {
                 // Incorrect number of arguments
-                ostringstream message;
+                wostringstream message;
                 
-                message << "Error: Function " << name << " requires ";
-                message << gFunctions[i].numArgs << " argument(s).";
+                message << L"Error: Function " << name << L" requires ";
+                message << gFunctions[i].numArgs << L" argument(s).";
                 
                 throw MathException(message.str());
             }
@@ -191,21 +191,21 @@ MathValue MathParser::CallFunction(const string& name, const MathValueList& argL
     }
     
     // No such function
-    throw MathException("Error: " + name + " is not a function");
+    throw MathException(L"Error: " + name + L" is not a function");
 }
 
 
-MathValue MathParser::GetVariable(const string& name) const
+MathValue MathParser::GetVariable(const wstring& name) const
 {
     // Check for recursive variable definitions
     if (mRecursiveVarSet.count(name) > 0)
     {
         // While there may be a localized version of this particular
         // exception string, none of the other exception strings are localized.
-        ostringstream message;
+        wostringstream message;
 
-        message << "Error: Variable \"" << name;
-        message << "\" is defined recursively.";
+        message << L"Error: Variable \"" << name.c_str();
+        message << L"\" is defined recursively.";
 
         throw MathException(message.str());
     }
@@ -223,25 +223,25 @@ MathValue MathParser::GetVariable(const string& name) const
     newRecursiveVarSet.insert(name);
 
     // Expand variable references
-    char value[MAX_LINE_LENGTH];
+    wchar_t value[MAX_LINE_LENGTH];
     g_LSAPIManager.GetSettingsManager()->VarExpansionEx(
         value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
     
-    if (_stricmp(value, "false") == 0 ||
-        _stricmp(value, "off") == 0 ||
-        _stricmp(value, "no") == 0)
+    if (_wcsicmp(value, L"false") == 0 ||
+        _wcsicmp(value, L"off") == 0 ||
+        _wcsicmp(value, L"no") == 0)
     {
         // False
         return false;
     }
-    else if (_stricmp(value, "true") == 0 ||
-             _stricmp(value, "on") == 0 ||
-             _stricmp(value, "yes") == 0)
+    else if (_wcsicmp(value, L"true") == 0 ||
+             _wcsicmp(value, L"on") == 0 ||
+             _wcsicmp(value, L"yes") == 0)
     {
         // True
         return true;
     }
-    else if (strlen(value) == 0)
+    else if (wcslen(value) == 0)
     {
         // Unfortunately, VarExpansionEx has no "failure" case, therefore,
         // an empty value may be from an undefined or recursive variable.
@@ -261,8 +261,8 @@ MathValue MathParser::GetVariable(const string& name) const
         if (value[0] == '\"' || value[0] == '\'')
         {
             // If the value is quoted, remove the quotes
-            char unquoted[MAX_LINE_LENGTH];
-            GetToken(value, unquoted, NULL, FALSE);
+            wchar_t unquoted[MAX_LINE_LENGTH];
+            GetTokenW(value, unquoted, NULL, FALSE);
             StringCchCopy(value, MAX_LINE_LENGTH, unquoted);
         }
         
@@ -290,7 +290,7 @@ MathValue MathParser::ParsePrimaryExpression()
         mLookahead[1].GetType() == TT_LPAREN)
     {
         // Function Call
-        string name;
+        wstring name;
         MathValueList argList;
         
         // Get name
@@ -310,13 +310,13 @@ MathValue MathParser::ParsePrimaryExpression()
     else if (mLookahead[0].GetType() == TT_ID)
     {
         // Identifier
-        string name = mLookahead[0].GetValue();
+        wstring name = mLookahead[0].GetValue();
         MathValue value = GetVariable(name);
         
         if ((mFlags & MATH_EXCEPTION_ON_UNDEFINED) && value.IsUndefined())
         {
             // Reference to undefined variable
-            ostringstream message;
+            wostringstream message;
             message << "Error: Variable " << name << " is not defined.";
             throw MathException(message.str());
         }
@@ -376,16 +376,16 @@ MathValue MathParser::ParsePrimaryExpression()
         // Defined
         Match(TT_DEFINED);
         Match(TT_LPAREN);
-        string name = mLookahead[0].GetValue();
+        wstring name = mLookahead[0].GetValue();
         Match(TT_ID);
         Match(TT_RPAREN);
         return !GetVariable(name).IsUndefined();
     }
     
-    ostringstream message;
+    wostringstream message;
     
-    message << "Syntax Error: Expected identifier, literal, or subexpression,";
-    message << " but found " << mLookahead[0].GetTypeName();
+    message << L"Syntax Error: Expected identifier, literal, or subexpression,";
+    message << L" but found " << mLookahead[0].GetTypeName();
     
     throw MathException(message.str());
 }
@@ -653,11 +653,11 @@ void MathParser::Match(int type)
 {
     if (mLookahead[0].GetType() != type)
     {
-        ostringstream message;
+        wostringstream message;
         
-        message << "Syntax Error: Expected ";
+        message << L"Syntax Error: Expected ";
         message << MathToken(type).GetTypeName();
-        message << ", but found " << mLookahead[0].GetTypeName();
+        message << L", but found " << mLookahead[0].GetTypeName();
         
         throw MathException(message.str());
     }
@@ -716,8 +716,8 @@ MathValue Math_contains(const MathValueList& argList)
 // Ends with a substring
 MathValue Math_endsWith(const MathValueList& argList)
 {
-    string toSearch = argList[0].ToString();
-    string toFind = argList[1].ToString();
+    wstring toSearch = argList[0].ToString();
+    wstring toFind = argList[1].ToString();
     
     if (toFind.empty())
     {
@@ -767,7 +767,7 @@ MathValue Math_length(const MathValueList& argList)
 // Convert string to lower case
 MathValue Math_lowerCase(const MathValueList& argList)
 {
-    string str = argList[0].ToString();
+    wstring str = argList[0].ToString();
     transform(str.begin(), str.end(), str.begin(), ::tolower);
     return str;
 }
@@ -828,8 +828,8 @@ MathValue Math_round(const MathValueList& argList)
 // Starts with a substring
 MathValue Math_startsWith(const MathValueList& argList)
 {
-    string toSearch = argList[0].ToString();
-    string toFind = argList[1].ToString();
+    wstring toSearch = argList[0].ToString();
+    wstring toFind = argList[1].ToString();
     
     if (toFind.empty())
     {
@@ -858,7 +858,7 @@ MathValue Math_sqrt(const MathValueList& argList)
 // Convert string to upper case
 MathValue Math_upperCase(const MathValueList& argList)
 {
-    string str = argList[0].ToString();
+    wstring str = argList[0].ToString();
     transform(str.begin(), str.end(), str.begin(), ::toupper);
     return str;
 }

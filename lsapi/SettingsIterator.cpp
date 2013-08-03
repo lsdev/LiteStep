@@ -24,41 +24,41 @@
 #include "../utility/core.hpp"
 #include <algorithm>
 
-using std::string;
+using std::wstring;
 
 
-SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, const string& szPath)
+SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, const wstring& sPath)
 {
     if (pSettingsMap)
     {
         m_pSettingsMap = pSettingsMap;
         m_pFileIterator = m_pSettingsMap->begin();
         
-        if (szPath.length())
+        if (sPath.length())
         {
-            m_Path = szPath;
+            m_sPath = sPath;
         }
     }
 }
 
 
-BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
+BOOL SettingsIterator::ReadNextLine(LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     
-    if (pszValue != NULL && cchValue > 0)
+    if (pwzValue != nullptr && cchValue > 0)
     {
         if (m_pFileIterator != m_pSettingsMap->end())
         {
-            StringCchCopy(pszValue, cchValue, m_pFileIterator->first.c_str());
-            StringCchCat(pszValue, cchValue, " ");
-            StringCchCat(pszValue, cchValue, m_pFileIterator->second.c_str());
+            StringCchCopyW(pwzValue, cchValue, m_pFileIterator->first.c_str());
+            StringCchCatW(pwzValue, cchValue, L" ");
+            StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.c_str());
             ++m_pFileIterator;
             bReturn = TRUE;
         }
         else
         {
-            pszValue[0] = '\0';
+            pwzValue[0] = L'\0';
         }
     }
     
@@ -66,7 +66,7 @@ BOOL SettingsIterator::ReadNextLine(LPSTR pszValue, size_t cchValue)
 }
 
 
-BOOL SettingsIterator::ReadNextCommand(LPSTR pszValue, size_t cchValue)
+BOOL SettingsIterator::ReadNextCommand(LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     
@@ -74,9 +74,9 @@ BOOL SettingsIterator::ReadNextCommand(LPSTR pszValue, size_t cchValue)
     {
         if (!ispunct(*(m_pFileIterator->first.c_str())))
         {
-            StringCchCopy(pszValue, cchValue, m_pFileIterator->first.c_str());
-            StringCchCat(pszValue, cchValue, " ");
-            StringCchCat(pszValue, cchValue, m_pFileIterator->second.c_str());
+            StringCchCopyW(pwzValue, cchValue, m_pFileIterator->first.c_str());
+            StringCchCatW(pwzValue, cchValue, L" ");
+            StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.c_str());
             bReturn = TRUE;
         }
         
@@ -87,45 +87,45 @@ BOOL SettingsIterator::ReadNextCommand(LPSTR pszValue, size_t cchValue)
 }
 
 
-BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
+BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     
-    if (pszValue != NULL && cchValue > 0 && pszConfig != NULL)
+    if (pwzValue != nullptr && cchValue > 0 && pwzConfig != nullptr)
     {
         SettingsMap::iterator itSettings;
         
-        pszValue[0] = '\0';
+        pwzValue[0] = L'\0';
         
 #if defined(LS_COMPAT_LCREADNEXTCONFIG)
         string sConfig;
         
-        if('*' != *pszConfig)
+        if(L'*' != *pwzConfig)
         {
-            sConfig = "*";
-            sConfig += pszConfig;
+            sConfig = L"*";
+            sConfig += pwzConfig;
         }
         else
         {
-            sConfig = pszConfig;
+            sConfig = pwzConfig;
         }
         
-        pszConfig = sConfig.c_str();
+        pwzConfig = sConfig.c_str();
 #endif // defined(LS_COMPAT_LCREADNEXTCONFIG)
         
         // Has ReadNextConfig been used before for pszConfig?
-        IteratorMap::iterator it = m_Iterators.find(pszConfig);
+        IteratorMap::iterator it = m_Iterators.find(pwzConfig);
         
         if (it == m_Iterators.end())
         {
             // No, so find the first item with a key of pszConfig
-            itSettings = m_pSettingsMap->lower_bound(pszConfig);
+            itSettings = m_pSettingsMap->lower_bound(pwzConfig);
             
-            if (_stricmp(itSettings->first.c_str(), pszConfig) == 0)
+            if (_wcsicmp(itSettings->first.c_str(), pwzConfig) == 0)
             {
                 // Save the iterator for future use and return the value
                 it = (m_Iterators.insert(
-                    IteratorMap::value_type(pszConfig, itSettings)
+                    IteratorMap::value_type(pwzConfig, itSettings)
                 )).first;
                 
                 bReturn = TRUE;
@@ -134,14 +134,14 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
         else
         {
             // Yes so find the last item with a matching key
-            itSettings = m_pSettingsMap->upper_bound(pszConfig);
+            itSettings = m_pSettingsMap->upper_bound(pwzConfig);
             
             // Loop until we either find an item with a matching key or the
             // last matching item
             do
             {
                 ++it->second;
-            } while ((_stricmp(pszConfig, it->first.c_str()) != 0) &&
+            } while ((_wcsicmp(pwzConfig, it->first.c_str()) != 0) &&
                      (it->second != itSettings));
             
             // If we found a valid item, return it
@@ -153,9 +153,9 @@ BOOL SettingsIterator::ReadNextConfig(LPCSTR pszConfig, LPSTR pszValue, size_t c
         
         if (bReturn)
         {
-            StringCchCopy(pszValue, cchValue, it->second->first.c_str());
-            StringCchCat(pszValue, cchValue, " ");
-            StringCchCat(pszValue, cchValue, it->second->second.c_str());
+            StringCchCopyW(pwzValue, cchValue, it->second->first.c_str());
+            StringCchCatW(pwzValue, cchValue, L" ");
+            StringCchCatW(pwzValue, cchValue, it->second->second.c_str());
         }
     }
     

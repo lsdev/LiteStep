@@ -49,7 +49,7 @@ enum
  *         <code>false</code> if an error occured
  */
 bool MathEvaluateBool(const SettingsMap& context,
-    const std::string& expression,
+    const std::wstring& expression,
     bool& result,
     unsigned int flags = 0);
 
@@ -66,8 +66,8 @@ bool MathEvaluateBool(const SettingsMap& context,
  *         <code>false</code> if an error occured
  */
 bool MathEvaluateString(const SettingsMap& context,
-    const std::string& expression,
-    std::string& result,
+    const std::wstring& expression,
+    std::wstring& result,
     const StringSet& recursiveVarSet,
     unsigned int flags = 0);
 

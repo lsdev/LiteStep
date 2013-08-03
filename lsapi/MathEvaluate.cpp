@@ -27,7 +27,7 @@
 using namespace std;
 
 
-bool MathEvaluateBool(const SettingsMap& context, const string& expression,
+bool MathEvaluateBool(const SettingsMap& context, const wstring& expression,
     bool& result, unsigned int flags)
 {
     try
@@ -41,10 +41,10 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
         RESOURCE_STREX(
             GetModuleHandle(NULL), IDS_MATHEXCEPTION,
             resourceTextBuffer, MAX_LINE_LENGTH,
-            "Error in Expression:\n  %s\n\nDescription:\n  %s",
+            L"Error in Expression:\n  %ls\n\nDescription:\n  %ls",
             expression.c_str(), e.what());
         
-        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
+        RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
         
         return false;
     }
@@ -53,8 +53,8 @@ bool MathEvaluateBool(const SettingsMap& context, const string& expression,
 }
 
 
-bool MathEvaluateString(const SettingsMap& context, const string& expression,
-    string& result, const StringSet& recursiveVarSet, unsigned int flags)
+bool MathEvaluateString(const SettingsMap& context, const wstring& expression,
+    wstring& result, const StringSet& recursiveVarSet, unsigned int flags)
 {
     try
     {
@@ -74,10 +74,10 @@ bool MathEvaluateString(const SettingsMap& context, const string& expression,
         RESOURCE_STREX(
             GetModuleHandle(NULL), IDS_MATHEXCEPTION,
             resourceTextBuffer, MAX_LINE_LENGTH,
-            "Error in Expression:\n  %s\n\nDescription:\n  %s",
+            L"Error in Expression:\n  %s\n\nDescription:\n  %s",
             expression.c_str(), e.what());
         
-        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
+        RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
         
         return false;
     }

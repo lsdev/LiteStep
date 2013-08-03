@@ -163,7 +163,7 @@ void FullscreenMonitor::ShowModules(HMONITOR hMonitor)
 {
     if (m_bAutoHideModules)
     {
-        ParseBangCommand((HWND)hMonitor, "!ShowModules", nullptr);
+        ParseBangCommandW((HWND)hMonitor, L"!ShowModules", nullptr);
     }
     PostMessage(GetLitestepWnd(), LM_FULLSCREENDEACTIVATED, (WPARAM) hMonitor, 0);
 }
@@ -176,7 +176,7 @@ void FullscreenMonitor::HideModules(HMONITOR hMonitor, HWND hWnd)
 {
     if (m_bAutoHideModules)
     {
-        ParseBangCommand((HWND)hMonitor, "!HideModules", nullptr);
+        ParseBangCommandW((HWND)hMonitor, L"!HideModules", nullptr);
     }
     PostMessage(GetLitestepWnd(), LM_FULLSCREENACTIVATED, (WPARAM) hMonitor, (LPARAM) hWnd);
 }
@@ -339,7 +339,7 @@ void FullscreenMonitor::ThreadProc()
 //
 HRESULT FullscreenMonitor::Start()
 {
-    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) != FALSE;
+    m_bAutoHideModules = GetRCBoolW(L"LSAutoHideModules", TRUE) != FALSE;
     m_bRun.store(true);
     m_fullscreenMonitorThread = std::thread(std::bind(&FullscreenMonitor::ThreadProc, this));
 
@@ -365,13 +365,13 @@ HRESULT FullscreenMonitor::Stop()
 HRESULT FullscreenMonitor::Recycle()
 {
     bool bAlreadyHidden = m_bAutoHideModules;
-    m_bAutoHideModules = GetRCBool("LSAutoHideModules", TRUE) != FALSE;
+    m_bAutoHideModules = GetRCBoolW(L"LSAutoHideModules", TRUE) != FALSE;
 
     // We need to show the modules that were hidden before
     if (bAlreadyHidden && !m_bAutoHideModules)
     {
         // TODO::We could possibly just show the modules on monitors with fullscreen windows. 
-        ParseBangCommand(nullptr, "!ShowModules", nullptr);
+        ParseBangCommandW(nullptr, L"!ShowModules", nullptr);
     }
 
     m_bReHide.store(true);

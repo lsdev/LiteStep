@@ -70,7 +70,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
     
-    VarExpansionEx(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
+    VarExpansionExW(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
     PathUnquoteSpaces(tzExpandedPath);
     
     DWORD dwLen = GetFullPathName(
@@ -78,7 +78,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     if (0 == dwLen || dwLen > MAX_PATH_LENGTH)
     {
-        TRACE("Error: Can not get full path for \"%s\"", tzExpandedPath);
+        TRACE("Error: Can not get full path for \"%ls\"", tzExpandedPath);
         return;
     }
 
@@ -107,10 +107,10 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
         RESOURCE_STREX(
             GetModuleHandle(NULL), IDS_RECURSIVEINCLUDE,
             resourceTextBuffer, MAX_LINE_LENGTH,
-            "Error: Reursive include detected!\n %s.",
+            L"Error: Reursive include detected!\n %ls.",
             trail);
                             
-        RESOURCE_MSGBOX_F("LiteStep", MB_ICONERROR);
+        RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
 
         return;
     }
@@ -119,12 +119,12 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     
     if (nullptr == m_phFile)
     {
-        TRACE("Error: Can not open file \"%s\" (Defined as \"%s\").",
+        TRACE("Error: Can not open file \"%ls\" (Defined as \"%ls\").",
             m_tzFullPath, ptzFileName);
         return;
     }
     
-    TRACE("Parsing \"%s\"", m_tzFullPath);
+    TRACE("Parsing \"%ls\"", m_tzFullPath);
     m_trail.push_back(TrailItem(0, m_tzFullPath));
     
     fseek(m_phFile, 0, SEEK_SET);
@@ -144,7 +144,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
     m_phFile = nullptr;
     m_trail.pop_back();
     
-    TRACE("Finished Parsing \"%s\"", m_tzFullPath);
+    TRACE("Finished Parsing \"%ls\"", m_tzFullPath);
 }
 
 
@@ -189,7 +189,7 @@ bool FileParser::_ReadNextLine(LPTSTR ptzBuffer)
             // then the line has an invalid format.  Ignore it.
             if (_tcschr(WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
             {
-                TRACE("Syntax Error (%s, %d): Invalid line format",
+                TRACE("Syntax Error (%ls, %d): Invalid line format",
                     m_tzFullPath, m_uLineNumber);
                 continue;
             }
@@ -221,7 +221,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
     {
         if (m_stPrefixes.empty())
         {
-            TRACE("Syntax Error (%s, %d): Unexpected }",
+            TRACE("Syntax Error (%ls, %d): Unexpected }",
                 m_tzFullPath, m_uLineNumber);
         }
         else
@@ -332,7 +332,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     while (*ptzCurrent != _T('\0'))
     {
-        if (strchr(WHITESPACE, *ptzCurrent) == NULL)
+        if (wcschr(WHITESPACE, *ptzCurrent) == NULL)
         {
             if (ptzStart == NULL)
             {
@@ -388,7 +388,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     if (ptzLast != NULL)
     {
-        while (ptzLast > ptzString && strchr(WHITESPACE, *(ptzLast-1)))
+        while (ptzLast > ptzString && wcschr(WHITESPACE, *(ptzLast-1)))
         {
             --ptzLast;
         }
@@ -398,7 +398,7 @@ void FileParser::_StripString(LPTSTR ptzString)
     
     if (ptzStart != NULL && ptzStart != ptzString)
     {
-        StringCchCopy(ptzString, strlen(ptzString) + 1, ptzStart);
+        StringCchCopy(ptzString, wcslen(ptzString) + 1, ptzStart);
     }
 }
 
@@ -412,7 +412,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     ASSERT(NULL != m_pSettingsMap);
     ASSERT(NULL != ptzName); ASSERT(NULL != ptzValue);
     
-    if (_stricmp(ptzName, _T("if")) == 0)
+    if (_wcsicmp(ptzName, _T("if")) == 0)
     {
         _ProcessIf(ptzValue);
     }
@@ -420,27 +420,27 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     // In a release build ignore dangling elseif/else/endif.
     // Too much overhead just for error handling
     else if (
-           (_stricmp(ptzName, "else") == 0)
-        || (_stricmp(ptzName, "elseif") == 0)
-        || (_stricmp(ptzName, "endif") == 0)
+           (_wcsicmp(ptzName, L"else") == 0)
+        || (_wcsicmp(ptzName, L"elseif") == 0)
+        || (_wcsicmp(ptzName, L"endif") == 0)
     )
     {
-        TRACE("Error: Dangling pre-processor directive (%s, line %d): \"%s\"",
+        TRACE("Error: Dangling pre-processor directive (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, ptzName);
     }
 #endif
-    else if (_stricmp(ptzName, "include") == 0)
+    else if (_wcsicmp(ptzName, L"include") == 0)
     {
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
         
-        if (!GetToken(ptzValue, tzPath, NULL, FALSE))
+        if (!GetTokenW(ptzValue, tzPath, NULL, FALSE))
         {
-            TRACE("Syntax Error (%s, %d): Empty \"Include\" directive",
+            TRACE("Syntax Error (%ls, %d): Empty \"Include\" directive",
                 m_tzFullPath, m_uLineNumber);
             return;
         }
         
-        TRACE("Include (%s, line %d): \"%s\"",
+        TRACE("Include (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, tzPath);
         
         m_trail.back().uLine = m_uLineNumber;
@@ -448,18 +448,18 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         fpParser.ParseFile(tzPath);
     }
 #if defined(LS_CUSTOM_INCLUDEFOLDER)
-    else if (_stricmp(ptzName, _T("includefolder")) == 0)
+    else if (_wcsicmp(ptzName, _T("includefolder")) == 0)
     {
         TCHAR tzPath[MAX_PATH_LENGTH]; // path+pattern
         TCHAR tzFilter[MAX_PATH_LENGTH]; // path only
           
         // expands string in ptzValue to tzPath
         // buffer size defined by MAX_PATH_LENGTH
-        VarExpansionEx(tzPath, ptzValue, MAX_PATH_LENGTH);
+        VarExpansionExW(tzPath, ptzValue, MAX_PATH_LENGTH);
         
         PathUnquoteSpaces(tzPath); // strips quotation marks from string
         
-        TRACE("Searching IncludeFolder (%s, line %d): \"%s\"",
+        TRACE("Searching IncludeFolder (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, tzPath);
         
         // Hard-coded filter for *.rc files to limit search operation.
@@ -474,11 +474,11 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         HANDLE hSearch = FindFirstFile(tzFilter, &findData);
 
         // List of found files
-        std::vector<std::string> foundFiles;
+        std::vector<std::wstring> foundFiles;
 
         //
-        auto fileComparer = [] (const std::string s1, const std::string s2) -> bool {
-            return (_stricmp(s1.c_str(), s2.c_str()) > 0);
+        auto fileComparer = [] (const std::wstring s1, const std::wstring s2) -> bool {
+            return (_wcsicmp(s1.c_str(), s2.c_str()) > 0);
         };
         
         if (INVALID_HANDLE_VALUE != hSearch)
@@ -512,7 +512,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
             m_trail.back().uLine = m_uLineNumber;
             if (tzFile == PathCombine(tzFile, tzPath, foundFiles.begin()->c_str()))
             {
-                TRACE("Found and including: \"%s\"", tzFile);
+                TRACE("Found and including: \"%ls\"", tzFile);
                 
                 FileParser fpParser(m_pSettingsMap, m_trail);
                 fpParser.ParseFile(tzFile);
@@ -522,7 +522,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
             foundFiles.pop_back();
         }
         
-        TRACE("Done searching IncludeFolder (%s, line %d): \"%s\"",
+        TRACE("Done searching IncludeFolder (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, tzPath);
     }
 #endif // LS_CUSTOM_INCLUDEFOLDER
@@ -546,7 +546,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
     
     if (!MathEvaluateBool(*m_pSettingsMap, ptzExpression, result))
     {
-        TRACE("Error parsing expression \"%s\" (%s, line %d)",
+        TRACE("Error parsing expression \"%ls\" (%ls, line %d)",
             ptzExpression, m_tzFullPath, m_uLineNumber);
         
         // Invalid syntax, so quit processing entire conditional block
@@ -554,7 +554,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         return;
     }
     
-    TRACE("Expression (%s, line %d): \"%s\" evaluated to %s",
+    TRACE("Expression (%ls, line %d): \"%ls\" evaluated to %ls",
         m_tzFullPath, m_uLineNumber,
         ptzExpression, result ? "TRUE" : "FALSE");
     
@@ -567,14 +567,14 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         // an ElseIf. Else, or EndIf
         while (_ReadLineFromFile(tzName, tzValue))
         {
-            if ((_stricmp(tzName, _T("else")) == 0) ||
-                (_stricmp(tzName, _T("elseif")) == 0))
+            if ((_tcsicmp(tzName, _T("else")) == 0) ||
+                (_tcsicmp(tzName, _T("elseif")) == 0))
             {
                 // After an ElseIf or Else, skip all lines until EndIf
                 _SkipIf();
                 break;
             }
-            else if (_stricmp(tzName, _T("endif")) == 0)
+            else if (_tcsicmp(tzName, _T("endif")) == 0)
             {
                 // We're done
                 break;
@@ -592,27 +592,27 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         // ElseIf, Else, or EndIf
         while (_ReadLineFromFile(tzName, tzValue))
         {
-            if (_stricmp(tzName, _T("if")) == 0)
+            if (_tcsicmp(tzName, _T("if")) == 0)
             {
                 // Nested Ifs are a special case
                 _SkipIf();
             }
-            else if (_stricmp(tzName, _T("elseif")) == 0)
+            else if (_tcsicmp(tzName, _T("elseif")) == 0)
             {
                 // Handle ElseIfs by recursively calling ProcessIf
                 _ProcessIf(tzValue);
                 break;
             }
-            else if (_stricmp(tzName, _T("else")) == 0)
+            else if (_tcsicmp(tzName, _T("else")) == 0)
             {
                 // Since the If expression was false, when we see Else we
                 // start processing lines until EndIf
                 while (_ReadLineFromFile(tzName, tzValue))
                 {
-                    if (_stricmp(tzName, "elseif") == 0)
+                    if (_tcsicmp(tzName, _T("elseif")) == 0)
                     {
                         // Error: ElseIf after Else
-                        TRACE("Syntax Error (%s, %d): "
+                        TRACE("Syntax Error (%ls, %d): "
                               "\"ElseIf\" directive after \"Else\"",
                             m_tzFullPath, m_uLineNumber);
                         
@@ -620,7 +620,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                         _SkipIf();
                         break;
                     }
-                    else if (_stricmp(tzName, _T("endif")) == 0)
+                    else if (_tcsicmp(tzName, _T("endif")) == 0)
                     {
                         // We're done
                         break;
@@ -634,7 +634,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                 // We're done
                 break;
             }
-            else if (_stricmp(tzName, _T("endif")) == 0)
+            else if (_tcsicmp(tzName, _T("endif")) == 0)
             {
                 // We're done
                 break;
@@ -654,11 +654,11 @@ void FileParser::_SkipIf()
     
     while (_ReadLineFromFile(tzName, NULL))
     {
-        if (_stricmp(tzName, _T("if")) == 0)
+        if (_tcsicmp(tzName, _T("if")) == 0)
         {
             _SkipIf();
         }
-        else if (_stricmp(tzName, _T("endif")) == 0)
+        else if (_tcsicmp(tzName, _T("endif")) == 0)
         {
             break;
         }

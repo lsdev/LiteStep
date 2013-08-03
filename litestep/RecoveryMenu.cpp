@@ -51,19 +51,19 @@ struct MenuCommands
 {
     int nStringID;
     int nCommandID;
-    LPCSTR pszDefText;
+    LPCTSTR pszDefText;
 }
 rgMenuCommands[] = \
 {
-     { IDS_LITESTEP_RECYCLELS,   ID_RECYCLE,   "Re&cycle LiteStep"            }
-    ,{ IDS_LITESTEP_QUITLS,      ID_QUIT,      "&Quit LiteStep"               }
-    ,{ IDS_LITESTEP_TERMINATELS, ID_TERMINATE, "Forcibly &Terminate LiteStep" }
-    ,{ IDS_LITESTEP_ABOUTLS,     ID_ABOUT,     "&About LiteStep"              }
-    ,{ 0,                        -1,           ""                             }
-    ,{ IDS_LITESTEP_RUN,         ID_RUN,       "&Run..."                      }
-    ,{ IDS_LITESTEP_EXPLORER,    ID_EXPLORER,  "&Start Explorer as shell"     }
-    ,{ 0,                        -1,           ""                             }
-    ,{ IDS_LITESTEP_SHUTDOWNWIN, ID_SHUTDOWN,  "Sh&utdown Windows..."         }
+     { IDS_LITESTEP_RECYCLELS,   ID_RECYCLE,   _T("Re&cycle LiteStep")            }
+    ,{ IDS_LITESTEP_QUITLS,      ID_QUIT,      _T("&Quit LiteStep")               }
+    ,{ IDS_LITESTEP_TERMINATELS, ID_TERMINATE, _T("Forcibly &Terminate LiteStep") }
+    ,{ IDS_LITESTEP_ABOUTLS,     ID_ABOUT,     _T("&About LiteStep")              }
+    ,{ 0,                        -1,           _T("")                             }
+    ,{ IDS_LITESTEP_RUN,         ID_RUN,       _T("&Run...")                      }
+    ,{ IDS_LITESTEP_EXPLORER,    ID_EXPLORER,  _T("&Start Explorer as shell")     }
+    ,{ 0,                        -1,           _T("")                             }
+    ,{ IDS_LITESTEP_SHUTDOWNWIN, ID_SHUTDOWN,  _T("Sh&utdown Windows...")         }
 };
 
 
@@ -304,8 +304,8 @@ int RecoveryMenu::ShowMenu(HWND hWnd) const
     {
         if (rgMenuCommands[i].nStringID)
         {
-            char szBuffer[MAX_PATH] = { 0 };
-            GetResStr(m_hInstance,
+            TCHAR szBuffer[MAX_PATH] = { 0 };
+            GetResStrW(m_hInstance,
                 rgMenuCommands[i].nStringID, szBuffer, MAX_PATH,
                 rgMenuCommands[i].pszDefText);
             
@@ -361,7 +361,7 @@ void RecoveryMenu::HandleMenuCommand(int nCommand) const
 
     case ID_ABOUT:
         {
-            LSExecute(nullptr, "!about", SW_SHOW);
+            LSExecuteW(nullptr, L"!about", SW_SHOW);
         }
         break;
 

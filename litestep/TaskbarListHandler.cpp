@@ -53,7 +53,7 @@ HRESULT TaskbarListHandler::Start(HWND hWndTray) {
     ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
     wndClass.cbSize = sizeof(WNDCLASSEX);
     wndClass.cbWndExtra = sizeof(TaskbarListHandler*);
-    wndClass.lpszClassName = "taskbandHWNDClass";
+    wndClass.lpszClassName = _T("taskbandHWNDClass");
     wndClass.lpfnWndProc = &TaskbarListHandler::WindowProcedureInit;
     wndClass.hInstance = m_hInstance;
     wndClass.style = CS_NOCLOSE;
@@ -65,15 +65,15 @@ HRESULT TaskbarListHandler::Start(HWND hWndTray) {
     }
     else
     {
-        m_hWndTaskband = CreateWindowEx(WS_EX_TOOLWINDOW, (LPCSTR)m_aWndClass, "taskbandHWND", WS_CHILD, 0, 0, 100, 100, hWndTray, nullptr, m_hInstance, this);
+        m_hWndTaskband = CreateWindowEx(WS_EX_TOOLWINDOW, (LPCTSTR)m_aWndClass, _T("taskbandHWND"), WS_CHILD, 0, 0, 100, 100, hWndTray, nullptr, m_hInstance, this);
         if (m_hWndTaskband == nullptr)
         {
             hr = HrGetLastError();
         }
         else
         {
-            WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
-            SetProp(hWndTray, "TaskbandHWND", m_hWndTaskband);
+            WM_ShellHook = RegisterWindowMessage(_T("SHELLHOOK"));
+            SetProp(hWndTray, _T("TaskbandHWND"), m_hWndTaskband);
             hr = S_OK;
         }
     }
@@ -91,7 +91,7 @@ HRESULT TaskbarListHandler::Stop() {
     }
     
     if (m_aWndClass != 0) {
-        UnregisterClass((LPCSTR)m_aWndClass, m_hInstance);
+        UnregisterClass((LPCTSTR)m_aWndClass, m_hInstance);
     }
 
     return S_OK;

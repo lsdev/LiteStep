@@ -260,15 +260,10 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
         case NID_5W_SIZE:
             {
                 LPCWSTR pwzSrc = ((NID_5W*)(pnidSource))->szTip;
+               
+                HRESULT hr = StringCchCopy(m_szTip, _countof(m_szTip), pwzSrc);
                 
-                WCHAR szTemp[128];
-                memcpy(szTemp, pwzSrc, sizeof(WCHAR)*128);
-                szTemp[127] = 0;
-                
-                int nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
-                    m_szTip, TRAY_MAX_TIP_LENGTH, NULL, NULL);
-                
-                if (!nReturn)
+                if (FAILED(hr))
                 {
                     m_szTip[0] = 0;
                 }
@@ -279,14 +274,9 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
             {
                 LPCWSTR pwzSrc = ((NID_4W*)(pnidSource))->szTip;
                 
-                WCHAR szTemp[64];
-                memcpy(szTemp, pwzSrc, sizeof(WCHAR)*64);
-                szTemp[63] = 0;
+                HRESULT hr = StringCchCopy(m_szTip, _countof(m_szTip), pwzSrc);
                 
-                int nReturn = WideCharToMultiByte(CP_ACP, 0, szTemp, -1,
-                    m_szTip, TRAY_MAX_TIP_LENGTH, NULL, NULL);
-                
-                if (!nReturn)
+                if (FAILED(hr))
                 {
                     m_szTip[0] = 0;
                 }
@@ -297,10 +287,11 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
         case NID_5A_SIZE:
             {
                 LPCSTR pwzSrc = ((NID_5A*)(pnidSource))->szTip;
+
+                int nReturn = MultiByteToWideChar(CP_ACP, 0,
+                    pwzSrc, -1, m_szTip, _countof(m_szTip));
                 
-                HRESULT hr = StringCchCopy(m_szTip, 128, pwzSrc);
-                
-                if (FAILED(hr))
+                if (nReturn == 0)
                 {
                     m_szTip[0] = 0;
                 }
@@ -311,9 +302,10 @@ void NotifyIcon::copy_tip(PCNID_XX pnidSource)
             {
                 LPCSTR pwzSrc = ((NID_4A*)(pnidSource))->szTip;
                 
-                HRESULT hr = StringCchCopy(m_szTip, 64, pwzSrc);
-                
-                if (FAILED(hr))
+                int nReturn = MultiByteToWideChar(CP_ACP, 0,
+                    pwzSrc, -1, m_szTip, _countof(m_szTip));
+
+                if (nReturn == 0)
                 {
                     m_szTip[0] = 0;
                 }

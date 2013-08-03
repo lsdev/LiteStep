@@ -22,28 +22,34 @@
 #include "settingsmanager.h"
 #include "lsapiInit.h"
 #include "../utility/core.hpp"
+#include "../utility/stringutility.h"
 
 
-LPVOID LCOpen(LPCSTR pszPath)
+LPVOID LCOpenW(LPCWSTR pwzPath)
 {
-    LPVOID pFile = NULL;
+    LPVOID pFile = nullptr;
     
     if (g_LSAPIManager.IsInitialized())
     {
-        if (pszPath)
+        if (pwzPath)
         {
-            if (pszPath[0] != '\0')
+            if (pwzPath[0] != L'\0')
             {
-                pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(pszPath);
+                pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(pwzPath);
             }
         }
-        if (pFile == NULL)
+        if (pFile == nullptr)
         {
-            pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(NULL);
+            pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(nullptr);
         }
     }
     
     return pFile;
+}
+
+LPVOID LCOpenA(LPCSTR pszPath)
+{
+    return LCOpenW(std::unique_ptr<wchar_t>(WCSFromMBS(pszPath)).get());
 }
 
 
@@ -53,7 +59,7 @@ BOOL LCClose(LPVOID pFile)
     
     if (g_LSAPIManager.IsInitialized())
     {
-        if (pFile != NULL)
+        if (pFile != nullptr)
         {
             bReturn = g_LSAPIManager.GetSettingsManager()->LCClose(pFile);
         }
@@ -63,16 +69,16 @@ BOOL LCClose(LPVOID pFile)
 }
 
 
-BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+BOOL LCReadNextCommandW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     
     if (g_LSAPIManager.IsInitialized())
     {
-        if (pFile != NULL && pszValue != NULL && cchValue > 0)
+        if (pFile != nullptr && pwzValue != nullptr && cchValue > 0)
         {
             bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextCommand(
-                pFile, pszValue, cchValue);
+                pFile, pwzValue, cchValue);
         }
     }
     
@@ -80,17 +86,36 @@ BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 }
 
 
-BOOL LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
+BOOL LCReadNextCommandA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     
     if (g_LSAPIManager.IsInitialized())
     {
-        if (pFile != NULL && pszConfig != NULL &&
-            pszValue != NULL && cchValue > 0)
+        if (pFile != nullptr && pszValue != nullptr && cchValue > 0)
+        {
+            std::unique_ptr<wchar_t> temp(new wchar_t[cchValue]);
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextCommand(
+                pFile, temp.get(), cchValue);
+            WideCharToMultiByte(CP_ACP, 0, temp.get(), (int)cchValue, pszValue, (int)cchValue, "?", nullptr);
+        }
+    }
+    
+    return bReturn;
+}
+
+
+BOOL LCReadNextConfigW(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzValue, size_t cchValue)
+{
+    BOOL bReturn = FALSE;
+    
+    if (g_LSAPIManager.IsInitialized())
+    {
+        if (pFile != nullptr && pwzConfig != nullptr &&
+            pwzValue != nullptr && cchValue > 0)
         {
             bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextConfig(
-                pFile, pszConfig, pszValue, cchValue);
+                pFile, pwzConfig, pwzValue, cchValue);
         }
     }
     
@@ -98,102 +123,225 @@ BOOL LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cch
 }
 
 
-BOOL LCReadNextLine(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+BOOL LCReadNextConfigA(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
     
     if (g_LSAPIManager.IsInitialized())
     {
-        if (pFile != NULL && pszValue != NULL && cchValue > 0)
+        if (pFile != nullptr && pszConfig != nullptr &&
+            pszValue != nullptr && cchValue > 0)
         {
-            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLine(
-                pFile, pszValue, cchValue);
+            std::unique_ptr<wchar_t> temp(new wchar_t[cchValue]);
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextConfig(
+                pFile, MBSTOWCS(pszConfig), temp.get(), cchValue);
+            WideCharToMultiByte(CP_ACP, 0, temp.get(), (int)cchValue, pszValue, (int)cchValue, "?", nullptr);
         }
     }
     
     return bReturn;
 }
 
-int GetRCInt(LPCSTR szKeyName, int nDefault)
+
+BOOL LCReadNextLineW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
+{
+    BOOL bReturn = FALSE;
+    
+    if (g_LSAPIManager.IsInitialized())
+    {
+        if (pFile != nullptr && pwzValue != nullptr && cchValue > 0)
+        {
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLine(
+                pFile, pwzValue, cchValue);
+        }
+    }
+    
+    return bReturn;
+}
+
+
+BOOL LCReadNextLineA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+{
+    BOOL bReturn = FALSE;
+    
+    if (g_LSAPIManager.IsInitialized())
+    {
+        if (pFile != nullptr && pszValue != nullptr && cchValue > 0)
+        {
+            std::unique_ptr<wchar_t> value(new wchar_t[cchValue]);
+            bReturn = g_LSAPIManager.GetSettingsManager()->LCReadNextLine(
+                pFile, value.get(), cchValue);
+            WideCharToMultiByte(CP_ACP, 0, value.get(), (int)cchValue, pszValue, (int)cchValue, "?", nullptr);
+        }
+    }
+    
+    return bReturn;
+}
+
+
+int GetRCIntW(LPCWSTR pwzKeyName, int nDefault)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         return g_LSAPIManager.GetSettingsManager()->GetRCInt(
-            szKeyName, nDefault);
+            pwzKeyName, nDefault);
     }
     
     return nDefault;
 }
 
 
-BOOL GetRCBool(LPCSTR szKeyName, BOOL ifFound)
+int GetRCIntA(LPCSTR pszKeyName, int nDefault)
+{
+    return GetRCIntW(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), nDefault);
+}
+
+
+BOOL GetRCBoolW(LPCWSTR pwzKeyName, BOOL ifFound)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         return g_LSAPIManager.GetSettingsManager()->GetRCBool(
-            szKeyName, ifFound);
+            pwzKeyName, ifFound);
     }
     
     return !ifFound;
 }
 
 
-BOOL GetRCBoolDef(LPCSTR szKeyName, BOOL bDefault)
+BOOL GetRCBoolA(LPCSTR pszKeyName, BOOL ifFound)
+{
+    return GetRCBoolW(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), ifFound);
+}
+
+
+BOOL GetRCBoolDefW(LPCWSTR pwzKeyName, BOOL bDefault)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         return g_LSAPIManager.GetSettingsManager()->GetRCBoolDef(
-            szKeyName, bDefault);
+            pwzKeyName, bDefault);
     }
     
     return bDefault;
 }
 
 
-BOOL GetRCString(LPCSTR szKeyName, LPSTR szValue, LPCSTR defStr, int maxLen)
+BOOL GetRCBoolDefA(LPCSTR pszKeyName, BOOL bDefault)
+{
+    return GetRCBoolDefW(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), bDefault);
+}
+
+
+BOOL GetRCStringW(LPCWSTR pwzKeyName, LPWSTR pwzValue, LPCWSTR pwzDefStr, int maxLen)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         return g_LSAPIManager.GetSettingsManager()->GetRCString(
-            szKeyName, szValue, defStr, maxLen);
+            pwzKeyName, pwzValue, pwzDefStr, maxLen);
     }
-    else if (szValue && defStr)
+    else if (pwzValue && pwzDefStr)
     {
-        StringCchCopy(szValue, maxLen, defStr);
+        StringCchCopyW(pwzValue, maxLen, pwzDefStr);
     }
     
     return FALSE;
 }
 
 
-COLORREF GetRCColor(LPCSTR szKeyName, COLORREF colDef)
+BOOL GetRCStringA(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszDefStr, int maxLen)
+{
+    if (g_LSAPIManager.IsInitialized())
+    {
+        std::unique_ptr<wchar_t> tempValue(new wchar_t[maxLen]);
+        std::unique_ptr<wchar_t> key (WCSFromMBS(pszKeyName));
+        std::unique_ptr<wchar_t> def (WCSFromMBS(pszDefStr));
+
+        *tempValue = L'\0';
+
+        BOOL bRet = g_LSAPIManager.GetSettingsManager()->GetRCString(
+            key.get(), tempValue.get(), def.get(), maxLen);
+
+        if (pszValue)
+        {
+            WideCharToMultiByte(CP_ACP, 0, tempValue.get(), maxLen, pszValue, maxLen, "?", nullptr);
+        }
+
+        return bRet;
+    }
+    else if (pszValue && pszDefStr)
+    {
+        StringCchCopyA(pszValue, maxLen, pszDefStr);
+    }
+    
+    return FALSE;
+}
+
+
+COLORREF GetRCColorW(LPCWSTR pwzKeyName, COLORREF colDef)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         return g_LSAPIManager.GetSettingsManager()->GetRCColor(
-            szKeyName, colDef);
+            pwzKeyName, colDef);
     }
     
     return colDef;
 }
 
 
-BOOL GetRCLine(LPCSTR szKeyName, LPSTR szBuffer, UINT nBufLen, LPCSTR szDefault)
+COLORREF GetRCColorA(LPCSTR pszKeyName, COLORREF colDef)
+{
+    return GetRCColorW(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), colDef);
+}
+
+
+BOOL GetRCLineW(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, UINT nBufLen, LPCWSTR pwzDefault)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         return g_LSAPIManager.GetSettingsManager()->GetRCLine(
-            szKeyName, szBuffer, nBufLen, szDefault);
+            pwzKeyName, pwzBuffer, nBufLen, pwzDefault);
     }
-    else if (szBuffer && szDefault)
+    else if (pwzBuffer && pwzDefault)
     {
-        StringCchCopy(szBuffer, nBufLen, szDefault);
+        StringCchCopyW(pwzBuffer, nBufLen, pwzDefault);
     }
     
     return FALSE;
 }
 
-BOOL LSGetVariableEx(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
+
+BOOL GetRCLineA(LPCSTR pszKeyName, LPSTR pszBuffer, UINT nBufLen, LPCSTR pszDefault)
+{
+    if (g_LSAPIManager.IsInitialized())
+    {
+        std::unique_ptr<wchar_t> tempValue(new wchar_t[nBufLen]);
+        std::unique_ptr<wchar_t> key (WCSFromMBS(pszKeyName));
+        std::unique_ptr<wchar_t> def (WCSFromMBS(pszDefault));
+
+        *tempValue = L'\0';
+
+        BOOL bRet = g_LSAPIManager.GetSettingsManager()->GetRCLine(
+            key.get(), tempValue.get(), nBufLen, def.get());
+
+        if (pszBuffer)
+        {
+            WideCharToMultiByte(CP_ACP, 0, tempValue.get(), nBufLen, pszBuffer, nBufLen, "?", nullptr);
+        }
+
+        return bRet;
+    }
+    else if (pszBuffer && pszDefault)
+    {
+        StringCchCopyA(pszBuffer, nBufLen, pszDefault);
+    }
+    
+    return FALSE;
+}
+
+
+BOOL LSGetVariableExW(LPCWSTR pszKeyName, LPWSTR pszValue, DWORD dwLength)
 {
     if (g_LSAPIManager.IsInitialized())
     {
@@ -204,14 +352,33 @@ BOOL LSGetVariableEx(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
     return FALSE;
 }
 
-BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
+
+BOOL LSGetVariableExA(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
+{
+    if (g_LSAPIManager.IsInitialized())
+    {
+        std::unique_ptr<wchar_t> temp(new wchar_t[dwLength]);
+
+        BOOL bRet = g_LSAPIManager.GetSettingsManager()->GetVariable(
+            MBSTOWCS(pszKeyName), temp.get(), dwLength);
+
+        WideCharToMultiByte(CP_ACP, 0, temp.get(), dwLength, pszValue, dwLength, "?", nullptr);
+
+        return bRet;
+    }
+    
+    return FALSE;
+}
+
+
+BOOL LSGetVariableW(LPCWSTR pszKeyName, LPWSTR pszValue)
 {
     BOOL bReturn = FALSE;
-    char szTempValue[MAX_LINE_LENGTH];
+    wchar_t szTempValue[MAX_LINE_LENGTH];
     
     if (pszValue)
     {
-        pszValue[0] = '\0';
+        pszValue[0] = L'\0';
     }
     
     if (g_LSAPIManager.IsInitialized())
@@ -221,7 +388,7 @@ BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
         
         if (bReturn && pszValue)
         {
-            StringCchCopy(pszValue, strlen(szTempValue) + 1, szTempValue);
+            StringCchCopy(pszValue, wcslen(szTempValue) + 1, szTempValue);
         }
     }
     
@@ -229,10 +396,44 @@ BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
 }
 
 
-void LSSetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
+BOOL LSGetVariableA(LPCSTR pszKeyName, LPSTR pszValue)
+{
+    BOOL bReturn = FALSE;
+    wchar_t szTempValue[MAX_LINE_LENGTH];
+    
+    if (pszValue)
+    {
+        pszValue[0] = L'\0';
+    }
+    
+    if (g_LSAPIManager.IsInitialized())
+    {
+        bReturn = g_LSAPIManager.GetSettingsManager()->GetVariable(
+            MBSTOWCS(pszKeyName), szTempValue, MAX_LINE_LENGTH);
+        
+        if (bReturn && pszValue)
+        {
+            StringCchCopyA(pszValue, _countof(szTempValue), WCSTOMBS(szTempValue));
+        }
+    }
+    
+    return bReturn;
+}
+
+
+void LSSetVariableW(LPCWSTR pszKeyName, LPCWSTR pszValue)
 {
     if (g_LSAPIManager.IsInitialized())
     {
         g_LSAPIManager.GetSettingsManager()->SetVariable(pszKeyName, pszValue);
     }
+}
+
+
+void LSSetVariableA(LPCSTR pszKeyName, LPCSTR pszValue)
+{
+    LSSetVariableW(
+        std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(),
+        std::unique_ptr<wchar_t>(WCSFromMBS(pszValue)).get()
+        );
 }

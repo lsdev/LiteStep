@@ -39,7 +39,7 @@
 #include "lsapi.h"
 #include <locale>
 
-static int matche_after_star (LPCSTR pattern, LPCSTR text);
+static int matche_after_starA(LPCSTR pattern, LPCSTR text);
 
 /*-----------------------------------------------------------------------------
 *
@@ -58,7 +58,7 @@ static int matche_after_star (LPCSTR pattern, LPCSTR text);
 *
 -----------------------------------------------------------------------------*/
 
-BOOL is_valid_pattern(LPCSTR p, LPINT error_type)
+BOOL is_valid_patternA(LPCSTR p, LPINT error_type)
 {
     // init error_type
     *error_type = PATTERN_VALID;
@@ -192,7 +192,7 @@ BOOL is_valid_pattern(LPCSTR p, LPINT error_type)
 *
 -----------------------------------------------------------------------------*/
 
-int matche(LPCSTR p, LPCSTR t)
+int matcheA(LPCSTR p, LPCSTR t)
 {
     char range_start, range_end;  // start and end in range
     
@@ -217,7 +217,7 @@ int matche(LPCSTR p, LPCSTR t)
             
         // multiple any character match
         case '*':
-            return matche_after_star(p, t);
+            return matche_after_starA(p, t);
             
         // [..] construct, single member/exclusion character match
         case '[':
@@ -385,7 +385,7 @@ int matche(LPCSTR p, LPCSTR t)
 * recursively call matche() with final segment of PATTERN and of TEXT.
 *
 -----------------------------------------------------------------------------*/
-static int matche_after_star (LPCSTR p, LPCSTR t)
+static int matche_after_starA(LPCSTR p, LPCSTR t)
 {
     int match = 0;
     char nextp;
@@ -432,7 +432,7 @@ static int matche_after_star (LPCSTR p, LPCSTR t)
         // text pointer as we go here
         if (toupper(nextp) == toupper(*t) || *p == '[')
         {
-            match = matche(p, t);
+            match = matcheA(p, t);
         }
         
         // if the end of text is reached then no match
@@ -454,7 +454,7 @@ static int matche_after_star (LPCSTR p, LPCSTR t)
 * match() is a shell to matche() to return only BOOL values.
 *
 -----------------------------------------------------------------------------*/
-BOOL match(LPCSTR p, LPCSTR t)
+BOOL matchA(LPCSTR p, LPCSTR t)
 {
-    return (matche(p, t) == MATCH_VALID) ? TRUE : FALSE;
+    return (matcheA(p, t) == MATCH_VALID) ? TRUE : FALSE;
 }

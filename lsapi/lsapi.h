@@ -48,60 +48,93 @@ extern "C"
 {
 #endif  // __cplusplus
     
-    LSAPI LPVOID LCOpen(LPCSTR szPath);
+    LSAPI LPVOID LCOpenA(LPCSTR szPath);
+    LSAPI LPVOID LCOpenW(LPCWSTR wzPath);
     LSAPI BOOL LCClose(LPVOID pFile);
-    LSAPI BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue);
-    LSAPI BOOL LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
-    LSAPI BOOL LCReadNextLine(LPVOID pFile, LPSTR pszValue, size_t cchValue);
-    LSAPI int LCTokenize (LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters);
+    LSAPI BOOL LCReadNextCommandA(LPVOID pFile, LPSTR pszValue, size_t cchValue);
+    LSAPI BOOL LCReadNextCommandW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue);
+    LSAPI BOOL LCReadNextConfigA(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue);
+    LSAPI BOOL LCReadNextConfigW(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzValue, size_t cchValue);
+    LSAPI BOOL LCReadNextLineA(LPVOID pFile, LPSTR pszValue, size_t cchValue);
+    LSAPI BOOL LCReadNextLineW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue);
+    LSAPI int LCTokenizeA(LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters);
+    LSAPI int LCTokenizeW(LPCWSTR wzString, LPWSTR * lpwzBuffers, DWORD dwNumBuffers, LPWSTR wzExtraParameters);
     
-    LSAPI int GetRCInt(LPCSTR lpKeyName, int nDefault);
-    LSAPI BOOL GetRCString(LPCSTR lpKeyName, LPSTR value, LPCSTR defStr, int maxLen);
-    LSAPI BOOL GetRCBool(LPCSTR lpKeyName, BOOL ifFound);
-    LSAPI BOOL GetRCBoolDef(LPCSTR lpKeyName, BOOL bDefault);
-    LSAPI BOOL GetRCLine(LPCSTR, LPSTR, UINT, LPCSTR);
-    LSAPI COLORREF GetRCColor(LPCSTR lpKeyName, COLORREF colDef);
+    LSAPI int GetRCIntA(LPCSTR lpKeyName, int nDefault);
+    LSAPI int GetRCIntW(LPCWSTR lpKeyName, int nDefault);
+    LSAPI BOOL GetRCStringA(LPCSTR lpKeyName, LPSTR value, LPCSTR defStr, int maxLen);
+    LSAPI BOOL GetRCStringW(LPCWSTR lpKeyName, LPWSTR value, LPCWSTR defStr, int maxLen);
+    LSAPI BOOL GetRCBoolA(LPCSTR lpKeyName, BOOL ifFound);
+    LSAPI BOOL GetRCBoolW(LPCWSTR lpKeyName, BOOL ifFound);
+    LSAPI BOOL GetRCBoolDefA(LPCSTR lpKeyName, BOOL bDefault);
+    LSAPI BOOL GetRCBoolDefW(LPCWSTR lpKeyName, BOOL bDefault);
+    LSAPI BOOL GetRCLineA(LPCSTR lpKeyName, LPSTR value, UINT maxLen, LPCSTR defStr);
+    LSAPI BOOL GetRCLineW(LPCWSTR lpKeyName, LPWSTR value, UINT maxLen, LPCWSTR defStr);
+    LSAPI COLORREF GetRCColorA(LPCSTR lpKeyName, COLORREF colDef);
+    LSAPI COLORREF GetRCColorW(LPCWSTR lpKeyName, COLORREF colDef);
     
-    LSAPI BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue);
-    LSAPI BOOL LSGetVariableEx(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength);
-    LSAPI void LSSetVariable(LPCSTR pszKeyName, LPCSTR pszValue);
+    LSAPI BOOL LSGetVariableA(LPCSTR pszKeyName, LPSTR pszValue);
+    LSAPI BOOL LSGetVariableW(LPCWSTR pwzKeyName, LPWSTR pwzValue);
+    LSAPI BOOL LSGetVariableExA(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength);
+    LSAPI BOOL LSGetVariableExW(LPCWSTR pwzKeyName, LPWSTR pwzValue, DWORD dwLength);
+    LSAPI void LSSetVariableA(LPCSTR pszKeyName, LPCSTR pszValue);
+    LSAPI void LSSetVariableW(LPCWSTR pwzKeyName, LPCWSTR pwzValue);
     
-    LSAPI BOOL AddBangCommand(LPCSTR pszCommand, BangCommand pfnBangCommand);
-    LSAPI BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandEx pfnBangCommand);
-    LSAPI BOOL RemoveBangCommand(LPCSTR pszCommand);
-    LSAPI BOOL ParseBangCommand (HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
+    LSAPI BOOL AddBangCommandA(LPCSTR pszCommand, BangCommandA pfnBangCommand);
+    LSAPI BOOL AddBangCommandW(LPCWSTR pwzCommand, BangCommandW pfnBangCommand);
+    LSAPI BOOL AddBangCommandExA(LPCSTR pszCommand, BangCommandExA pfnBangCommand);
+    LSAPI BOOL AddBangCommandExW(LPCWSTR pwzCommand, BangCommandExW pfnBangCommand);
+    LSAPI BOOL RemoveBangCommandA(LPCSTR pszCommand);
+    LSAPI BOOL RemoveBangCommandW(LPCWSTR pwzCommand);
+    LSAPI BOOL ParseBangCommandA(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
+    LSAPI BOOL ParseBangCommandW(HWND hCaller, LPCWSTR pwzCommand, LPCWSTR pwzArgs);
     
     LSAPI HRGN BitmapToRegion(HBITMAP hBmp, COLORREF cTransparentColor, COLORREF cTolerance, int xoffset, int yoffset);
     LSAPI HBITMAP BitmapFromIcon (HICON hIcon);
-    LSAPI HBITMAP LoadLSImage(LPCSTR szFile, LPCSTR szImage);
-    LSAPI HICON LoadLSIcon (LPCSTR szImage, LPCSTR szFile);
+    LSAPI HBITMAP LoadLSImageA(LPCSTR pszFile, LPCSTR pszImage);
+    LSAPI HBITMAP LoadLSImageW(LPCWSTR pwzFile, LPCWSTR pwzImage);
+    LSAPI HICON LoadLSIconA(LPCSTR pszImage, LPCSTR pszFile);
+    LSAPI HICON LoadLSIconW(LPCWSTR pwzImage, LPCWSTR pwzFile);
     LSAPI void GetLSBitmapSize(HBITMAP hBitmap, LPINT nWidth, LPINT nHeight);
-    LSAPI void TransparentBltLS (HDC dc, int nXDest, int nYDest, int nWidth, int nHeight, HDC tempDC, int nXSrc, int nYSrc, COLORREF colorTransparent);
+    LSAPI void TransparentBltLS(HDC dc, int nXDest, int nYDest, int nWidth, int nHeight, HDC tempDC, int nXSrc, int nYSrc, COLORREF colorTransparent);
     
-    LSAPI int CommandTokenize (LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters);
-    LSAPI void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs);
+    LSAPI int CommandTokenizeA(LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters);
+    LSAPI int CommandTokenizeW(LPCWSTR szString, LPWSTR * lpszBuffers, DWORD dwNumBuffers, LPWSTR szExtraParameters);
+    LSAPI void CommandParseA(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs);
+    LSAPI void CommandParseW(LPCWSTR pszCommand, LPWSTR pszOutCommand, LPWSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs);
     
-    LSAPI HINSTANCE LSExecute(HWND Owner, LPCSTR szCommand, int nShowCmd);
-    LSAPI HINSTANCE LSExecuteEx(HWND Owner, LPCSTR szOperation, LPCSTR szCommand, LPCSTR szArgs, LPCSTR szDirectory, int nShowCmd);
+    LSAPI HINSTANCE LSExecuteA(HWND Owner, LPCSTR szCommand, int nShowCmd);
+    LSAPI HINSTANCE LSExecuteW(HWND Owner, LPCWSTR wzCommand, int nShowCmd);
+    LSAPI HINSTANCE LSExecuteExA(HWND Owner, LPCSTR szOperation, LPCSTR szCommand, LPCSTR szArgs, LPCSTR szDirectory, int nShowCmd);
+    LSAPI HINSTANCE LSExecuteExW(HWND Owner, LPCWSTR wzOperation, LPCWSTR wzCommand, LPCWSTR wzArgs, LPCWSTR wzDirectory, int nShowCmd);
     
     LSAPI HWND GetLitestepWnd(void);
-    LSAPI BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath);
-    LSAPI BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath);
+    LSAPI BOOL WINAPI LSGetLitestepPathA(LPSTR pszPath, size_t cchPath);
+    LSAPI BOOL WINAPI LSGetLitestepPathW(LPWSTR pwzPath, size_t cchPath);
+    LSAPI BOOL WINAPI LSGetImagePathA(LPSTR pszPath, size_t cchPath);
+    LSAPI BOOL WINAPI LSGetImagePathW(LPWSTR pwzPath, size_t cchPath);
     
-    LSAPI void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate);
-    LSAPI void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString);
+    LSAPI void VarExpansionA(LPSTR pszExpandedString, LPCSTR pszTemplate);
+    LSAPI void VarExpansionW(LPWSTR pwzExpandedString, LPCWSTR pwzTemplate);
+    LSAPI void VarExpansionExA(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString);
+    LSAPI void VarExpansionExW(LPWSTR pwzExpandedString, LPCWSTR pwzTemplate, size_t cchExpandedString);
     
-    LSAPI BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR * pszNextToken, BOOL useBrackets);
-    LSAPI BOOL GetTokenW(LPCWSTR pszString, LPWSTR pszToken, LPCWSTR * pszNextToken, BOOL useBrackets);
+    LSAPI BOOL GetTokenA(LPCSTR pszString, LPSTR pszToken, LPCSTR * pszNextToken, BOOL useBrackets);
+    LSAPI BOOL GetTokenW(LPCWSTR pwzString, LPWSTR pwzToken, LPCWSTR * pwzNextToken, BOOL useBrackets);
     LSAPI void Frame3D(HDC dc, RECT rect, COLORREF TopColor, COLORREF BottomColor, int Width);
     LSAPI void SetDesktopArea(int left, int top, int right, int bottom);
     
-    LSAPI BOOL match(LPCSTR pattern, LPCSTR text);
-    LSAPI int matche(LPCSTR pattern, LPCSTR text);
-    LSAPI BOOL is_valid_pattern(LPCSTR p, LPINT error_type);
+    LSAPI BOOL matchA(LPCSTR pattern, LPCSTR text);
+    LSAPI BOOL matchW(LPCWSTR pattern, LPCWSTR text);
+    LSAPI int matcheA(LPCSTR pattern, LPCSTR text);
+    LSAPI int matcheW(LPCWSTR pattern, LPCWSTR text);
+    LSAPI BOOL is_valid_patternA(LPCSTR p, LPINT error_type);
+    LSAPI BOOL is_valid_patternW(LPCWSTR p, LPINT error_type);
     
-    LSAPI void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText);
-    LSAPI void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...);
+    LSAPI void GetResStrA(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText);
+    LSAPI void GetResStrW(HINSTANCE hInstance, UINT uIDText, LPWSTR pwzText, size_t cchText, LPCWSTR pwzDefText);
+    LSAPI void GetResStrExA(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...);
+    LSAPI void GetResStrExW(HINSTANCE hInstance, UINT uIDText, LPWSTR pwzText, size_t cchText, LPCWSTR pwzDefText, ...);
     
     LSAPI int LSGetSystemMetrics(int);
     LSAPI HMONITOR LSMonitorFromWindow(HWND, DWORD);
@@ -116,14 +149,15 @@ extern "C"
     LSAPI int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal);
     LSAPI int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal);
     
-    LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
+    LSAPI HRESULT EnumLSDataA(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
+    LSAPI HRESULT EnumLSDataW(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
     
 #if defined(LSAPI_PRIVATE)
-    LSAPI BOOL LSAPIInitialize(LPCSTR pszLitestepPath, LPCSTR pszRcPath);
+    LSAPI BOOL LSAPIInitialize(LPCWSTR pwzLitestepPath, LPCWSTR pwzRcPath);
     LSAPI void LSAPIReloadBangs(void);
     LSAPI void LSAPIReloadSettings(void);
     LSAPI void LSAPISetLitestepWindow(HWND hLitestepWnd);
-    LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs);
+    LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCWSTR pszCommand, LPCWSTR pwzArgs);
 #endif /* LSAPI_PRIVATE */
     
 #if defined(__cplusplus)

@@ -31,38 +31,38 @@
 
 #if !defined(LSRESOURCEBUFFER)
 #define LSRESOURCEBUFFER
-static char resourceTextBuffer[MAX_LINE_LENGTH + 1] = { 0 };
-static char resourceTitleBuffer[MAX_LINE_LENGTH + 1] = { 0 };
+static wchar_t resourceTextBuffer[MAX_LINE_LENGTH + 1] = { 0 };
+static wchar_t resourceTitleBuffer[MAX_LINE_LENGTH + 1] = { 0 };
 #endif // LSRESOURCEBUFFER
 
 #define RESOURCE_MSGBOX_F(title, extra_flags)                   \
-    MessageBox(NULL, resourceTextBuffer, title,                 \
+    MessageBoxW(nullptr, resourceTextBuffer, title,             \
         MB_TOPMOST | extra_flags)
 
 #define RESOURCE_MSGBOX(instance, id, deftext, title)           \
-    GetResStr( (instance), (id)                                 \
+    GetResStrW( (instance), (id)                                \
         ,resourceTextBuffer, MAX_LINE_LENGTH                    \
         ,deftext);                                              \
     RESOURCE_MSGBOX_F(title, MB_OK | MB_ICONEXCLAMATION)
 
 #define RESOURCE_MSGBOX_T(instance, id, deftext, titleid, deftitle) \
-    GetResStr( (instance), (id)                                     \
+    GetResStrW( (instance), (id)                                    \
         ,resourceTextBuffer, MAX_LINE_LENGTH                        \
         ,deftext );                                                 \
-    GetResStr( (instance), (titleid)                                \
+    GetResStrW( (instance), (titleid)                               \
         ,resourceTitleBuffer, MAX_LINE_LENGTH                       \
         ,deftitle );                                                \
     RESOURCE_MSGBOX_F(resourceTitleBuffer, MB_OK | MB_ICONEXCLAMATION)
 
 #define RESOURCE_STR(instance, id, deftext)  \
-    GetResStr( (instance), (id)              \
+    GetResStrW( (instance), (id)             \
         ,resourceTextBuffer, MAX_LINE_LENGTH \
         ,deftext )
 
-#define RESOURCE_STREX GetResStrEx
+#define RESOURCE_STREX GetResStrExW
 
 #define RESOURCE_TITLE(instance, id, deftext) \
-    GetResStr( (instance), (id)               \
+    GetResStrW( (instance), (id)              \
         ,resourceTitleBuffer, MAX_LINE_LENGTH \
         ,deftext )
 

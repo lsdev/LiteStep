@@ -48,7 +48,7 @@ struct FileInfo
 typedef std::set<SettingsIterator*> IteratorSet;
 
 /** Maps file names to FileInfo structures. */
-typedef std::map<std::string, FileInfo*, stringicmp> FileMap;
+typedef std::map<std::wstring, FileInfo*, stringicmp> FileMap;
 
 
 /**
@@ -79,12 +79,12 @@ protected:
     /**
      * Searches for a global setting by name.
      *
-     * @param   pszName  setting name
+     * @param   pwzName  setting name
      * @param   it       iterator to be set to point to setting
      * @return  <code>TRUE</code> if the setting exists or <code>FALSE</code>
      *          otherwise
      */
-    BOOL _FindLine(LPCSTR pszName, SettingsMap::iterator &it);
+    BOOL _FindLine(LPCWSTR pwzName, SettingsMap::iterator &it);
     
 public:
     /**
@@ -100,109 +100,109 @@ public:
     /**
      * Parses a configuration file and adds its contents to the global settings.
      *
-     * @param  pszFileName  path to configuration file
+     * @param  pwzFileName  path to configuration file
      */
-    void ParseFile(LPCSTR pszFileName);
+    void ParseFile(LPCWSTR pwzFileName);
     
     /**
      * Retrieves a Boolean value from the global settings. Returns
      * <code>fIfFound</code> if the setting exists and <code>!fIfFound</code>
      * if it does not.
      *
-     * @param   pszKeyName  setting name
+     * @param   pwzKeyName  setting name
      * @param   fIfFound    value to return if setting is found
      * @return  setting value
      */
-    BOOL GetRCBool(LPCSTR pszKeyName, BOOL fIfFound);
+    BOOL GetRCBool(LPCWSTR pwzKeyName, BOOL fIfFound);
     
     /**
      * Retrieves a Boolean value from the global settings. Returns
      * <code>fDefault</code> if the setting does not exist.
      *
-     * @param   pszKeyName setting name
+     * @param   pwzKeyName setting name
      * @param   fDefault   default value
      * @return  setting value
      */
-    BOOL GetRCBoolDef(LPCSTR pszKeyName, BOOL fDefault);
+    BOOL GetRCBoolDef(LPCWSTR pszKeyName, BOOL fDefault);
     
     /**
      * Retrieves a color value from the global settings. Returns
      * <code>crDefault</code> if the setting does not exist.
      *
-     * @param   pszKeyName  setting name
+     * @param   pwzKeyName  setting name
      * @param   crDefault   default value
      * @return  setting value
      */
-    COLORREF GetRCColor(LPCSTR pszKeyName, COLORREF crDefault);
+    COLORREF GetRCColor(LPCWSTR pszKeyName, COLORREF crDefault);
     
     /**
      * Retrieves an integer value from the global settings. Returns
      * <code>nDefault</code> if the setting does not exist.
      *
-     * @param   pszKeyName  setting name
+     * @param   pwzKeyName  setting name
      * @param   nDefault    default value
      * @return  setting value
      */
-    int GetRCInt(LPCSTR pszKeyName, int nDefault);
+    int GetRCInt(LPCWSTR pwzKeyName, int nDefault);
     
     /**
      * Retrieves a raw string value from the global settings. If setting does
      * not exist, copies <code>pszDefault</code> into the buffer and returns
-     * <code>FALSE</code>. <code>pszDefault</code> may be <code>NULL</code> in
+     * <code>FALSE</code>. <code>pszDefault</code> may be <code>nullptr</code> in
      * which case nothing is copied into the buffer.
      *
      * <code>GetRCLine</code> does not parse the string value like
      * <code>GetRCString</code> does. Its purpose is for retreiving command
      * lines for applications and bang commands.
      *
-     * @param   pszKeyName    setting name
-     * @param   pszBuffer     buffer to receive value
+     * @param   pwzKeyName    setting name
+     * @param   pwzBuffer     buffer to receive value
      * @param   cchBufferLen  size of buffer
-     * @param   pszDefault    default value
+     * @param   pwzDefault    default value
      * @return  <code>TRUE</code> if setting exists or <code>FALSE</code>
      *          otherwise
      */
-    BOOL GetRCLine(LPCSTR pszKeyName, LPSTR pszBuffer, int cchBufferLen, LPCSTR pszDefault);
+    BOOL GetRCLine(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, int cchBufferLen, LPCWSTR pwzDefault);
     
     /**
      * Retreives a string value from the global settings. If the setting does
-     * not exist, copies <code>pszDefault</code> into the buffer and returns
-     * <code>FALSE</code>. <code>pszDefault</code> may be <code>NULL</code> in
+     * not exist, copies <code>pwzDefault</code> into the buffer and returns
+     * <code>FALSE</code>. <code>pwzDefault</code> may be <code>nullptr</code> in
      * which case nothing is copied into the buffer.
      *
      * The raw setting value is parsed and the first space-delimited token or
      * quoted string is the value returned.
      *
-     * @param   pszKeyName    setting name
-     * @param   pszBuffer     buffer to receive value
-     * @param   pszDefault    default value
+     * @param   pwzKeyName    setting name
+     * @param   pwzBuffer     buffer to receive value
+     * @param   pwzDefault    default value
      * @param   cchBufferLen  size of buffer
      * @return  <code>TRUE</code> if setting exists or <code>FALSE</code>
      *          otherwise
      */
-    BOOL GetRCString(LPCSTR pszKeyName, LPSTR pszBuffer, LPCSTR pszDefault, int cchBufferLen);
+    BOOL GetRCString(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, LPCWSTR pwzDefault, int cchBufferLen);
     
     /**
      * Retrieves a string value from the global settings. Returns
      * <code>FALSE</code> if the setting does not exist. Performs the same
      * operation as {@link #GetRCString}.
      *
-     * @param   pszKeyName    setting name
-     * @param   pszBuffer     buffer to receive value
+     * @param   pwzKeyName    setting name
+     * @param   pwzBuffer     buffer to receive value
      * @param   cchBufferLen  size of buffer
      * @return  <code>TRUE</code> if setting exists or <code>FALSE</code>
      *          otherwise
      */
-    BOOL GetVariable(LPCSTR pszKeyName, LPSTR pszBuffer, DWORD cchBufferLen);
+    BOOL GetVariable(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, DWORD cchBufferLen);
     
     /**
      * Assigns a new value to a global setting. If the setting already exists
      * its previous value is overwritten, otherwise a new setting is created.
      *
-     * @param  pszKeyName  setting name
-     * @param  pszValue    new setting value
+     * @param  pwzKeyName  setting name
+     * @param  pwzValue    new setting value
      */
-    void SetVariable(LPCSTR pszKeyName, LPCSTR pszValue);
+    void SetVariable(LPCWSTR pwzKeyName, LPCWSTR pwzValue);
     
     /**
      * Opens a configuration file for sequential access to its contents. The
@@ -219,7 +219,7 @@ public:
      *          access global settings
      * @return  file handle or <code>NULL</code> if the file could not be opened
      */
-    LPVOID LCOpen(LPCSTR pszPath);
+    LPVOID LCOpen(LPCWSTR pwzPath);
     
     /**
      * Closes a configuration file opened with {@link #LCOpen}.
@@ -239,14 +239,14 @@ public:
      * retrieve all the lines that begin with the specified setting name.
      *
      * @param   pFile         file handle returned by LCOpen
-     * @param   pszConfig     setting name
-     * @param   pszBuffer     buffer to receive line
+     * @param   pwzConfig     setting name
+     * @param   pwzBuffer     buffer to receive line
      * @param   cchBufferLen  size of buffer
      * @return  <code>TRUE</code> if the line was retrieved or
      *          <code>FALSE</code> if there are no more lines or an error
      *          occurred
      */
-    BOOL LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR pszBuffer, size_t cchBufferLen);
+    BOOL LCReadNextConfig(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzBuffer, size_t cchBufferLen);
     
     /**
      * Retrieves the next none config line (one that does not start with a '*'
@@ -257,13 +257,13 @@ public:
      * retrieve all non config lines in the file.
      *
      * @param   pFile         file handle returned by LCOpen
-     * @param   pszBuffer     buffer to receive line
+     * @param   pwzBuffer     buffer to receive line
      * @param   cchBufferLen  size of buffer
      * @return  <code>TRUE</code> if the line was retrieved or
      *          <code>FALSE</code> if there are no more lines or an error
      *          occurred
      */
-    BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszBuffer, size_t cchBufferLen);
+    BOOL LCReadNextCommand(LPVOID pFile, LPWSTR pwzBuffer, size_t cchBufferLen);
     
     /**
      * Retrieves the next line from a configuration file. The entire line
@@ -273,36 +273,36 @@ public:
      * retrieve all the lines in the file.
      *
      * @param   pFile         file handle returned by LCOpen
-     * @param   pszBuffer     buffer to receive line
+     * @param   pwzBuffer     buffer to receive line
      * @param   cchBufferLen  size of buffer
      * @return  <code>TRUE</code> if the line was retrieved or
      *          <code>FALSE</code> if there are no more lines or an error
      *          occurred
      */
-    BOOL LCReadNextLine(LPVOID pFile, LPSTR pszBuffer, size_t cchBufferLen);
+    BOOL LCReadNextLine(LPVOID pFile, LPWSTR pszBuffer, size_t cchBufferLen);
     
     /**
      * Expands variable references. The template string is copied into the
      * buffer with all variable references (<code>$var$</code>) replaced by the
      * value of the variable.
      *
-     * @param  pszBuffer     buffer to received the expanded string
-     * @param  pszTemplate   string to be expanded
+     * @param  pwzBuffer     buffer to received the expanded string
+     * @param  pwzTemplate   string to be expanded
      * @param  cchBufferLen  size of the buffer
      */
-    void VarExpansionEx(LPSTR pszBuffer, LPCSTR pszTemplate, size_t cchBufferLen);
+    void VarExpansionEx(LPWSTR pszBuffer, LPCWSTR pszTemplate, size_t cchBufferLen);
     
     /**
      * Expands variable references. The template string is copied into the
      * buffer with all variable references (<code>$var$</code>) replaced by the
      * value of the variable.
      *
-     * @param  pszBuffer        buffer to received the expanded string
-     * @param  pszTemplate      string to be expanded
+     * @param  pwzBuffer        buffer to received the expanded string
+     * @param  pwzTemplate      string to be expanded
      * @param  cchBufferLen     size of the buffer
      * @param  recursiveVarSet  recursive variable set
      */
-    void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t stLength, const StringSet& recursiveVarSet);
+    void VarExpansionEx(LPWSTR pwzExpandedString, LPCWSTR pwzTemplate, size_t stLength, const StringSet& recursiveVarSet);
 };
 
 #endif // SETTINGSMANAGER_H

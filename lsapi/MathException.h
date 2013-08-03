@@ -36,7 +36,8 @@ public:
     /**
      * Constructs a MathException with the specified message.
      */
-    MathException(const std::string& message) throw() : std::runtime_error(message)
+#pragma message("FIX ME!")
+    MathException(const std::wstring& message) throw() : std::runtime_error("")
     {
         // do nothing
     }

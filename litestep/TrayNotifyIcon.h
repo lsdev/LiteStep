@@ -35,8 +35,63 @@
 // NOTE: Currently, the dwState/Mask members are never passed on to the
 // systray modules. dwState/Mask are handled internally to this tray service.
 //
-typedef struct
+typedef struct LSNOTIFYICONDATA
 {
+    DWORD cbSize;                                /* arbitrary  &     volatile */
+    HWND hWnd;                                   /* persistent & non volatile */
+    UINT uID;                                    /* persistent & non volatile */
+    UINT uFlags;                                 /* persistent &     volatile */
+    UINT uCallbackMessage;                       /* persistent &     volatile */
+    HICON hIcon;                                 /* persistent &     volatile */
+    WCHAR szTip[TRAY_MAX_TIP_LENGTH];            /* persistent &     volatile */
+    
+    // new in 2K:
+    DWORD dwState;                               /* persistent &     volatile */
+    DWORD dwStateMask;                           /* arbitrary  &     volatile */
+    WCHAR szInfo[TRAY_MAX_INFO_LENGTH];          /* arbitrary  &     volatile */
+    union
+    {
+        UINT uTimeout;                           /* arbitrary  &     volatile */
+        UINT uVersion;                           /* arbitrary  &     volatile */
+    } DUMMYUNIONNAME;
+    WCHAR szInfoTitle[TRAY_MAX_INFOTITLE_LENGTH];/* arbitrary  &     volatile */
+    DWORD dwInfoFlags;                           /* arbitrary  &     volatile */
+    
+    // new in XP:
+    GUID guidItem;                               /* persistent & non volatile */
+
+    // new in Vista
+    HICON hBalloonIcon;                          /* arbitrary  &     volatile */
+    /**/
+} *PLSNOTIFYICONDATA;
+typedef const LSNOTIFYICONDATA * PCLSNOTIFYICONDATA;
+
+//
+// Sent to legacy modules
+//
+typedef struct LSNOTIFYICONDATAA
+{
+    LSNOTIFYICONDATAA(PCLSNOTIFYICONDATA nid) {
+        this->cbSize = sizeof(this);
+        this->hWnd = nid->hWnd;
+        this->uID = nid->uID;
+        this->uFlags = nid->uFlags;
+        this->uCallbackMessage = nid->uCallbackMessage;
+        this->hIcon = nid->hIcon;
+        WideCharToMultiByte(CP_ACP, 0, nid->szTip, _countof(nid->szTip),
+            this->szTip, sizeof(this->szTip), "?", nullptr);
+        this->dwState = nid->dwState;
+        this->dwStateMask = nid->dwStateMask;
+        WideCharToMultiByte(CP_ACP, 0, nid->szInfo, _countof(nid->szInfo), 
+           this->szInfo, sizeof(this->szInfo), "?", nullptr);
+        this->uVersion = nid->uVersion;
+        WideCharToMultiByte(CP_ACP, 0, nid->szInfoTitle, _countof(nid->szInfoTitle),
+            this->szInfoTitle, sizeof(this->szInfoTitle), "?", nullptr);
+        this->dwInfoFlags = nid->dwInfoFlags;
+        this->guidItem = nid->guidItem;
+        this->hBalloonIcon = nid->hBalloonIcon;
+    }
+
     DWORD cbSize;                                /* arbitrary  &     volatile */
     HWND hWnd;                                   /* persistent & non volatile */
     UINT uID;                                    /* persistent & non volatile */
@@ -63,8 +118,7 @@ typedef struct
     // new in Vista
     HICON hBalloonIcon;                          /* arbitrary  &     volatile */
     /**/
-} LSNOTIFYICONDATA, *PLSNOTIFYICONDATA;
-typedef const LSNOTIFYICONDATA * PCLSNOTIFYICONDATA;
+} *PLSNOTIFYICONDATAA;
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -336,7 +390,7 @@ private:
     UINT  m_uFlags;                              /* persistent &     volatile */
     UINT  m_uCallbackMessage;                    /* persistent &     volatile */
     HICON m_hIcon;                               /* persistent &     volatile */
-    CHAR  m_szTip[TRAY_MAX_TIP_LENGTH];          /* persistent &     volatile */
+    WCHAR  m_szTip[TRAY_MAX_TIP_LENGTH];         /* persistent &     volatile */
     
     DWORD m_dwState;                             /* persistent &     volatile */
     HICON m_hBalloonIcon;                        /* persistent &     volatile */

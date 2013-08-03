@@ -221,6 +221,74 @@ HRESULT PathAddBackslashEx(LPTSTR ptzPath, size_t cchPath)
 
 
 //
+// PathAddBackslashEx
+//
+// Checked version of PathAddBackslash which also handles quoted paths
+//
+// Return values:  S_OK          - backslash appended
+//                 S_FALSE       - path already ended with a backslash
+//                 E_OUTOFMEMORY - buffer too small
+//                 E_FAIL        - other failure (invalid input string)
+//
+HRESULT PathAddBackslashExA(LPSTR pszPath, size_t cchPath)
+{
+    ASSERT(cchPath <= STRSAFE_MAX_CCH);
+    ASSERT(nullptr != pszPath); ASSERT(0 != cchPath);
+    
+    HRESULT hr = E_FAIL;
+    size_t cchCurrentLength = 0;
+    
+    if (SUCCEEDED(StringCchLengthA(pszPath, cchPath, &cchCurrentLength)))
+    {
+        bool bHasQuote = false;
+        LPSTR ptzEnd = pszPath + cchCurrentLength;
+        
+        if ((ptzEnd > pszPath) && (*(ptzEnd-1) == _T('\"')))
+        {
+            --ptzEnd;
+            bHasQuote = true;
+        }
+        
+        if (ptzEnd > pszPath)
+        {
+            if (*(ptzEnd-1) != _T('\\'))
+            {
+                if (cchPath - cchCurrentLength > 1)
+                {
+                    if (bHasQuote)
+                    {
+                        *(ptzEnd+1) = *ptzEnd;
+                    }
+                    
+                    *ptzEnd = _T('\\');
+                    
+                    if (bHasQuote)
+                    {
+                        ++ptzEnd;
+                    }
+                    
+                    ASSERT((size_t)(ptzEnd - pszPath) < cchPath);
+                    *(ptzEnd+1) = _T('\0');
+                    
+                    hr = S_OK;
+                }
+                else
+                {
+                    hr = E_OUTOFMEMORY;
+                }
+            }
+            else
+            {
+                hr = S_FALSE;
+            }
+        }
+    }
+    
+    return hr;
+}
+
+
+//
 // GetSystemString
 //
 bool GetSystemString(DWORD dwCode, LPTSTR ptzBuffer, DWORD cchBuffer)
@@ -371,7 +439,7 @@ bool IsVistaOrAbove()
 void LSShutdownDialog(HWND hWnd)
 {
     FARPROC fnProc = GetProcAddress(
-        GetModuleHandle("SHELL32.DLL"), (LPCSTR)((long)0x003C));
+        GetModuleHandleW(L"SHELL32.DLL"), (LPCSTR)((long)0x003C));
     
     if (fnProc)
     {
@@ -410,7 +478,7 @@ void LSShutdownDialog(HWND hWnd)
 // LSPlaySystemSound
 // Wrapper around PlaySound to play system event sounds
 //
-BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
+BOOL LSPlaySystemSound(LPCWSTR pwzSoundAlias)
 {
     BOOL bResult = FALSE;
     
@@ -419,15 +487,10 @@ BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
     
     if (hWinMM)
     {
-        typedef BOOL (WINAPI* PlaySoundProc)(LPCTSTR, HMODULE, DWORD);
+        typedef BOOL (WINAPI* PlaySoundProc)(LPCWSTR, HMODULE, DWORD);
         
-#if defined(UNICODE)
         PlaySoundProc fnPlaySound = (PlaySoundProc)
             GetProcAddress(hWinMM, "PlaySoundW");
-#else
-        PlaySoundProc fnPlaySound = (PlaySoundProc)
-            GetProcAddress(hWinMM, "PlaySoundA");
-#endif
         
         if (fnPlaySound)
         {
@@ -444,7 +507,7 @@ BOOL LSPlaySystemSound(LPCTSTR pszSoundAlias)
                 dwFlags |= SND_SYSTEM;
             }
             
-            bResult = fnPlaySound(pszSoundAlias, NULL, dwFlags);
+            bResult = fnPlaySound(pwzSoundAlias, NULL, dwFlags);
         }
         
         VERIFY(FreeLibrary(hWinMM));
@@ -723,12 +786,12 @@ BOOL LSRevertWow64FsRedirection(PVOID pvOldValue)
 //
 // LSShellExecuteEx
 //
-BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo)
+BOOL LSShellExecuteEx(LPSHELLEXECUTEINFOW lpExecInfo)
 {
     PVOID pvOldValue = nullptr;
     LSDisableWow64FsRedirection(&pvOldValue);
     
-    BOOL bReturn = ShellExecuteEx(lpExecInfo);
+    BOOL bReturn = ShellExecuteExW(lpExecInfo);
     
     LSRevertWow64FsRedirection(pvOldValue);
     return bReturn;
@@ -739,13 +802,13 @@ BOOL LSShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo)
 //
 // LSShellExecuteA
 //
-HINSTANCE LSShellExecute(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile,
-                          LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow)
+HINSTANCE LSShellExecute(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile,
+                          LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShow)
 {
     PVOID pvOldValue = nullptr;
     LSDisableWow64FsRedirection(&pvOldValue);
 
-    HINSTANCE hinstResult = ShellExecute(
+    HINSTANCE hinstResult = ShellExecuteW(
         hwnd, lpOperation, lpFile, lpParameters, lpDirectory, nShow);
     
     LSRevertWow64FsRedirection(pvOldValue);
@@ -818,7 +881,7 @@ HANDLE LSActivateActCtxForClsid(REFCLSID rclsid, PULONG_PTR pulCookie)
         TCHAR szSubkey[MAX_PATH] = { 0 };
         
         HRESULT hr = StringCchPrintf(szSubkey, COUNTOF(szSubkey),
-            _T("CLSID\\%s\\InProcServer32"), szCLSID);
+            _T("CLSID\\%ls\\InProcServer32"), szCLSID);
         
         if (SUCCEEDED(hr))
         {
@@ -878,16 +941,16 @@ void LSDeactivateActCtx(HANDLE hActCtx, ULONG_PTR* pulCookie)
 // DescriptionFromHR
 // Retrives a description of a HRESULT error code.
 //
-HRESULT DescriptionFromHR(HRESULT hr, LPTSTR buf, size_t cchBuf) {
+HRESULT DescriptionFromHR(HRESULT hr, LPWSTR buf, size_t cchBuf) {
     if (FACILITY_WINDOWS == HRESULT_FACILITY(hr))
     {
          hr = HRESULT_CODE(hr);
     }
 
-    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hr,
+    if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hr,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, DWORD(cchBuf), nullptr) == 0)
     {
-        return StringCchPrintf(buf, cchBuf, _T("Unknown error, 0x%.8X"), hr);
+        return StringCchPrintfW(buf, cchBuf, L"Unknown error, 0x%.8X", hr);
     }
 
     return S_OK;

@@ -23,7 +23,8 @@
 #define STRINGUTILITY_H
 
 #include <string>
-#include <string.h> // for _stricmp/strcmp
+#include <string.h> // for _wcsicmp/wcscmp
+#include <memory>
 
 
 //
@@ -33,9 +34,9 @@
 //
 struct stringicmp
 {
-    bool operator()(const std::string &s1, const std::string &s2) const
+    bool operator()(const std::wstring &s1, const std::wstring &s2) const
     {
-        return (_stricmp(s1.c_str(), s2.c_str()) < 0);
+        return (_wcsicmp(s1.c_str(), s2.c_str()) < 0);
     }
 };
 
@@ -47,11 +48,20 @@ struct stringicmp
 //
 struct stringcmp
 {
-    bool operator()(const std::string &s1, const std::string &s2) const
+    bool operator()(const std::wstring &s1, const std::wstring &s2) const
     {
-        return (strcmp(s1.c_str(), s2.c_str()) < 0);
+        return (wcscmp(s1.c_str(), s2.c_str()) < 0);
     }
 };
 
+
+//
+// Quick conversion
+//
+wchar_t *WCSFromMBS(const char *pszMBS);
+char *MBSFromWCS(const wchar_t *pwzWCS);
+
+#define WCSTOMBS(str) std::unique_ptr<char>(MBSFromWCS(str)).get()
+#define MBSTOWCS(str) std::unique_ptr<wchar_t>(WCSFromMBS(str)).get()
 
 #endif // STRINGUTILITY_H

@@ -66,12 +66,12 @@ public:
     /**
      * Constructs a string value.
      */
-    MathValue(const std::string& value);
+    MathValue(const std::wstring& value);
     
     /**
      * Constructs a string value.
      */
-    MathValue(const char *value);
+    MathValue(const wchar_t *value);
     
     /**
      * Assigns a Boolean to this value.
@@ -91,17 +91,17 @@ public:
     /**
      * Assigns a string to this value.
      */
-    MathValue& operator=(const std::string& value);
+    MathValue& operator=(const std::wstring& value);
     
     /**
      * Assigns a string to this value.
      */
-    MathValue& operator=(const char *value);
+    MathValue& operator=(const wchar_t *value);
     
     /**
      * Returns a string description of this value's type.
      */
-    std::string GetTypeName() const;
+    std::wstring GetTypeName() const;
     
     /**
      * Returns <code>true</code> if this value is undefined.
@@ -153,13 +153,13 @@ public:
     /**
      * Converts this value to a string.
      */
-    std::string ToString() const;
+    std::wstring ToString() const;
     
     /**
      * Converts this value to a string using integer representation
      * for any NUMBER type.
      */
-    std::string ToCompatibleString() const;
+    std::wstring ToCompatibleString() const;
     
     /** Operators */
     friend MathValue operator+ (const MathValue& a, const MathValue& b);
@@ -190,7 +190,7 @@ private:
     double mNumber;
     
     /** String value */
-    std::string mString;
+    std::wstring mString;
 };
 
 
@@ -201,10 +201,10 @@ MathValue MathConcatenate(const MathValue& a, const MathValue& b);
 MathValue MathIntDivide(const MathValue& a, const MathValue& b);
 
 /** Convert a number to a string. */
-std::string MathNumberToString(double number);
+std::wstring MathNumberToString(double number);
 
 /** Convert a string to a number. */
-double MathStringToNumber(const std::string& str);
+double MathStringToNumber(const std::wstring& str);
 
 
 #endif // MATHVALUE_H

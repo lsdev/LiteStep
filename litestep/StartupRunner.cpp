@@ -205,7 +205,7 @@ void StartupRunner::_RunShellFolderContents(int nFolder)
                     
                     if (!LSShellExecuteEx(&seiCommand))
                     {
-                        TRACE("StartupRunner failed to launch '%s'",
+                        TRACE("StartupRunner failed to launch '%ls'",
                             findData.cFileName);
                     }
                 }
@@ -486,7 +486,7 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     TCHAR tzToken[MAX_LINE_LENGTH] = { 0 };
     LPTSTR ptzArgs = nullptr;
 
-    GetToken(ptzCommandLine, tzToken, const_cast<LPCSTR*>(&ptzArgs), FALSE);
+    GetTokenW(ptzCommandLine, tzToken, const_cast<LPCTSTR*>(&ptzArgs), FALSE);
     
     HANDLE hProcess = nullptr;
 
@@ -538,7 +538,7 @@ void StartupRunner::_SpawnProcess(LPTSTR ptzCommandLine, DWORD dwFlags)
     {
         TCHAR tzError[4096];
         DescriptionFromHR(HrGetLastError(), tzError, _countof(tzError));
-        TRACE("StartupRunner failed to launch '%s', %s", ptzCommandLine, tzError);
+        TRACE("StartupRunner failed to launch '%ls', %ls", ptzCommandLine, tzError);
     }
 #endif
 }

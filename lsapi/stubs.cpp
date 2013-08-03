@@ -25,9 +25,9 @@
 BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {
 #if defined(LS_COMPAT_LOGGING)
-    char szLogFile[MAX_PATH] = { 0 };
+    wchar_t wzLogFile[MAX_PATH] = { 0 };
     
-    int nLogLevel = GetRCInt("LSLogLevel", 2);
+    int nLogLevel = GetRCIntW(L"LSLogLevel", 2);
     
     // Should this message be logged?
     if (!pszModule || !pszMessage ||
@@ -37,13 +37,13 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
     }
     
     // Has a log file been assigned?
-    if (!GetRCString("LSLogFile", szLogFile, NULL, MAX_PATH))
+    if (!GetRCStringW(L"LSLogFile", wzLogFile, NULL, MAX_PATH))
     {
         return FALSE;
     }
     
     // If so, open it
-    HANDLE hLogFile = CreateFile(szLogFile,
+    HANDLE hLogFile = CreateFile(wzLogFile,
         GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
@@ -67,11 +67,11 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
     // Add timestamp and module name to message
     LPCSTR rszLevel[4] = { "Error", "Warning", "Notice", "Debug" };
     
-    TCHAR szLine[MAX_LINE_LENGTH] = { 0 };
+    CHAR szLine[MAX_LINE_LENGTH] = { 0 };
     size_t cbLine = sizeof(szLine);
     size_t cbRemaining = 0;
     
-    if (SUCCEEDED(StringCbPrintfEx(szLine, cbLine, NULL, &cbRemaining,
+    if (SUCCEEDED(StringCbPrintfExA(szLine, cbLine, NULL, &cbRemaining,
         STRSAFE_IGNORE_NULLS, "%02d-%02d-%04d %02d:%02d:%02d - %s - %s: %s\r\n",
         st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute, st.wSecond,
         rszLevel[nLevel-1], pszModule, pszMessage)))
@@ -105,7 +105,7 @@ BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
     va_list argList;
     va_start(argList, pszFormat);
     
-    if (SUCCEEDED(StringCchVPrintf(szMessage, MAX_LINE_LENGTH,
+    if (SUCCEEDED(StringCchVPrintfA(szMessage, MAX_LINE_LENGTH,
         pszFormat, argList)))
     {
         bReturn = LSLog(nLevel, pszModule, szMessage);
@@ -123,7 +123,7 @@ int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal)
 {
     char strVal[MAX_LINE_LENGTH];
     
-    if (!GetRCString(pszKeyName, strVal, NULL, MAX_LINE_LENGTH))
+    if (!GetRCStringA(pszKeyName, strVal, NULL, MAX_LINE_LENGTH))
     {
         return nDefault;
     }
@@ -257,4 +257,192 @@ BOOL LSEnumDisplayDevices(
     DWORD dwFlags)
 {
     return EnumDisplayDevicesA(lpDevice, iDevNum, lpDisplayDevice, dwFlags);
+}
+
+extern "C"
+{
+    LSAPI LPVOID LCOpen(LPCSTR szPath)
+    {
+        return LCOpenA(szPath);
+    }
+
+    LSAPI BOOL LCReadNextCommand(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+    {
+        return LCReadNextCommandA(pFile, pszValue, cchValue);
+    }
+
+    LSAPI BOOL LCReadNextConfig(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
+    {
+        return LCReadNextConfigA(pFile, pszConfig, pszValue, cchValue);
+    }
+
+    LSAPI BOOL LCReadNextLine(LPVOID pFile, LPSTR pszValue, size_t cchValue)
+    {
+        return LCReadNextLineA(pFile, pszValue, cchValue);
+    }
+
+    LSAPI int LCTokenize(LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
+    {
+        return LCTokenizeA(szString, lpszBuffers, dwNumBuffers, szExtraParameters);
+    }
+
+    LSAPI int GetRCInt(LPCSTR lpKeyName, int nDefault)
+    {
+        return GetRCIntA(lpKeyName, nDefault);
+    }
+
+    LSAPI BOOL GetRCString(LPCSTR lpKeyName, LPSTR value, LPCSTR defStr, int maxLen)
+    {
+        return GetRCStringA(lpKeyName, value, defStr, maxLen);
+    }
+
+    LSAPI BOOL GetRCBool(LPCSTR lpKeyName, BOOL ifFound)
+    {
+        return GetRCBoolA(lpKeyName, ifFound);
+    }
+
+    LSAPI BOOL GetRCBoolDef(LPCSTR lpKeyName, BOOL bDefault)
+    {
+        return GetRCBoolDefA(lpKeyName, bDefault);
+    }
+
+    LSAPI BOOL GetRCLine(LPCSTR lpKeyName, LPSTR value, UINT maxLen, LPCSTR defStr)
+    {
+        return GetRCLineA(lpKeyName, value, maxLen, defStr);
+    }
+
+    LSAPI COLORREF GetRCColor(LPCSTR lpKeyName, COLORREF colDef)
+    {
+        return GetRCColorA(lpKeyName, colDef);
+    }
+
+    LSAPI BOOL LSGetVariable(LPCSTR pszKeyName, LPSTR pszValue)
+    {
+        return LSGetVariableA(pszKeyName, pszValue);
+    }
+
+    LSAPI BOOL LSGetVariableEx(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
+    {
+        return LSGetVariableExA(pszKeyName, pszValue, dwLength);
+    }
+
+    LSAPI void LSSetVariable(LPCSTR pszKeyName, LPCSTR pszValue)
+    {
+        return LSSetVariableA(pszKeyName, pszValue);
+    }
+
+    LSAPI BOOL AddBangCommand(LPCSTR pszCommand, BangCommandA pfnBangCommand)
+    {
+        return AddBangCommandA(pszCommand, pfnBangCommand);
+    }
+
+    LSAPI BOOL AddBangCommandEx(LPCSTR pszCommand, BangCommandExA pfnBangCommand)
+    {
+        return AddBangCommandExA(pszCommand, pfnBangCommand);
+    }
+
+    LSAPI BOOL RemoveBangCommand(LPCSTR pszCommand)
+    {
+        return RemoveBangCommandA(pszCommand);
+    }
+
+    LSAPI BOOL ParseBangCommand(HWND hCaller, LPCSTR pszCommand, LPCSTR pszArgs)
+    {
+        return ParseBangCommandA(hCaller, pszCommand, pszArgs);
+    }
+
+    LSAPI HBITMAP LoadLSImage(LPCSTR pszFile, LPCSTR pszImage)
+    {
+        return LoadLSImageA(pszFile, pszImage);
+    }
+
+    LSAPI HICON LoadLSIcon(LPCSTR pszImage, LPCSTR pszFile)
+    {
+        return LoadLSIconA(pszImage, pszFile);
+    }
+
+    LSAPI int CommandTokenize(LPCSTR szString, LPSTR * lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
+    {
+        return CommandTokenizeA(szString, lpszBuffers, dwNumBuffers, szExtraParameters);
+    }
+
+    LSAPI void CommandParse(LPCSTR pszCommand, LPSTR pszOutCommand, LPSTR pszOutArgs, size_t cchOutCommand, size_t cchOutArgs)
+    {
+        return CommandParseA(pszCommand, pszOutCommand, pszOutArgs, cchOutCommand, cchOutArgs);
+    }
+
+    LSAPI HINSTANCE LSExecute(HWND Owner, LPCSTR szCommand, int nShowCmd)
+    {
+        return LSExecuteA(Owner, szCommand, nShowCmd);
+    }
+
+    LSAPI HINSTANCE LSExecuteEx(HWND Owner, LPCSTR szOperation, LPCSTR szCommand, LPCSTR szArgs, LPCSTR szDirectory, int nShowCmd)
+    {
+        return LSExecuteExA(Owner, szOperation, szCommand, szArgs, szDirectory, nShowCmd);
+    }
+
+    LSAPI BOOL WINAPI LSGetLitestepPath(LPSTR pszPath, size_t cchPath)
+    {
+        return LSGetLitestepPathA(pszPath, cchPath);
+    }
+
+    LSAPI BOOL WINAPI LSGetImagePath(LPSTR pszPath, size_t cchPath)
+    {
+        return LSGetImagePathA(pszPath, cchPath);
+    }
+
+    LSAPI void VarExpansion(LPSTR pszExpandedString, LPCSTR pszTemplate)
+    {
+        return VarExpansionA(pszExpandedString, pszTemplate);
+    }
+
+    LSAPI void VarExpansionEx(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpandedString)
+    {
+        return VarExpansionExA(pszExpandedString, pszTemplate, cchExpandedString);
+    }
+
+    LSAPI BOOL GetToken(LPCSTR pszString, LPSTR pszToken, LPCSTR * pszNextToken, BOOL useBrackets)
+    {
+        return GetTokenA(pszString, pszToken, pszNextToken, useBrackets);
+    }
+
+    LSAPI BOOL match(LPCSTR pattern, LPCSTR text)
+    {
+        return matchA(pattern, text);
+    }
+
+    LSAPI int matche(LPCSTR pattern, LPCSTR text)
+    {
+        return matcheA(pattern, text);
+    }
+
+    LSAPI BOOL is_valid_pattern(LPCSTR p, LPINT error_type)
+    {
+        return is_valid_patternA(p, error_type);
+    }
+
+    LSAPI void GetResStr(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText)
+    {
+        return GetResStrA(hInstance, uIDText, pszText, cchText, pszDefText);
+    }
+
+    LSAPI void GetResStrEx(HINSTANCE hInstance, UINT uIDText, LPSTR pszText, size_t cchText, LPCSTR pszDefText, ...)
+    {
+        char szFormat[MAX_LINE_LENGTH];
+        va_list vargs;
+    
+        if (pszText != NULL && cchText > 0)
+        {
+            GetResStrA(hInstance, uIDText, szFormat, MAX_LINE_LENGTH, pszDefText);
+        
+            va_start(vargs, pszDefText);
+            StringCchVPrintfA(pszText, cchText, szFormat, vargs);
+            va_end(vargs);
+        }
+    }
+
+    LSAPI HRESULT EnumLSData(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
+    {
+        return EnumLSDataA(uInfo, pfnCallback, lParam);
+    }
 }

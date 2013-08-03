@@ -29,21 +29,21 @@
 class ThreadedBangCommand : public CountedBase
 {
 public:
-    ThreadedBangCommand(HWND hCaller, LPCSTR pszName, LPCSTR pszParams)
+    ThreadedBangCommand(HWND hCaller, LPCWSTR pwzName, LPCWSTR pwzParams)
     :m_hCaller(hCaller)
     {
-        ASSERT(NULL != pszName);
+        ASSERT(NULL != pwzName);
         
         // pszName is guaranteed to be non-NULL
-        StringCchCopy(m_szName, MAX_BANGCOMMAND, pszName);
+        StringCchCopyW(m_wzName, MAX_BANGCOMMAND, pwzName);
         
-        if (pszParams)
+        if (pwzParams)
         {
-            StringCchCopy(m_szParams, MAX_BANGARGS, pszParams);
+            StringCchCopyW(m_wzParams, MAX_BANGARGS, pwzParams);
         }
         else
         {
-            m_szParams[0] = '\0';
+            m_wzParams[0] = L'\0';
         }
     }
     
@@ -52,12 +52,12 @@ public:
         // Cannot use ParseBangCommand here because that would expand variables
         // again - and some themes rely on the fact that they are expanded only
         // once. Besides, it would create inconsistent behavior.
-        InternalExecuteBangCommand(m_hCaller, m_szName, m_szParams);
+        InternalExecuteBangCommand(m_hCaller, m_wzName, m_wzParams);
     }
     
 private:
-    char m_szName[MAX_BANGCOMMAND];
-    char m_szParams[MAX_BANGARGS];
+    wchar_t m_wzName[MAX_BANGCOMMAND];
+    wchar_t m_wzParams[MAX_BANGARGS];
     HWND m_hCaller;
 };
 

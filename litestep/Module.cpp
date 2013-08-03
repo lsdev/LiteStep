@@ -23,31 +23,32 @@
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
 #include "../utility/core.hpp"
+#include "../utility/stringutility.h"
 
 #include <process.h>
 
 
-Module::Module(const std::string& sLocation, DWORD dwFlags)
+Module::Module(const std::wstring& sLocation, DWORD dwFlags)
 {
-    m_hInstance = NULL;
-    m_hThread = NULL;
-    m_pInitEx = NULL;
-    m_hInitEvent = NULL;
-    m_hInitCopyEvent = NULL;
-    m_pQuit = NULL;
+    m_hInstance =  nullptr;
+    m_hThread = nullptr;
+    m_pInit = nullptr;
+    m_hInitEvent = nullptr;
+    m_hInitCopyEvent = nullptr;
+    m_pQuit = nullptr;
     m_dwFlags = dwFlags;
     m_dwLoadTime = 0;
-    m_tzLocation = sLocation;
+    m_wzLocation = sLocation;
 }
 
 
-static WORD GetModuleArchitecture(LPCTSTR tzModuleName)
+static WORD GetModuleArchitecture(LPCWSTR wzModuleName)
 {
     WORD wRet = 0;
-    HANDLE hFile = CreateFile(tzModuleName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    HANDLE hFile = CreateFileW(wzModuleName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        HANDLE hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+        HANDLE hFileMapping = CreateFileMappingW(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
         if (hFileMapping != nullptr)
         {
             LPVOID lpFileBase = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
@@ -80,15 +81,31 @@ bool Module::_LoadDll()
         // First, make Windows display all errors
         UINT uOldMode = SetErrorMode(0);
 
-        if ((m_hInstance = LoadLibrary(m_tzLocation.c_str())) != nullptr)
+        if ((m_hInstance = LoadLibraryW(m_wzLocation.c_str())) != nullptr)
         {
-            m_pInitEx = (initModuleExProc)GetProcAddress(
-                m_hInstance, "initModuleEx");
-            
-            if (!m_pInitEx) // Might be a BC module, check for underscore
+            m_pInit = (initModuleProc)GetProcAddress(
+                m_hInstance, "initModuleW");
+
+            if (m_pInit != nullptr) // Might be a legacy module, check for initModuleEx
             {
-                m_pInitEx = (initModuleExProc)GetProcAddress(
-                    m_hInstance, "_initModuleEx");
+                initModuleProcA pInit = (initModuleProcA)GetProcAddress(
+                    m_hInstance, "initModuleEx");
+
+                if (!pInit) // Might be a BC module, check for underscore
+                {
+                    pInit = (initModuleProcA)GetProcAddress(
+                        m_hInstance, "_initModuleEx");
+                }
+
+                if (pInit)
+                {
+                    m_pInit = [pInit] (HWND hWnd, HINSTANCE hInst, LPCWSTR pwzPath) -> int {
+                        char szPath[MAX_PATH];
+                        WideCharToMultiByte(CP_ACP, 0, pwzPath, -1,
+                            szPath, sizeof(szPath), "", nullptr);
+                        return pInit(hWnd, hInst, szPath);
+                    };
+                }
             }
             
             m_pQuit = (quitModuleProc)GetProcAddress(
@@ -100,20 +117,20 @@ bool Module::_LoadDll()
                     m_hInstance, "_quitModule");
             }
             
-            if (!m_pInitEx)
+            if (!m_pInit)
             {
-                RESOURCE_STR(NULL, IDS_INITMODULEEXNOTFOUND_ERROR,
-                    "Error: Could not find initModuleEx().\n"
-                    "\n"
-                    "Please confirm that the dll is a LiteStep module,\n"
-                    "and check with the author for updates.");
+                RESOURCE_STR(nullptr, IDS_INITMODULEEXNOTFOUND_ERROR,
+                    L"Error: Could not find initModule().\n"
+                    L"\n"
+                    L"Please confirm that the dll is a LiteStep module,\n"
+                    L"and check with the author for updates.");
             }
             else if (!m_pQuit)
             {
-                RESOURCE_STR(NULL, IDS_QUITMODULENOTFOUND_ERROR,
-                    "Error: Could not find quitModule().\n"
-                    "\n"
-                    "Please confirm that the dll is a LiteStep module.");
+                RESOURCE_STR(nullptr, IDS_QUITMODULENOTFOUND_ERROR,
+                    L"Error: Could not find quitModule().\n"
+                    L"\n"
+                    L"Please confirm that the dll is a LiteStep module.");
             }
             else
             {
@@ -125,43 +142,43 @@ bool Module::_LoadDll()
             HRESULT hrError = HrGetLastError();
 
 #if defined(_WIN64)
-            if (GetModuleArchitecture(m_tzLocation.c_str()) == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+            if (GetModuleArchitecture(m_wzLocation.c_str()) == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
             {
-                RESOURCE_STR(NULL, IDS_MODULEWRONGARCH64_ERROR,
-                    _T("Error: Could not load module.\n"
-                    "\n"
-                    "The module seems to compiled for 32-bit LiteStep. This is a 64-bit version of LiteStep, which can only load 64-bit modules."));
+                RESOURCE_STR(nullptr, IDS_MODULEWRONGARCH64_ERROR,
+                    L"Error: Could not load module.\n"
+                    L"\n"
+                    L"The module seems to compiled for 32-bit LiteStep. This is a 64-bit version of LiteStep, which can only load 64-bit modules.");
             }
 #else
-            if (GetModuleArchitecture(m_tzLocation.c_str()) == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+            if (GetModuleArchitecture(m_wzLocation.c_str()) == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
             {
-                RESOURCE_STR(NULL, IDS_MODULEWRONGARCH32_ERROR,
-                    _T("Error: Could not load module.\n"
-                    "\n"
-                    "The module seems to compiled for 64-bit LiteStep. This is a 32-bit version of LiteStep, which can only load 32-bit modules."));
+                RESOURCE_STR(nullptr, IDS_MODULEWRONGARCH32_ERROR,
+                    L"Error: Could not load module.\n"
+                    L"\n"
+                    L"The module seems to compiled for 64-bit LiteStep. This is a 32-bit version of LiteStep, which can only load 32-bit modules.");
             }
 #endif
-            else if (PathFileExists(m_tzLocation.c_str()))
+            else if (PathFileExistsW(m_wzLocation.c_str()))
             {
-                RESOURCE_STR(NULL, IDS_MODULEDEPENDENCY_ERROR,
-                    _T("Error: Could not load module.\n"
-                    "\n"
-                    "This is likely a case of a missing C Run-Time Library"
-                    "or other dependency."
-                    "\n"
-                    "Error Information:"
-                    "\n"));
+                RESOURCE_STR(nullptr, IDS_MODULEDEPENDENCY_ERROR,
+                    L"Error: Could not load module.\n"
+                    L"\n"
+                    L"This is likely a case of a missing C Run-Time Library"
+                    L"or other dependency."
+                    L"\n"
+                    L"Error Information:"
+                    L"\n");
 
                 size_t nLen = 0;
-                StringCchLength(resourceTextBuffer, _countof(resourceTextBuffer), &nLen);
+                StringCchLengthW(resourceTextBuffer, _countof(resourceTextBuffer), &nLen);
                 DescriptionFromHR(hrError, resourceTextBuffer + nLen, _countof(resourceTextBuffer) - nLen);
             }
             else
             {
-                RESOURCE_STR(NULL, IDS_MODULENOTFOUND_ERROR,
-                    _T("Error: Could not locate module.\n"
-                    "\n"
-                    "Please check your configuration."));
+                RESOURCE_STR(nullptr, IDS_MODULENOTFOUND_ERROR,
+                    L"Error: Could not locate module.\n"
+                    L"\n"
+                    L"Please check your configuration.");
             }
         }
 
@@ -170,14 +187,14 @@ bool Module::_LoadDll()
         
         if (!bReturn)
         {
-            LPCTSTR pszFileName = PathFindFileName(m_tzLocation.c_str());
+            LPCWSTR pwzFileName = PathFindFileNameW(m_wzLocation.c_str());
             
-            RESOURCE_MSGBOX_F(pszFileName, MB_ICONERROR);
+            RESOURCE_MSGBOX_F(pwzFileName, MB_ICONERROR);
             
             if (m_hInstance)
             {
                 FreeLibrary(m_hInstance);
-                m_hInstance = NULL;
+                m_hInstance = nullptr;
             }
         }
     }
@@ -223,7 +240,7 @@ Module::~Module()
 }
 
 
-bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
+bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
 {
     ASSERT(NULL == m_hInstance);
     
@@ -239,21 +256,21 @@ bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
     // grdtransparent work (it hooks LoadLibrary)
     if (_LoadDll())
     {
-        ASSERT(NULL != m_pInitEx);
-        ASSERT(NULL != m_pQuit);
+        ASSERT(nullptr != m_pInit);
+        ASSERT(nullptr != m_pQuit);
         
         m_hMainWindow = hMainWindow;
-        m_tzAppPath = sAppPath;
+        m_wzAppPath = sAppPath;
         
         if (m_dwFlags & LS_MODULE_THREADED)
         {
             SECURITY_ATTRIBUTES sa;
             
             sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-            sa.lpSecurityDescriptor = NULL;
+            sa.lpSecurityDescriptor = nullptr;
             sa.bInheritHandle = FALSE;
             
-            m_hInitCopyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+            m_hInitCopyEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
             m_hInitEvent = m_hInitCopyEvent;
             // using _beginthreadex instead of CreateThread because modules
             // might use CRT functions
@@ -284,8 +301,8 @@ bool Module::Init(HWND hMainWindow, const std::string& sAppPath)
 
 int Module::CallInit()
 {
-    ASSERT(m_pInitEx != NULL);
-    return m_pInitEx(m_hMainWindow, m_hInstance, m_tzAppPath.c_str());
+    ASSERT(m_pInit != nullptr);
+    return m_pInit(m_hMainWindow, m_hInstance, m_wzAppPath.c_str());
 }
 
 
@@ -317,8 +334,8 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
     Module* dllMod = (Module*)dllModPtr;
     
 #if defined(MSVC_DEBUG)
-    LPCTSTR pszFileName = PathFindFileName(dllMod->m_tzLocation.c_str());
-    DbgSetCurrentThreadName(pszFileName);
+    LPCTSTR pszFileName = PathFindFileName(dllMod->m_wzLocation.c_str());
+    DbgSetCurrentThreadName(WCSTOMBS(pszFileName));
 #endif
     
     dllMod->CallInit();
