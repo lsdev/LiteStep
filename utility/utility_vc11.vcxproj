@@ -192,6 +192,7 @@
   <ItemGroup>
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="shellhlp.cpp" />
+    <ClCompile Include="stringutility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base.h" />
