@@ -1,6 +1,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                              LiteStep 0.25.0 Alpha
-                         Experimental Build 2013-08-??
+                         Experimental Build 2013-08-03
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 This build requires the Visual C++ 2012 Redistributable Package
@@ -42,14 +42,18 @@ This build is the current state of that code.
   8) Fixed lack of screen lock/unlock sound on XP and up
   9) Decided on official "LiteStep" spelling
  10) Support for ITaskbarList* interfaces
+ 11) Support for unicode modules
 
 
 -- CHANGES BY DATE ------------------------------------------------------------
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
-  - [2013-08-??] -
+  - [2013-08-03] -
     - Fixed crash with recursive includes.
+    - Fixed LiteStep not loading on Windows XP.
+    - Support for unicode modules.
+    - Added GetRCFloat and GetRCDouble.
   
   - [2013-08-01] -
     - Modified the .RC prefix syntax, added special handling of keys starting
@@ -196,6 +200,8 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - IncludeFolder directive, to include every .RC file in a folder.
     - Added Added "About LiteStep" and "Start Explorer as shell" to the recovery
       menu.
+    - Support for unicode modules.
+    - Added GetRCFloat and GetRCDouble.
 
 
   - VISTA & WIN7 & 64-BIT SUPPORT -
@@ -240,6 +246,7 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
       is a fullscreen window on that monitor.
     - !about's system information page will now show > 4GB of memory correctly
     - Added support for all ITaskbarList* interfaces. 
+    - Fixed crash with recursive includes.
 
 
   - REMOVED/CHANGED -
