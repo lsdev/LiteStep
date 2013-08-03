@@ -144,6 +144,27 @@ public:
      * @return  setting value
      */
     int GetRCInt(LPCWSTR pwzKeyName, int nDefault);
+
+    /**
+     * Retrieves a floating point value from the global settings. Returns
+     * <code>fDefault</code> if the setting does not exist.
+     *
+     * @param   pwzKeyName  setting name
+     * @param   fDefault    default value
+     * @return  setting value
+     */
+    float GetRCFloat (LPCWSTR pwzKeyName, float fDefault);
+
+    /**
+     * Retrieves a double-precision floating point value from the
+     * global settings. Return <code>dDefault</code> if the setting
+     * does not exist.
+     *
+     * @param   pwzKeyName  setting name
+     * @param   dDefault    default value
+     * @return  setting value
+     */
+    double GetRCDouble(LPCWSTR pwzKeyName, double dDefault);
     
     /**
      * Retrieves a raw string value from the global settings. If setting does

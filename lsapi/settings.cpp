@@ -197,6 +197,42 @@ int GetRCIntA(LPCSTR pszKeyName, int nDefault)
 }
 
 
+float GetRCFloatW(LPCWSTR pwzKeyName, float fDefault)
+{
+    if (g_LSAPIManager.IsInitialized())
+    {
+        return g_LSAPIManager.GetSettingsManager()->GetRCFloat(
+            pwzKeyName, fDefault);
+    }
+    
+    return fDefault;
+}
+
+
+float GetRCFloatA(LPCSTR pszKeyName, float fDefault)
+{
+    return GetRCFloatW(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), fDefault);
+}
+
+
+double GetRCDoubleW(LPCWSTR pwzKeyName, double dDefault)
+{
+    if (g_LSAPIManager.IsInitialized())
+    {
+        return g_LSAPIManager.GetSettingsManager()->GetRCDouble(
+            pwzKeyName, dDefault);
+    }
+    
+    return dDefault;
+}
+
+
+double GetRCDoubleA(LPCSTR pszKeyName, double dDefault)
+{
+    return GetRCDoubleW(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), dDefault);
+}
+
+
 BOOL GetRCBoolW(LPCWSTR pwzKeyName, BOOL ifFound)
 {
     if (g_LSAPIManager.IsInitialized())
