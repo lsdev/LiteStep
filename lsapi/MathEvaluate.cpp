@@ -42,7 +42,7 @@ bool MathEvaluateBool(const SettingsMap& context, const wstring& expression,
             GetModuleHandle(NULL), IDS_MATHEXCEPTION,
             resourceTextBuffer, MAX_LINE_LENGTH,
             L"Error in Expression:\n  %ls\n\nDescription:\n  %ls",
-            expression.c_str(), e.what());
+            expression.c_str(), e.GetException());
         
         RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
         
@@ -75,7 +75,7 @@ bool MathEvaluateString(const SettingsMap& context, const wstring& expression,
             GetModuleHandle(NULL), IDS_MATHEXCEPTION,
             resourceTextBuffer, MAX_LINE_LENGTH,
             L"Error in Expression:\n  %s\n\nDescription:\n  %s",
-            expression.c_str(), e.what());
+            expression.c_str(), e.GetException());
         
         RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
         
