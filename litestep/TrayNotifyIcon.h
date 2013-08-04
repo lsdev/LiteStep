@@ -78,14 +78,14 @@ typedef struct LSNOTIFYICONDATAA
         this->uFlags = nid->uFlags;
         this->uCallbackMessage = nid->uCallbackMessage;
         this->hIcon = nid->hIcon;
-        WideCharToMultiByte(CP_ACP, 0, nid->szTip, _countof(nid->szTip),
+        WideCharToMultiByte(CP_ACP, 0, nid->szTip, -1,
             this->szTip, sizeof(this->szTip), "?", nullptr);
         this->dwState = nid->dwState;
         this->dwStateMask = nid->dwStateMask;
-        WideCharToMultiByte(CP_ACP, 0, nid->szInfo, _countof(nid->szInfo), 
+        WideCharToMultiByte(CP_ACP, 0, nid->szInfo, -1, 
            this->szInfo, sizeof(this->szInfo), "?", nullptr);
         this->uVersion = nid->uVersion;
-        WideCharToMultiByte(CP_ACP, 0, nid->szInfoTitle, _countof(nid->szInfoTitle),
+        WideCharToMultiByte(CP_ACP, 0, nid->szInfoTitle, -1,
             this->szInfoTitle, sizeof(this->szInfoTitle), "?", nullptr);
         this->dwInfoFlags = nid->dwInfoFlags;
         this->guidItem = nid->guidItem;

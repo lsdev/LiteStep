@@ -1065,7 +1065,7 @@ void VarExpansionExA(LPSTR pszExpandedString, LPCSTR pszTemplate, size_t cchExpa
             std::unique_ptr<wchar_t> temp(new wchar_t[cchExpandedString]);
             g_LSAPIManager.GetSettingsManager()->VarExpansionEx(
                 temp.get(), MBSTOWCS(pszTemplate), cchExpandedString);
-            WideCharToMultiByte(CP_ACP, 0, temp.get(), (int)cchExpandedString,
+            WideCharToMultiByte(CP_ACP, 0, temp.get(), -1,
                 pszExpandedString, (int)cchExpandedString, "?", nullptr);
         }
         else
