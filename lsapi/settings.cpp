@@ -179,6 +179,24 @@ BOOL LCReadNextLineA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 }
 
 
+__int64 GetRCInt64W(LPCWSTR pwzKeyName, __int64 nDefault)
+{
+    if (g_LSAPIManager.IsInitialized())
+    {
+        return g_LSAPIManager.GetSettingsManager()->GetRCInt64(
+            pwzKeyName, nDefault);
+    }
+    
+    return nDefault;
+}
+
+
+__int64 GetRCInt64A(LPCSTR pszKeyName, __int64 nDefault)
+{
+    return GetRCInt64W(std::unique_ptr<wchar_t>(WCSFromMBS(pszKeyName)).get(), nDefault);
+}
+
+
 int GetRCIntW(LPCWSTR pwzKeyName, int nDefault)
 {
     if (g_LSAPIManager.IsInitialized())

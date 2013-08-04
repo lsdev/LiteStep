@@ -228,6 +228,31 @@ BOOL SettingsManager::GetRCBoolDef(LPCWSTR pwzKeyName, BOOL bDefault)
 }
 
 
+__int64 SettingsManager::GetRCInt64(LPCWSTR pszKeyName, __int64 nDefault)
+{
+    SettingsMap::iterator it;
+    __int64 nValue = nDefault;
+    
+    if (pszKeyName && _FindLine(pszKeyName, it))
+    {
+        wchar_t wzToken[MAX_LINE_LENGTH] = { 0 };
+        wchar_t wzExpanded[MAX_LINE_LENGTH] = { 0 };
+        
+        StringSet recursiveVarSet;
+        recursiveVarSet.insert(pszKeyName);
+        VarExpansionEx(wzExpanded, it->second.c_str(),
+            MAX_LINE_LENGTH, recursiveVarSet);
+        
+        if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
+        {
+            nValue = _wcstoi64(wzToken, nullptr, 0);
+        }
+    }
+    
+    return nValue;
+}
+
+
 int SettingsManager::GetRCInt(LPCWSTR pszKeyName, int nDefault)
 {
     SettingsMap::iterator it;
@@ -270,7 +295,7 @@ float SettingsManager::GetRCFloat(LPCWSTR pszKeyName, float fDefault)
         
         if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
         {
-            fValue = wcstof(wzToken, nullptr);
+            fValue = (float)wcstod(wzToken, nullptr);
         }
     }
     

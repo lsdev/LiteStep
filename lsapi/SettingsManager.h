@@ -134,6 +134,16 @@ public:
      * @return  setting value
      */
     COLORREF GetRCColor(LPCWSTR pszKeyName, COLORREF crDefault);
+
+    /**
+     * Retrieves an integer value from the global settings. Returns
+     * <code>nDefault</code> if the setting does not exist.
+     *
+     * @param   pwzKeyName  setting name
+     * @param   nDefault    default value
+     * @return  setting value
+     */
+    __int64 GetRCInt64(LPCWSTR pwzKeyName, __int64 nDefault);
     
     /**
      * Retrieves an integer value from the global settings. Returns

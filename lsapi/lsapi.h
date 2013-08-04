@@ -62,6 +62,8 @@ extern "C"
     
     LSAPI int GetRCIntA(LPCSTR lpKeyName, int nDefault);
     LSAPI int GetRCIntW(LPCWSTR lpKeyName, int nDefault);
+    LSAPI __int64 GetRCInt64A(LPCSTR lpKeyName, __int64 nDefault);
+    LSAPI __int64 GetRCInt64W(LPCWSTR lpKeyName, __int64 nDefault);
     LSAPI float GetRCFloatA(LPCSTR lpKeyName, float fDefault);
     LSAPI float GetRCFloatW(LPCWSTR lpKeyName, float fDefault);
     LSAPI double GetRCDoubleA(LPCSTR lpKeyName, double dDefault);
