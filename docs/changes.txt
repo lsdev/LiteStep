@@ -1,6 +1,6 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                              LiteStep 0.25.0 Alpha
-                         Experimental Build 2013-08-03
+                         Experimental Build 2013-08-04
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 This build requires the Visual C++ 2012 Redistributable Package
@@ -49,6 +49,11 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
+  - [2013-08-04] -
+    - Fixed the A versions of GetRCString, Line, and so on writing to the entire
+      buffer, causing crashes in modules which do not specify their buffer sizes
+      correctly.
+    
   - [2013-08-03] -
     - Fixed crash with recursive includes.
     - Fixed LiteStep not loading on Windows XP.

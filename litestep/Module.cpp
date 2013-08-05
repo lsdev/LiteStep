@@ -67,6 +67,20 @@ static WORD GetModuleArchitecture(LPCWSTR wzModuleName)
 }
 
 
+template<typename T>
+void AssignToFunction(std::function<T> &func, T* value)
+{
+    if (value == nullptr)
+    {
+        func = nullptr;
+    }
+    else
+    {
+        func = value;
+    }
+}
+
+
 bool Module::_LoadDll()
 {
     bool bReturn = false;
@@ -83,10 +97,10 @@ bool Module::_LoadDll()
 
         if ((m_hInstance = LoadLibraryW(m_wzLocation.c_str())) != nullptr)
         {
-            m_pInit = (initModuleProc)GetProcAddress(
-                m_hInstance, "initModuleW");
+            AssignToFunction(m_pInit, (initModuleProc) GetProcAddress(
+                m_hInstance, "initModuleW"));
 
-            if (m_pInit != nullptr) // Might be a legacy module, check for initModuleEx
+            if (!m_pInit) // Might be a legacy module, check for initModuleEx
             {
                 initModuleProcA pInit = (initModuleProcA)GetProcAddress(
                     m_hInstance, "initModuleEx");
@@ -117,7 +131,7 @@ bool Module::_LoadDll()
                     m_hInstance, "_quitModule");
             }
             
-            if (!m_pInit)
+            if (m_pInit == nullptr)
             {
                 RESOURCE_STR(nullptr, IDS_INITMODULEEXNOTFOUND_ERROR,
                     L"Error: Could not find initModule().\n"
@@ -125,7 +139,7 @@ bool Module::_LoadDll()
                     L"Please confirm that the dll is a LiteStep module,\n"
                     L"and check with the author for updates.");
             }
-            else if (!m_pQuit)
+            else if (m_pQuit == nullptr)
             {
                 RESOURCE_STR(nullptr, IDS_QUITMODULENOTFOUND_ERROR,
                     L"Error: Could not find quitModule().\n"
