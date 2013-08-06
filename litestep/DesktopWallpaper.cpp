@@ -426,11 +426,20 @@ HRESULT DesktopWallpaper::PrivateB(LPVOID)
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// Called by the Color and Appearance dialog when you select the automatic
+// DWM color
 //
-HRESULT DesktopWallpaper::PrivateC(LPVOID)
+HRESULT DesktopWallpaper::GetWallpaperColor(PULONG puColor)
 {
-    return E_NOTIMPL;
+    // TODO::We need to actually compute the DWM colorization here...
+
+    DWORD dwColor;
+    DWORD dwType = REG_DWORD;
+    DWORD dwSize = sizeof(dwColor);
+    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"ImageColor", &dwType, &dwColor, &dwSize);
+    *puColor = dwColor;
+
+    return S_OK;
 }
 
 
@@ -438,8 +447,9 @@ HRESULT DesktopWallpaper::PrivateC(LPVOID)
 // IDesktopWallpaperPrivate::??
 // ???
 // Something to do with monitors.
+// First parameter is one of the IDs returned by GetMonitorDevicePathAt
 //
-HRESULT DesktopWallpaper::PrivateD(LPVOID)
+HRESULT DesktopWallpaper::PrivateD(LPCWSTR /* pwzMonitorID */, LPVOID)
 {
     return E_NOTIMPL;
 }

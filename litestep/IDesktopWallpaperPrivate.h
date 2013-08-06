@@ -34,8 +34,8 @@ class IDesktopWallpaperPrivate : public IDesktopWallpaper
 public:
     STDMETHOD(PrivateA) (LPVOID) = 0;
     STDMETHOD(PrivateB) (LPVOID) = 0;
-    STDMETHOD(PrivateC) (LPVOID) = 0;
-    STDMETHOD(PrivateD) (LPVOID) = 0;
+    STDMETHOD(GetWallpaperColor) (PULONG) = 0;
+    STDMETHOD(PrivateD) (LPCWSTR, LPVOID) = 0;
     STDMETHOD(PrivateE) (LPVOID) = 0;
     STDMETHOD(PrivateF) (LPVOID) = 0;
     STDMETHOD(PrivateG) (LPVOID) = 0;

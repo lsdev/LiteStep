@@ -64,8 +64,8 @@ public:
 public:
     STDMETHOD(PrivateA) (LPVOID);
     STDMETHOD(PrivateB) (LPVOID);
-    STDMETHOD(PrivateC) (LPVOID);
-    STDMETHOD(PrivateD) (LPVOID);
+    STDMETHOD(GetWallpaperColor) (PULONG);
+    STDMETHOD(PrivateD) (LPCWSTR, LPVOID);
     STDMETHOD(PrivateE) (LPVOID);
     STDMETHOD(PrivateF) (LPVOID);
     STDMETHOD(PrivateG) (LPVOID);
