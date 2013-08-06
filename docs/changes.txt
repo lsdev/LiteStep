@@ -49,6 +49,12 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
+  - [2013-08-??] -
+    - Added GetRCInt64.
+    - Fixed Right Click -> Set as desktop background on Windows 8.
+    - Fixed the color and appearance dialog on Windows 8.
+    - Fixed the desktop background dialog on Windows 8.
+
   - [2013-08-04] -
     - Fixed the A versions of GetRCString, Line, and so on writing to the entire
       buffer, causing crashes in modules which do not specify their buffer sizes
