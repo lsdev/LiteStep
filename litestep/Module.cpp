@@ -67,6 +67,9 @@ static WORD GetModuleArchitecture(LPCWSTR wzModuleName)
 }
 
 
+//
+// This is a workaround because Microsofts std::function implementation is bugged
+//
 template<typename T>
 void AssignToFunction(std::function<T> &func, T* value)
 {

@@ -226,10 +226,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="COMFactory.cpp" />
+    <ClCompile Include="COMService.cpp" />
     <ClCompile Include="DataStore.cpp" />
     <ClCompile Include="DDEService.cpp" />
     <ClCompile Include="DDEStub.cpp" />
     <ClCompile Include="DDEWorker.cpp" />
+    <ClCompile Include="DesktopWallpaper.cpp" />
     <ClCompile Include="ExplorerService.cpp" />
     <ClCompile Include="FullscreenMonitor.cpp" />
     <ClCompile Include="litestep.cpp" />
@@ -246,12 +249,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buildoptions.h" />
+    <ClInclude Include="COMService.h" />
     <ClInclude Include="DataStore.h" />
     <ClInclude Include="DDEService.h" />
     <ClInclude Include="DDEStub.h" />
     <ClInclude Include="DDEWorker.h" />
+    <ClInclude Include="DesktopWallpaper.h" />
     <ClInclude Include="ExplorerService.h" />
     <ClInclude Include="FullscreenMonitor.h" />
+    <ClInclude Include="IDesktopWallpaper.h" />
+    <ClInclude Include="IDesktopWallpaperPrivate.h" />
     <ClInclude Include="litestep.h" />
     <ClInclude Include="MessageManager.h" />
     <ClInclude Include="Module.h" />
@@ -260,6 +267,7 @@
     <ClInclude Include="ShellDesktopTray.h" />
     <ClInclude Include="StartupRunner.h" />
     <ClInclude Include="TaskbarListHandler.h" />
+    <ClInclude Include="COMFactory.h" />
     <ClInclude Include="TrayAppBar.h" />
     <ClInclude Include="TrayNotifyIcon.h" />
     <ClInclude Include="TrayService.h" />

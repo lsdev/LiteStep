@@ -36,17 +36,17 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -226,10 +226,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="COMFactory.cpp" />
+    <ClCompile Include="COMService.cpp" />
     <ClCompile Include="DataStore.cpp" />
     <ClCompile Include="DDEService.cpp" />
     <ClCompile Include="DDEStub.cpp" />
     <ClCompile Include="DDEWorker.cpp" />
+    <ClCompile Include="DesktopWallpaper.cpp" />
     <ClCompile Include="ExplorerService.cpp" />
     <ClCompile Include="FullscreenMonitor.cpp" />
     <ClCompile Include="litestep.cpp" />
@@ -246,12 +249,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buildoptions.h" />
+    <ClInclude Include="COMFactory.h" />
+    <ClInclude Include="COMService.h" />
     <ClInclude Include="DataStore.h" />
     <ClInclude Include="DDEService.h" />
     <ClInclude Include="DDEStub.h" />
     <ClInclude Include="DDEWorker.h" />
+    <ClInclude Include="DesktopWallpaper.h" />
     <ClInclude Include="ExplorerService.h" />
     <ClInclude Include="FullscreenMonitor.h" />
+    <ClInclude Include="IDesktopWallpaperPrivate.h" />
     <ClInclude Include="litestep.h" />
     <ClInclude Include="MessageManager.h" />
     <ClInclude Include="Module.h" />

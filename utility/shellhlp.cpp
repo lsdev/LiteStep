@@ -347,6 +347,36 @@ HRESULT CLSIDToString(REFCLSID rclsid, LPTSTR ptzBuffer, size_t cchBuffer)
 
 
 //
+// Attempts to parse a string into a GUID.
+// Mostly for debugging purposes.
+//
+BOOL LSGUIDFromString(LPCTSTR guidString, LPGUID guid)
+{
+    typedef BOOL (WINAPI* PROCTYPE)(LPCTSTR, LPGUID);
+    static PROCTYPE proc = nullptr;
+
+    if (proc == nullptr)
+    {
+        proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")),
+#if defined(_UNICODE)
+            (LPCSTR)704
+#else
+            (LPCSTR)703
+#endif
+        );
+    }
+
+    if (proc)
+    {
+        return proc(guidString, guid);
+    }
+
+    return FALSE;
+}
+
+
+
+//
 // LSGetModuleFileName
 //
 // Wrapper around GetModuleFileName that takes care of truncated buffers. If

@@ -311,7 +311,7 @@ BOOL GetRCStringA(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszDefStr, int maxLe
         std::unique_ptr<wchar_t> key (WCSFromMBS(pszKeyName));
         std::unique_ptr<wchar_t> def (WCSFromMBS(pszDefStr));
 
-        *tempValue = L'\0';
+        *tempValue = '\0';
 
         BOOL bRet = g_LSAPIManager.GetSettingsManager()->GetRCString(
             key.get(), tempValue.get(), def.get(), maxLen);
@@ -374,7 +374,7 @@ BOOL GetRCLineA(LPCSTR pszKeyName, LPSTR pszBuffer, UINT nBufLen, LPCSTR pszDefa
         std::unique_ptr<wchar_t> key (WCSFromMBS(pszKeyName));
         std::unique_ptr<wchar_t> def (WCSFromMBS(pszDefault));
 
-        *tempValue = L'\0';
+        *tempValue = '\0';
 
         BOOL bRet = g_LSAPIManager.GetSettingsManager()->GetRCLine(
             key.get(), tempValue.get(), nBufLen, def.get());
@@ -457,7 +457,7 @@ BOOL LSGetVariableA(LPCSTR pszKeyName, LPSTR pszValue)
     
     if (pszValue)
     {
-        pszValue[0] = L'\0';
+        pszValue[0] = '\0';
     }
     
     if (g_LSAPIManager.IsInitialized())

@@ -187,6 +187,11 @@ void FullscreenMonitor::HideModules(HMONITOR hMonitor, HWND hWnd)
 //
 void FullscreenMonitor::ThreadProc()
 {
+    
+#if defined(_DEBUG)
+    DbgSetCurrentThreadName("LS FullscreenMonitor Service");
+#endif
+
     //
     struct FSWindow {
         FSWindow(HWND hWnd, HMONITOR hMonitor) {

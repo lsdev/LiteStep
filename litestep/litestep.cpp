@@ -28,6 +28,7 @@
 #include "TrayService.h"
 #include "ExplorerService.h"
 #include "FullscreenMonitor.h"
+#include "COMService.h"
 
 // Managers
 #include "MessageManager.h"
@@ -1269,6 +1270,20 @@ HRESULT CLiteStep::_InitServices(bool bSetAsShell)
 #else
         _SetShellWindow(m_hMainWindow);
 #endif
+    }
+
+    //
+    // COM Service
+    //
+    pService = new (std::nothrow) COMService();
+
+    if (pService)
+    {
+        m_Services.push_back(pService);
+    }
+    else
+    {
+        return E_OUTOFMEMORY;
     }
 
     //

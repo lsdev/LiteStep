@@ -50,6 +50,7 @@ void LSShutdownDialog(HWND hWnd);
 BOOL LSPlaySystemSound(LPCWSTR pwzSoundAlias);
 HANDLE LSCreateThread(LPCSTR pszName, LPTHREAD_START_ROUTINE fnStartAddres,
                       LPVOID lpParameter, LPDWORD pdwThreadId);
+BOOL LSGUIDFromString(LPCTSTR ptzGUIDString, LPGUID pGUID);
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
