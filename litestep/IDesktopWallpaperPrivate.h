@@ -24,18 +24,18 @@
 #define IDESKTOPWALLPAPERPRIVATE_H
 
 //
-// Just a bunch of stubs to prevent LS from crashing.
-// No idea how many functions (or what those function are) there are.
+// The functions listed here, and their functionality are guesses, which were
+// obtained by examining how explorer handles these calls.
 // 
 
-const GUID IID_IDesktopWallpaperPrivate = {0xC182461F, 0xDFAC, 0x4375, { 0xAB, 0x6E, 0x4C, 0xC4, 0x5A, 0xA7, 0xF9, 0xCC } };
+const GUID IID_IDesktopWallpaperPrivate = { 0xC182461F, 0xDFAC, 0x4375, { 0xAB, 0x6E, 0x4C, 0xC4, 0x5A, 0xA7, 0xF9, 0xCC } };
 class IDesktopWallpaperPrivate : public IDesktopWallpaper
 {
 public:
-    STDMETHOD(PrivateA) (LPVOID) = 0;
+    STDMETHOD(SetWallpaper2) (LPCWSTR, LPCWSTR) = 0;
     STDMETHOD(PrivateB) (LPVOID) = 0;
     STDMETHOD(GetWallpaperColor) (PULONG) = 0;
-    STDMETHOD(PrivateD) (LPCWSTR, LPVOID) = 0;
+    STDMETHOD(GetMonitorNumber) (LPCWSTR, LPUINT) = 0;
     STDMETHOD(PrivateE) (LPVOID) = 0;
     STDMETHOD(PrivateF) (LPVOID) = 0;
     STDMETHOD(PrivateG) (LPVOID) = 0;

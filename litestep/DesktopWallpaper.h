@@ -62,21 +62,26 @@ public:
 
     // IDesktopWallpaperPrivate Implementation
 public:
-    STDMETHOD(PrivateA) (LPVOID);
+    STDMETHOD(SetWallpaper2) (LPCWSTR, LPCWSTR);
     STDMETHOD(PrivateB) (LPVOID);
     STDMETHOD(GetWallpaperColor) (PULONG);
-    STDMETHOD(PrivateD) (LPCWSTR, LPVOID);
+    STDMETHOD(GetMonitorNumber) (LPCWSTR, LPUINT);
     STDMETHOD(PrivateE) (LPVOID);
     STDMETHOD(PrivateF) (LPVOID);
     STDMETHOD(PrivateG) (LPVOID);
     STDMETHOD(PrivateH) (LPVOID);
 
 private:
-
+    struct MonitorData
+    {
+        RECT rRect;
+        WCHAR wzDeviceString[MAX_PATH];
+        UINT uNumber;
+    };
 
 private:
     ULONG m_uRefCount;
-    std::vector<LPWSTR> monitors;
+    std::vector<MonitorData> m_vMonitors;
 };
 
 #endif // DESKTOPWALLPAPER_H

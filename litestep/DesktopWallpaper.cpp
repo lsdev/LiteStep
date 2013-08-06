@@ -32,10 +32,25 @@
 DesktopWallpaper::DesktopWallpaper()
 {
     m_uRefCount = 1;
+    EnumDisplayMonitors(NULL, NULL, [] (HMONITOR hMonitor, HDC, LPRECT rect, LPARAM lParam) -> BOOL
+    {
+        DesktopWallpaper* self = (DesktopWallpaper*)lParam;
 
-    monitors.push_back(L"\\\\?Monitor1");
-    monitors.push_back(L"\\\\?Monitor2");
-    monitors.push_back(L"\\\\?Monitor3");
+        MONITORINFOEXW monitorInfoEx;
+        ZeroMemory(&monitorInfoEx, sizeof(MONITORINFOEXW));
+        monitorInfoEx.cbSize = sizeof(MONITORINFOEXW);
+        GetMonitorInfoW(hMonitor, &monitorInfoEx);
+
+        MonitorData data;
+        data.rRect = *rect;
+        data.uNumber = UINT(self->m_vMonitors.size() + 1);
+        StringCchCopyW(data.wzDeviceString, _countof(data.wzDeviceString), monitorInfoEx.szDevice);
+
+        self->m_vMonitors.push_back(data);
+
+        return TRUE;
+
+    }, (LPARAM)this);
 }
 
 
@@ -113,14 +128,27 @@ HRESULT DesktopWallpaper::QueryInterface(REFIID riid, void **ppvObject)
 //
 HRESULT DesktopWallpaper::SetWallpaper(LPCWSTR pwzMonitorID, LPCWSTR pwzWallpaper)
 {
+    if (pwzWallpaper == nullptr)
+    {
+        return E_INVALIDARG;
+    }
+
+    if (!PathFileExistsW(pwzWallpaper))
+    {
+        return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+    }
+
     // TODO::Handle the case where this is not null
     if (pwzMonitorID != nullptr)
     {
+        // Find the monitor and apply the wallpaper to only that monitor
     }
-
-    SHSetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ,
-        pwzWallpaper, (DWORD)wcslen(pwzWallpaper)*sizeof(pwzWallpaper[0]));
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+    else
+    {
+        SHSetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ,
+            pwzWallpaper, (DWORD)wcslen(pwzWallpaper)*sizeof(pwzWallpaper[0]));
+        SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+    }
 
     return S_OK;
 }
@@ -132,15 +160,22 @@ HRESULT DesktopWallpaper::SetWallpaper(LPCWSTR pwzMonitorID, LPCWSTR pwzWallpape
 //
 HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpaper)
 {
+    if (ppwzWallpaper == nullptr)
+    {
+        return E_POINTER;
+    }
+
     // TODO::Handle the case where this is not null
     if (pwzMonitorID != nullptr)
     {
     }
-
-    DWORD dwType = REG_SZ;
-    DWORD dwSize = MAX_PATH*sizeof(WCHAR);
-    *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
-    SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", &dwType, *ppwzWallpaper, &dwSize);
+    else
+    {
+        DWORD dwType = REG_SZ;
+        DWORD dwSize = MAX_PATH*sizeof(WCHAR);
+        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
+        SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", &dwType, *ppwzWallpaper, &dwSize);
+    }
     return S_OK;
 }
 
@@ -151,8 +186,18 @@ HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpap
 //
 HRESULT DesktopWallpaper::GetMonitorDevicePathAt(UINT uMonitorIndex, LPWSTR* ppwzMonitorID)
 {
-    *ppwzMonitorID = (LPWSTR)CoTaskMemAlloc(MAX_PATH * 2);
-    StringCchCopy(*ppwzMonitorID, MAX_PATH, monitors[uMonitorIndex]);
+    if (ppwzMonitorID == nullptr)
+    {
+        return E_POINTER;
+    }
+
+    if (uMonitorIndex >= m_vMonitors.size())
+    {
+        return E_INVALIDARG;
+    }
+
+    SHStrDupW(m_vMonitors[uMonitorIndex].wzDeviceString, ppwzMonitorID);
+
     return S_OK;
 }
 
@@ -163,7 +208,13 @@ HRESULT DesktopWallpaper::GetMonitorDevicePathAt(UINT uMonitorIndex, LPWSTR* ppw
 //
 HRESULT DesktopWallpaper::GetMonitorDevicePathCount(LPUINT puCount)
 {
-    *puCount = GetSystemMetrics(SM_CMONITORS);
+    if (puCount == nullptr)
+    {
+        return E_POINTER;
+    }
+
+    *puCount = UINT(m_vMonitors.size());
+
     return S_OK;
 }
 
@@ -174,18 +225,27 @@ HRESULT DesktopWallpaper::GetMonitorDevicePathCount(LPUINT puCount)
 //
 HRESULT DesktopWallpaper::GetMonitorRECT(LPCWSTR pwzMonitorID, tagRECT* pDisplayRect)
 {
-    for (LPWSTR monitor : monitors)
+    if (pDisplayRect == nullptr)
     {
-        if (_wcsicmp(monitor, pwzMonitorID) == 0)
+        return E_POINTER;
+    }
+
+    if (pwzMonitorID == nullptr)
+    {
+        // This is what explorer returns in this case.
+        return 0x800706F4;
+    }
+
+    for (MonitorData &monitor : m_vMonitors)
+    {
+        if (_wcsicmp(monitor.wzDeviceString, pwzMonitorID) == 0)
         {
-            pDisplayRect->bottom = 1200;
-            pDisplayRect->left = 0;
-            pDisplayRect->right = 1920;
-            pDisplayRect->top = 0;
+            *pDisplayRect = monitor.rRect;
             return S_OK;
         }
     }
-    return S_OK;
+
+    return E_INVALIDARG;
 }
 
 
@@ -211,6 +271,11 @@ HRESULT DesktopWallpaper::SetBackgroundColor(ULONG uColor)
 //
 HRESULT DesktopWallpaper::GetBackgroundColor(PULONG puColor)
 {
+    if (puColor == nullptr)
+    {
+        return E_POINTER;
+    }
+
     // Get the current color from the registry
     WCHAR wzColor[64];
     DWORD dwType = REG_SZ;
@@ -275,6 +340,11 @@ HRESULT DesktopWallpaper::SetPosition(DESKTOP_WALLPAPER_POSITION position)
             pwzTile = L"1";
         }
         break;
+
+    default:
+        {
+        }
+        return E_INVALIDARG;
     }
 
     SHSetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"WallpaperStyle", REG_SZ,
@@ -293,6 +363,11 @@ HRESULT DesktopWallpaper::SetPosition(DESKTOP_WALLPAPER_POSITION position)
 //
 HRESULT DesktopWallpaper::GetPosition(DESKTOP_WALLPAPER_POSITION* pPosition)
 {
+    if (pPosition == nullptr)
+    {
+        return E_POINTER;
+    }
+
     WCHAR wzStyle[64], wzTiling[64];
     DWORD dwType = REG_SZ;
     DWORD dwSize = sizeof(wzStyle);
@@ -338,7 +413,7 @@ HRESULT DesktopWallpaper::GetPosition(DESKTOP_WALLPAPER_POSITION* pPosition)
 //
 HRESULT DesktopWallpaper::SetSlideshow(IShellItemArray* pItems)
 {
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 
@@ -348,7 +423,43 @@ HRESULT DesktopWallpaper::SetSlideshow(IShellItemArray* pItems)
 //
 HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
 {
-    return E_NOTIMPL;
+    if (ppItems == nullptr)
+    {
+        return E_POINTER;
+    }
+
+    DWORD dwType = REG_SZ;
+    DWORD dwSize = MAX_PATH*sizeof(WCHAR);
+    WCHAR wallpaper[MAX_PATH];
+    SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", &dwType, wallpaper, &dwSize);
+
+    HRESULT hr;
+
+    IShellFolder *pRootFolder = nullptr;
+    hr = SHGetDesktopFolder(&pRootFolder);
+
+    LPITEMIDLIST idList = nullptr;
+    if (SUCCEEDED(hr))
+    {
+        hr = pRootFolder->ParseDisplayName(nullptr, nullptr, wallpaper, nullptr, &idList, NULL);
+    }
+        
+    if (SUCCEEDED(hr))
+    {
+        hr = SHCreateShellItemArrayFromIDLists(1, (LPCITEMIDLIST*)&idList, ppItems);
+    }
+    
+    if (idList)
+    {
+        CoTaskMemFree(idList);
+    }
+    if (pRootFolder)
+    {
+        pRootFolder->Release();
+    }
+
+    // S_FALSE means that the slideshow is currently disabled
+    return S_FALSE;
 }
 
 
@@ -368,6 +479,11 @@ HRESULT DesktopWallpaper::SetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS options,
 //
 HRESULT DesktopWallpaper::GetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS *pOptions, LPUINT puSlideshowTick)
 {
+    if (pOptions == nullptr || puSlideshowTick == nullptr)
+    {
+        return E_POINTER;
+    }
+
     *pOptions = DESKTOP_SLIDESHOW_OPTIONS(0);
     return S_OK;
 }
@@ -389,6 +505,11 @@ HRESULT DesktopWallpaper::AdvanceSlideshow(LPCWSTR pwzMonitorID, DESKTOP_SLIDESH
 //
 HRESULT DesktopWallpaper::GetStatus(DESKTOP_SLIDESHOW_STATE* pState)
 {
+    if (pState == nullptr)
+    {
+        return E_POINTER;
+    }
+
     *pState = DESKTOP_SLIDESHOW_STATE::DSS_ENABLED;
     return S_OK;
 }
@@ -398,7 +519,7 @@ HRESULT DesktopWallpaper::GetStatus(DESKTOP_SLIDESHOW_STATE* pState)
 // IDesktopWallpaper::Enable
 // 
 //
-HRESULT DesktopWallpaper::Enable(BOOL bEnable)
+HRESULT DesktopWallpaper::Enable(BOOL /* bEnable */)
 {
     return S_OK;
 }
@@ -406,17 +527,19 @@ HRESULT DesktopWallpaper::Enable(BOOL bEnable)
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// Never seen anything call this.
+// Experiments with explorer, makes this seem like an alias of SetWallpaper
 //
-HRESULT DesktopWallpaper::PrivateA(LPVOID)
+HRESULT DesktopWallpaper::SetWallpaper2(LPCWSTR pwzMonitor, LPCWSTR pwzWallpaper)
 {
-    return E_NOTIMPL;
+    return SetWallpaper(pwzMonitor, pwzWallpaper);
 }
 
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// Likes to give me E_PENDING. Does not care about parameters, not sure it actually
+// takes any.
 //
 HRESULT DesktopWallpaper::PrivateB(LPVOID)
 {
@@ -431,7 +554,11 @@ HRESULT DesktopWallpaper::PrivateB(LPVOID)
 //
 HRESULT DesktopWallpaper::GetWallpaperColor(PULONG puColor)
 {
-    // TODO::We need to actually compute the DWM colorization here...
+    // TODO::We may need to actually compute the DWM colorization here...
+    if (puColor == nullptr)
+    {
+        return E_POINTER;
+    }
 
     DWORD dwColor;
     DWORD dwType = REG_DWORD;
@@ -445,13 +572,31 @@ HRESULT DesktopWallpaper::GetWallpaperColor(PULONG puColor)
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
-// Something to do with monitors.
-// First parameter is one of the IDs returned by GetMonitorDevicePathAt
+// Seems to set the 2nd parameter to the monitor "#"
 //
-HRESULT DesktopWallpaper::PrivateD(LPCWSTR /* pwzMonitorID */, LPVOID)
+HRESULT DesktopWallpaper::GetMonitorNumber(LPCWSTR pwzMonitorID, LPUINT puMonitorNumber)
 {
-    return E_NOTIMPL;
+    if (puMonitorNumber == nullptr)
+    {
+        return E_POINTER;
+    }
+
+    if (pwzMonitorID == nullptr)
+    {
+        // This is what explorer returns in this case.
+        return 0x800706F4;
+    }
+
+    for (MonitorData &monitor : m_vMonitors)
+    {
+        if (_wcsicmp(monitor.wzDeviceString, pwzMonitorID) == 0)
+        {
+            *puMonitorNumber = monitor.uNumber;
+            return S_OK;
+        }
+    }
+
+    return E_INVALIDARG;
 }
 
 
