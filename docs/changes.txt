@@ -60,7 +60,7 @@ See the next section for a cumulative changelog since 0.24.8.
     - Added pathDirPart(), pathDrivePart(), pathFilePart(), pathFileNamePart(),
       and pathExtPart() functions.
     - Extended the prefix RC syntax by adding @ as a special character in the 
-      value, refering to the current prefix.
+      value, referring to the current prefix.
 
   - [2013-08-04] -
     - Fixed the A versions of GetRCString, Line, and so on writing to the entire
@@ -224,7 +224,7 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - Support for unicode modules.
     - Added GetRCFloat, GetRCDouble, and GetRCInt64.
     - Extended the prefix RC syntax by adding @ as a special character in the 
-      value, refering to the current prefix.
+      value, referring to the current prefix.
 
 
   - VISTA & WIN7 & 64-BIT SUPPORT -
