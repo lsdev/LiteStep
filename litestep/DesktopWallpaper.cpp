@@ -27,12 +27,38 @@
 
 
 //
+// Wrapper around SHCreateShellItemArrayFromIDLists.
+// Until we drop XP support.
+//
+HRESULT LSCreateShellItemArrayFromIDLists(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgpidl,
+                                          IShellItemArray **ppsiItemArray)
+{
+    typedef HRESULT (WINAPI* PROCTYPE)(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgpidl,
+                                          IShellItemArray **ppsiItemArray);
+    static PROCTYPE proc = nullptr;
+    
+    if (proc == nullptr)
+    {
+        proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")),
+            "SHCreateShellItemArrayFromIDLists");
+    }
+
+    if (proc == nullptr)
+    {
+        return E_FAIL;
+    }
+
+    return proc(cidl, rgpidl, ppsiItemArray);
+}
+
+
+//
 // DesktopWallpaper
 //
 DesktopWallpaper::DesktopWallpaper()
 {
     m_uRefCount = 1;
-    EnumDisplayMonitors(NULL, NULL, [] (HMONITOR hMonitor, HDC, LPRECT rect, LPARAM lParam) -> BOOL
+    EnumDisplayMonitors(nullptr, nullptr, [] (HMONITOR hMonitor, HDC, LPRECT rect, LPARAM lParam) -> BOOL
     {
         DesktopWallpaper* self = (DesktopWallpaper*)lParam;
 
@@ -171,9 +197,11 @@ HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpap
     }
     else
     {
+        // If we are displaying wallpapers per-monitor, or a slideshow is running...
+        
+        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
         DWORD dwType = REG_SZ;
         DWORD dwSize = MAX_PATH*sizeof(WCHAR);
-        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
         SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", &dwType, *ppwzWallpaper, &dwSize);
     }
     return S_OK;
@@ -446,7 +474,7 @@ HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
         
     if (SUCCEEDED(hr))
     {
-        hr = SHCreateShellItemArrayFromIDLists(1, (LPCITEMIDLIST*)&idList, ppItems);
+        hr = LSCreateShellItemArrayFromIDLists(1, (LPCITEMIDLIST*)&idList, ppItems);
     }
     
     if (idList)
