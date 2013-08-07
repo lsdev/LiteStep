@@ -52,7 +52,7 @@ BOOL SettingsIterator::ReadNextLine(LPWSTR pwzValue, size_t cchValue)
         {
             StringCchCopyW(pwzValue, cchValue, m_pFileIterator->first.c_str());
             StringCchCatW(pwzValue, cchValue, L" ");
-            StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.c_str());
+            StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.sValue.c_str());
             ++m_pFileIterator;
             bReturn = TRUE;
         }
@@ -76,7 +76,7 @@ BOOL SettingsIterator::ReadNextCommand(LPWSTR pwzValue, size_t cchValue)
         {
             StringCchCopyW(pwzValue, cchValue, m_pFileIterator->first.c_str());
             StringCchCatW(pwzValue, cchValue, L" ");
-            StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.c_str());
+            StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.sValue.c_str());
             bReturn = TRUE;
         }
         
@@ -155,7 +155,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
         {
             StringCchCopyW(pwzValue, cchValue, it->second->first.c_str());
             StringCchCatW(pwzValue, cchValue, L" ");
-            StringCchCatW(pwzValue, cchValue, it->second->second.c_str());
+            StringCchCatW(pwzValue, cchValue, it->second->second.sValue.c_str());
         }
     }
     

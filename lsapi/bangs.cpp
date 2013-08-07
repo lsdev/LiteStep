@@ -352,7 +352,10 @@ static void BangRun(HWND /* hCaller */, LPCWSTR pwzArgs)
                                         // Only handle bang commands ourselfs, as anything else will prevent the RunMRU from populating properly.
                                         if (pwzText[0] == L'!')
                                         {
-                                            LSExecuteW(nullptr, pwzText, SW_SHOWNORMAL);
+                                            WCHAR wzCommand[MAX_BANGCOMMAND];
+                                            LPCWSTR pwzArgs = nullptr;
+                                            GetTokenW(pwzText, wzCommand, &pwzArgs, TRUE);
+                                            LSExecuteExW(nullptr, nullptr, wzCommand, pwzArgs, nullptr, 0);
                                             wParam = MAKEWPARAM(2, 0); // Click on cancel
                                         }
                                         free(pwzText);

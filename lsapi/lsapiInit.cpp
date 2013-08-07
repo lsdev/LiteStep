@@ -190,6 +190,11 @@ void LSAPIInit::setLitestepVars()
         PathQuoteSpacesW(wzTemp);
         pSM->SetVariable(L"username", wzTemp);
     }
+
+    pSM->SetVariable(L"nl", L"\n", true);
+    pSM->SetVariable(L"cr", L"\r", true);
+    pSM->SetVariable(L"dollar", L"$", true);
+    pSM->SetVariable(L"at", L"@", true);
     
     pSM->SetVariable(L"bitbucket", L"::{645FF040-5081-101B-9F08-00AA002F954E}");
     pSM->SetVariable(L"documents", L"::{450D8FBA-AD25-11D0-98A8-0800361B1103}");

@@ -232,8 +232,9 @@ public:
      *
      * @param  pwzKeyName  setting name
      * @param  pwzValue    new setting value
+     * @param  bTerminal   whether or not this is a terminal value
      */
-    void SetVariable(LPCWSTR pwzKeyName, LPCWSTR pwzValue);
+    void SetVariable(LPCWSTR pwzKeyName, LPCWSTR pwzValue, bool bTerminal = false);
     
     /**
      * Opens a configuration file for sequential access to its contents. The

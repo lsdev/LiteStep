@@ -104,7 +104,7 @@ BOOL SettingsManager::GetRCString(LPCWSTR pwzKeyName, LPWSTR pwzValue, LPCWSTR p
             if (pwzValue)
             {
                 wchar_t wzToken[MAX_LINE_LENGTH] = { 0 };
-                GetTokenW(it->second.c_str(), wzToken, NULL, FALSE);
+                GetTokenW(it->second.sValue.c_str(), wzToken, NULL, FALSE);
                 
                 StringSet recursiveVarSet;
                 recursiveVarSet.insert(pwzKeyName);
@@ -146,7 +146,7 @@ BOOL SettingsManager::GetRCLine(LPCWSTR pwzKeyName, LPWSTR pwzValue, int nMaxLen
                 // for compatibility reasons GetRCLine expands $evars$
                 StringSet recursiveVarSet;
                 recursiveVarSet.insert(pwzKeyName);
-                VarExpansionEx(pwzValue, it->second.c_str(),
+                VarExpansionEx(pwzValue, it->second.sValue.c_str(),
                     nMaxLen, recursiveVarSet);
             }
         }
@@ -175,7 +175,7 @@ BOOL SettingsManager::GetRCBool(LPCWSTR pwzKeyName, BOOL bIfFound)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pwzKeyName);
-        VarExpansionEx(wzExpanded, it->second.c_str(),
+        VarExpansionEx(wzExpanded, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
@@ -208,7 +208,7 @@ BOOL SettingsManager::GetRCBoolDef(LPCWSTR pwzKeyName, BOOL bDefault)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pwzKeyName);
-        VarExpansionEx(wzExpanded, it->second.c_str(),
+        VarExpansionEx(wzExpanded, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetTokenW(wzExpanded, wzToken, NULL, FALSE))
@@ -240,7 +240,7 @@ __int64 SettingsManager::GetRCInt64(LPCWSTR pszKeyName, __int64 nDefault)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pszKeyName);
-        VarExpansionEx(wzExpanded, it->second.c_str(),
+        VarExpansionEx(wzExpanded, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
@@ -265,7 +265,7 @@ int SettingsManager::GetRCInt(LPCWSTR pszKeyName, int nDefault)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pszKeyName);
-        VarExpansionEx(wzExpanded, it->second.c_str(),
+        VarExpansionEx(wzExpanded, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
@@ -290,7 +290,7 @@ float SettingsManager::GetRCFloat(LPCWSTR pszKeyName, float fDefault)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pszKeyName);
-        VarExpansionEx(wzExpanded, it->second.c_str(),
+        VarExpansionEx(wzExpanded, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
@@ -315,7 +315,7 @@ double SettingsManager::GetRCDouble(LPCWSTR pszKeyName, double dDefault)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pszKeyName);
-        VarExpansionEx(wzExpanded, it->second.c_str(),
+        VarExpansionEx(wzExpanded, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         if (GetTokenW(wzExpanded, wzToken, nullptr, FALSE))
@@ -344,7 +344,7 @@ COLORREF SettingsManager::GetRCColor(LPCWSTR pszKeyName, COLORREF crDefault)
         
         StringSet recursiveVarSet;
         recursiveVarSet.insert(pszKeyName);
-        VarExpansionEx(wzBuffer, it->second.c_str(),
+        VarExpansionEx(wzBuffer, it->second.sValue.c_str(),
             MAX_LINE_LENGTH, recursiveVarSet);
         
         int nCount = LCTokenizeW(wzBuffer, lpwzTokens, 3, nullptr);
@@ -381,19 +381,20 @@ BOOL SettingsManager::GetVariable(LPCWSTR pszKeyName, LPWSTR pszValue, DWORD dwL
 }
 
 
-void SettingsManager::SetVariable(LPCWSTR pszKeyName, LPCWSTR pszValue)
+void SettingsManager::SetVariable(LPCWSTR pszKeyName, LPCWSTR pszValue, bool bTerminal)
 {
-    if ((pszKeyName) && (pszValue))
+    if (pszKeyName && pszValue)
     {
         // in order for LSSetVariable to work evars must be redefinable
         SettingsMap::iterator it;
         if (_FindLine(pszKeyName, it))
         {
-            it->second.assign(pszValue);
+            it->second.sValue.assign(pszValue);
+            it->second.bTerminal = bTerminal;
         }
         else
         {
-            m_SettingsMap.insert(SettingsMap::value_type(pszKeyName, pszValue));
+            m_SettingsMap.insert(SettingsMap::value_type(pszKeyName, SettingValue(pszValue, bTerminal)));
         }
     }
 }
@@ -483,12 +484,23 @@ void SettingsManager::VarExpansionEx(LPWSTR pwzExpandedString, LPCWSTR pwzTempla
                             StringSet newRecursiveVarSet(recursiveVarSet);
                             newRecursiveVarSet.insert(wzVariable);
                             
-                            // FIXME: Should we not call GetToken here?!
-                            WCHAR wzTemp[MAX_LINE_LENGTH];
-                            GetTokenW(it->second.c_str(), wzTemp, NULL, FALSE);
-                            
-                            VarExpansionEx(pwzTempExpandedString, wzTemp,
-                                (size_t)cchTempExpanded, newRecursiveVarSet);
+                            // Don't call GetTokenW on terminals, because we don't want to strip
+                            // Whitespace (in particular, for $nl$ and $cr$).
+                            // Ok, since we define all terminals internally.
+                            if (it->second.bTerminal)
+                            {
+                                StringCchCopyW(pwzTempExpandedString, (size_t)cchTempExpanded,
+                                    it->second.sValue.c_str());
+                            }
+                            else
+                            {
+                                // FIXME: Should we not call GetToken here?!
+                                WCHAR wzTemp[MAX_LINE_LENGTH];
+                                GetTokenW(it->second.sValue.c_str(), wzTemp, NULL, FALSE);
+
+                                VarExpansionEx(pwzTempExpandedString, wzTemp,
+                                    (size_t)cchTempExpanded, newRecursiveVarSet);
+                            }
                             
                             bSucceeded = true;
                         }

@@ -225,7 +225,7 @@ MathValue MathParser::GetVariable(const wstring& name) const
     // Expand variable references
     wchar_t value[MAX_LINE_LENGTH];
     g_LSAPIManager.GetSettingsManager()->VarExpansionEx(
-        value, (*it).second.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
+        value, (*it).second.sValue.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
     
     if (_wcsicmp(value, L"false") == 0 ||
         _wcsicmp(value, L"off") == 0 ||

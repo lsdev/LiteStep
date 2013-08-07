@@ -27,9 +27,21 @@
 #include <map>
 #include <set>
 
+/** */
+struct SettingValue
+{
+    SettingValue(std::wstring sValue, bool bTerminal)
+    {
+        this->sValue = sValue;
+        this->bTerminal = bTerminal;
+    }
+
+    std::wstring sValue;
+    bool bTerminal;
+};
 
 /** Maps setting names to values */
-typedef std::multimap<std::wstring, std::wstring, stringicmp> SettingsMap;
+typedef std::multimap<std::wstring, SettingValue, stringicmp> SettingsMap;
 
 /** Maps setting names to iterators */
 typedef std::map<std::wstring, SettingsMap::iterator, stringicmp> IteratorMap;

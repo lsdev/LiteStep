@@ -528,7 +528,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 #endif // LS_CUSTOM_INCLUDEFOLDER
     else
     {
-        m_pSettingsMap->insert(SettingsMap::value_type(ptzName, ptzValue));
+        m_pSettingsMap->insert(SettingsMap::value_type(ptzName, SettingValue(ptzValue, false)));
     }
 }
 
