@@ -74,8 +74,8 @@ bool MathEvaluateString(const SettingsMap& context, const wstring& expression,
         RESOURCE_STREX(
             GetModuleHandle(NULL), IDS_MATHEXCEPTION,
             resourceTextBuffer, MAX_LINE_LENGTH,
-            L"Error in Expression:\n  %s\n\nDescription:\n  %s",
-            expression.c_str(), e.GetException());
+            L"Error in Expression:\n  %ls\n\nDescription:\n  %ls",
+            expression.c_str(), e.GetException().c_str());
         
         RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
         
