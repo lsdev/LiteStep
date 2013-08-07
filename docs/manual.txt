@@ -640,6 +640,26 @@ Contents:
         1 and false maps to 0.  A string is parsed as a numeric literal; if
         parsing fails, the string is mapped to NaN.
 
+      pathDirPart(string)
+        Returns the directory part of the string. For example,
+        pathDirPart('c:\\test\\somefile.txt') will return c:\test\
+
+      pathDrivePart(string)
+        Returns the drive part of the string. For example,
+        pathDrivePart('c:\\test\\somefile.txt') will return c:\
+        
+      pathExtPart(string)
+        Returns the extension part of the string. For example,
+        pathExtPart('c:\\test\\somefile.txt') will return 
+        
+      pathFilePart(string)
+        Returns the file part of the string. For example,
+        pathFilePart('c:\\test\\somefile.txt') will return somefile.txt
+        
+      pathFileNamePart(string)
+        Returns the file name part of the string. For example,
+        pathFileNamePart('c:\\test\\somefile.txt') will return somefile
+        
       pow(number, number)
         Returns the first argument, converted to a number, raised to the power
         of the second argument, converted to a number.
@@ -933,7 +953,7 @@ Contents:
    WinDir
 
   2. Conditional Expansions
-
+  
    Win64
    Win9X
    WinNT
@@ -973,6 +993,12 @@ Contents:
    NetworkAndDialup
    Printers
    Scheduled
+   
+   5. Character Literal Expansions
+   Dollar - Evaluates to $
+   At - Evaluates to @
+   NL - Evaluates to a newline character
+   CR - Evaluate to a carriage return character
 
  F) !Bang Commands
  -----------------
