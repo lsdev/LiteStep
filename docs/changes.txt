@@ -54,6 +54,10 @@ See the next section for a cumulative changelog since 0.24.8.
     - Fixed Right Click -> Set as desktop background on Windows 8.
     - Fixed the color and appearance dialog on Windows 8.
     - Fixed the desktop background dialog on Windows 8.
+    - Added $dollar$, $at$, $nl$, and $cr$. Allowing you to insert literal $, 
+      newlines, carriage returns, and @'s in strings.
+    - Added pathDirPart(), pathDrivePart(), pathFilePart(), pathFileNamePart(),
+      and pathExtPart() functions.
 
   - [2013-08-04] -
     - Fixed the A versions of GetRCString, Line, and so on writing to the entire
@@ -183,6 +187,8 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - Added $WinVista$, $Win2008$, $Win7$, $Win2008R2$, $Win8$, $Win2012$,
       $Win2012R2$, and $Win81$.
     - Added $Win64$ to identify Windows x64
+    - Added $Dollar$, $At$, $NL$, and $CR$ to allow for insertion of literal $,
+      @, newline, and carriage return symbols.
     - In safe mode, LiteStep attempts to launch Explorer as shell
       - If it fails, LiteStep launches as shell but skips running startup apps
     - Added "-explorer" command line switch to launch Explorer in shell mode
@@ -201,7 +207,8 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - New .RC construct, { }, allowing for the specification of settings
       prefixes. Allows for tidier configs.
     - Added a performance page to !about, showing module load times.
-    - Added a fileExists() function.
+    - Added fileExists(), pathDirPart(), pathDrivePart(), pathFilePart(),
+      pathFileNamePart(), and pathExtPart() functions.
     - Support for version 4 tray icons on Windows 7 and Windows 8. Tray modules
       now need to handle LM_SYSTRAYINFOEVENT in order to support this.
     - The !Run dialog will now execute !Bang commands.
@@ -212,7 +219,7 @@ This is a list of selected changes since the (projected) 0.24.8 final build:
     - Added Added "About LiteStep" and "Start Explorer as shell" to the recovery
       menu.
     - Support for unicode modules.
-    - Added GetRCFloat and GetRCDouble.
+    - Added GetRCFloat, GetRCDouble, and GetRCInt64.
 
 
   - VISTA & WIN7 & 64-BIT SUPPORT -

@@ -114,6 +114,11 @@ static MathValue Math_lowerCase(const MathValueList& argList);
 static MathValue Math_max(const MathValueList& argList);
 static MathValue Math_min(const MathValueList& argList);
 static MathValue Math_number(const MathValueList& argList);
+static MathValue Math_pathDirPart(const MathValueList& argList);
+static MathValue Math_pathDrivePart(const MathValueList& argList);
+static MathValue Math_pathExtPart(const MathValueList& argList);
+static MathValue Math_pathFilePart(const MathValueList& argList);
+static MathValue Math_pathFileNamePart(const MathValueList& argList);
 static MathValue Math_pow(const MathValueList& argList);
 static MathValue Math_round(const MathValueList& argList);
 static MathValue Math_startsWith(const MathValueList& argList);
@@ -126,26 +131,31 @@ struct FunctionTable
 {
     const wchar_t *name; MathFunction function; unsigned int numArgs;
 } gFunctions[] = {
-    { L"abs",          Math_abs,              1 },
-    { L"boolean",      Math_boolean,          1 },
-    { L"ceil",         Math_ceil,             1 },
-    { L"contains",     Math_contains,         2 },
-    { L"endsWith",     Math_endsWith,         2 },
-    { L"fileExists",   Math_fileExists,       1 },
-    { L"floor",        Math_floor,            1 },
-    { L"if",           Math_if,               3 },
-    { L"integer",      Math_integer,          1 },
-    { L"length",       Math_length,           1 },
-    { L"lowerCase",    Math_lowerCase,        1 },
-    { L"max",          Math_max,              2 },
-    { L"min",          Math_min,              2 },
-    { L"number",       Math_number,           1 },
-    { L"pow",          Math_pow,              2 },
-    { L"round",        Math_round,            1 },
-    { L"startsWith",   Math_startsWith,       2 },
-    { L"string",       Math_string,           1 },
-    { L"sqrt",         Math_sqrt,             1 },
-    { L"upperCase",    Math_upperCase,        1 }
+    { L"abs",               Math_abs,              1 },
+    { L"boolean",           Math_boolean,          1 },
+    { L"ceil",              Math_ceil,             1 },
+    { L"contains",          Math_contains,         2 },
+    { L"endsWith",          Math_endsWith,         2 },
+    { L"fileExists",        Math_fileExists,       1 },
+    { L"floor",             Math_floor,            1 },
+    { L"if",                Math_if,               3 },
+    { L"integer",           Math_integer,          1 },
+    { L"length",            Math_length,           1 },
+    { L"lowerCase",         Math_lowerCase,        1 },
+    { L"max",               Math_max,              2 },
+    { L"min",               Math_min,              2 },
+    { L"number",            Math_number,           1 },
+    { L"pathDirPart",       Math_pathDirPart,      1 },
+    { L"pathDrivePart",     Math_pathDrivePart,    1 },
+    { L"pathExtPart",       Math_pathExtPart,      1 },
+    { L"pathFilePart",      Math_pathFilePart,     1 },
+    { L"pathFileNamePart",  Math_pathFileNamePart, 1 },
+    { L"pow",               Math_pow,              2 },
+    { L"round",             Math_round,            1 },
+    { L"startsWith",        Math_startsWith,       2 },
+    { L"string",            Math_string,           1 },
+    { L"sqrt",              Math_sqrt,             1 },
+    { L"upperCase",         Math_upperCase,        1 }
 };
 
 const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
@@ -807,6 +817,60 @@ MathValue Math_min(const MathValueList& argList)
 MathValue Math_number(const MathValueList& argList)
 {
     return argList[0].ToNumber();
+}
+
+
+// Path directory part
+MathValue Math_pathDirPart(const MathValueList& argList)
+{
+    WCHAR wzPath[MAX_PATH];
+
+    StringCchCopy(wzPath, _countof(wzPath), argList[0].ToString().c_str());
+    *(LPTSTR)PathFindFileName(wzPath) = _T('\0');
+
+    return wzPath;
+}
+
+
+// Path drive part
+MathValue Math_pathDrivePart(const MathValueList& argList)
+{
+    WCHAR wzDrive[MAX_PATH];
+
+    StringCchCopy(wzDrive, _countof(wzDrive), argList[0].ToString().c_str());
+
+    return PathStripToRoot(wzDrive) != FALSE ? wzDrive : _T("");
+}
+
+
+// Path extension part
+MathValue Math_pathExtPart(const MathValueList& argList)
+{
+    WCHAR wzPath[MAX_PATH];
+
+    StringCchCopy(wzPath, _countof(wzPath), argList[0].ToString().c_str());
+
+    LPCTSTR ptzExtension = PathFindExtension(wzPath);
+    return *ptzExtension == _T('\0') ? ptzExtension : ptzExtension + 1;
+}
+
+
+// Path file part
+MathValue Math_pathFilePart(const MathValueList& argList)
+{
+    return PathFindFileName(argList[0].ToString().c_str());
+}
+
+
+// Path filename part
+MathValue Math_pathFileNamePart(const MathValueList& argList)
+{
+    WCHAR wzPath[MAX_PATH];
+
+    StringCchCopy(wzPath, _countof(wzPath), argList[0].ToString().c_str());
+    *(LPTSTR)PathFindExtension(wzPath) = _T('\0');
+
+    return PathFindFileName(wzPath);
 }
 
 
