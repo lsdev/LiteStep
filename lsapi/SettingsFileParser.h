@@ -24,7 +24,7 @@
 
 #include "settingsdefines.h"
 #include "lsapidefines.h"
-#include <stack>
+#include <deque>
 #include <list>
 #include <strsafe.h>
 
@@ -113,7 +113,7 @@ private:
     };
 
     /** Stack of prefixes. */
-    std::stack<TCStack> m_stPrefixes;
+    std::deque<TCStack> m_stPrefixes;
 
     /** The next line to be parsed by _ReadLineFromFile */
     TCHAR m_tzReadAhead[MAX_LINE_LENGTH];

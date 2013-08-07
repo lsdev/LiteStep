@@ -409,12 +409,19 @@ Contents:
       any command within the braces to have the specified prefix prefixed to it.
       Within prefix braces, the key - is evaluated to just the prefix.
       Keys starting with a * are treated specially, and the begining * is put at
-      the begining of the final key name.
+      the begining of the final key name. Inside the curly braces, @ is treated
+      as a special character in values, and is replaced by the prefix. Several
+      @'s in a row walks up the prefix stack.
       
-      This:
+      Using an example, this:
       
       Prefix
       {
+        Prefix2
+        {
+          SomeKey @@
+          SomeOtherKey @
+        }
         - Value
         Key Value
         *Event Value
@@ -422,6 +429,8 @@ Contents:
     
       Is equivalent to this:
       
+      PrefixPrefix2SomeKey Prefix
+      PrefixPrefix2SomeOtherKey PrefixPrefix2
       Prefix Value
       PrefixKey Value
       *PrefixEvent Value

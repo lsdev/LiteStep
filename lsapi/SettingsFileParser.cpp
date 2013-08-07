@@ -226,7 +226,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         }
         else
         {
-            m_stPrefixes.pop();
+            m_stPrefixes.pop_front();
         }
         
         // Skip this line
@@ -262,7 +262,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     || _tcsnicmp(ptzCurrent, _T("endif"), stEndConfig) == 0
                     ))
                 {
-                    StringCchCat(ptzName, MAX_RCCOMMAND, m_stPrefixes.top().tzString);
+                    StringCchCat(ptzName, MAX_RCCOMMAND, m_stPrefixes.front().tzString);
                 }
 
                 // If the keyname is simply -, ignore it.
@@ -290,8 +290,45 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     
                     // Removing trailing whitespace and comments
                     _StripString(ptzValueStart);
-                    
-                    StringCchCopy(ptzValue, MAX_LINE_LENGTH, ptzValueStart);
+
+                    DWORD cchRemaining = MAX_LINE_LENGTH;
+
+                    // If we have prefixes, check if the string contains any @'s
+                    if (!m_stPrefixes.empty())
+                    {
+                        LPTSTR ptzAtSearch;
+                        while ((ptzAtSearch = _tcschr(ptzValueStart, _T('@'))) != nullptr)
+                        {
+                            // Copy this part of the value over.
+                            DWORD nSize = (DWORD)(ptzAtSearch - ptzValueStart);
+                            StringCchCopyN(ptzValue, cchRemaining, ptzValueStart, nSize);
+                            cchRemaining -= nSize;
+                            ptzValue += nSize;
+
+                            // Figure out how many levels up to go
+                            auto prefix = m_stPrefixes.begin();
+                            for (; *(ptzAtSearch + 1) == _T('@'); ++ptzAtSearch)
+                            {
+                                if (prefix != m_stPrefixes.end())
+                                {
+                                    ++prefix;
+                                }
+                            }
+                            
+                            // Copy over the prefix.
+                            if (prefix != m_stPrefixes.end())
+                            {
+                                StringCchCopy(ptzValue, cchRemaining, prefix->tzString);
+                                nSize = (DWORD)_tcslen(prefix->tzString);
+                                ptzValue += nSize;
+                                cchRemaining -= nSize;
+                            }
+
+                            // Move our pointer past the @'s
+                            ptzValueStart = ++ptzAtSearch;
+                        }
+                    }
+                    StringCchCopy(ptzValue, cchRemaining, ptzValueStart);
                 }
                 
                 bReturn = true;
@@ -301,7 +338,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                 {
                     if (m_tzReadAhead[0] == '{')
                     {
-                        m_stPrefixes.push(TCStack(ptzName));
+                        m_stPrefixes.push_front(TCStack(ptzName));
 
                         // Skip these 2 lines.
                         _ReadNextLine(m_tzReadAhead);
