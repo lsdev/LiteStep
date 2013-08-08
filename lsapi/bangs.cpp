@@ -197,7 +197,7 @@ BOOL CALLBACK WindowsEnumProc(HWND hWnd, LPARAM lParam)
             (GetWindowLong(hWnd, GWL_STYLE) & WS_VISIBLE)) &&
             (!(GetWindowLong(hWnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW)))
         {
-            ShowWindow(hWnd, (UINT)lParam);
+            PostMessage(hWnd, WM_SYSCOMMAND, lParam, 0);
         }
     }
     
@@ -210,7 +210,7 @@ BOOL CALLBACK WindowsEnumProc(HWND hWnd, LPARAM lParam)
 //
 static void BangMinimizeWindows(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
-    EnumWindows(WindowsEnumProc, (LPARAM)SW_MINIMIZE);
+    EnumWindows(WindowsEnumProc, (LPARAM)SC_MINIMIZE);
 }
 
 
@@ -289,7 +289,7 @@ static void BangReloadModule(HWND /* hCaller */, LPCWSTR pwzArgs)
 //
 static void BangRestoreWindows(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
-    EnumWindows(WindowsEnumProc, (LPARAM)SW_RESTORE);
+    EnumWindows(WindowsEnumProc, (LPARAM)SC_RESTORE);
 }
 
 
