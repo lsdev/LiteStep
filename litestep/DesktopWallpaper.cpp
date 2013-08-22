@@ -630,9 +630,11 @@ HRESULT DesktopWallpaper::GetMonitorNumber(LPCWSTR pwzMonitorID, LPUINT puMonito
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// Called when you change themes.
+// Explorer tends to return S_OK, in my own tests. Not really sure what it does.
+// Can't decipher params. Might be bogus.
 //
-HRESULT DesktopWallpaper::PrivateE(LPVOID)
+HRESULT DesktopWallpaper::PrivateE(LPVOID, LPVOID, LPVOID)
 {
     return E_NOTIMPL;
 }
@@ -640,7 +642,7 @@ HRESULT DesktopWallpaper::PrivateE(LPVOID)
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// This function might exist.
 //
 HRESULT DesktopWallpaper::PrivateF(LPVOID)
 {
@@ -650,7 +652,7 @@ HRESULT DesktopWallpaper::PrivateF(LPVOID)
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// Pretty sure this does not actually exist
 //
 HRESULT DesktopWallpaper::PrivateG(LPVOID)
 {
@@ -660,7 +662,7 @@ HRESULT DesktopWallpaper::PrivateG(LPVOID)
 
 //
 // IDesktopWallpaperPrivate::??
-// ???
+// Pretty sure this doesn't exist either
 //
 HRESULT DesktopWallpaper::PrivateH(LPVOID)
 {

@@ -66,7 +66,7 @@ public:
     STDMETHOD(PrivateB) (LPVOID);
     STDMETHOD(GetWallpaperColor) (PULONG);
     STDMETHOD(GetMonitorNumber) (LPCWSTR, LPUINT);
-    STDMETHOD(PrivateE) (LPVOID);
+    STDMETHOD(PrivateE) (LPVOID, LPVOID, LPVOID);
     STDMETHOD(PrivateF) (LPVOID);
     STDMETHOD(PrivateG) (LPVOID);
     STDMETHOD(PrivateH) (LPVOID);
