@@ -2,9 +2,9 @@
 <?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
 
 <function>
-  <name>GetRCInt</name>
+  <name>GetRCFloat</name>
   <description>
-    Gets an integer from the configuration database.
+    Gets a float from the configuration database.
   </description>
   <parameters>
     <parameter>
@@ -20,7 +20,7 @@
         Default value to return if the key cannot be found in the
         configuration database.
       </description>
-      <type>INT</type>
+      <type>FLOAT</type>
     </parameter>
   </parameters>
   <return>
@@ -29,7 +29,7 @@
       configuration database. If the key cannot be found, the return value is
       the value of the <param>nDefault</param> parameter.
     </description>
-    <type>INT</type>
+    <type>FLOAT</type>
   </return>
   <see-also>
     <fn>GetRCBool</fn>
@@ -37,7 +37,7 @@
     <fn>GetRCColor</fn>
     <fn>GetRCCoordinate</fn>
     <fn>GetRCDouble</fn>
-    <fn>GetRCFloat</fn>
+    <fn>GetRCInt</fn>
     <fn>GetRCInt64</fn>
     <fn>GetRCLine</fn>
     <fn>GetRCString</fn>

@@ -35,7 +35,10 @@
     <fn>GetRCBool</fn>
     <fn>GetRCColor</fn>
     <fn>GetRCCoordinate</fn>
+	<fn>GetRCDouble</fn>
+	<fn>GetRCFloat</fn>
     <fn>GetRCInt</fn>
+    <fn>GetRCInt64</fn>
     <fn>GetRCLine</fn>
     <fn>GetRCString</fn>
   </see-also>

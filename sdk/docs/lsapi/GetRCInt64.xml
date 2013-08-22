@@ -4,7 +4,7 @@
 <function>
   <name>GetRCInt</name>
   <description>
-    Gets an integer from the configuration database.
+    Gets a 64bit integer from the configuration database.
   </description>
   <parameters>
     <parameter>
@@ -20,7 +20,7 @@
         Default value to return if the key cannot be found in the
         configuration database.
       </description>
-      <type>INT</type>
+      <type>INT64</type>
     </parameter>
   </parameters>
   <return>
@@ -29,7 +29,7 @@
       configuration database. If the key cannot be found, the return value is
       the value of the <param>nDefault</param> parameter.
     </description>
-    <type>INT</type>
+    <type>INT64</type>
   </return>
   <see-also>
     <fn>GetRCBool</fn>
@@ -38,7 +38,7 @@
     <fn>GetRCCoordinate</fn>
     <fn>GetRCDouble</fn>
     <fn>GetRCFloat</fn>
-    <fn>GetRCInt64</fn>
+    <fn>GetRCInt</fn>
     <fn>GetRCLine</fn>
     <fn>GetRCString</fn>
   </see-also>

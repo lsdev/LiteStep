@@ -20,7 +20,10 @@
       <link>GetRCBoolDef</link>
       <link>GetRCColor</link>
       <link>GetRCCoordinate</link>
+      <link>GetRCDouble</link>
+      <link>GetRCFloat</link>
       <link>GetRCInt</link>
+      <link>GetRCInt64</link>
       <link>GetRCLine</link>
       <link>GetRCString</link>
       <link>LCClose</link>
