@@ -456,7 +456,13 @@ void SettingsManager::VarExpansionEx(LPWSTR pwzExpandedString, LPCWSTR pwzTempla
                     //
                     wchar_t wzVariable[MAX_LINE_LENGTH];
                     
-                    if (SUCCEEDED(StringCchCopyNW(wzVariable, MAX_LINE_LENGTH,
+                    // $$
+                    if (pwzTemplate == pwzVariable)
+                    {
+                        StringCchCopyW(pwzTempExpandedString, (size_t) cchTempExpanded, L"$");
+                        bSucceeded = true;
+                    }
+                    else if (SUCCEEDED(StringCchCopyNW(wzVariable, MAX_LINE_LENGTH,
                         pwzVariable, pwzTemplate - pwzVariable)) &&
                         (wzVariable[0] != L'\0'))
                     {
