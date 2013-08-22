@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "litestep", "litestep\litestep_vc12.vcxproj", "{994556EE-2F21-4811-A85D-6925F7F84B0D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utility", "utility\utility_vc12.vcxproj", "{2213036F-018C-416A-8A6A-7934C936CFFC}"
