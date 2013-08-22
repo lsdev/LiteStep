@@ -83,7 +83,7 @@ static BOOL AddBangCommandWorker(LPCWSTR pwzCommand, BangType pfnBangCommand)
     {
         DWORD dwCurrentThreadID = GetCurrentThreadId();
         
-        Bang* pBang = new Bang(dwCurrentThreadID, pfnBangCommand, pwzCommand);
+        Bang* pBang = new (std::nothrow) Bang(dwCurrentThreadID, pfnBangCommand, pwzCommand);
         
         if (pBang != nullptr)
         {
