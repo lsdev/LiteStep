@@ -1902,9 +1902,10 @@ BOOL TrayService::HandleNotification(PSHELLTRAYDATA pstd)
 bool TrayService::notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const
 {
     LSNOTIFYICONDATAA lsnidA(pclsnid);
-    return 0 != (SendMessage(m_hLiteStep, LM_SYSTRAYW,
-        dwMessage, (LPARAM)pclsnid) | SendMessage(m_hLiteStep, LM_SYSTRAYA,
-        dwMessage, (LPARAM)&lsnidA));
+    LRESULT wResult = SendMessage(m_hLiteStep, LM_SYSTRAYW, dwMessage, (LPARAM)pclsnid);
+    LRESULT aResult = SendMessage(m_hLiteStep, LM_SYSTRAYA, dwMessage, (LPARAM)&lsnidA);
+
+    return wResult != 0 || aResult != 0;
 }
 
 
