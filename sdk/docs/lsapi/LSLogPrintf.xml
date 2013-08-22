@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSLogPrintf</name>
+  <description>
+    Outputs a formatted message to the LiteStep log.
+  </description>
+  <parameters>
+    <parameter>
+      <name>nLevel</name>
+      <description>
+        <p>
+          Log Level of the message being logged. This must be one of the
+          following constants.
+        </p>
+        <constant-list>
+          <constant>
+            <name>LOG_ERROR</name>
+            <description>
+              <param>pszMessage</param> contains an error message
+            </description>
+          </constant>
+          <constant>
+            <name>LOG_WARNING</name>
+            <description>
+              <param>pszMessage</param> contains a warning message
+            </description>
+          </constant>
+          <constant>
+            <name>LOG_NOTICE</name>
+            <description>
+              <param>pszMessage</param> contains a notification message
+            </description>
+          </constant>
+          <constant>
+            <name>LOG_DEBUG</name>
+            <description>
+              <param>pszMessage</param> contains a debug message
+            </description>
+          </constant>
+        </constant-list>
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>pszModule</name>
+      <description>
+        Name of module logging the message.
+      </description>
+      <type>LPCSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszMessage</name>
+      <description>
+        Format string used in formatting the output message to the log. Any
+        <extfn>printf</extfn>-style format string is allowed.
+      </description>
+      <type>LPCSTR</type>
+    </parameter>
+    <parameter>
+      <name>...</name>
+      <description>
+        Format string parameter list.
+      </description>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      This function is deprecated and should not be used.
+    </p>
+    <p>
+      The current date and time is prefixed to the output message.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LSLog</fn>
+  </see-also>
+</function>

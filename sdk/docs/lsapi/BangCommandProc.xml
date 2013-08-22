@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>BangCommandProc</name>
+  <calling-convention>__cdecl</calling-convention>
+  <description>
+    Application-defined callback function that LiteStep calls to execute a
+    bang command registered with <fn>AddBangCommand</fn>.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hwndOwner</name>
+      <description>
+        Handle to a window that acts as owner for any dialogs or message
+        boxes. May be <const>NULL</const>.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>pszArgs</name>
+      <description>
+        Arguments for the bang command.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <see-also>
+    <fn>AddBangCommand</fn>
+    <fn>AddBangCommandEx</fn>
+    <fn>BangCommandProcEx</fn>
+    <fn>ParseBangCommand</fn>
+    <fn>RemoveBangCommand</fn>
+  </see-also>
+</function>

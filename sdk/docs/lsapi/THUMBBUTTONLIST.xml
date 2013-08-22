@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<structure>
+  <name>THUMBBUTTONLIST</name>
+
+  <description>
+    Represents a list of buttons for the thumbnail bar. Used by
+    <msg>LM_TASK_THUMBBARADDBUTTONS</msg> and
+    <msg>LM_TASK_THUMBBARUPDATEBUTTONS</msg>
+  </description>
+
+  <members>
+    <member>
+      <name>cButtons</name>
+      <type>UINT</type>
+      <description>The number of buttons in the array.</description>
+    </member>
+    <member>
+      <name>pButton</name>
+      <type>LPTHUMBBUTTON</type>
+      <description>
+        An array of THUMBBUTTON structs.
+      </description>
+    </member>
+  </members>
+  
+  <see-also>
+    <msg>LM_TASK_THUMBBARADDBUTTONS</msg>
+    <msg>LM_TASK_THUMBBARUPDATEBUTTONS</msg>
+  </see-also>
+</structure>

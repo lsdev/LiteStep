@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetLSBitmapSize</name>
+  <description>
+    Gets the width and height of a bitmap.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hbmBitmap</name>
+      <description>
+        Handle to the bitmap.
+      </description>
+      <type>HBITMAP</type>
+    </parameter>
+    <parameter>
+      <name>pnWidth</name>
+      <description>
+        Pointer to an integer that receives the bitmap's width.
+      </description>
+      <type>INT *</type>
+    </parameter>
+    <parameter>
+      <name>pnHeight</name>
+      <description>
+        Pointer to an integer that receives the bitmap's height.
+      </description>
+      <type>INT *</type>
+    </parameter>
+  </parameters>
+  <see-also>
+    <fn>LoadLSImage</fn>
+  </see-also>
+</function>

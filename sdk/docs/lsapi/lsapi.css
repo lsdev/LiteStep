@@ -1,0 +1,102 @@
+a:link, a:visited
+{
+    background-color: white;
+    color: rgb(51, 51, 102);
+}
+
+body
+{
+    background-color: white;
+    color: black;
+    font-family: sans-serif;
+    margin-left: 2em;
+    margin-right: 2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+div#indexlink
+{
+  float:right;
+  margin: 1em 0 0 0;
+  padding:0;
+}
+
+dd
+{
+    margin-bottom: 1em;
+}
+
+dd p
+{
+    margin-top: 0;
+}
+
+dl.constant-list
+{
+    margin-top: 1em;
+    margin-left: 2em;
+}
+
+dt
+{
+    margin-bottom: 0.1em;
+}
+
+dt.parameter-name, dt.member-name
+{
+    font-weight: bold;
+}
+
+dt.constant-name
+{
+    font-family: monospace;
+}
+
+div.brief, div.syntax, div.parameters, div.return, div.members, div.remarks, div.example, div.see-also
+{
+    margin-left: 2em;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+    background-color: white;
+    color: rgb(51, 51, 102);
+    font-family: "Tahoma", sans-serif;
+    font-weight: bold;
+}
+
+h1
+{
+    border-bottom: solid 1pt rgb(51, 51, 102);
+}
+
+pre.blockcode
+{
+    background-color: rgb(240, 240, 240);
+    color: black;
+    font-family: monospace;
+    padding: 0.5em;
+}
+
+span.code
+{
+    background-color: rgb(240, 240, 240);
+    color: black;
+    padding: 0.125em;
+}
+
+span.code, span.const, span.type
+{
+    font-family: monospace;
+}
+
+span.fn, span.msg, span.struct, span.extfn, span.extmsg, span.extstruct
+{
+    font-weight: bold;
+}
+
+span.param
+{
+    font-style: italic;
+}

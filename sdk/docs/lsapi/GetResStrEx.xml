@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetResStrEx</name>
+  <description>
+    Loads a format string resource and returns the formatted output in
+    <param>pszBuffer</param>.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hInstance</name>
+      <description>
+        Handle to the file instance containing the string resource.
+      </description>
+      <type>HINSTANCE</type>
+    </parameter>
+    <parameter>
+      <name>uID</name>
+      <description>
+        Specifies the resource index identifier of the format string to be
+        loaded.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the formatted string output. If the formatted
+        string is too large to fit in the buffer, it is truncated.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pszDefault</name>
+      <description>
+        Default format string. If the specified string resource cannot be found,
+        <fn>GetResStrEx</fn> uses this string as the format string.  If this
+        parameter is <const>NULL</const>, it is treated as an empty string.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>...</name>
+      <description>
+        Format string parameter list.
+      </description>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      Any <extfn>printf</extfn>-style format string is allowed.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>GetResStr</fn>
+  </see-also>
+</function>

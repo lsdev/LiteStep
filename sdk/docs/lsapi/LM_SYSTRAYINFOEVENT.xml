@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_SYSTRAYINFOEVENT</name>
+  <description>
+    LiteStep sends this message twice when an application calls 
+    Shell_NotifyIconGetRect. Once to get the position of a tray icon, and once
+    to get the size of the icon.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        Pointer to an <struct>SYSTRAYINFOEVENT</struct> structure.
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Pointer to an LRESULT which should be modified
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If a module successfully handles this message, it should return
+      <const>TRUE</const>.
+      If there was an error, it should return <const>FALSE</const>.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+  </remarks>
+  <example>
+    <blockcode>
+case LM_SYSTRAYINFOEVENT:
+    {
+        LPSYSTRAYINFOEVENT lpSTE = (LPSYSTRAYINFOEVENT)wParam;
+        TRAYICON icon = FindIcon(lpSTE);
+        RECT r;
+        GetScreenRect(icon, &amp;r);
+        switch (lpSTE->dwEvent) {
+        case TRAYEVENT_GETICONPOS:
+            {
+                *(LRESULT*)lParam = MAKELPARAM(r.left, r.top);
+            }
+            break;
+
+        case TRAYEVENT_GETICONSIZE:
+            {
+                *(LRESULT*)lParam = MAKELPARAM(r.right - r.left, r.bottom - r.top);
+            }
+            break;
+        }
+    }
+    return TRUE;
+}
+    </blockcode>
+  </example>
+  <see-also>
+    <msg>LM_REGISTERMESSAGE</msg>
+    <msg>LM_SYSTRAY</msg>
+    <msg>LM_SYSTRAYREADY</msg>
+  </see-also>
+</message>

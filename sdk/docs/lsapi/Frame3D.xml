@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>Frame3D</name>
+  <description>
+    Draws a 3D frame.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hdcDst</name>
+      <description>
+        Handle to the destination device context on which to draw.
+      </description>
+      <type>HDC</type>
+    </parameter>
+    <parameter>
+      <name>rcFrame</name>
+      <description>
+        Rectangle in the device context around which to draw the 3D frame.
+      </description>
+      <type>RECT</type>
+    </parameter>
+    <parameter>
+      <name>crTop</name>
+      <description>
+        Left and top frame border color.
+      </description>
+      <type>COLORREF</type>
+    </parameter>
+    <parameter>
+      <name>crBottom</name>
+      <description>
+        Right and bottom frame border color.
+      </description>
+      <type>COLORREF</type>
+    </parameter>
+    <parameter>
+      <name>nWidth</name>
+      <description>
+        Thickness of frame border.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+</function>

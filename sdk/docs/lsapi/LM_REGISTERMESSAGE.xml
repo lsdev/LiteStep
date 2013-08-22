@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_REGISTERMESSAGE</name>
+  <description>
+    A module sends <msg>LM_REGISTERMESSAGE</msg> to LiteStep to register
+    for special messages.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        Handle (<type>HWND</type>) to recipient/module window.
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Array of type <type>UINT</type> of messages to register for,
+        terminated with a <const>0</const> item.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is not well defined and should not be relied upon.
+    </description>
+  </return>
+  <remarks>
+    Before a module is unloaded, it must unregister all messages it registered
+    for by using <msg>LM_UNREGISTERMESSAGE</msg>.
+  </remarks>
+  <example>
+    After using the following code, LiteStep will dispatch the
+    <msg>LM_GETREVID</msg> and <msg>LM_REFRESH</msg> messages to the module
+    at appropriate times.
+    <blockcode>
+HWND hModuleWindow = ...;
+
+UINT uMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+
+SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)hModuleWindow, (LPARAM)&amp;uMessages);</blockcode>
+  </example>
+  <see-also>
+    <fn>GetLitestepWnd</fn>
+    <msg>LM_UNREGISTERMESSAGE</msg>
+  </see-also>
+</message>

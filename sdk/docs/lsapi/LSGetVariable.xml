@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSGetVariable</name>
+  <description>
+    Gets a string from the configuration database.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to retrieve.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the retrieved string.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the key is found in the configuration database, the return value is
+      nonzero. If the key cannot be found, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <strong>Deprecated.</strong> Replaced by <fn>LSGetVariableEx</fn>.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LSGetVariableEx</fn>
+    <fn>LSSetVariable</fn>
+    <fn>VarExpansion</fn>
+    <fn>VarExpansionEx</fn>
+  </see-also>
+</function>

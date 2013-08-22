@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LCReadNextConfig</name>
+  <description>
+    Gets the next line from a configuration file.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pFile</name>
+      <description>
+        Handle to an open file. The file must have been opened with
+        <fn>LCOpen</fn>.
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to retrieve. The first character must be an asterisk
+        (<const>*</const>). <fn>LCReadNextConfig</fn> gets the next line from
+        the configuration file with this key.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the retrieved line. If the line is too large to
+        fit in the buffer, it is truncated.
+      </description>
+      <type>LPSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the next line was successfully retrieved, the return value is
+      nonzero. If there are no more lines with the specified key or an error
+      occurs, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      In LiteStep configuration files, keys that can be repeated are prefixed
+      with an asterisk (<const>*</const>). Call <fn>LCReadNextConfig</fn>
+      repeatedly until it returns zero to retrieve all the values for one of
+      these keys.
+    </p>
+    <p>
+      <fn>LCReadNextConfig</fn> retrieves the entire unparsed line from the
+      configuration file, including the key name.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LCClose</fn>
+    <fn>LCOpen</fn>
+    <fn>LCReadNextCommand</fn>
+    <fn>LCReadNextLine</fn>
+  </see-also>
+</function>

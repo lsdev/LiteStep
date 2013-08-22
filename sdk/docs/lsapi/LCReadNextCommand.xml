@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LCReadNextCommand</name>
+  <description>
+    Gets, from a configuration file, the next line that does not begin with an
+    asterisk (*), or more specifically any punctuation character.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pFile</name>
+      <description>
+        Handle to an open file. The file must have been opened with
+        <fn>LCOpen</fn>.
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the next line from the configuration file. If the
+        line is too large to fit in the buffer, it is truncated.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the next line was successfully retrieved, the return value is
+      nonzero. If there are no more lines in the configuration file or an
+      error occurs, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>LCReadNextCommand</fn> retrieves the entire unparsed line from the
+      configuration file, including the key name.
+    </p>
+    <p>
+      <strong>Note:</strong> In LiteStep 0.24.7 and 0.24.8 this function
+      incorrectly returned every line from the configuration file, including
+      ones that began with a punctuation character.  LiteStep 0.25.0 and later
+      correct this behavior.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LCClose</fn>
+    <fn>LCOpen</fn>
+    <fn>LCReadNextConfig</fn>
+    <fn>LCReadNextLine</fn>
+  </see-also>
+</function>

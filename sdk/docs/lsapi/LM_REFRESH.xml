@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_REFRESH</name>
+  <description>
+    When a module receives this message, it should re-read its settings.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        This parameter is set to <const>0</const>.
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        This parameter is set to <const>0</const>.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is ignored.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+    <p>
+      It is recommended that all modules implement this.
+    </p>
+    <p>
+      LiteStep typically sends this message when the user calls the
+      <const>!refresh</const> bang command.
+    </p>
+    <p>
+      The order in which modules receive this message is undefined.
+    </p>
+  </remarks>
+  <example>
+    <blockcode>
+case LM_REFRESH:
+{
+    DestroyWidgets();
+    UnloadSetup();
+
+    LoadSetup();
+    CreateWidgets();
+}</blockcode>
+  </example>
+  <see-also>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

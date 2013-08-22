@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSExecute</name>
+  <description>
+    Executes a bang command or application.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hwndOwner</name>
+      <description>
+        Handle to a window that acts as owner for any dialogs or message
+        boxes. May be <const>NULL</const>.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>pszCommandLine</name>
+      <description>
+        Command line to execute. This consists of the name of a bang command
+        or the path to an application followed by any arguments.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>nShowCmd</name>
+      <description>
+        Value that controls how an application displays its main window. This
+        can be any of the SW constants used with the <extfn>ShowWindow</extfn>
+        function. If executing a bang command, this parameter is ignored.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value for this function is not well defined and should not be
+      relied upon.
+    </description>
+    <type>HINSTANCE</type>
+  </return>
+  <see-also>
+    <fn>LSExecuteEx</fn>
+    <fn>ParseBangCommand</fn>
+  </see-also>
+</function>

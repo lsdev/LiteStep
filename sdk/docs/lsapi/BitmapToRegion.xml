@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>BitmapToRegion</name>
+  <description>
+    Creates a region containing the non-transparent pixels in a bitmap.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hbmBitmap</name>
+      <description>
+        Handle to the bitmap.
+      </description>
+      <type>HBITMAP</type>
+    </parameter>
+    <parameter>
+      <name>crTransparent</name>
+      <description>
+        Transparency color.
+      </description>
+      <type>COLORREF</type>
+    </parameter>
+    <parameter>
+      <name>crTolerance</name>
+      <description>
+        Amount that pixels can differ from <param>crTransparent</param> and
+        still be considered transparent.
+      </description>
+      <type>COLORREF</type>
+    </parameter>
+    <parameter>
+      <name>xOffset</name>
+      <description>
+        Horizontal offset of the resulting region.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>yOffset</name>
+      <description>
+        Vertical offset of the resulting region.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      <p>
+        If the function succeeds, the return value is the handle to the newly
+        created region. If an error occurs, the return value is
+        <const>NULL</const>.
+      </p>
+      <p>
+        The returned handle must be freed with a call to
+        <extfn>DeleteObject</extfn>.
+      </p>
+    </description>
+    <type>HRGN</type>
+  </return>
+  <remarks>
+    <p>
+      The <param>crTolerance</param> parameter specifies the amount a pixel
+      can differ from <param>crTransparent</param> and still be considered
+      transparent. The amounts for each color component (red, green, and blue)
+      are encoded into a <type>COLORREF</type> using the <code>RGB</code>
+      macro. If <param>crTolerance</param> is zero, then only those pixels
+      that exactly match <param>crTransparent</param> are considered
+      transparent.
+    </p>
+    <p>
+      In some versions of LiteStep the <param>crTransparent</param> and
+      <param>crTolerance</param> parameters are ignored. Such versions use
+      <const>FF00FF</const> as the transparency color.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LoadLSImage</fn>
+    <fn>TransparentBltLS</fn>
+  </see-also>
+</function>

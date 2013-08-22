@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_SYSTRAYREADY</name>
+  <description>
+    System tray modules send <msg>LM_SYSTRAYREADY</msg> to LiteStep once
+    they're done initializing to receive the tray icon list from the core
+    TrayService.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        Must be <const>NULL</const>.
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Must be <const>NULL</const>.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is a handle (<type>HWND</type>) to the
+      <const>TrayNotifyWnd</const> window or <const>NULL</const> (see Remarks
+      section).
+    </description>
+  </return>
+  <remarks>
+    <p>
+      While processing this message, the core sends a <msg>LM_SYSTRAY</msg>
+      message with <param>wParam</param> set to <const>NIM_ADD</const> for each
+      icon in its internal list.
+    </p>
+    <p>
+      <const>TrayNotifyWnd</const> is a hidden dummy window created by the core
+      solely for applications that depend on it. Some use it to calculate the
+      position of the tray, e.g. to display their menu. In order to support
+      such applications, the tray module needs to position that window to match
+      its own position.
+    </p>
+  </remarks>
+  <example>
+    In this example, the module first requests all current icons from the core,
+    then repositions the <const>TrayNotifyWnd</const> to match its x/y position
+    on the screen.
+    <blockcode>
+INT mainX = ...;
+INT mainY = ...;
+HWND hMainWindow = ...;
+
+UINT uMessages[] = { LM_SYSTRAY, 0 };
+SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)hMainWindow, (LPARAM)&amp;uMessages);
+
+HWND hNotifyWnd = (HWND)SendMessage(GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
+
+if (IsWindow(hNotifyWnd))
+{
+    MoveWindow(hNotifyWnd, mainX, mainY, 0, 0, FALSE);
+}</blockcode>
+    The module also needs to handle the generated <msg>LM_SYSTRAY</msg> messages:
+    <blockcode>
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case LM_SYSTRAY:
+    {
+        // ...
+    }
+    break;
+    }
+}</blockcode>
+  </example>
+  <see-also>
+    <fn>GetLitestepWnd</fn>
+    <msg>LM_SYSTRAY</msg>
+    <msg>LM_SYSTRAYINFOEVENT</msg>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

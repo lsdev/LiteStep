@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetRCCoordinate</name>
+  <description>
+    Gets a coordinate from the configuration database.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to retrieve.
+      </description>
+      <type>LPCSTR</type>
+    </parameter>
+    <parameter>
+      <name>nDefault</name>
+      <description>
+        Default value to return if the key cannot be found in the
+        configuration database.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nLimit</name>
+      <description>
+        Maximum value for the coordinate.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the key is found, the return value is the value from the
+      configuration database. If the key cannot be found, the return value is
+      the value of the <param>nDefault</param> parameter.
+    </description>
+    <type>INT</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>GetRCCoordinate</fn> supports five types of coordinates. A positive
+      integer is interpreted as a distance from the origin (zero). A negative
+      integer is interpreted as a distance from the limit (value of the
+      <param>nLimit</param> parameter). A positive integer with <const>c</const>
+      suffix is interpreted as a distance from the center towards the limit. A
+      negative integer with a <const>c</const> suffix is interpreted as a
+      distance from the center towards the origin. A percentage is a relative
+      distance between the origin and the limit.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>GetRCBool</fn>
+    <fn>GetRCBoolDef</fn>
+    <fn>GetRCColor</fn>
+    <fn>GetRCInt</fn>
+    <fn>GetRCLine</fn>
+    <fn>GetRCString</fn>
+    <fn>ParseCoordinate</fn>
+  </see-also>
+</function>

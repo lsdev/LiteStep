@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_RESTOREDATA</name>
+  <description>
+    A module sends <msg>LM_RESTOREDATA</msg> to LiteStep to retrieve data
+    previously stored with <msg>LM_SAVEDATA</msg>. If it is retrieved
+    successfully, it is removed from the internal DataStore.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        <p>
+          The low-order word specifies the size of the buffer pointed to by
+          <param>lParam</param>.
+        </p>
+        <p>
+          The high-order word is the ID the data was saved with.
+        </p>
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Pointer to a buffer which will receive the data.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the data was successfully retrieved, the return value is nonzero.
+      If an error occured, the return value is zero.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      It is recommended that you use the <extfn>MAKEWPARAM</extfn> macro to
+      construct <param>wParam</param>.
+    </p>
+  </remarks>
+  <example>
+    Virtual Windows Modules (VWMs) might use code like the following to restore
+    the currently selected screen number saved before a recycle:
+    <blockcode>
+#define MODULE_ID 0x1111    // The ID that was used for LM_SAVEDATA
+
+UINT uCurrentDesk = 0;
+
+WPARAM wParam = MAKEWPARAM(sizeof(uCurrentDesk), MODULE_ID);
+
+if (SendMessage(GetLitestepWnd(), LM_RESTOREDATA, wParam, (LPARAM)&amp;uCurrentDesk))
+{
+  // data retrieved successfully, uCurrentDesk now holds screen number
+}</blockcode>
+  </example>
+  <see-also>
+    <fn>GetLitestepWnd</fn>
+    <msg>LM_SAVEDATA</msg>
+  </see-also>
+</message>

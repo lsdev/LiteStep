@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_TASK_SETTABPROPERTIES</name>
+  <description>
+    LiteStep sends this message when an application has called
+    ITaskbarList4::SetTabProperties.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        The window whose properties are being modified.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        The new tab properties.
+      </description>
+      <type>STPFLAG</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is ignored.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+  </remarks>
+  <see-also>
+    <msg>LM_TASK_REGISTERTAB</msg>
+    <msg>LM_TASK_UNREGISTERTAB</msg>
+    <msg>LM_TASK_SETACTIVETAB</msg>
+    <msg>LM_TASK_SETTABORDER</msg>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

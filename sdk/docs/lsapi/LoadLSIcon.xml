@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LoadLSIcon</name>
+  <description>
+    Loads an icon file.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPath</name>
+      <description>
+        Path to the icon resource to load. Refer to the <const>Remarks</const>
+        section for details.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pReserved</name>
+      <description>
+        Reserved. Must be <const>NULL</const>.
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      <p>
+        If the icon is loaded successfully, the return value is a handle to
+        the icon. If an error occurs, the return value is <const>NULL</const>.
+      </p>
+      <p>
+        The returned handle must be freed with a call to
+        <extfn>DestroyIcon</extfn>.
+      </p>
+    </description>
+    <type>HICON</type>
+  </return>
+  <remarks>
+    <p>
+      <param>pszPath</param> specifies the Icon resource to load and can be of
+      the following formats:
+      
+      <dl>
+        <dt>Directly load an icon file</dt>
+        <dd><const>"\path\to\file.ico"</const></dd>
+        <dt>
+          Extract an icon from a resource library (.icl, .dll, .exe, et cetera)
+          using the specified resource index <const>n</const>
+        </dt>
+        <dd><const>"\path\to\library.ext,n"</const></dd>
+        <dt>Extract the associated icon from a folder's "desktop.ini" file</dt>
+        <dd><const>"\some\folder\"</const></dd>
+      </dl>
+    </p>
+    <p>
+      Relative paths refer to files in the LiteStep image directory.  Refer to
+      <fn>LSGetImagePath</fn> for details.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LoadLSImage</fn>
+    <fn>LSGetImagePath</fn>
+  </see-also>
+</function>

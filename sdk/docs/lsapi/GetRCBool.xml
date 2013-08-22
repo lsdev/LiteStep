@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetRCBool</name>
+  <description>
+    Gets a Boolean value from the configuration database.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to retrieve.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>fValue</name>
+      <description>
+        Value to return if the key is found in the configuration database. If
+        the key cannot be found, <fn>GetRCBool</fn> returns the logical
+        complement of this value.
+      </description>
+      <type>BOOL</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the key is found in the configuration database, the return value is
+      the value of the <param>fValue</param> parameter. If the key cannot be
+      found, the return value is the logical complement of the
+      <param>fValue</param> parameter.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <see-also>
+    <fn>GetRCBoolDef</fn>
+    <fn>GetRCColor</fn>
+    <fn>GetRCCoordinate</fn>
+    <fn>GetRCInt</fn>
+    <fn>GetRCLine</fn>
+    <fn>GetRCString</fn>
+  </see-also>
+</function>

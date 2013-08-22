@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>initModuleW</name>
+  <calling-convention>__cdecl</calling-convention>
+  <description>
+    The LiteStep Module entry point.  After loading the module into memory, the
+    LiteStep core calls this module function to initialize the module.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hParent</name>
+      <description>
+        Handle to module's parent window, or the LiteStep window if no parent
+        exists. See Remarks.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>hInstance</name>
+      <description>
+        Handle to this module's instance.
+      </description>
+      <type>HINSTANCE</type>
+    </parameter>
+    <parameter>
+      <name>pszPath</name>
+      <description>
+        Path to the LiteStep directory. Equivalent to what is returned by
+        <fn>LSGetLitestepPath</fn>.
+      </description>
+      <type>LPCWSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      A module should return <const>0</const> for success.  Return non-zero for
+      failure.
+    </description>
+    <type>INT</type>
+  </return>
+  <remarks>
+    <p>
+      A module should compare the return value of <fn>GetLitestepWnd</fn> with
+      <param>hParent</param> and if they are different and not
+      <const>NULL</const>, the module should create all visible windows as
+      children of <param>hParent</param> and position the windows relative to
+      the parent's client area.
+    </p>
+    <p>
+      A module should use the handle returned from <fn>GetLitestepWnd</fn> for
+      communicating with the main LiteStep window rather than expecting
+      <param>hParent</param> to be a handle to the LiteStep window.
+    </p>
+    <p>
+      A call into the module through <fn>initModuleEx</fn> is always paired with
+      a call to <fn>quitModule</fn> before the module is unloaded. A Module is
+      typically loaded when LiteStep initially starts and unloaded when
+      LiteStep exits.  However, a module may be loaded and unloaded multiple
+      times during a single invocation of the LiteStep process.  This normally
+      occurs during a LiteStep Recycle.  Ensure that all global variables and
+      resources are explicitly initialized in <fn>initModuleEx</fn> and released
+      in <fn>quitModule</fn>.
+    </p>
+    <p>
+      If a module returns a non-zero value from the function the module will be
+      immediately unloaded from memory.  A module should ensure that all
+      resources allocated have been free'd prior to returning a failure value.
+    </p>
+  </remarks>
+  <example>
+    <blockcode>
+#define EXPORT __declspec(dllexport)
+
+EXTERN_C EXPORT INT __cdecl initModuleW(
+    HWND hParent,
+    HINSTANCE hInstance,
+    LPCWSTR pszPath
+)
+{
+    BOOL fIsChild = FALSE;
+    
+    if (NULL != hParent &amp;&amp; GetLitestepWnd() != hParent)
+    {
+        fIsChild = TRUE;
+    }
+    
+    if (!myInitializeModule(hParent, fIsChild))
+    {
+        return -1;
+    }
+    
+    return 0;
+}   </blockcode>
+  </example>
+  <see-also>
+    <fn>GetLitestepWnd</fn>
+    <fn>LSGetLitestepPath</fn>
+    <fn>initModuleEx</fn>
+    <fn>quitModule</fn>
+  </see-also>
+</function>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetLitestepWnd</name>
+  <description>
+    Returns a handle to LiteStep's main window.
+  </description>
+  <return>
+    <description>
+      If the function is successful, the return value is a handle to
+      LiteStep's main window. If an error occurs, the return value is
+      <const>NULL</const>.
+    </description>
+    <type>HWND</type>
+  </return>
+  <remarks>
+    <p>
+      To access some shell functions, a module must send a message to
+      LiteStep's main window. Call <fn>GetLitestepWnd</fn> to get a handle to
+      that window.
+    </p>
+  </remarks>
+</function>

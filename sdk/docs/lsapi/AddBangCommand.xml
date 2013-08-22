@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>AddBangCommand</name>
+  <description>Registers a bang command.</description>
+  <parameters>
+    <parameter>
+      <name>pszBangCommandName</name>
+      <description>
+        Name of the bang command to register. The first character must be an
+        exclamation point (<const>!</const>).
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pfnCallback</name>
+      <description>
+        Pointer to a callback function that LiteStep calls to execute the bang
+        command. For more information, see <fn>BangCommandProc</fn>.
+      </description>
+      <type>BANGCOMMANDPROC</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the bang command is successfully registered, the return value is
+      nonzero. If an error occurs, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      Before a module is unloaded, it must call <fn>RemoveBangCommand</fn>
+      to unregister the bang command.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>AddBangCommandEx</fn>
+    <fn>BangCommandProc</fn>
+    <fn>ParseBangCommand</fn>
+    <fn>RemoveBangCommand</fn>
+  </see-also>
+</function>

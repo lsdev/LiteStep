@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_SYSTRAY</name>
+  <description>
+    LiteStep sends this message whenever the state of a tray icon has changed.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        Specifies the action to be taken. This can be any of the NIM constants
+        used with the <extfn>Shell_NotifyIcon</extfn> function.
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Pointer to an <struct>LSNOTIFYICONDATA</struct> structure.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If a module successfully handles this message, it should return
+      <const>TRUE</const>.
+      If there was an error, it should return <const>FALSE</const>.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+    <p>
+      This message is generated when a module sends <msg>LM_SYSTRAYREADY</msg>
+      or when the state of an icon has changed. The latter usually means an
+      application has called <extfn>Shell_NotifyIcon</extfn>.
+    </p>
+  </remarks>
+  <example>
+    <blockcode>
+case LM_SYSTRAY:
+{
+    DWORD dwMessage = (DWORD)wParam;
+    PLSNOTIFYICONDATA pnid = (PLSNOTIFYICONDATA)lParam;
+    
+    if (dwMessage == NIM_ADD)
+    {
+       return AddIcon(pnid);
+    }
+    else
+    {
+       // handle other messages
+    }
+
+    return FALSE;
+}</blockcode>
+  </example>
+  <see-also>
+    <msg>LM_REGISTERMESSAGE</msg>
+    <msg>LM_SYSTRAYREADY</msg>
+    <msg>LM_SYSTRAYINFOEVENT</msg>
+  </see-also>
+</message>

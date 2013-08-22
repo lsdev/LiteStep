@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_UNLOADMODULE</name>
+  <description>
+    Unloads a specific module.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        <p>
+          If lParam is set to <const>LMM_PATH</const>,
+          this is the path to the module (as an <type>LPCTSTR</type>).
+        </p>
+        <p>
+          If lParam is set to <const>LMM_HINSTANCE</const>,
+          this is the module's <type>HINSTANCE</type>.
+        </p>        
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        This parameter can be <const>LMM_PATH</const> or
+        <const>LMM_HINSTANCE</const>.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is unspecified.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      If a module uses this message to unload itself, it <em>must not</em> use
+      <extfn>SendMessage</extfn> but <extfn>PostMessage</extfn>. Nevertheless,
+      using it for this purpose may lead to undesired side-effects and is thus
+      not recommended.
+    </p>
+    <p>
+      Using this message with lParam set to <const>LMM_PATH</const> is
+      equivalent to <const>!unloadmodule</const>.
+    </p>
+  </remarks>
+  <example>
+<blockcode>
+TCHAR szModule[] = TEXT("C:\\Path\\Other_Module.dll");
+SendMessage(GetLitestepWnd(), LM_UNLOADMODULE, (WPARAM)szModule, LMM_PATH);
+</blockcode>
+  </example>
+  <see-also>
+    <msg>LM_RELOADMODULE</msg>
+  </see-also>
+</message>

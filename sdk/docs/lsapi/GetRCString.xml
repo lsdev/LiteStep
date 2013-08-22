@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetRCString</name>
+  <description>
+    Gets a string from the configuration database.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to retrieve.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the retrieved string. If the string is too large
+        to fit in the buffer, it is truncated.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszDefault</name>
+      <description>
+        Default string. If the key cannot be found in the configuration
+        database, <fn>GetRCString</fn> copies the this string into the buffer.
+        If this parameter is <const>NULL</const>, it is treated as an empty
+        string.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the key is found in the configuration database, the return value is
+      nonzero. If the key cannot be found, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>GetRCString</fn> parses the raw string retrieved from the
+      configuration database and extracts the first token. Therefore, a string
+      that contains spaces must be quoted. Use <fn>GetRCLine</fn> to retrieve
+      the unparsed string.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>GetRCBool</fn>
+    <fn>GetRCBoolDef</fn>
+    <fn>GetRCColor</fn>
+    <fn>GetRCCoordinate</fn>
+    <fn>GetRCInt</fn>
+    <fn>GetRCLine</fn>
+  </see-also>
+</function>

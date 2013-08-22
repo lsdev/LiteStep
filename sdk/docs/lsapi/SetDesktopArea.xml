@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>SetDesktopArea</name>
+  <description>
+    Sets the desktop work area.
+  </description>
+  <parameters>
+    <parameter>
+      <name>nLeft</name>
+      <description>
+        X coordinate of work area upper left corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nTop</name>
+      <description>
+        Y coordinate of work area upper left corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nRight</name>
+      <description>
+        X coordinate of work area lower right corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nBottom</name>
+      <description>
+        Y coordinate of work area lower right corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      The work area is the area of the desktop that is not covered by maximized
+      windows.
+    </p>
+    <p>
+      Invoking this function does not automatically reposition maximized windows.
+    </p>
+  </remarks>
+</function>

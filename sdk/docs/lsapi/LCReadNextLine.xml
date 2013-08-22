@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LCReadNextLine</name>
+  <description>
+    Gets the next line from a configuration file.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pFile</name>
+      <description>
+        Handle to an open file. The file must have been opened with
+        <fn>LCOpen</fn>.
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the next line from the configuration file. If the
+        line is too large to fit in the buffer, it is truncated.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the next line was successfully retrieved, the return value is
+      nonzero. If there are no more lines in the configuration file or an
+      error occurs, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>LCReadNextLine</fn> retrieves the entire unparsed line from the
+      configuration file, including the key name.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LCClose</fn>
+    <fn>LCOpen</fn>
+    <fn>LCReadNextCommand</fn>
+    <fn>LCReadNextConfig</fn>
+  </see-also>
+</function>

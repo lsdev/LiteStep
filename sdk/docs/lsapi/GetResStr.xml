@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetResStr</name>
+  <description>
+    Loads a string resource.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hInstance</name>
+      <description>
+        Handle to the file instance containing the string resource.
+      </description>
+      <type>HINSTANCE</type>
+    </parameter>
+    <parameter>
+      <name>uID</name>
+      <description>
+        Specifies the resource index identifier of the string to be loaded.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the retrieved string. If the string is too large
+        to fit in the buffer, it is truncated.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pszDefault</name>
+      <description>
+        Default string. If the specified string resource cannot be found,
+        <fn>GetResStr</fn> copies this string into the buffer. If this
+        parameter is <const>NULL</const>, it is treated as an empty string.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      This is essentially a wrapper to the Win32 <extfn>LoadString</extfn>, but
+      provides a default value to return if the string resource does not exist.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>GetResStrEx</fn>
+  </see-also>
+</function>

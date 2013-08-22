@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LCOpen</name>
+  <description>
+    Opens a configuration file for sequential access.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPath</name>
+      <description>
+        Path to a configuration file or <const>NULL</const>. If
+        <const>NULL</const>, <fn>LCOpen</fn> opens LiteStep's main
+        configuration file (<const>step.rc</const>).
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      <p>
+        If the configuration file is opened successfully, the return value is
+        a handle to the file. If an error occurs, the return value is
+        <const>NULL</const>.
+      </p>
+      <p>
+        The returned file handle must be closed with <fn>LCClose</fn>.
+      </p>
+    </description>
+    <type>LPVOID</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>LCOpen</fn> opens a configuration file for subsequent access with
+      <fn>LCReadNextCommand</fn>, <fn>LCReadNextConfig</fn>, or
+      <fn>LCReadNextLine</fn>.
+    </p>
+    <p>
+      The value returned from <fn>LCOpen</fn> should be treated as an opaque
+      file handle. In past versions of LiteStep the return value was a C
+      <type>FILE *</type>, however this is no longer the case.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LCClose</fn>
+    <fn>LCReadNextCommand</fn>
+    <fn>LCReadNextConfig</fn>
+    <fn>LCReadNextLine</fn>
+  </see-also>
+</function>

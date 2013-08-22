@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+ 
+<function>
+  <name>is_valid_pattern</name>
+  <description>
+    Verifies that the given string contains a well formed wildcard pattern for
+    use with <fn>match</fn> or <fn>matche</fn>.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPattern</name>
+      <description>
+        A string containing a wildcard pattern for which to test for
+        correctness.  See <const>Remarks</const> for details.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pnError</name>
+      <description>
+        <p>
+          A pointer to an integer which receives the error code based on the
+          type of pattern error.  <type>PATTERN_VALID</type> is returned in
+          <param>error_type</param> if <param>pattern</param> contains a well
+          formed wildcard pattern.
+        </p>
+        <constant-list>
+          <constant>
+            <name>PATTERN_VALID</name>
+            <description>
+              The pattern is well formed.
+            </description>
+          </constant>
+          <constant>
+            <name>PATTERN_ESC</name>
+            <description>
+              The pattern has an invalid escape sequence: <const>\</const> at
+              end of pattern.
+            </description>
+          </constant>
+          <constant>
+            <name>PATTERN_RANGE</name>
+            <description>
+              The pattern has a set <const>[..]</const> construct with no end
+              range: <const>[a-]</const>
+            </description>
+          </constant>
+          <constant>
+            <name>PATTERN_CLOSE</name>
+            <description>
+              The pattern has a set <const>[..]</const> construct with no end
+              bracket: <const>[abc-g</const>
+            </description>
+          </constant>
+          <constant>
+            <name>PATTERN_EMPTY</name>
+            <description>
+              The pattern has an empty set <const>[..]</const> construct:
+              <const>[]</const>
+            </description>
+          </constant>
+        </constant-list>
+      </description>
+      <type>INT *</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If <param>pattern</param> contains a well formed wildcard pattern, the
+      return value is non zero. If the wildcard pattern is not valid, the return
+      value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      The string pointed to by <param>pattern</param> may contain the following
+      wildcard patterns:
+    </p>
+    <constant-list>
+      <constant>
+        <name>*</name>
+        <description>
+          matches any sequence of characters (zero or more)
+        </description>
+      </constant>
+      <constant>
+        <name>?</name>
+        <description>
+          matches any character
+        </description>
+      </constant>
+      <constant>
+        <name>[SET]</name>
+        <description>
+          matches any character in the specified set
+        </description>
+      </constant>
+      <constant>
+        <name>[!SET] or [^SET]</name>
+        <description>
+          matches any character not in the specified set
+        </description>
+      </constant>
+    </constant-list>
+    <p>
+      A <const>[SET]</const> is composed of characters or ranges; a range looks
+      like character hyphen character as in <const>[0-9]</const> or
+      <const>[A-Z]</const>.
+    </p>
+    <p>
+      A character is any 8 bit character with the minimal alpha numeric set
+      being <const>[a-zA-Z0-9]</const>.
+    </p>
+    <p>
+      To suppress the special syntactic significance of any of
+      <const>[]*?!^-\</const>, and match the character exactly, precede it with
+      a backslash <const>\</const> character.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>match</fn>
+    <fn>matche</fn>
+  </see-also>
+</function>

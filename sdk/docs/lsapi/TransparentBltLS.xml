@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>TransparentBltLS</name>
+  <description>
+    Performs a bit-block transfer of the non-transparent color data from one
+    device context to another.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hdcDest</name>
+      <description>
+        Handle to the destination device context.
+      </description>
+      <type>HDC</type>
+    </parameter>
+    <parameter>
+      <name>nXDest</name>
+      <description>
+        X coordinate of destination upper left corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nYDest</name>
+      <description>
+        Y coordinate of destination upper left corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nWidth</name>
+      <description>
+        Width of destination rectangle.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nHeight</name>
+      <description>
+        Height of destination rectangle.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>hdcSrc</name>
+      <description>
+        Handle to the source device context.
+      </description>
+      <type>HDC</type>
+    </parameter>
+    <parameter>
+      <name>nXSrc</name>
+      <description>
+        X coordinate of source upper left corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nYSrc</name>
+      <description>
+        Y coordinate of source upper left corner.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>crTransparent</name>
+      <description>
+        Transparency color.
+      </description>
+      <type>COLORREF</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      Any pixel that matches the <param>crTransparent</param> parameter will not
+      be copied in the bit-block transfer, leaving the coresponding destination
+      pixel unmodified.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>BitmapToRegion</fn>
+  </see-also>
+</function>

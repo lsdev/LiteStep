@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSSetVariable</name>
+  <description>
+    Sets the value of a key in the configuration database or adds a new key
+    to the database if it does not exist.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to update or add.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszValue</name>
+      <description>
+        New value for the key.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      <fn>LSSetVariable</fn> only modifies the configuration database in
+      memory; it does not modify any configuration files. When LiteStep
+      recycles or shuts down, the changes to the database are lost.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LSGetVariable</fn>
+    <fn>LSGetVariableEx</fn>
+    <fn>VarExpansion</fn>
+    <fn>VarExpansionEx</fn>
+  </see-also>
+</function>

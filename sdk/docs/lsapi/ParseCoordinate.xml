@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>ParseCoordinate</name>
+  <description>
+    Parses a coordinate from a string.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszString</name>
+      <description>
+        String to parse.
+      </description>
+      <type>LPCSTR</type>
+    </parameter>
+    <parameter>
+      <name>nDefault</name>
+      <description>
+        Default value to return if pszString is not a valid coordinate value.
+      </description>
+      <type>INT</type>
+    </parameter>
+    <parameter>
+      <name>nLimit</name>
+      <description>
+        Maximum value for the coordinate.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the coordinate is parsed successfully, the return value is the parsed
+      value. If an error occurs, the return value is the value of the
+      <param>nDefault</param> parameter.
+    </description>
+    <type>INT</type>
+  </return>
+  <remarks>
+    For a discussion of the types of coordinates supported, see
+    <fn>GetRCCoordinate</fn>.
+  </remarks>
+  <see-also>
+    <fn>GetRCCoordinate</fn>
+  </see-also>
+</function>

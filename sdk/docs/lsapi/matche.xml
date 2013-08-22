@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+ 
+<function>
+  <name>matche</name>
+  <description>
+    Matches a text string against a case-insensitive wildcard pattern and
+    returns an error code with the result of the match comparison.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPattern</name>
+      <description>
+        A <type>NULL</type> terminated string containing a wildcard pattern.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszText</name>
+      <description>
+        A <type>NULL</type> terminated string containing the text to match
+        against the given wildcard pattern.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      <p>
+        If the string given in <param>pszText</param> fully matches the wildcard
+        pattern given in <param>pszPattern</param> then the function returns
+        <type>MATCH_VALID</type>, otherwise it returns one of the following
+        error codes:
+      </p>
+      <constant-list>
+        <constant>
+          <name>MATCH_PATTERN</name>
+          <description>
+            <param>pszPattern</param> contains an invalid pattern.
+            See <fn>is_valid_pattern</fn>.
+          </description>
+        </constant>
+        <constant>
+          <name>MATCH_LITERAL</name>
+          <description>
+            Match failure on literal mismatch.
+          </description>
+        </constant>
+        <constant>
+          <name>MATCH_RANGE</name>
+          <description>
+            Match failure on set <const>[..]</const> construct.
+          </description>
+        </constant>
+        <constant>
+          <name>MATCH_ABORT</name>
+          <description>
+            Premature end of text string.
+          </description>
+        </constant>
+        <constant>
+          <name>MATCH_END</name>
+          <description>
+            Premature end of pattern string.
+          </description>
+        </constant>
+        <constant>
+          <name>MATCH_VALID</name>
+          <description>
+            The string in <param>pszText</param> fully matches the wildcard
+            pattern in <param>pszPattern</param>.
+          </description>
+        </constant>
+      </constant-list>
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>matche</fn> implements a very limited pattern matching syntax. See
+      <fn>is_valid_pattern</fn> for details.
+    </p>
+    <p>
+      If the error code is not needed, use <fn>match</fn> to obtain a simple
+      <type>TRUE</type> or <type>FALSE</type> match result.
+    </p>
+  </remarks>
+  <example>
+    <p>
+      <code>matche("New*[1-9Class", "NewModule1Class");</code> would return
+      <type>MATCH_PATTERN</type> because of the missing closing range set
+      bracket <const>']'</const>.
+    </p>
+    <p>
+      <code>matche("New*[1-9]Class", "OldModule2Class");</code> would return
+      <type>MATCH_LITERAL</type> because the first character <const>'N'</const>
+      of <param>pszPattern</param> does not equal the first character
+      <const>'O'</const> of <param>pszText</param>.
+    </p>
+    <p>
+      <code>matche("???Module[1-9]*", "NewModule0Class");</code> would return
+      <type>MATCH_RANGE</type> because <const>'0'</const> does not exist in the
+      range set <const>[1-9]</const>.
+    </p>
+    <p>
+      <code>matche("???Module[1-9]Class", "OldModule3Clas");</code> would return
+      <type>MATCH_ABORT</type> because the <param>pszText</param> string is
+      missing a single character <const>'s'</const> that the
+      <param>pszPattern</param> string has.
+    </p>
+    <p>
+      <code>matche("NewModule[1-9]", "NewModule2Class");</code> would return
+      <type>MATCH_END</type> because the <param>pszPattern</param> string ends
+      before all of the <param>pszText</param> string is used up.
+    </p>
+    <p>
+      <code>matche("???*[1-9]Class", "OldModule1Class");</code> would return
+      <type>MATCH_VALID</type> as the <param>pszText</param> string fully
+      matches the wildcard pattern supplied in the <param>pszPattern</param>
+      string.
+    </p>
+  </example>
+  <see-also>
+    <fn>is_valid_pattern</fn>
+    <fn>match</fn>
+  </see-also>
+</function>

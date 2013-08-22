@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_TASK_REGISTERTAB</name>
+  <description>
+    LiteStep sends this message when an application has called
+    ITaskbarList3::RegisterTab.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        A handle to the tab window that is being registered.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        A handle to the MDI window for which the tab is being registered.
+      </description>
+      <type>HWND</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is ignored.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+  </remarks>
+  <see-also>
+    <msg>LM_TASK_UNREGISTERTAB</msg>
+    <msg>LM_TASK_SETTABORDER</msg>
+    <msg>LM_TASK_SETACTIVETAB</msg>
+    <msg>LM_TASK_SETTABPROPERTIES</msg>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

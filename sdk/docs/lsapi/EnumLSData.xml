@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>EnumLSData</name>
+  <description>
+    Enumerates bang commands, modules, or revision IDs.
+  </description>
+  <parameters>
+    <parameter>
+      <name>uType</name>
+      <description>
+        <p>
+          Type of information to enumerate. This must be one of the following
+          constants.
+        </p>
+        <constant-list>
+          <constant>
+            <name>ELD_BANGS</name>
+            <description>Enumerates registered bang commands.</description>
+          </constant>
+          <constant>
+            <name>ELD_BANGS_V2</name>
+            <description>
+              Enumerates registered bang commands and
+              the modules that implement them.
+            </description>
+          </constant>
+          <constant>
+            <name>ELD_MODULES</name>
+            <description>Enumerates loaded modules.</description>
+          </constant>
+          <constant>
+            <name>ELD_PERFORMANCE</name>
+            <description>Enumerates module loading times.</description>
+          </constant>
+          <constant>
+            <name>ELD_REVIDS</name>
+            <description>Enumerates revision ID strings.</description>
+          </constant>
+        </constant-list>
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pfnCallback</name>
+      <description>
+        Pointer to the callback function that <fn>EnumLSData</fn> calls for
+        each enumerated item. For more information, see
+        Remarks.
+      </description>
+      <type>FARPROC</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Application-defined value passed to the callback function.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If all the items are enumerated, the return value is
+      <const>S_OK</const>. If the callback function returned zero, the return
+      value is <const>S_FALSE</const>. If an error occurs, the return value is
+      an error code.
+    </description>
+    <type>HRESULT</type>
+  </return>
+  <remarks>
+    <p>
+      The signature of the callback function depends on the
+      <param>uType</param> parameter. For <const>ELD_BANGS</const> the
+      callback function must match <fn>EnumBangsProc</fn>, for
+      <const>ELD_BANGS_V2</const> the callback function must match
+      <fn>EnumBangsV2Proc</fn>, for <const>ELD_MODULES</const> the callback
+      function must match <fn>EnumModulesProc</fn>, for
+      <const>ELD_PERFORMANCE</const> the callback function must match
+      <fn>EnumPerformanceProc</fn> and for <const>ELD_REVIDS</const> the
+      callback must match <fn>EnumRevIDsProc</fn>.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>EnumBangsProc</fn>
+    <fn>EnumBangsV2Proc</fn>
+    <fn>EnumModulesProc</fn>
+    <fn>EnumPerformanceProc</fn>
+    <fn>EnumRevIDsProc</fn>
+  </see-also>
+</function>

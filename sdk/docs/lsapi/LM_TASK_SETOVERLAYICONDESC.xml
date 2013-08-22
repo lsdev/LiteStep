@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_TASK_SETOVERLAYICONDESC</name>
+  <description>
+    LiteStep sends this message when an application has called
+    ITaskbarList3::SetOverlayIcon.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        A handle to the window whose overlay icon description is being set.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        The new description of the overlay icon. Can be NULL.
+      </description>
+      <type>LPCWSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is ignored.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+  </remarks>
+  <see-also>
+    <msg>LM_TASK_SETOVERLAYICON</msg>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

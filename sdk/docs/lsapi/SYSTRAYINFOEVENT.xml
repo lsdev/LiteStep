@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<structure>
+  <name>SYSTRAYINFOEVENT</name>
+
+  <description>
+    Used in conjunction with <msg>LM_SYSTRAYINFOEVENT</msg>.
+  </description>
+
+  <members>
+    <member>
+      <name>cbSize</name>
+      <type>DWORD</type>
+      <description>The size of the structure, in bytes.</description>
+    </member>
+    <member>
+      <name>dwEvent</name>
+      <type>DWORD</type>
+      <description>
+        The type of info event this is. TRAYEVENT_GETICONPOS or 
+        TRAYEVENT_GETICONSIZE.
+      </description>
+    </member>
+    <member>
+      <name>hWnd</name>
+      <type>HWND</type>
+      <description>
+        A handle to the window that should receive notifications for the icon.
+      </description>
+    </member>
+    <member>
+      <name>uID</name>
+      <type>UINT</type>
+      <description>
+        The application-defined identifier of the taskbar icon.
+      </description>
+    </member>
+    <member>
+      <name>guidItem</name>
+      <type>GUID</type>
+      <description>The GUID of the icon.</description>
+    </member>
+  </members>
+  
+  <see-also>
+    <msg>LM_SYSTRAYINFOEVENT</msg>
+  </see-also>
+</structure>

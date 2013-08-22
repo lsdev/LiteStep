@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_FULLSCREENACTIVATED</name>
+  <description>
+    LiteStep sends this message when the currently active window becomes a
+    fullscreen window, on a monitor which previously did not contain any 
+    fullscreen windows.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        A handle to the monitor which contains the fullscreen window.
+      </description>
+      <type>HMONITOR</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Handle to the fullscreen window.
+      </description>
+      <type>HWND</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is ignored.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+  </remarks>
+  <example>
+    <blockcode>
+case LM_FULLSCREENACTIVATED:
+{
+    for (Widget *pWidget : gWidgets)
+    {
+       if (pWidget->bAlwaysOnTop &amp;&amp; MonitorFromWindow(pWidget->hWnd, MONITOR_DEFAULTTONULL) == (HMONITOR)wParam)
+       {
+          SetWindowPos(pWidget->hWnd, (HWND)lParam, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+       }
+    }
+
+    return 0;
+}
+	</blockcode>
+  </example>
+  <see-also>
+    <msg>LM_FULLSCREENDEACTIVATED</msg>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

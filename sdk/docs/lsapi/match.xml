@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+ 
+<function>
+  <name>match</name>
+  <description>
+    Matches a text string against a case-insensitive wildcard pattern.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPattern</name>
+      <description>
+        A <type>NULL</type> terminated string containing a wildcard pattern.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszText</name>
+      <description>
+        A <type>NULL</type> terminated string containing the text to match
+        against the given wildcard pattern.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the string given in <param>pszText</param> fully matches the wildcard
+      pattern given in <param>pszPattern</param>, the return value is non zero.
+      If the match failed, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>match</fn> implements a very limited pattern matching syntax. See
+      <fn>is_valid_pattern</fn> for details.
+    </p>
+    <p>
+      If needed, use <fn>matche</fn> to determine why a pattern match failed.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>is_valid_pattern</fn>
+    <fn>matche</fn>
+  </see-also>
+</function>

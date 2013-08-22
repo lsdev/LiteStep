@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>BitmapFromIcon</name>
+  <description>
+    Creates a bitmap from an icon resource.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hIcon</name>
+      <description>
+        Handle to the source icon.
+      </description>
+      <type>HICON</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      <p>
+        If the function succeeds, the return value is the handle to the newly
+        created bitmap. If an error occurs, the return value is
+        <const>NULL</const>.
+      </p>
+      <p>
+        The returned handle must be freed with a call to
+        <extfn>DeleteObject</extfn>.
+      </p>
+    </description>
+    <type>HBITMAP</type>
+  </return>
+  <see-also>
+    <fn>BitmapToRegion</fn>
+    <fn>LoadLSImage</fn>
+    <fn>LoadLSIcon</fn>
+  </see-also>
+</function>

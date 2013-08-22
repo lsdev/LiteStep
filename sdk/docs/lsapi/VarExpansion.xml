@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>VarExpansion</name>
+  <description>
+    Expands variable references.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the expanded string.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszString</name>
+      <description>
+        String containing variable references to be expanded.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      Variable references are enclosed in dollar signs (<const>$</const>) and
+      can contain the name of a configuration key, an environment variable, or
+      an expression.
+    </p>
+    <p>
+      Typically a module does not call this function directly since all of the
+      configuration functions expand variable references automatically.
+    </p>
+    <p>
+      <strong>Deprecated.</strong> Replaced by <fn>VarExpansionEx</fn>.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LSGetVariable</fn>
+    <fn>LSGetVariableEx</fn>
+    <fn>LSSetVariable</fn>
+    <fn>VarExpansionEx</fn>
+  </see-also>
+</function>

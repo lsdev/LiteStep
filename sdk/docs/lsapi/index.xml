@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="index.xslt"?>
+
+<index>
+  <title>LiteStep Reference</title>
+
+  <section name="LiteStep Functions">
+
+    <section name="Bang Commands">
+      <link>AddBangCommand</link>
+      <link>AddBangCommandEx</link>
+      <link>BangCommandProc</link>
+      <link>BangCommandProcEx</link>
+      <link>ParseBangCommand</link>
+      <link>RemoveBangCommand</link>
+    </section>
+
+    <section name="Configuration">
+      <link>GetRCBool</link>
+      <link>GetRCBoolDef</link>
+      <link>GetRCColor</link>
+      <link>GetRCCoordinate</link>
+      <link>GetRCInt</link>
+      <link>GetRCLine</link>
+      <link>GetRCString</link>
+      <link>LCClose</link>
+      <link>LCOpen</link>
+      <link>LCReadNextCommand</link>
+      <link>LCReadNextConfig</link>
+      <link>LCReadNextLine</link>
+      <link>LSGetVariable</link>
+      <link>LSGetVariableEx</link>
+      <link>LSSetVariable</link>
+      <link>VarExpansion</link>
+      <link>VarExpansionEx</link>
+    </section>
+
+    <section name="Graphics">
+      <link>BitmapFromIcon</link>
+      <link>BitmapToRegion</link>
+      <link>Frame3D</link>
+      <link>GetLSBitmapSize</link>
+      <link>LoadLSIcon</link>
+      <link>LoadLSImage</link>
+      <link>LSGetImagePath</link>
+      <link>TransparentBltLS</link>
+    </section>
+
+    <section name="Miscellaneous">
+      <link>EnumBangsProc</link>
+      <link>EnumBangsV2Proc</link>
+      <link>EnumLSData</link>
+      <link>EnumModulesProc</link>
+      <link>EnumPerformanceProc</link>
+      <link>EnumRevIDsProc</link>
+      <link>GetLitestepWnd</link>
+      <link>LSExecute</link>
+      <link>LSExecuteEx</link>
+      <link>LSLog</link>
+      <link>LSLogPrintf</link>
+      <link>LSGetLitestepPath</link>
+      <link>SetDesktopArea</link>
+    </section>
+    
+    <section name="Multi-Monitor">
+      <description>
+        <p>
+          Wrapper functions to the Win32 API equivalent to support modules
+          running on Windows 95.
+        </p>
+        <p>
+          These functions have been <strong>deprecated</strong>. <em>Please use
+          the Win32 API equivalents.</em>
+        </p>
+      </description>
+      <link stub="yes">LSEnumDisplayMonitors</link>
+      <link stub="yes">LSEnumDisplayDevices</link>
+      <link stub="yes">LSGetMonitorInfo</link>
+      <link stub="yes">LSGetSystemMetrics</link>
+      <link stub="yes">LSMonitorFromPoint</link>
+      <link stub="yes">LSMonitorFromRect</link>
+      <link stub="yes">LSMonitorFromWindow</link>
+    </section>
+    
+    <section name="Strings">
+      <link>CommandParse</link>
+      <link>CommandTokenize</link>
+      <link>GetResStr</link>
+      <link>GetResStrEx</link>
+      <link>GetToken</link>
+      <link>is_valid_pattern</link>
+      <link>LCTokenize</link>
+      <link>match</link>
+      <link>matche</link>
+      <link>ParseCoordinate</link>
+    </section>
+    
+  </section>
+
+  <section name="LiteStep Messages">
+
+    <section name="Core to module">
+      <link>LM_GETREVID</link>
+      <link>LM_REFRESH</link>
+      <link>LM_SYSTRAY</link>
+      <link>LM_SYSTRAYINFOEVENT</link>
+      <link>LM_FULLSCREENACTIVATED</link>
+      <link>LM_FULLSCREENDEACTIVATED</link>
+
+      <section name="Shell Hook">
+        <link target="LM_SHELLHOOK">LM_ACCESSIBILITYSTATE</link>
+        <link target="LM_SHELLHOOK">LM_ACTIVATESHELLWINDOW</link>
+        <link target="LM_SHELLHOOK">LM_APPCOMMAND</link>
+        <link target="LM_SHELLHOOK">LM_GETMINRECT</link>
+        <link target="LM_SHELLHOOK">LM_LANGUAGE</link>
+        <link target="LM_SHELLHOOK">LM_MONITORCHANGED</link>
+        <link target="LM_SHELLHOOK">LM_REDRAW</link>
+        <link target="LM_SHELLHOOK">LM_TASKMAN</link>
+        <link target="LM_SHELLHOOK">LM_WINDOWACTIVATED</link>
+        <link target="LM_SHELLHOOK">LM_WINDOWCREATED</link>
+        <link target="LM_SHELLHOOK">LM_WINDOWREPLACED</link>
+        <link target="LM_SHELLHOOK">LM_WINDOWREPLACING</link>
+        <link target="LM_SHELLHOOK">LM_WINDOWDESTROYED</link>
+      </section>
+      
+      <section name="ITaskbarList*">
+        <link>LM_TASK_SETPROGRESSSTATE</link>
+        <link>LM_TASK_SETPROGRESSVALUE</link>
+        <link>LM_TASK_MARKASACTIVE</link>
+        <link>LM_TASK_REGISTERTAB</link>
+        <link>LM_TASK_UNREGISTERTAB</link>
+        <link>LM_TASK_SETACTIVETAB</link>
+        <link>LM_TASK_SETTABORDER</link>
+        <link>LM_TASK_SETTABPROPERTIES</link>
+        <link>LM_TASK_SETOVERLAYICON</link>
+        <link>LM_TASK_SETOVERLAYICONDESC</link>
+        <link>LM_TASK_SETTHUMBNAILTOOLTIP</link>
+        <link>LM_TASK_SETTHUMBNAILCLIP</link>
+        <link>LM_TASK_THUMBBARADDBUTTONS</link>
+        <link>LM_TASK_THUMBBARUPDATEBUTTONS</link>
+        <link>LM_TASK_THUMBBARSETIMAGELIST</link>
+      </section>
+    </section>
+
+    <section name="Module to core">
+      <link>LM_REGISTERMESSAGE</link>
+      <link>LM_RELOADMODULE</link>
+      <link>LM_RESTOREDATA</link>
+      <link>LM_SAVEDATA</link>
+      <link>LM_SYSTRAYREADY</link>
+      <link>LM_UNLOADMODULE</link>
+      <link>LM_UNREGISTERMESSAGE</link>
+    </section>
+
+  </section>
+  
+  <section name="LiteStep Structures">
+    <link>LSNOTIFYICONDATA</link>
+    <link>SYSTRAYINFOEVENT</link>
+    <link>THUMBBUTTONLIST</link>
+  </section>
+  
+  <section name="Module Entry Points">
+    <link>initModuleW</link>
+    <link>initModuleEx</link>
+    <link>quitModule</link>
+  </section>
+  
+</index>

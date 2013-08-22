@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<structure>
+  <name>LSNOTIFYICONDATA</name>
+
+  <description>
+    Contains information that modules need to show system tray icons.
+    Used in conjunction with <msg>LM_SYSTRAY</msg>.
+  </description>
+
+  <members>
+    <member>
+      <name>cbSize</name>
+      <type>DWORD</type>
+      <description>The size of the structure, in bytes.</description>
+    </member>
+    <member>
+      <name>hWnd</name>
+      <type>HWND</type>
+      <description>
+        A handle to the window that should receive notifications for the icon.
+      </description>
+    </member>
+    <member>
+      <name>uID</name>
+      <type>UINT</type>
+      <description>
+        The application-defined identifier of the taskbar icon.
+      </description>
+    </member>
+    <member>
+      <name>uFlags</name>
+      <type>UINT</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>uCallbackMessage</name>
+      <type>UINT</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>hIcon</name>
+      <type>HICON</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>szTip</name>
+      <type array-size="TRAY_MAX_TIP_LENGTH">TCHAR</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>dwState</name>
+      <type>DWORD</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>dwStateMask</name>
+      <type>DWORD</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>szInfo</name>
+      <type array-size="TRAY_MAX_INFO_LENGTH">TCHAR</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>uTimeout</name>
+      <type>UINT</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>uVersion</name>
+      <type>UINT</type>
+      <description>
+        Specifies which version of tray icon this is. Only valid for
+        NIM_SETVERSION messages.
+      </description>
+    </member>
+    <member>
+      <name>szInfoTitle</name>
+      <type array-size="TRAY_MAX_INFOTITLE_LENGTH">TCHAR</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>dwInfoFlags</name>
+      <type>DWORD</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>guidItem</name>
+      <type>GUID</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+    <member>
+      <name>hBalloonIcon</name>
+      <type>HICON</type>
+      <description>TODO, refer to MSDN</description>
+    </member>
+  </members>
+  
+  <remarks>
+    <p>
+      This is LiteStep's version of Windows's
+      <extstruct>NOTIFYICONDATA</extstruct>. However,
+      <struct>LSNOTIFYICONDATA</struct> is stable while
+      <extstruct>NOTIFYICONDATA</extstruct> changes from one Windows version
+      to another.
+    </p>
+    <p>
+      Unless otherwise noted, LiteStep simply copies incoming data from
+      <extstruct>NOTIFYICONDATA</extstruct> to
+      <struct>LSNOTIFYICONDATA</struct>. For that reason, please refer to the
+      documentation of <extstruct>NOTIFYICONDATA</extstruct> in addition to
+      this.
+    </p>
+  </remarks>
+  
+  <see-also>
+    <msg>LM_SYSTRAY</msg>
+  </see-also>
+</structure>

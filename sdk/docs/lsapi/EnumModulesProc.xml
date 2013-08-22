@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>EnumModulesProc</name>
+  <calling-convention>CALLBACK</calling-convention>
+  <description>
+    Application-defined callback function used with <fn>EnumLSData</fn> and
+    <const>ELD_MODULES</const>.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPath</name>
+      <description>
+        Path to the module's DLL.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>fdwFlags</name>
+      <description>
+        <p>
+          Set of flags used to the load module. The following is the list of
+          possible flags.
+        </p>
+        <constant-list>
+          <constant>
+            <name>LS_MODULE_THREADED</name>
+            <description>The module was loaded in its own thread.</description>
+          </constant>
+        </constant-list>
+      </description>
+      <type>DWORD</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Application-defined value given to <fn>EnumLSData</fn>.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      To continue the enumeration, the callback function must return
+      <const>TRUE</const>. To cancel the enumeration, the callback function
+      must return <const>FALSE</const>.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <see-also>
+    <fn>EnumBangsProc</fn>
+    <fn>EnumBangsV2Proc</fn>
+    <fn>EnumLSData</fn>
+    <fn>EnumPerformanceProc</fn>
+    <fn>EnumRevIDsProc</fn>
+  </see-also>
+</function>

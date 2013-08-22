@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LCTokenize</name>
+  <description>
+    Parses a string into tokens.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszString</name>
+      <description>
+        String to tokenize.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>ppszBuffers</name>
+      <description>
+        Array of buffers that receive the tokens. <fn>LCTokenize</fn>
+        repeatedly parses a token from the input string and copies it into the
+        next available buffer. Once all the buffers have been used, any
+        remaining input is copied into the buffer pointed to by
+        <param>pszExtraBuffer</param>. If this parameter is
+        <const>NULL</const>, <fn>LCTokenize</fn> returns the total number of
+        tokens in the input string.
+      </description>
+      <type>LPTSTR *</type>
+    </parameter>
+    <parameter>
+      <name>cBuffers</name>
+      <description>
+        Number of buffers in the array pointed to by
+        <param>lplpszBuffers</param>.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pszExtraBuffer</name>
+      <description>
+        Buffer that receives any remaining characters. If this parameter is
+        <const>NULL</const>, the extra characters are discarded.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If <param>ppszBuffers</param> is not <const>NULL</const>, the return
+      value is the number of tokens parsed. If <param>ppszBuffers</param> is
+      <const>NULL</const>, the return value is the total number of tokens in
+      the input string.
+    </description>
+    <type>UINT</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>LCTokenize</fn> extracts whitespace-delimited tokens and quoted
+      strings. Spaces, tabs, carriage returns (<const>\r</const>), and line
+      feeds (<const>\n</const>) are interpreted as whitespace. Both single
+      (<const>'</const>) and double (<const>"</const>) quotes are supported.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>CommandTokenize</fn>
+    <fn>GetToken</fn>
+  </see-also>
+</function>

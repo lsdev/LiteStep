@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_RELOADMODULE</name>
+  <description>
+    Loads or reloads a specific module.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <type>WPARAM</type>
+      <description>
+        This parameter identifies the module. For more information, see
+        <param>lParam</param>.
+      </description>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <type>LPARAM</type>
+      <description>
+        This parameter can be one or more of the following values:
+        <constant-list>
+          <constant>
+            <name>LMM_PATH</name>
+            <description>
+              <p>
+                <param>wParam</param> is the path to the module
+                (as an <type>LPCTSTR</type>).
+              </p>
+              <p>
+                This flag cannot be used with <const>LMM_HINSTANCE</const>.
+              </p>
+            </description>
+          </constant>
+          <constant>
+            <name>LMM_HINSTANCE</name>
+            <description>
+              <p>
+                <param>wParam</param> is the module's <type>HINSTANCE</type>.
+              </p>
+              <p>
+                This flag cannot be used with <const>LMM_PATH</const>.
+              </p>
+            </description>
+          </constant>
+          <constant>
+            <name>LS_MODULE_THREADED</name>
+            <description>
+              <p>
+                The module is loaded in a separate thread.
+              </p>
+              <p>
+                This flag cannot be used with <const>LMM_HINSTANCE</const>.
+              </p>
+            </description>
+          </constant>
+        </constant-list>
+      </description>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is unspecified.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      If a module uses this message to reload itself, it <em>must not</em> use
+      <extfn>SendMessage</extfn> but <extfn>PostMessage</extfn>. Nevertheless,
+      using it for this purpose may lead to undesired side-effects and is thus
+      not recommended.
+    </p>
+    <p>
+      If the specified module is already loaded, it is unloaded and then
+      reloaded.
+    </p>
+    <p>
+      Using this message with lParam set to <const>LMM_PATH</const> is
+      equivalent to <const>!reloadmodule</const>.
+    </p>
+  </remarks>
+  <example>
+<blockcode>
+TCHAR szModule[] = TEXT("C:\\Path\\Other_Module.dll");
+SendMessage(GetLitestepWnd(), LM_RELOADMODULE, (WPARAM)szModule, LMM_PATH);
+
+TCHAR szThreadedModule[] = TEXT("C:\\Path\\Threaded_Module.dll");
+SendMessage(GetLitestepWnd(), LM_RELOADMODULE, (WPARAM)szThreadedModule, LMM_PATH | LS_MODULE_THREADED);
+</blockcode>
+  </example>
+  <see-also>
+    <msg>LM_UNLOADMODULE</msg>
+  </see-also>
+</message>

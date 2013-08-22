@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>quitModule</name>
+  <calling-convention>__cdecl</calling-convention>
+  <description>
+    The LiteStep Module exit point.  Prior to unloading the module from memory,
+    the LiteStep core calls this module function to allow the module to shutdown
+    and free any resources it has in use.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hInstance</name>
+      <description>
+        Handle to this module's instance.
+      </description>
+      <type>HINSTANCE</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      A call into the module through <fn>quitModule</fn> is always paired with
+      a previous call to <fn>initModuleEx</fn> when the module was first loaded.
+      A Module is typically loaded when LiteStep initially starts and unloaded
+      when LiteStep exits. However, a module may be loaded and unloaded multiple
+      times during a single invocation of the LiteStep process.  This normally
+      occurs during a LiteStep Recycle.  Ensure that all resources that have
+      been allocated by the module are released in <fn>quitModule</fn>.
+    </p>
+  </remarks>
+  <example>
+    <blockcode>
+#define EXPORT __declspec(dllexport)
+
+EXTERN_C EXPORT VOID __cdecl quitModule(HINSTANCE hInstance)
+{
+    // Free all allocated resources. Examples:
+    // * unregister !bang commands and LiteStep messages
+    // * free GDI resources and allocated memory
+    // * destroy windows
+    myShutdownModule();
+    
+    return;
+}   </blockcode>
+  </example>
+  <see-also>
+    <fn>initModuleW</fn>
+    <fn>initModuleEx</fn>
+  </see-also>
+</function>

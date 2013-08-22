@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LCClose</name>
+  <description>
+    Closes a configuration file.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pFile</name>
+      <description>
+        Handle to an open file. The file must have been opened with
+        <fn>LCOpen</fn>.
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the file is closed successfully, the return value is nonzero. If an
+      errror occurs, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <see-also>
+    <fn>LCOpen</fn>
+    <fn>LCReadNextCommand</fn>
+    <fn>LCReadNextConfig</fn>
+    <fn>LCReadNextLine</fn>
+  </see-also>
+</function>

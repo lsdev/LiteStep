@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>CommandParse</name>
+  <description>
+    Splits a string into a command token and its arguments.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszString</name>
+      <description>
+        String to split.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszCommandToken</name>
+      <description>
+        Buffer that receives the command token.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszCommandArgs</name>
+      <description>
+        Buffer that receives the command arguments. If this parameter is
+        <const>NULL</const>, the arguments are discarded.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchCommandToken</name>
+      <description>
+        Size of the <param>pszCommandToken</param> buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>cchCommandArgs</name>
+      <description>
+        Size of the <param>pszCommandArgs</param> buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+  </parameters>
+  <remarks>
+    <p>
+      Prior to splitting <param>pszString</param> into its command token and
+      arguments, <fn>CommandParse</fn> expands all variable references in
+      <param>pszString</param>.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>CommandTokenize</fn>
+    <fn>GetToken</fn>
+    <fn>VarExpansionEx</fn>
+  </see-also>
+</function>

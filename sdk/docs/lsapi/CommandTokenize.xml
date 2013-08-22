@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>CommandTokenize</name>
+  <description>
+    Parses a string into tokens.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszString</name>
+      <description>
+        String to tokenize.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>ppszBuffers</name>
+      <description>
+        Array of buffers that receive the tokens. <fn>CommandTokenize</fn>
+        repeatedly parses a token from the input string and copies it into the
+        next available buffer. Once all the buffers have been used, any
+        remaining input is copied into the buffer pointed to by
+        <param>pszExtraBuffer</param>. If this parameter is
+        <const>NULL</const>, <fn>CommandTokenize</fn> returns the total number
+        of tokens in the input string.
+      </description>
+      <type>LPTSTR *</type>
+    </parameter>
+    <parameter>
+      <name>cBuffers</name>
+      <description>
+        Number of buffers in the array pointed to by
+        <param>ppszBuffers</param>.
+      </description>
+      <type>UINT</type>
+    </parameter>
+    <parameter>
+      <name>pszExtraBuffer</name>
+      <description>
+        Buffer that receives any remaining characters. If this parameter is
+        <const>NULL</const>, the extra characters are discarded.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If <param>ppszBuffers</param> is not <const>NULL</const>, the return
+      value is the number of tokens parsed. If <param>ppszBuffers</param> is
+      <const>NULL</const>, the return value is the total number of tokens in
+      the input string.
+    </description>
+    <type>UINT</type>
+  </return>
+  <remarks>
+    <p>
+      In addition to the tokens extracted by <fn>LCTokenize</fn>,
+      <fn>CommandTokenize</fn> also handles tokens enclosed in square
+      brackets, which may be nested.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>GetToken</fn>
+    <fn>LCTokenize</fn>
+  </see-also>
+</function>

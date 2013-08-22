@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSGetImagePath</name>
+  <description>
+    Gets the path to the image directory.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the path. If the path is too large to fit in the
+        buffer, it is truncated.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>cchBuffer</name>
+      <description>
+        Size of the buffer in characters.
+      </description>
+      <type>UINT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the path is retrieved successfully, the return value is nonzero. If
+      an error occurs, the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      The path to the image directory is stored in the <const>step.rc</const>
+      under the <const>LSImageFolder</const> key. <fn>LoadLSIcon</fn> and
+      <fn>LoadLSImage</fn> search for files in this directory.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>LoadLSIcon</fn>
+    <fn>LoadLSImage</fn>
+    <fn>LSGetLitestepPath</fn>
+  </see-also>
+</function>

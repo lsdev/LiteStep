@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_SAVEDATA</name>
+  <description>
+    A module sends <msg>LM_SAVEDATA</msg> to LiteStep to store arbitrary data.
+    This data persists until it is retrieved by <msg>LM_RESTOREDATA</msg> or
+    LiteStep exits.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        <p>
+          The low-order word specifies the size of the data to be saved.
+        </p>
+        <p>
+          The high-order word is a module-defined, unique ID.
+        </p>
+      </description>
+      <type>WPARAM</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Pointer to the data.
+      </description>
+      <type>LPARAM</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the data was successfully saved, the return value is nonzero.
+      If an error occured, the return value is zero.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      Do not use this to store huge amounts of data. For example, if the module
+      is not reloaded after <const>!recycle</const>, it'll never call
+      <msg>LM_RESTOREDATA</msg>. The memory is then leaked until LiteStep
+      exits.
+    </p>
+    <p>
+      It is recommended that you use the <extfn>MAKEWPARAM</extfn> macro to
+      construct <param>wParam</param>.
+    </p>
+  </remarks>
+  <example>
+    Virtual Windows Modules (VWMs) might use code like the following to store
+    the currently selected screen number across recycles:
+    <blockcode>
+#define MODULE_ID 0x1111    // A unique ID, later used to retrieve the data
+
+UINT uCurrentDesk = ...;
+
+WPARAM wParam = MAKEWPARAM(sizeof(uCurrentDesk), MODULE_ID);
+
+SendMessage(GetLitestepWnd(), LM_SAVEDATA, wParam, (LPARAM)&amp;uCurrentDesk);</blockcode>
+  </example>
+  <see-also>
+    <fn>GetLitestepWnd</fn>
+    <msg>LM_RESTOREDATA</msg>
+  </see-also>
+</message>

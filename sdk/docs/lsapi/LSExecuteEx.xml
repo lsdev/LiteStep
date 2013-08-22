@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSExecuteEx</name>
+  <description>
+    Executes a bang command or application.
+  </description>
+  <parameters>
+    <parameter>
+      <name>hwndOwner</name>
+      <description>
+        Handle to a window that acts as owner for any dialogs or message
+        boxes. May be <const>NULL</const>.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>pszOperation</name>
+      <description>
+        Operation to perform. If executing an application, this parameter is
+        passed on to <extfn>ShellExecute</extfn>. If executing a bang command,
+        this parameter is ignored. If this parameter is <const>NULL</const>,
+        the default operation is performed.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszCommand</name>
+      <description>
+        Command to execute. This can be the name of a bang command or the path
+        to an application.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszArgs</name>
+      <description>
+        Arguments to pass to the bang command or application. If this
+        parameter is <const>NULL</const>, it is treated as an empty string.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszDirectory</name>
+      <description>
+        Path to the working directory for an application. If executing a bang
+        command, this parameter is ignored. If this parameter is
+        <const>NULL</const>, the working directory is the current directory.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>nShowCmd</name>
+      <description>
+        Value that controls how an application displays its main window. This
+        can be any of the SW constants used with the <extfn>ShowWindow</extfn>
+        function. If executing a bang command, this parameter is ignored.
+      </description>
+      <type>INT</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value for this function is not well defined and should not be
+      relied upon.
+    </description>
+    <type>HINSTANCE</type>
+  </return>
+  <see-also>
+    <fn>LSExecute</fn>
+    <fn>ParseBangCommand</fn>
+  </see-also>
+</function>

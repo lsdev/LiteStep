@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetToken</name>
+  <description>
+    Extracts the next token from a string.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszString</name>
+      <description>
+        String to tokenize.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pszBuffer</name>
+      <description>
+        Buffer that receives the token. May be <const>NULL</const>.
+      </description>
+      <type>LPTSTR</type>
+    </parameter>
+    <parameter>
+      <name>ppszNext</name>
+      <description>
+        Pointer to a string pointer that receives the address of the first
+        character following the token in the input string. This parameter can
+        be, and commonly is, the address of the <param>pszString</param>
+        parameter. May be <const>NULL</const>.
+      </description>
+      <type>LPCTSTR *</type>
+    </parameter>
+    <parameter>
+      <name>fBrackets</name>
+      <description>
+        If nonzero, square brackets are interpreted as a token delimiter. If
+        zero, square brackets have no special meaning.
+      </description>
+      <type>BOOL</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If a token was successfully extracted from the input, the return value
+      is nonzero. If there are no more tokens in the input or an error occurs,
+      the return value is zero.
+    </description>
+    <type>BOOL</type>
+  </return>
+  <remarks>
+    <p>
+      <fn>GetToken</fn> extracts both whitespace-delimited tokens as well as
+      quoted strings. If <param>fBrackets</param> is nonzero, strings enclosed
+      in square brackets are also considered tokens (nested square brackets
+      are supported). <fn>GetToken</fn> interprets space, tab, carriage return
+      (<const>\r</const>), and line feed (<const>\n</const>) as whitespace and
+      it can handle both single (<const>'</const>) and double (<const>"</const>)
+      quotes.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>CommandTokenize</fn>
+    <fn>LCTokenize</fn>
+  </see-also>
+</function>

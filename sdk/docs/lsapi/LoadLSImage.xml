@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LoadLSImage</name>
+  <description>
+    Loads an image file.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszPath</name>
+      <description>
+        Path to the image file to load. Refer to the <const>Remarks</const>
+        section for details.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>pReserved</name>
+      <description>
+        Reserved. Must be <const>NULL</const>.
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      <p>
+        If the image is loaded successfully, the return value is the handle to
+        the image. If an error occurs, the return value is <const>NULL</const>.
+      </p>
+      <p>
+        The returned handle must be freed with a call to
+        <extfn>DeleteObject</extfn>.
+      </p>
+    </description>
+    <type>HBITMAP</type>
+  </return>
+  <remarks>
+    <p>
+      LiteStep can currently load BMP and PNG image files as well as icons from
+      ICO files and resource libraries.  However, this could change in the
+      future.
+    </p>
+    <p>
+      To load a normal BMP or PNG image file, simply specify the path to the
+      file in the <const>pszImage</const> parameter.
+    </p>
+    <p>
+      To load an icon from an ICO file or resource library, use the syntax:
+    </p>
+    <p>
+      <const>".extract=\path\to\resource\file.ext,n"</const>
+    </p>
+    <p>
+      where <const>n</const> is the index of the icon to load from the resource.
+      See <fn>LoadLSIcon</fn> for details.
+    </p>
+    <p>
+      To load and merge multiple bitmaps into a single image, separate the file
+      paths with the pipe character <const>|</const> using the syntax:
+    </p>
+    <p>
+      <const>"\path\to\image1.ext|\path\to\image2.ext[|...]"</const>
+    </p>
+    <p>
+      where the last image specified will be on bottom, and the first image
+      specified will be on top.
+    </p>
+    <p>
+      Relative paths refer to files in the LiteStep image directory.  Refer to
+      <fn>LSGetImagePath</fn> for details.
+    </p>
+  </remarks>
+  <see-also>
+    <fn>GetLSBitmapSize</fn>
+    <fn>LoadLSIcon</fn>
+    <fn>LSGetImagePath</fn>
+  </see-also>
+</function>

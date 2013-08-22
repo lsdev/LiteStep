@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<message>
+  <name>LM_TASK_THUMBBARSETIMAGELIST</name>
+  <description>
+    LiteStep sends this message when an application has called
+    ITaskbarList3::ThumbBarSetImageList.
+  </description>
+  <parameters>
+    <parameter>
+      <name>wParam</name>
+      <description>
+        A handle to the window which is having its thumbbar imagelist set.
+      </description>
+      <type>HWND</type>
+    </parameter>
+    <parameter>
+      <name>lParam</name>
+      <description>
+        Handle to the image list.
+      </description>
+      <type>HIMAGELIST</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      The return value is ignored.
+    </description>
+  </return>
+  <remarks>
+    <p>
+      To receive this message, modules need to register for it by using
+      <msg>LM_REGISTERMESSAGE</msg>.
+    </p>
+  </remarks>
+  <see-also>
+    <msg>LM_TASK_THUMBBARADDBUTTONS</msg>
+    <msg>LM_TASK_THUMBBARUPDATEBUTTONS</msg>
+    <msg>LM_REGISTERMESSAGE</msg>
+  </see-also>
+</message>

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>GetRCColor</name>
+  <description>
+    Gets a color from the configuration database.
+  </description>
+  <parameters>
+    <parameter>
+      <name>pszKeyName</name>
+      <description>
+        Name of the key to retrieve.
+      </description>
+      <type>LPCTSTR</type>
+    </parameter>
+    <parameter>
+      <name>crDefault</name>
+      <description>
+        Default value to return if the key cannot be found in the
+        configuration database.
+      </description>
+      <type>COLORREF</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+      If the key is found, the return value is the value from the
+      configuration database. If the key cannot be found, the return value is
+      the value of the <param>crDefault</param> parameter.
+    </description>
+    <type>COLORREF</type>
+  </return>
+  <see-also>
+    <fn>GetRCBool</fn>
+    <fn>GetRCBoolDef</fn>
+    <fn>GetRCCoordinate</fn>
+    <fn>GetRCInt</fn>
+    <fn>GetRCLine</fn>
+    <fn>GetRCString</fn>
+  </see-also>
+</function>
