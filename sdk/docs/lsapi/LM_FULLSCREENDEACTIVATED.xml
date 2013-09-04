@@ -48,7 +48,7 @@ case LM_FULLSCREENDEACTIVATED:
 
     return 0;
 }
-	</blockcode>
+    </blockcode>
   </example>
   <see-also>
     <msg>LM_FULLSCREENACTIVATED</msg>

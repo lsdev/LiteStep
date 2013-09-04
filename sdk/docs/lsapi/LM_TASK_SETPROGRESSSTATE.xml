@@ -35,7 +35,7 @@
     </p>
   </remarks>
   <see-also>
-	<msg>LM_TASK_SETPROGRESSVALUE</msg>
+    <msg>LM_TASK_SETPROGRESSVALUE</msg>
     <msg>LM_REGISTERMESSAGE</msg>
   </see-also>
 </message>
