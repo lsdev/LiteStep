@@ -907,7 +907,7 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         }
         break;
         
-	case LM_ENUMPERFORMANCE:
+    case LM_ENUMPERFORMANCE:
         {
             HRESULT hr = E_FAIL;
             
