@@ -1,10 +1,114 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
+VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "litestep", "litestep\litestep_vc12.vcxproj", "{994556EE-2F21-4811-A85D-6925F7F84B0D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utility", "utility\utility_vc12.vcxproj", "{2213036F-018C-416A-8A6A-7934C936CFFC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lsapi", "lsapi\lsapi_vc12.vcxproj", "{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDK", "SDK", "{0CB7B995-8934-4494-8EB9-968D5407C6E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{DEC29FCD-986F-4AAB-A697-AE091EFEF71A}"
+	ProjectSection(SolutionItems) = preProject
+		sdk\docs\lsapi\AddBangCommand.xml = sdk\docs\lsapi\AddBangCommand.xml
+		sdk\docs\lsapi\AddBangCommandEx.xml = sdk\docs\lsapi\AddBangCommandEx.xml
+		sdk\docs\lsapi\BangCommandProc.xml = sdk\docs\lsapi\BangCommandProc.xml
+		sdk\docs\lsapi\BangCommandProcEx.xml = sdk\docs\lsapi\BangCommandProcEx.xml
+		sdk\docs\lsapi\BitmapFromIcon.xml = sdk\docs\lsapi\BitmapFromIcon.xml
+		sdk\docs\lsapi\BitmapToRegion.xml = sdk\docs\lsapi\BitmapToRegion.xml
+		sdk\docs\lsapi\CommandParse.xml = sdk\docs\lsapi\CommandParse.xml
+		sdk\docs\lsapi\CommandTokenize.xml = sdk\docs\lsapi\CommandTokenize.xml
+		sdk\docs\lsapi\EnumBangsProc.xml = sdk\docs\lsapi\EnumBangsProc.xml
+		sdk\docs\lsapi\EnumBangsV2Proc.xml = sdk\docs\lsapi\EnumBangsV2Proc.xml
+		sdk\docs\lsapi\EnumLSData.xml = sdk\docs\lsapi\EnumLSData.xml
+		sdk\docs\lsapi\EnumModulesProc.xml = sdk\docs\lsapi\EnumModulesProc.xml
+		sdk\docs\lsapi\EnumPerformanceProc.xml = sdk\docs\lsapi\EnumPerformanceProc.xml
+		sdk\docs\lsapi\EnumRevIDsProc.xml = sdk\docs\lsapi\EnumRevIDsProc.xml
+		sdk\docs\lsapi\Frame3D.xml = sdk\docs\lsapi\Frame3D.xml
+		sdk\docs\lsapi\GetLitestepWnd.xml = sdk\docs\lsapi\GetLitestepWnd.xml
+		sdk\docs\lsapi\GetLSBitmapSize.xml = sdk\docs\lsapi\GetLSBitmapSize.xml
+		sdk\docs\lsapi\GetRCBool.xml = sdk\docs\lsapi\GetRCBool.xml
+		sdk\docs\lsapi\GetRCBoolDef.xml = sdk\docs\lsapi\GetRCBoolDef.xml
+		sdk\docs\lsapi\GetRCColor.xml = sdk\docs\lsapi\GetRCColor.xml
+		sdk\docs\lsapi\GetRCCoordinate.xml = sdk\docs\lsapi\GetRCCoordinate.xml
+		sdk\docs\lsapi\GetRCDouble.xml = sdk\docs\lsapi\GetRCDouble.xml
+		sdk\docs\lsapi\GetRCFloat.xml = sdk\docs\lsapi\GetRCFloat.xml
+		sdk\docs\lsapi\GetRCInt.xml = sdk\docs\lsapi\GetRCInt.xml
+		sdk\docs\lsapi\GetRCInt64.xml = sdk\docs\lsapi\GetRCInt64.xml
+		sdk\docs\lsapi\GetRCLine.xml = sdk\docs\lsapi\GetRCLine.xml
+		sdk\docs\lsapi\GetRCString.xml = sdk\docs\lsapi\GetRCString.xml
+		sdk\docs\lsapi\GetResStr.xml = sdk\docs\lsapi\GetResStr.xml
+		sdk\docs\lsapi\GetResStrEx.xml = sdk\docs\lsapi\GetResStrEx.xml
+		sdk\docs\lsapi\GetToken.xml = sdk\docs\lsapi\GetToken.xml
+		sdk\docs\lsapi\index.xml = sdk\docs\lsapi\index.xml
+		sdk\docs\lsapi\index.xslt = sdk\docs\lsapi\index.xslt
+		sdk\docs\lsapi\initModuleEx.xml = sdk\docs\lsapi\initModuleEx.xml
+		sdk\docs\lsapi\initModuleW.xml = sdk\docs\lsapi\initModuleW.xml
+		sdk\docs\lsapi\is_valid_pattern.xml = sdk\docs\lsapi\is_valid_pattern.xml
+		sdk\docs\lsapi\LCClose.xml = sdk\docs\lsapi\LCClose.xml
+		sdk\docs\lsapi\LCOpen.xml = sdk\docs\lsapi\LCOpen.xml
+		sdk\docs\lsapi\LCReadNextCommand.xml = sdk\docs\lsapi\LCReadNextCommand.xml
+		sdk\docs\lsapi\LCReadNextConfig.xml = sdk\docs\lsapi\LCReadNextConfig.xml
+		sdk\docs\lsapi\LCReadNextLine.xml = sdk\docs\lsapi\LCReadNextLine.xml
+		sdk\docs\lsapi\LCTokenize.xml = sdk\docs\lsapi\LCTokenize.xml
+		sdk\docs\lsapi\LM_FULLSCREENACTIVATED.xml = sdk\docs\lsapi\LM_FULLSCREENACTIVATED.xml
+		sdk\docs\lsapi\LM_FULLSCREENDEACTIVATED.xml = sdk\docs\lsapi\LM_FULLSCREENDEACTIVATED.xml
+		sdk\docs\lsapi\LM_GETREVID.xml = sdk\docs\lsapi\LM_GETREVID.xml
+		sdk\docs\lsapi\LM_REFRESH.xml = sdk\docs\lsapi\LM_REFRESH.xml
+		sdk\docs\lsapi\LM_REGISTERMESSAGE.xml = sdk\docs\lsapi\LM_REGISTERMESSAGE.xml
+		sdk\docs\lsapi\LM_RELOADMODULE.xml = sdk\docs\lsapi\LM_RELOADMODULE.xml
+		sdk\docs\lsapi\LM_RESTOREDATA.xml = sdk\docs\lsapi\LM_RESTOREDATA.xml
+		sdk\docs\lsapi\LM_SAVEDATA.xml = sdk\docs\lsapi\LM_SAVEDATA.xml
+		sdk\docs\lsapi\LM_SHELLHOOK.xml = sdk\docs\lsapi\LM_SHELLHOOK.xml
+		sdk\docs\lsapi\LM_SYSTRAY.xml = sdk\docs\lsapi\LM_SYSTRAY.xml
+		sdk\docs\lsapi\LM_SYSTRAYINFOEVENT.xml = sdk\docs\lsapi\LM_SYSTRAYINFOEVENT.xml
+		sdk\docs\lsapi\LM_SYSTRAYREADY.xml = sdk\docs\lsapi\LM_SYSTRAYREADY.xml
+		sdk\docs\lsapi\LM_TASK_MARKASACTIVE.xml = sdk\docs\lsapi\LM_TASK_MARKASACTIVE.xml
+		sdk\docs\lsapi\LM_TASK_REGISTERTAB.xml = sdk\docs\lsapi\LM_TASK_REGISTERTAB.xml
+		sdk\docs\lsapi\LM_TASK_SETACTIVETAB.xml = sdk\docs\lsapi\LM_TASK_SETACTIVETAB.xml
+		sdk\docs\lsapi\LM_TASK_SETOVERLAYICON.xml = sdk\docs\lsapi\LM_TASK_SETOVERLAYICON.xml
+		sdk\docs\lsapi\LM_TASK_SETOVERLAYICONDESC.xml = sdk\docs\lsapi\LM_TASK_SETOVERLAYICONDESC.xml
+		sdk\docs\lsapi\LM_TASK_SETPROGRESSSTATE.xml = sdk\docs\lsapi\LM_TASK_SETPROGRESSSTATE.xml
+		sdk\docs\lsapi\LM_TASK_SETPROGRESSVALUE.xml = sdk\docs\lsapi\LM_TASK_SETPROGRESSVALUE.xml
+		sdk\docs\lsapi\LM_TASK_SETTABORDER.xml = sdk\docs\lsapi\LM_TASK_SETTABORDER.xml
+		sdk\docs\lsapi\LM_TASK_SETTABPROPERTIES.xml = sdk\docs\lsapi\LM_TASK_SETTABPROPERTIES.xml
+		sdk\docs\lsapi\LM_TASK_SETTHUMBNAILCLIP.xml = sdk\docs\lsapi\LM_TASK_SETTHUMBNAILCLIP.xml
+		sdk\docs\lsapi\LM_TASK_SETTHUMBNAILTOOLTIP.xml = sdk\docs\lsapi\LM_TASK_SETTHUMBNAILTOOLTIP.xml
+		sdk\docs\lsapi\LM_TASK_THUMBBARADDBUTTONS.xml = sdk\docs\lsapi\LM_TASK_THUMBBARADDBUTTONS.xml
+		sdk\docs\lsapi\LM_TASK_THUMBBARSETIMAGELIST.xml = sdk\docs\lsapi\LM_TASK_THUMBBARSETIMAGELIST.xml
+		sdk\docs\lsapi\LM_TASK_THUMBBARUPDATEBUTTONS.xml = sdk\docs\lsapi\LM_TASK_THUMBBARUPDATEBUTTONS.xml
+		sdk\docs\lsapi\LM_TASK_UNREGISTERTAB.xml = sdk\docs\lsapi\LM_TASK_UNREGISTERTAB.xml
+		sdk\docs\lsapi\LM_UNLOADMODULE.xml = sdk\docs\lsapi\LM_UNLOADMODULE.xml
+		sdk\docs\lsapi\LM_UNREGISTERMESSAGE.xml = sdk\docs\lsapi\LM_UNREGISTERMESSAGE.xml
+		sdk\docs\lsapi\LoadLSIcon.xml = sdk\docs\lsapi\LoadLSIcon.xml
+		sdk\docs\lsapi\LoadLSImage.xml = sdk\docs\lsapi\LoadLSImage.xml
+		sdk\docs\lsapi\lsapi.css = sdk\docs\lsapi\lsapi.css
+		sdk\docs\lsapi\lsapi.xslt = sdk\docs\lsapi\lsapi.xslt
+		sdk\docs\lsapi\LSExecute.xml = sdk\docs\lsapi\LSExecute.xml
+		sdk\docs\lsapi\LSExecuteEx.xml = sdk\docs\lsapi\LSExecuteEx.xml
+		sdk\docs\lsapi\LSGetImagePath.xml = sdk\docs\lsapi\LSGetImagePath.xml
+		sdk\docs\lsapi\LSGetLitestepPath.xml = sdk\docs\lsapi\LSGetLitestepPath.xml
+		sdk\docs\lsapi\LSGetVariable.xml = sdk\docs\lsapi\LSGetVariable.xml
+		sdk\docs\lsapi\LSGetVariableEx.xml = sdk\docs\lsapi\LSGetVariableEx.xml
+		sdk\docs\lsapi\LSLog.xml = sdk\docs\lsapi\LSLog.xml
+		sdk\docs\lsapi\LSLogPrintf.xml = sdk\docs\lsapi\LSLogPrintf.xml
+		sdk\docs\lsapi\LSNOTIFYICONDATA.xml = sdk\docs\lsapi\LSNOTIFYICONDATA.xml
+		sdk\docs\lsapi\LSSetVariable.xml = sdk\docs\lsapi\LSSetVariable.xml
+		sdk\docs\lsapi\match.xml = sdk\docs\lsapi\match.xml
+		sdk\docs\lsapi\matche.xml = sdk\docs\lsapi\matche.xml
+		sdk\docs\lsapi\ParseBangCommand.xml = sdk\docs\lsapi\ParseBangCommand.xml
+		sdk\docs\lsapi\ParseCoordinate.xml = sdk\docs\lsapi\ParseCoordinate.xml
+		sdk\docs\lsapi\quitModule.xml = sdk\docs\lsapi\quitModule.xml
+		sdk\docs\lsapi\RemoveBangCommand.xml = sdk\docs\lsapi\RemoveBangCommand.xml
+		sdk\docs\lsapi\SetDesktopArea.xml = sdk\docs\lsapi\SetDesktopArea.xml
+		sdk\docs\lsapi\SYSTRAYINFOEVENT.xml = sdk\docs\lsapi\SYSTRAYINFOEVENT.xml
+		sdk\docs\lsapi\THUMBBUTTONLIST.xml = sdk\docs\lsapi\THUMBBUTTONLIST.xml
+		sdk\docs\lsapi\TransparentBltLS.xml = sdk\docs\lsapi\TransparentBltLS.xml
+		sdk\docs\lsapi\VarExpansion.xml = sdk\docs\lsapi\VarExpansion.xml
+		sdk\docs\lsapi\VarExpansionEx.xml = sdk\docs\lsapi\VarExpansionEx.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +118,14 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|Win32.Build.0 = Debug|Win32
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|x64.ActiveCfg = Debug|x64
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|x64.Build.0 = Debug|x64
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|Win32.ActiveCfg = Release|Win32
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|Win32.Build.0 = Release|Win32
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|x64.ActiveCfg = Release|x64
+		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|x64.Build.0 = Release|x64
 		{2213036F-018C-416A-8A6A-7934C936CFFC}.Debug|Win32.ActiveCfg = Debug|Win32
 		{2213036F-018C-416A-8A6A-7934C936CFFC}.Debug|Win32.Build.0 = Debug|Win32
 		{2213036F-018C-416A-8A6A-7934C936CFFC}.Debug|x64.ActiveCfg = Debug|x64
@@ -30,16 +142,11 @@ Global
 		{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}.Release|Win32.Build.0 = Release|Win32
 		{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}.Release|x64.ActiveCfg = Release|x64
 		{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}.Release|x64.Build.0 = Release|x64
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|Win32.Build.0 = Debug|Win32
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|x64.ActiveCfg = Debug|x64
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Debug|x64.Build.0 = Debug|x64
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|Win32.ActiveCfg = Release|Win32
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|Win32.Build.0 = Release|Win32
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|x64.ActiveCfg = Release|x64
-		{994556EE-2F21-4811-A85D-6925F7F84B0D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DEC29FCD-986F-4AAB-A697-AE091EFEF71A} = {0CB7B995-8934-4494-8EB9-968D5407C6E5}
 	EndGlobalSection
 EndGlobal
