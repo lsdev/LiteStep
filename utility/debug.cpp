@@ -60,17 +60,17 @@ void DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
 {
     if (uMsg < WM_USER)
     {
-        TRACE("[%ls] WM_%.4X(%p, %p)",
+        TRACE("[%s] WM_%.4X(%p, %p)",
             pszPrefix, uMsg, wParam, lParam);
     }
     else if (uMsg >= WM_USER && uMsg <= (WM_APP-1))
     {
-        TRACE("[%ls] WM_USER+%u(%p, %p)",
+        TRACE("[%s] WM_USER+%u(%p, %p)",
             pszPrefix, uMsg-WM_USER, wParam, lParam);
     }
     else if (uMsg >= WM_APP && uMsg <= (MAXINTATOM-1))
     {
-        TRACE("[%ls] WM_APP+%u(%p, %p)",
+        TRACE("[%s] WM_APP+%u(%p, %p)",
             pszPrefix, uMsg-WM_APP, wParam, lParam);
     }
     else if (uMsg >= MAXINTATOM)
@@ -82,12 +82,12 @@ void DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
         if (GetClipboardFormatName(
             uMsg, szMsgName, COUNTOF(szMsgName)) > 0)
         {
-            TRACE("[%ls] WM_'%ls'(%p, %p)",
+            TRACE("[%s] WM_'%ls'(%p, %p)",
                 pszPrefix, szMsgName, wParam, lParam);
         }
         else
         {
-            TRACE("[%ls] WM_%.8X(%p, %p)",
+            TRACE("[%s] WM_%.8X(%p, %p)",
                 pszPrefix, uMsg, wParam, lParam);
         }
     }
