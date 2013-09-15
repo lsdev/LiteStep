@@ -591,7 +591,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
         return;
     }
     
-    TRACE("Expression (%ls, line %d): \"%ls\" evaluated to %ls",
+    TRACE("Expression (%ls, line %d): \"%ls\" evaluated to %s",
         m_tzFullPath, m_uLineNumber,
         ptzExpression, result ? "TRUE" : "FALSE");
     
