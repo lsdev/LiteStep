@@ -116,25 +116,25 @@ namespace CStrings
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using Map = std::map<LPCWSTR, Type, Compare, Allocator>;
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using ConstMap = const Map<Type, Allocator>;
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using UnorderedMap = std::unordered_map<LPCWSTR, Type, Hash, Equal, Allocator>;
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using ConstUnorderedMap = const UnorderedMap<Type, Allocator>;
     };
@@ -189,25 +189,25 @@ namespace CStrings
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using Map = std::map<LPCWSTR, Type, Compare, Allocator>;
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using ConstMap = const Map<Type, Allocator>;
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using UnorderedMap = std::unordered_map<LPCWSTR, Type, Hash, Equal, Allocator>;
 
         template <
             typename Type,
-            typename Allocator = std::allocator<pair<const LPCWSTR, Type>>
+            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
         >
         using ConstUnorderedMap = const UnorderedMap<Type, Allocator>;
     };
