@@ -2,7 +2,7 @@
     LiteStep 0.25.0
     Release Notes
     
-    Copyright (c) 2013 - LiteStep Development Team
+    Copyright (c) 2014 - LiteStep Development Team
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Contents:
@@ -72,13 +72,10 @@ Contents:
 
 -- SYSTEM REQUIREMENTS ---------------------------------------------------------
 
- LiteStep requires only that you are running a 32bit version of Windows:
+ LiteStep requires only that you are running a 32 or 64bit version of Windows:
 
   Windows 95, Windows 98(se), Windows ME, Windows 2000, Windows XP, Windows 2003
-
- NOTE: Windows Vista/2008 32bit versions are *NOT* supported in 0.24.8!  Please
-       check our website for experimental builds containing support for running
-       under both 32bit and 64bit Windows XP/Vista/2008/Win7 versions.
+  Windows Vista, Windows 7, Windows 8, Windows 8.1
 
  LiteStep is designed to consume less resources than the Explorer shell which it
  replaces; so there are no system requirements above and beyond that which is
@@ -1398,7 +1395,7 @@ ENDIF
  A) Documentation License Notice
  -------------------------------
 
- Copyright (c) 2005-2013 LiteStep Development Team
+ Copyright (c) 2005-2014 LiteStep Development Team
 
  Permission is granted to copy, distribute and/or modify this document under the
  terms of the GNU Free Documentation License, Version 1.2 or any later version
