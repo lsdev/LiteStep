@@ -21,6 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "../litestep/resource.h"
 #include "../utility/core.hpp"
+#include "../utility/stringutility.h"
 #include <CommCtrl.h>
 #include <WindowsX.h>
 #include <math.h>
@@ -422,25 +423,8 @@ DWORD WINAPI AboutBoxThread(LPVOID /* lpParameter */)
 static BOOL CALLBACK BangCallback(
     HMODULE hModule, LPCWSTR pszName, LPARAM lParam)
 {
-    CallbackInfo* pCi = (CallbackInfo*)lParam;
-    
-    LVITEM itemInfo;
-    itemInfo.mask = LVIF_TEXT;
-    itemInfo.iItem = pCi->nItem;
-    itemInfo.pszText = (wchar_t*)pszName;
-    itemInfo.iSubItem = 0;
-    
-    ListView_InsertItem(pCi->hListView, &itemInfo);
-    
-    wchar_t szModule[MAX_PATH] = { 0 };
-    
-    if (LSGetModuleFileName(hModule, szModule, COUNTOF(szModule)))
-    {
-        PathStripPath(szModule);
-        ListView_SetItemText(pCi->hListView, pCi->nItem, 1, szModule);
-    }
-    
-    ++pCi->nItem;
+    ((CStrings::CaseInsensitive::Map<HMODULE> *)lParam)->emplace(
+        pszName, hModule);
     return TRUE;
 }
 
@@ -472,10 +456,29 @@ static void AboutBangs(HWND hListView)
     
     ListView_InsertColumn(hListView, 1, &columnInfo);
     
-    CallbackInfo ci = { 0 };
-    ci.hListView = hListView;
-    
-    EnumLSDataW(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&ci);
+    // Put the bangs into a map in order to sort them.
+    CStrings::CaseInsensitive::Map<HMODULE> bangs;
+    EnumLSDataW(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&bangs);
+
+    LVITEM itemInfo;
+    itemInfo.mask = LVIF_TEXT;
+    itemInfo.iItem = 0;
+    itemInfo.iSubItem = 0;
+
+    for (auto & entry : bangs)
+    {
+        itemInfo.pszText = const_cast<LPWSTR>(entry.first);
+        ListView_InsertItem(hListView, &itemInfo);
+
+        wchar_t szModule[MAX_PATH] = { 0 };
+        if (LSGetModuleFileName(entry.second, szModule, COUNTOF(szModule)))
+        {
+            PathStripPath(szModule);
+            ListView_SetItemText(hListView, itemInfo.iItem, 1, szModule);
+        }
+
+        itemInfo.iItem++;
+    }
 }
 
 

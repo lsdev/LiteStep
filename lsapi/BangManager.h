@@ -26,7 +26,6 @@
 #include "lsapidefines.h"
 #include "../utility/criticalsection.h"
 #include "../utility/stringutility.h"
-#include <map>
 #include <string>
 
 /**
@@ -36,7 +35,7 @@ class BangManager
 {
 private:
     /** Maps bang command names to Bang objects. */
-    typedef std::map<std::wstring, Bang*, stringicmp> BangMap;
+    typedef CStrings::CaseInsensitive::UnorderedMap<Bang*> BangMap;
     
     /** List of bang commands indexed by name */
     BangMap bang_map;

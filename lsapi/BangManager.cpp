@@ -40,7 +40,7 @@ BOOL BangManager::AddBangCommand(LPCWSTR pwzName, Bang *pbbBang)
 {
     Lock lock(m_cs);
     
-    BangMap::iterator iter = bang_map.find(pwzName);
+    BangMap::iterator iter = bang_map.find(pbbBang->GetCommand());
     
     if (iter != bang_map.end())
     {
@@ -48,7 +48,7 @@ BOOL BangManager::AddBangCommand(LPCWSTR pwzName, Bang *pbbBang)
         bang_map.erase(iter);
     }
     
-    bang_map.insert(BangMap::value_type(pwzName, pbbBang));
+    bang_map.emplace(pbbBang->GetCommand(), pbbBang);
     pbbBang->AddRef();
     
     return TRUE;
@@ -66,8 +66,9 @@ BOOL BangManager::RemoveBangCommand(LPCWSTR pwzName)
     
     if (iter != bang_map.end())
     {
-        iter->second->Release();
+        Bang * bang = iter->second;
         bang_map.erase(iter);
+        bang->Release(); // We must erase before we release since the key is stored inside the Bang.
         
         bReturn = TRUE;
     }
@@ -131,12 +132,9 @@ HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROCW pfnCallback, LPARAM lParam) co
     
     HRESULT hr = S_OK;
     
-    for (BangMap::const_iterator iter = bang_map.begin();
-        iter != bang_map.end(); ++iter)
+    for (const BangMap::value_type & value : bang_map)
     {
-        HMODULE hModule = iter->second->GetModule();
-        
-        if (!pfnCallback(hModule, iter->first.c_str(), lParam))
+        if (!pfnCallback(value.second->GetModule(), value.first, lParam))
         {
             hr = S_FALSE;
             break;

@@ -90,7 +90,7 @@ public:
      */
     void Execute(HWND hCaller, LPCWSTR pwzParams) const;
 
-    std::wstring const & GetCommand() const;
+    LPCWSTR GetCommand() const;
     
     HINSTANCE GetModule() const;
 
@@ -118,7 +118,7 @@ private:
     const std::function<void (HWND hwndOwner, LPCWSTR pwzBangCommandName, LPCWSTR pwzArgs)> m_bBangEX;
     
     /** Name of this bang command */
-    const std::wstring m_sCommand;
+    const LPCWSTR m_pwzCommand;
 };
 
 #endif // BANGCOMMAND_H

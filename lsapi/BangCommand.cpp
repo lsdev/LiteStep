@@ -31,7 +31,7 @@ Bang::Bang(DWORD dwThread, BangCommandW pfnBang, LPCWSTR pwzCommand)
     , m_pAddress(pfnBang)
     , m_bBang(pfnBang)
     , m_bBangEX(nullptr)
-    , m_sCommand(pwzCommand)
+    , m_pwzCommand(_wcsdup(pwzCommand))
 {
 }
 
@@ -45,7 +45,7 @@ Bang::Bang(DWORD dwThread, BangCommandA pfnBang, LPCWSTR pwzCommand)
           pfnBang(hOwner, std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
       })
     , m_bBangEX(nullptr)
-    , m_sCommand(pwzCommand)
+    , m_pwzCommand(_wcsdup(pwzCommand))
 {
 }
 
@@ -56,7 +56,7 @@ Bang::Bang(DWORD dwThread, BangCommandExW pfnBang, LPCWSTR pwzCommand)
     , m_pAddress(pfnBang)
     , m_bBang(nullptr)
     , m_bBangEX(pfnBang)
-    , m_sCommand(pwzCommand)
+    , m_pwzCommand(_wcsdup(pwzCommand))
 {
 }
 
@@ -72,14 +72,14 @@ Bang::Bang(DWORD dwThread, BangCommandExA pfnBang, LPCWSTR pwzCommand)
           std::unique_ptr<char>(MBSFromWCS(pwzCommand)).get(),
           std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
       })
-    , m_sCommand(pwzCommand)
+    , m_pwzCommand(_wcsdup(pwzCommand))
 {
 }
 
 
 Bang::~Bang()
 {
-    // do nothing
+    free((LPVOID)m_pwzCommand);
 }
 
 
@@ -88,7 +88,7 @@ void Bang::Execute(HWND hCaller, LPCWSTR pwzParams) const
     if (GetCurrentThreadId() != m_dwThreadID)
     {
         ThreadedBangCommand * pInfo = new ThreadedBangCommand(hCaller,
-            m_sCommand.c_str(), pwzParams);
+            m_pwzCommand, pwzParams);
         
         if (pInfo != nullptr)
         {
@@ -101,7 +101,7 @@ void Bang::Execute(HWND hCaller, LPCWSTR pwzParams) const
     {
         if (m_bEX)
         {
-            m_bBangEX(hCaller, m_sCommand.c_str(), pwzParams);
+            m_bBangEX(hCaller, m_pwzCommand, pwzParams);
         }
         else
         {
@@ -131,7 +131,7 @@ HINSTANCE Bang::GetModule() const
 }
 
 
-std::wstring const & Bang::GetCommand() const
+LPCWSTR Bang::GetCommand() const
 {
-    return m_sCommand;
+    return m_pwzCommand;
 }
