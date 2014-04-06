@@ -47,6 +47,7 @@ LPVOID LCOpenW(LPCWSTR pwzPath)
     return pFile;
 }
 
+
 LPVOID LCOpenA(LPCSTR pszPath)
 {
     return LCOpenW(std::unique_ptr<wchar_t>(WCSFromMBS(pszPath)).get());
