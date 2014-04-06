@@ -24,6 +24,7 @@
 #include "MathException.h"
 #include "lsapiInit.h"
 #include "../utility/core.hpp"
+#include "../utility/stringutility.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -127,38 +128,39 @@ static MathValue Math_sqrt(const MathValueList& argList);
 static MathValue Math_upperCase(const MathValueList& argList);
 
 // Mapping of names to predefined functions
-struct FunctionTable
+struct FunctionTableEntry
 {
-    const wchar_t *name; MathFunction function; unsigned int numArgs;
-} gFunctions[] = {
-    { L"abs",               Math_abs,              1 },
-    { L"boolean",           Math_boolean,          1 },
-    { L"ceil",              Math_ceil,             1 },
-    { L"contains",          Math_contains,         2 },
-    { L"endsWith",          Math_endsWith,         2 },
-    { L"fileExists",        Math_fileExists,       1 },
-    { L"floor",             Math_floor,            1 },
-    { L"if",                Math_if,               3 },
-    { L"integer",           Math_integer,          1 },
-    { L"length",            Math_length,           1 },
-    { L"lowerCase",         Math_lowerCase,        1 },
-    { L"max",               Math_max,              2 },
-    { L"min",               Math_min,              2 },
-    { L"number",            Math_number,           1 },
-    { L"pathDirPart",       Math_pathDirPart,      1 },
-    { L"pathDrivePart",     Math_pathDrivePart,    1 },
-    { L"pathExtPart",       Math_pathExtPart,      1 },
-    { L"pathFilePart",      Math_pathFilePart,     1 },
-    { L"pathFileNamePart",  Math_pathFileNamePart, 1 },
-    { L"pow",               Math_pow,              2 },
-    { L"round",             Math_round,            1 },
-    { L"startsWith",        Math_startsWith,       2 },
-    { L"string",            Math_string,           1 },
-    { L"sqrt",              Math_sqrt,             1 },
-    { L"upperCase",         Math_upperCase,        1 }
+    MathFunction function;
+    unsigned int numArgs;
 };
-
-const int gNumFunctions = sizeof(gFunctions) / sizeof(gFunctions[0]);
+CStrings::CaseInsensitive::ConstUnorderedMap<FunctionTableEntry> gFunctions(
+{
+    { L"abs",               { Math_abs,              1 } },
+    { L"boolean",           { Math_boolean,          1 } },
+    { L"ceil",              { Math_ceil,             1 } },
+    { L"contains",          { Math_contains,         2 } },
+    { L"endsWith",          { Math_endsWith,         2 } },
+    { L"fileExists",        { Math_fileExists,       1 } },
+    { L"floor",             { Math_floor,            1 } },
+    { L"if",                { Math_if,               3 } },
+    { L"integer",           { Math_integer,          1 } },
+    { L"length",            { Math_length,           1 } },
+    { L"lowerCase",         { Math_lowerCase,        1 } },
+    { L"max",               { Math_max,              2 } },
+    { L"min",               { Math_min,              2 } },
+    { L"number",            { Math_number,           1 } },
+    { L"pathDirPart",       { Math_pathDirPart,      1 } },
+    { L"pathDrivePart",     { Math_pathDrivePart,    1 } },
+    { L"pathExtPart",       { Math_pathExtPart,      1 } },
+    { L"pathFilePart",      { Math_pathFilePart,     1 } },
+    { L"pathFileNamePart",  { Math_pathFileNamePart, 1 } },
+    { L"pow",               { Math_pow,              2 } },
+    { L"round",             { Math_round,            1 } },
+    { L"startsWith",        { Math_startsWith,       2 } },
+    { L"string",            { Math_string,           1 } },
+    { L"sqrt",              { Math_sqrt,             1 } },
+    { L"upperCase",         { Math_upperCase,        1 } }
+});
 
 
 MathParser::MathParser(const SettingsMap& context, const wstring& expression, const StringSet& recursiveVarSet, unsigned int flags) :
@@ -180,24 +182,22 @@ MathValue MathParser::Evaluate()
 
 MathValue MathParser::CallFunction(const wstring& name, const MathValueList& argList) const
 {
-    for (int i = 0; i < gNumFunctions; ++i)
+    auto const & entry = gFunctions.find(name.c_str());
+    if (entry != gFunctions.end())
     {
-        if (_wcsicmp(name.c_str(), gFunctions[i].name) == 0)
+        if (argList.size() != entry->second.numArgs)
         {
-            if (argList.size() != gFunctions[i].numArgs)
-            {
-                // Incorrect number of arguments
-                wostringstream message;
+            // Incorrect number of arguments
+            wostringstream message;
                 
-                message << L"Error: Function " << name << L" requires ";
-                message << gFunctions[i].numArgs << L" argument(s).";
+            message << L"Error: Function " << name << L" requires ";
+            message << entry->second.numArgs << L" argument(s).";
                 
-                throw MathException(message.str());
-            }
-            
-            // Call it
-            return gFunctions[i].function(argList);
+            throw MathException(message.str());
         }
+            
+        // Call it
+        return entry->second.function(argList);
     }
     
     // No such function

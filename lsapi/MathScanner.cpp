@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#include "../utility/stringutility.h"
 #include "MathScanner.h"
 #include "MathException.h"
 #include <string.h> // needed for _stricmp
@@ -28,7 +29,7 @@ using namespace std;
 
 
 // Reserved words
-struct ReservedWordTable { const wchar_t *str; int type; } gReservedWords[] = \
+CStrings::CaseInsensitive::ConstUnorderedMap<int> gReservedWords(
 {
     { L"false",    TT_FALSE    },
     { L"true",     TT_TRUE     },
@@ -40,9 +41,7 @@ struct ReservedWordTable { const wchar_t *str; int type; } gReservedWords[] = \
     { L"and",      TT_AND      },
     { L"or",       TT_OR       },
     { L"not",      TT_NOT      }
-};
-
-const int gNumReservedWords = sizeof(gReservedWords) / sizeof(gReservedWords[0]);
+});
 
 
 // Operators and punctuation
@@ -132,13 +131,11 @@ MathToken MathScanner::NextToken()
 
 MathToken MathScanner::CheckReservedWord(const wstring& identifier)
 {
-    for (int i = 0; i < gNumReservedWords; ++i)
+    auto const & reserverdWord = gReservedWords.find(identifier.c_str());
+    if (reserverdWord != gReservedWords.end())
     {
-        if (_wcsicmp(identifier.c_str(), gReservedWords[i].str) == 0)
-        {
-            // It's a reserved word
-            return MathToken(gReservedWords[i].type);
-        }
+        // It's a reserved word
+        return MathToken(reserverdWord->second);
     }
     
     // It's just an identifier

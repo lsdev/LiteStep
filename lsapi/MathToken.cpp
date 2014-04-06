@@ -21,44 +21,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "MathToken.h"
 
-using namespace std;
-
-
-// Mapping of token types to names
-struct TokenTypeTable { int type; const wchar_t *name; } gTokenTypes[] = \
-{
-    { TT_INVALID,   L"INVALID"   },
-    { TT_ID,        L"ID"        },
-    { TT_FALSE,     L"FALSE"     },
-    { TT_TRUE,      L"TRUE"      },
-    { TT_NUMBER,    L"NUMBER"    },
-    { TT_INFINITY,  L"INFINITY"  },
-    { TT_NAN,       L"NAN"       },
-    { TT_STRING,    L"STRING"    },
-    { TT_LPAREN,    L"LPAREN"    },
-    { TT_RPAREN,    L"RPAREN"    },
-    { TT_DEFINED,   L"DEFINED"   },
-    { TT_COMMA,     L"COMMA"     },
-    { TT_PLUS,      L"PLUS"      },
-    { TT_MINUS,     L"MINUS"     },
-    { TT_STAR,      L"STAR"      },
-    { TT_SLASH,     L"SLASH"     },
-    { TT_DIV,       L"DIV"       },
-    { TT_MOD,       L"MOD"       },
-    { TT_AMPERSAND, L"AMPERSAND" },
-    { TT_AND,       L"AND"       },
-    { TT_OR,        L"OR"        },
-    { TT_NOT,       L"NOT"       },
-    { TT_EQUAL,     L"EQUAL"     },
-    { TT_GREATER,   L"GREATER"   },
-    { TT_GREATEREQ, L"GREATEREQ" },
-    { TT_LESS,      L"LESS"      },
-    { TT_LESSEQ,    L"LESSEQ"    },
-    { TT_NOTEQUAL,  L"NOTEQUAL"  },
-    { TT_END,       L"END"       }
-};
-
-const int gNumTokenTypes = sizeof(gTokenTypes) / sizeof(gTokenTypes[0]);
+using std::wstring;
 
 
 MathToken::MathToken() :
@@ -84,15 +47,39 @@ MathToken::MathToken(int type, const wstring& value) :
 
 wstring MathToken::GetTypeName() const
 {
-    for (int i = 0; i < gNumTokenTypes; ++i)
+    switch (mType)
     {
-        if (gTokenTypes[i].type == mType)
-        {
-            return wstring(gTokenTypes[i].name);
-        }
+    case TT_INVALID: return L"INVALID";
+    case TT_ID: return L"ID";
+    case TT_FALSE: return L"FALSE";
+    case TT_TRUE: return L"TRUE";
+    case TT_NUMBER: return L"NUMBER";
+    case TT_INFINITY: return L"INFINITY";
+    case TT_NAN: return L"NAN";
+    case TT_STRING: return L"STRING";
+    case TT_LPAREN: return L"LPAREN";
+    case TT_RPAREN: return L"RPAREN";
+    case TT_DEFINED: return L"DEFINED";
+    case TT_COMMA: return L"COMMA";
+    case TT_PLUS: return L"PLUS";
+    case TT_MINUS: return L"MINUS";
+    case TT_STAR: return L"STAR";
+    case TT_SLASH: return L"SLASH";
+    case TT_DIV: return L"DIV";
+    case TT_MOD: return L"MOD";
+    case TT_AMPERSAND: return L"AMPERSAND";
+    case TT_AND: return L"AND";
+    case TT_OR: return L"OR";
+    case TT_NOT: return L"NOT";
+    case TT_EQUAL: return L"EQUAL";
+    case TT_GREATER: return L"GREATER";
+    case TT_GREATEREQ: return L"GREATEREQ";
+    case TT_LESS: return L"LESS";
+    case TT_LESSEQ: return L"LESSEQ";
+    case TT_NOTEQUAL: return L"NOTEQUAL";
+    case TT_END: return L"END";
+    default: return wstring();
     }
-    
-    return wstring();
 }
 
 
