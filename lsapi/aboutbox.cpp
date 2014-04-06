@@ -117,7 +117,7 @@ static const WCHAR g_wzLicense[] = \
  L"LiteStep is a replacement shell for the standard Windows® Explorer shell.\r\n"
  L"\r\n"
  L"Copyright (C) 1997-1998  Francis Gastellu\r\n"
- L"Copyright (C) 1998-2013  LiteStep Development Team\r\n"
+ L"Copyright (C) 1998-2014  LiteStep Development Team\r\n"
  L"\r\n"
  L"This program is free software; you can redistribute it and/or modify it "
  L"under the terms of the GNU General Public License as published by the Free "
