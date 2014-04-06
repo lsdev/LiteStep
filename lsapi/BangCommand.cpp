@@ -25,49 +25,55 @@
 #include "../utility/stringutility.h"
 
 
-Bang::Bang(DWORD dwThread, BangCommandW pfnBang, LPCWSTR pwzCommand) :
-    m_sCommand(pwzCommand)
+Bang::Bang(DWORD dwThread, BangCommandW pfnBang, LPCWSTR pwzCommand)
+    : m_dwThreadID(dwThread)
+    , m_bEX(false)
+    , m_pAddress(pfnBang)
+    , m_bBang(pfnBang)
+    , m_bBangEX(nullptr)
+    , m_sCommand(pwzCommand)
 {
-    m_bEX = false;
-    m_bBang = pfnBang;
-    m_pAddress = pfnBang;
-    m_dwThreadID = dwThread;
 }
 
 
-Bang::Bang(DWORD dwThread, BangCommandA pfnBang, LPCWSTR pwzCommand) :
-    m_sCommand(pwzCommand)
+Bang::Bang(DWORD dwThread, BangCommandA pfnBang, LPCWSTR pwzCommand)
+    : m_dwThreadID(dwThread)
+    , m_bEX(false)
+    , m_pAddress(pfnBang)
+    , m_bBang([pfnBang] (HWND hOwner, LPCWSTR pwzArgs) -> void
+      {
+          pfnBang(hOwner, std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
+      })
+    , m_bBangEX(nullptr)
+    , m_sCommand(pwzCommand)
 {
-    m_bEX = false;
-    m_bBang = [pfnBang] (HWND hOwner, LPCWSTR pwzArgs) -> void {
-        pfnBang(hOwner, std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
-    };
-    m_pAddress = pfnBang;
-    m_dwThreadID = dwThread;
 }
 
 
-Bang::Bang(DWORD dwThread, BangCommandExW pfnBang, LPCWSTR pwzCommand) :
-    m_sCommand(pwzCommand)
+Bang::Bang(DWORD dwThread, BangCommandExW pfnBang, LPCWSTR pwzCommand)
+    : m_dwThreadID(dwThread)
+    , m_bEX(true)
+    , m_pAddress(pfnBang)
+    , m_bBang(nullptr)
+    , m_bBangEX(pfnBang)
+    , m_sCommand(pwzCommand)
 {
-    m_bEX = true;
-    m_bBangEX = pfnBang;
-    m_pAddress = pfnBang;
-    m_dwThreadID = dwThread;
 }
 
 
-Bang::Bang(DWORD dwThread, BangCommandExA pfnBang, LPCWSTR pwzCommand) :
-    m_sCommand(pwzCommand)
+Bang::Bang(DWORD dwThread, BangCommandExA pfnBang, LPCWSTR pwzCommand)
+    : m_dwThreadID(dwThread)
+    , m_bEX(true)
+    , m_pAddress(pfnBang)
+    , m_bBang(nullptr)
+    , m_bBangEX([pfnBang](HWND hOwner, LPCWSTR pwzCommand, LPCWSTR pwzArgs) -> void
+      {
+          pfnBang(hOwner,
+          std::unique_ptr<char>(MBSFromWCS(pwzCommand)).get(),
+          std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
+      })
+    , m_sCommand(pwzCommand)
 {
-    m_bEX = true;
-    m_bBangEX = [pfnBang] (HWND hOwner, LPCWSTR pwzCommand, LPCWSTR pwzArgs) -> void {
-        pfnBang(hOwner,
-            std::unique_ptr<char>(MBSFromWCS(pwzCommand)).get(),
-            std::unique_ptr<char>(MBSFromWCS(pwzArgs)).get());
-    };;
-    m_pAddress = pfnBang;
-    m_dwThreadID = dwThread;
 }
 
 
@@ -77,11 +83,9 @@ Bang::~Bang()
 }
 
 
-void Bang::Execute(HWND hCaller, LPCWSTR pwzParams)
+void Bang::Execute(HWND hCaller, LPCWSTR pwzParams) const
 {
-    DWORD dwThreadID = GetCurrentThreadId();
-    
-    if (dwThreadID != m_dwThreadID)
+    if (GetCurrentThreadId() != m_dwThreadID)
     {
         ThreadedBangCommand * pInfo = new ThreadedBangCommand(hCaller,
             m_sCommand.c_str(), pwzParams);
@@ -124,4 +128,10 @@ HINSTANCE Bang::GetModule() const
     }
     
     return hModule;
+}
+
+
+std::wstring const & Bang::GetCommand() const
+{
+    return m_sCommand;
 }

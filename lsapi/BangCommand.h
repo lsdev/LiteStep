@@ -88,31 +88,37 @@ public:
      *                    typically uses this as an owner for dialog boxes.
      * @param  pwzParams  parameters for the bang command
      */
-    void Execute(HWND hCaller, LPCWSTR pwzParams);
+    void Execute(HWND hCaller, LPCWSTR pwzParams) const;
+
+    std::wstring const & GetCommand() const;
     
     HINSTANCE GetModule() const;
+
+private:
+    Bang(const Bang &) = delete;
+    Bang & operator=(const Bang &) = delete;
     
 private:
     /** Thread that owns this bang command */
-    DWORD m_dwThreadID;
+    const DWORD m_dwThreadID;
     
     /**
      * <code>true</code> if the bang command name is passed to the callback
      * function
      */
-    bool m_bEX;
+    const bool m_bEX;
 
     /** The address of the callback function, inside the module */
-    LPVOID m_pAddress;
+    const LPVOID m_pAddress;
     
     /** Callback function */
-    std::function<void (HWND hwndOwner, LPCWSTR pwzArgs)> m_bBang;
+    const std::function<void (HWND hwndOwner, LPCWSTR pwzArgs)> m_bBang;
     
     /** Callback function that takes the bang command name as a parameter */
-    std::function<void (HWND hwndOwner, LPCWSTR pwzBangCommandName, LPCWSTR pwzArgs)> m_bBangEX;
+    const std::function<void (HWND hwndOwner, LPCWSTR pwzBangCommandName, LPCWSTR pwzArgs)> m_bBangEX;
     
     /** Name of this bang command */
-    std::wstring m_sCommand;
+    const std::wstring m_sCommand;
 };
 
 #endif // BANGCOMMAND_H
