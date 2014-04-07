@@ -29,7 +29,7 @@ using namespace std;
 
 
 // Reserved words
-CStrings::CaseInsensitive::ConstUnorderedMap<int> gReservedWords(
+StringKeyedMaps<LPCWSTR, int>::ConstUnorderedMap gReservedWords(
 {
     { L"false",    TT_FALSE    },
     { L"true",     TT_TRUE     },

@@ -423,8 +423,8 @@ DWORD WINAPI AboutBoxThread(LPVOID /* lpParameter */)
 static BOOL CALLBACK BangCallback(
     HMODULE hModule, LPCWSTR pszName, LPARAM lParam)
 {
-    ((CStrings::CaseInsensitive::Map<HMODULE> *)lParam)->emplace(
-        pszName, hModule);
+    ((StringKeyedMaps<LPCWSTR, HMODULE>::Map *)lParam)
+        ->emplace(pszName, hModule);
     return TRUE;
 }
 
@@ -457,7 +457,7 @@ static void AboutBangs(HWND hListView)
     ListView_InsertColumn(hListView, 1, &columnInfo);
     
     // Put the bangs into a map in order to sort them.
-    CStrings::CaseInsensitive::Map<HMODULE> bangs;
+    StringKeyedMaps<LPCWSTR, HMODULE>::Map bangs;
     EnumLSDataW(ELD_BANGS_V2, (FARPROC)BangCallback, (LPARAM)&bangs);
 
     LVITEM itemInfo;

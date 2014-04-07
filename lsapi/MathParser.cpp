@@ -133,7 +133,7 @@ struct FunctionTableEntry
     MathFunction function;
     unsigned int numArgs;
 };
-CStrings::CaseInsensitive::ConstUnorderedMap<FunctionTableEntry> gFunctions(
+StringKeyedMaps<LPCWSTR, FunctionTableEntry>::ConstUnorderedMap gFunctions(
 {
     { L"abs",               { Math_abs,              1 } },
     { L"boolean",           { Math_boolean,          1 } },

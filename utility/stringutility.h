@@ -26,9 +26,11 @@
 
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <string.h> // for _wcsicmp/wcscmp
 #include <unordered_map>
+#include <unordered_set>
 
 
 //
@@ -58,160 +60,211 @@ struct stringcmp
     }
 };
 
-
 //
-// CStrings
+// CaseSensitive
 //
-// Standard containers using C-style strings as keys.
+// Case sensitive functions for StringKeyedContainers
 //
-namespace CStrings
+struct CaseSensitive
 {
-    struct CaseSensitive
+    struct Hash
     {
-        struct Hash
+        size_t operator()(LPCWSTR str) const
         {
-            size_t operator()(LPCWSTR str) const
-            {
 #if defined(_WIN64)
-                static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
-                const size_t _FNV_offset_basis = 14695981039346656037ULL;
-                const size_t _FNV_prime = 1099511628211ULL;
+            static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
+            const size_t _FNV_offset_basis = 14695981039346656037ULL;
+            const size_t _FNV_prime = 1099511628211ULL;
 #else
-                static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
-                const size_t _FNV_offset_basis = 2166136261U;
-                const size_t _FNV_prime = 16777619U;
+            static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
+            const size_t _FNV_offset_basis = 2166136261U;
+            const size_t _FNV_prime = 16777619U;
 #endif
-                size_t value = _FNV_offset_basis;
-                for (LPCWSTR chr = str; *chr != 0; ++chr)
-                {
-                    value ^= (size_t)*chr;
-                    value *= _FNV_prime;
-                }
+            size_t value = _FNV_offset_basis;
+            for (LPCWSTR chr = str; *chr != 0; ++chr)
+            {
+                value ^= (size_t)*chr;
+                value *= _FNV_prime;
+            }
 
 #if defined(_WIN64)
-                static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
-                value ^= value >> 32;
+            static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
+            value ^= value >> 32;
 #else
-                static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
+            static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
 #endif
-                return value;
-            }
-        };
+            return value;
+        }
 
-        struct Compare
+        size_t operator()(const std::wstring & str) const
         {
-            bool operator()(LPCWSTR a, LPCWSTR b) const
-            {
-                return wcscmp(a, b) < 0;
-            }
-        };
-
-        struct Equal
-        {
-            bool operator()(LPCWSTR a, LPCWSTR b) const
-            {
-                return wcscmp(a, b) == 0;
-            }
-        };
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using Map = std::map<LPCWSTR, Type, Compare, Allocator>;
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using ConstMap = const Map<Type, Allocator>;
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using UnorderedMap = std::unordered_map<LPCWSTR, Type, Hash, Equal, Allocator>;
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using ConstUnorderedMap = const UnorderedMap<Type, Allocator>;
+            return operator()(str.c_str());
+        }
     };
 
-    struct CaseInsensitive
+    struct Compare
     {
-        struct Hash
+        bool operator()(LPCWSTR a, LPCWSTR b) const
         {
-            size_t operator()(LPCWSTR str) const
-            {
-#if defined(_WIN64)
-                static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
-                const size_t _FNV_offset_basis = 14695981039346656037ULL;
-                const size_t _FNV_prime = 1099511628211ULL;
-#else
-                static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
-                const size_t _FNV_offset_basis = 2166136261U;
-                const size_t _FNV_prime = 16777619U;
-#endif
-                size_t value = _FNV_offset_basis;
-                for (LPCWSTR chr = str; *chr != 0; ++chr)
-                {
-                    value ^= (size_t)towlower(*chr);
-                    value *= _FNV_prime;
-                }
+            return wcscmp(a, b) < 0;
+        }
 
-#if defined(_WIN64)
-                static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
-                value ^= value >> 32;
-#else
-                static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
-#endif
-                return value;
-            }
-        };
-
-        struct Compare
+        bool operator()(const std::wstring & a, const std::wstring & b) const
         {
-            bool operator()(LPCWSTR a, LPCWSTR b) const
-            {
-                return _wcsicmp(a, b) < 0;
-            }
-        };
-
-        struct Equal
-        {
-            bool operator()(LPCWSTR a, LPCWSTR b) const
-            {
-                return _wcsicmp(a, b) == 0;
-            }
-        };
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using Map = std::map<LPCWSTR, Type, Compare, Allocator>;
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using ConstMap = const Map<Type, Allocator>;
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using UnorderedMap = std::unordered_map<LPCWSTR, Type, Hash, Equal, Allocator>;
-
-        template <
-            typename Type,
-            typename Allocator = std::allocator<std::pair<const LPCWSTR, Type>>
-        >
-        using ConstUnorderedMap = const UnorderedMap<Type, Allocator>;
+            return wcscmp(a.c_str(), b.c_str()) < 0;
+        }
     };
-}
+
+    struct Equal
+    {
+        bool operator()(LPCWSTR a, LPCWSTR b) const
+        {
+            return wcscmp(a, b) == 0;
+        }
+
+        bool operator()(const std::wstring & a, const std::wstring & b) const
+        {
+            return wcscmp(a.c_str(), b.c_str()) == 0;
+        }
+    };
+};
+
+
+//
+// CaseInsensitive
+//
+// Case insensitive functions for StringKeyedContainers
+//
+struct CaseInsensitive
+{
+    struct Hash
+    {
+        size_t operator()(LPCWSTR str) const
+        {
+#if defined(_WIN64)
+            static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
+            const size_t _FNV_offset_basis = 14695981039346656037ULL;
+            const size_t _FNV_prime = 1099511628211ULL;
+#else
+            static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
+            const size_t _FNV_offset_basis = 2166136261U;
+            const size_t _FNV_prime = 16777619U;
+#endif
+            size_t value = _FNV_offset_basis;
+            for (LPCWSTR chr = str; *chr != 0; ++chr)
+            {
+                value ^= (size_t)towlower(*chr);
+                value *= _FNV_prime;
+            }
+
+#if defined(_WIN64)
+            static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
+            value ^= value >> 32;
+#else
+            static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
+#endif
+            return value;
+        }
+
+        size_t operator()(const std::wstring & str) const
+        {
+            return operator()(str.c_str());
+        }
+    };
+
+    struct Compare
+    {
+        bool operator()(LPCSTR a, LPCSTR b) const
+        {
+            return _stricmp(a, b) < 0;
+        }
+
+        bool operator()(LPCWSTR a, LPCWSTR b) const
+        {
+            return _wcsicmp(a, b) < 0;
+        }
+
+        bool operator()(const std::string & a, const std::string & b) const
+        {
+            return _stricmp(a.c_str(), b.c_str()) < 0;
+        }
+
+        bool operator()(const std::wstring & a, const std::wstring & b) const
+        {
+            return _wcsicmp(a.c_str(), b.c_str()) < 0;
+        }
+    };
+
+    struct Equal
+    {
+        bool operator()(LPCSTR a, LPCSTR b) const
+        {
+            return _stricmp(a, b) == 0;
+        }
+
+        bool operator()(LPCWSTR a, LPCWSTR b) const
+        {
+            return _wcsicmp(a, b) == 0;
+        }
+
+        bool operator()(const std::string & a, const std::string & b) const
+        {
+            return _stricmp(a.c_str(), b.c_str()) == 0;
+        }
+
+        bool operator()(const std::wstring & a, const std::wstring & b) const
+        {
+            return _wcsicmp(a.c_str(), b.c_str()) == 0;
+        }
+    };
+};
+
+
+//
+// StringKeyedMaps
+//
+// Standard maps using strings as keys.
+//
+template <
+    typename KeyType,
+    typename Type,
+    typename KeyOperators = CaseInsensitive,
+    typename Allocator = std::allocator<std::pair<std::add_const<KeyType>, Type>>
+>
+struct StringKeyedMaps
+{
+    using Map = std::map<KeyType, Type, typename KeyOperators::Compare, Allocator>;
+    using ConstMap = const Map;
+    using MultiMap = std::multimap<KeyType, Type, typename KeyOperators::Compare, Allocator>;
+    using ConstMultiMap = const MultiMap;
+    using UnorderedMap = std::unordered_map<KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator>;
+    using ConstUnorderedMap = const UnorderedMap;
+    using UnorderedMultiMap = std::unordered_multimap<KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator>;
+    using ConstUnorderedMultiMap = const UnorderedMultiMap;
+};
+
+
+//
+// StringKeyedSets
+//
+// Standard sets using strings as keys.
+//
+template <
+    typename Type,
+    typename Operators = CaseInsensitive,
+    typename Allocator = std::allocator<std::pair<std::add_const<Type>, Type>>
+>
+struct StringKeyedSets
+{
+    using Set = std::set<Type, typename Operators::Compare, Allocator>;
+    using ConstSet = const Set;
+    using MultiSet = std::multiset<Type, typename Operators::Compare, Allocator>;
+    using ConstMultiSet = const MultiSet;
+    using UnorderedSet = std::unordered_set<Type, typename Operators::Hash, typename Operators::Equal, Allocator>;
+    using ConstUnorderedSet = const UnorderedSet;
+    using UnorderedMultiSet = std::unordered_multiset<Type, typename Operators::Hash, typename Operators::Equal, Allocator>;
+    using ConstUnorderedMultiSet = const UnorderedMultiSet;
+};
 
 
 //

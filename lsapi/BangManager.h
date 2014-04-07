@@ -35,7 +35,7 @@ class BangManager
 {
 private:
     /** Maps bang command names to Bang objects. */
-    typedef CStrings::CaseInsensitive::UnorderedMap<Bang*> BangMap;
+    typedef StringKeyedMaps<LPCWSTR, Bang*>::UnorderedMap BangMap;
     
     /** List of bang commands indexed by name */
     BangMap bang_map;

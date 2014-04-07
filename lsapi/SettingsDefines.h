@@ -41,13 +41,12 @@ struct SettingValue
 };
 
 /** Maps setting names to values */
-typedef std::multimap<std::wstring, SettingValue, stringicmp> SettingsMap;
+typedef StringKeyedMaps<std::wstring, SettingValue>::UnorderedMultiMap SettingsMap;
 
 /** Maps setting names to iterators */
-typedef std::map<std::wstring, SettingsMap::iterator, stringicmp> IteratorMap;
+typedef StringKeyedMaps<std::wstring, SettingsMap::iterator>::UnorderedMultiMap IteratorMap;
 
 /** Set of strings with case-insensitive ordering. */
-typedef std::set<std::wstring, stringicmp> StringSet;
-
+typedef StringKeyedSets<std::wstring>::UnorderedSet StringSet;
 
 #endif // SETTINGSDEFINES_H_

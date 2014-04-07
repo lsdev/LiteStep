@@ -120,13 +120,13 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
         {
             // No, so find the first item with a key of pszConfig
             itSettings = m_pSettingsMap->lower_bound(pwzConfig);
-            
-            if (_wcsicmp(itSettings->first.c_str(), pwzConfig) == 0)
+
+            if (itSettings != m_pSettingsMap->end())
             {
                 // Save the iterator for future use and return the value
                 it = (m_Iterators.insert(
                     IteratorMap::value_type(pwzConfig, itSettings)
-                )).first;
+                ));
                 
                 bReturn = TRUE;
             }
