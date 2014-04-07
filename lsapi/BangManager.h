@@ -62,7 +62,7 @@ public:
      * @return <code>TRUE</code> if the operation succeeds or
      *         <code>FALSE</code> otherwise
      */
-    BOOL AddBangCommand(LPCWSTR pszName, Bang *pbbBang);
+    BOOL AddBangCommand(Bang *pbbBang);
     
     /**
      * Removes a bang command from the list.

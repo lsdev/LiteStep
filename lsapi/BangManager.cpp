@@ -36,7 +36,7 @@ BangManager::~BangManager()
 
 
 // Add a bang command to the manager
-BOOL BangManager::AddBangCommand(LPCWSTR pwzName, Bang *pbbBang)
+BOOL BangManager::AddBangCommand(Bang *pbbBang)
 {
     Lock lock(m_cs);
     

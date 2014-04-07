@@ -88,7 +88,7 @@ static BOOL AddBangCommandWorker(LPCWSTR pwzCommand, BangType pfnBangCommand)
         if (pBang != nullptr)
         {
             //bBang->AddRef();
-            g_LSAPIManager.GetBangManager()->AddBangCommand(pwzCommand, pBang);
+            g_LSAPIManager.GetBangManager()->AddBangCommand(pBang);
             pBang->Release();
             bReturn = TRUE;
         }
