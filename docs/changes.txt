@@ -3,8 +3,8 @@
                          Experimental Build 2013-08-04
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-This build requires the Visual C++ 2012 Redistributable Package
-http://www.microsoft.com/en-us/download/details.aspx?id=30679
+This build requires the Visual C++ 2013 Redistributable Package
+http://www.microsoft.com/en-us/download/details.aspx?id=40784
 
 
 -- PREFACE --------------------------------------------------------------------
@@ -49,7 +49,11 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
-  - [2013-08-??] -
+  - [2014-09-02] -
+    - Changed the settings file parsing mode to utf-8, allowing for unicode
+      literals while maintaining backwards compatibility.
+
+  - [2013-08-07] -
     - Added GetRCInt64.
     - Fixed Right Click -> Set as desktop background on Windows 8.
     - Fixed the color and appearance dialog on Windows 8.
