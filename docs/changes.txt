@@ -1,10 +1,7 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                              LiteStep 0.25.0 Alpha
-                         Experimental Build 2013-08-04
+                         Experimental Build 2013-09-02
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-This build requires the Visual C++ 2013 Redistributable Package
-http://www.microsoft.com/en-us/download/details.aspx?id=40784
 
 
 -- PREFACE --------------------------------------------------------------------
@@ -32,7 +29,8 @@ This build is the current state of that code.
 
 -- CHANGE HIGHLIGHTS ----------------------------------------------------------
 
-  1) Support for running on Vista, 7, 8, Server 2008/2012, and 64-Bit variants
+  1) Support for running on Vista, 7, 8, 8.1, Server 2008/2012, and 64-Bit
+     variants
   2) No longer attempt to silently swallow module crashes
   3) Improvements in full screen application detection on multi-monitor setups
   4) Huge improvements in AppBar support, in particular on multi-monitor setups
