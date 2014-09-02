@@ -115,7 +115,7 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
         return;
     }
     
-    _tfopen_s(&m_phFile, m_tzFullPath, _T("r"));
+    _tfopen_s(&m_phFile, m_tzFullPath, _T("rt, ccs=UTF-8"));
     
     if (nullptr == m_phFile)
     {
