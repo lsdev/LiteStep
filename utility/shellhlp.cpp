@@ -35,7 +35,7 @@
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
-// LSGetKnownFolderIDList
+// LSSetEnvironmentStrings
 // Wrapper around kernel32's SetEnvironmentStringsW.
 //
 BOOL LSSetEnvironmentStrings(LPWCH pszStrings)
