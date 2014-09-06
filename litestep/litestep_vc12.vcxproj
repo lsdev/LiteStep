@@ -106,7 +106,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;msvcrtd.lib;msvcprtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;userenv.lib;msvcrtd.lib;msvcprtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)litestep.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -135,7 +135,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;msvcrtd.lib;msvcprtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;userenv.lib;msvcrtd.lib;msvcprtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)litestep.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -173,7 +173,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;libcmt.lib;libcpmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;userenv.lib;libcmt.lib;libcpmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)litestep.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -214,7 +214,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;libcmt.lib;libcpmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ole32.lib;uuid.lib;shlwapi.lib;advapi32.lib;gdi32.lib;shell32.lib;user32.lib;userenv.lib;libcmt.lib;libcpmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)litestep.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>

@@ -36,6 +36,23 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //
 // LSGetKnownFolderIDList
+// Wrapper around kernel32's SetEnvironmentStringsW.
+//
+BOOL LSSetEnvironmentStrings(LPWCH pszStrings)
+{
+    static auto fnSetEnvironmentStringsW = (BOOL(WINAPI*)(LPWCH))GetProcAddress(
+        GetModuleHandle(L"KERNEL32.DLL"), "SetEnvironmentStringsW");
+    if (fnSetEnvironmentStringsW)
+    {
+        return fnSetEnvironmentStringsW(pszStrings);
+    }
+    return FALSE;
+}
+
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//
+// LSGetKnownFolderIDList
 // Wrapper around SHGetKnownFolderIDList. Helper for GetShellFolderPath.
 //
 HRESULT LSGetKnownFolderIDList(REFKNOWNFOLDERID rfid, PIDLIST_ABSOLUTE* ppidl)
