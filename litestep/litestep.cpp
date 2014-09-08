@@ -22,13 +22,13 @@
 #include "litestep.h"
 
 // Services
+#include "COMService.h"
 #include "DDEService.h"
 #include "DDEStub.h"
-#include "RecoveryMenu.h"
-#include "TrayService.h"
 #include "ExplorerService.h"
 #include "FullscreenMonitor.h"
-#include "COMService.h"
+#include "RecoveryMenu.h"
+#include "TrayService.h"
 
 // Managers
 #include "MessageManager.h"
@@ -37,14 +37,15 @@
 // Other
 #include "DataStore.h"
 #include "StartupRunner.h"
+#include "Utility.h"
 #include "../lsapi/lsapiInit.h"
 #include "../lsapi/ThreadedBangCommand.h"
 #include "../utility/macros.h"
 #include "../utility/core.hpp"
 #include <algorithm>
-#include <WtsApi32.h>
 #include <functional>
 #include <Psapi.h>
+#include <WtsApi32.h>
 
 
 // namespace stuff
@@ -806,6 +807,15 @@ LRESULT CLiteStep::InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     
     switch (uMsg)
     {
+    case WM_SETTINGCHANGE:
+        {
+            if (lParam && _tcscmp((LPCTSTR)lParam, _T("Environment")) == 0)
+            {
+                UpdateEnvironmentVariables();
+            }
+        }
+        break;
+
     case WM_KEYDOWN:
     case WM_SYSCOMMAND:
         {

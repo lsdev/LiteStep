@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <docobj.h>
 #include <regstr.h>
-#include <Userenv.h>
 
 
 #if !defined(REGSTR_PATH_SHELLSERVICEOBJECTDELAYED)
@@ -48,26 +47,6 @@ static const TCHAR szNotifyClass[] = _T("TrayNotifyWnd");
 //
 const GUID CLSID_SysTrayObject = \
 {0x35CEC8A3, 0x2BE6, 0x11D2, {0x87, 0x73, 0x92, 0xE2, 0x20, 0x52, 0x41, 0x53}};
-
-
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//
-// UpdateEnvironmentVariables
-//
-static void UpdateEnvironmentVariables()
-{
-    HANDLE hToken;
-    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken) != FALSE)
-    {
-        LPVOID lpEnvironment;
-        if (CreateEnvironmentBlock(&lpEnvironment, hToken, FALSE) != FALSE)
-        {
-            LSSetEnvironmentStrings((LPWCH)lpEnvironment);
-            DestroyEnvironmentBlock(lpEnvironment);
-        }
-        CloseHandle(hToken);
-    }
-}
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -621,10 +600,6 @@ LRESULT CALLBACK TrayService::WindowTrayProc(HWND hWnd, UINT uMsg,
                         ,(WPARAM)NULL
                         ,(LPARAM)MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY)
                     );
-                }
-                else if (lParam && _tcscmp((LPCTSTR)lParam, _T("Environment")) == 0)
-                {
-                    UpdateEnvironmentVariables();
                 }
             }
             break;

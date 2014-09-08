@@ -245,6 +245,7 @@
     <ClCompile Include="TaskbarListHandler.cpp" />
     <ClCompile Include="TrayNotifyIcon.cpp" />
     <ClCompile Include="TrayService.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -272,6 +273,7 @@
     <ClInclude Include="TrayNotifyIcon.h" />
     <ClInclude Include="TrayService.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="litestep.bmp" />
