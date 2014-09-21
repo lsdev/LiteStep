@@ -327,7 +327,7 @@ HRESULT CLiteStep::Start(HINSTANCE hInstance, WORD wStartFlags)
     //
     if (FindWindow(L"Shell_TrayWnd", NULL) != NULL)
     {
-        if (GetRCBoolW(L"LSCloseExplorer", TRUE))
+        if ((wStartFlags & LSF_CLOSE_EXPLORER) || GetRCBoolW(L"LSCloseExplorer", TRUE))
         {
             HWND hTrayWindow = FindWindow(L"Shell_TrayWnd", NULL);
 

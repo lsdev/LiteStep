@@ -334,6 +334,20 @@ Contents:
    Usage:
     litestep.exe -startup
 
+  -explorer
+  --------
+   Attempts to start explorer as shell.
+
+   Usage:
+    litestep.exe -explorer
+
+  -closeexplorer
+  --------
+   Attempts to close explorer before starting LiteStep, if explorer is running.
+
+   Usage:
+    litestep.exe -closeexplorer
+
   !<bang command>
   ---------------
    Passes the specified !bang command and parameters to a currently running

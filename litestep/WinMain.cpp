@@ -79,8 +79,13 @@ WORD ParseCommandLine(LPCTSTR pszCommandLine, LPTSTR pszFile, DWORD cchFile)
             }
             else if (!_tcsicmp(szToken, _T("-explorer")))
             {
-                wStartFlags &= ~LSF_RUN_LITESTEP;
+                wStartFlags &= ~(LSF_RUN_LITESTEP | LSF_CLOSE_EXPLORER);
                 wStartFlags |= LSF_RUN_EXPLORER;
+            }
+            else if (!_tcsicmp(szToken, _T("-closeexplorer")))
+            {
+                wStartFlags &= ~LSF_RUN_EXPLORER;
+                wStartFlags |= LSF_CLOSE_EXPLORER;
             }
         }
         else

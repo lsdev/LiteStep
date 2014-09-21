@@ -56,6 +56,7 @@ const TCHAR szMainWindowTitle[] = _T("LiteStep");
 #define LSF_ALTERNATE_CONFIG   0x0004
 #define LSF_RUN_LITESTEP       0x0008
 #define LSF_RUN_EXPLORER       0x0010
+#define LSF_CLOSE_EXPLORER     0x0020
 
 int StartLitestep(HINSTANCE hInst, WORD wStartFlags, LPCTSTR pszAltConfigFile);
 

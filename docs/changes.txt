@@ -47,6 +47,12 @@ This build is the current state of that code.
 
 The following lists the changes between nightly builds.
 See the next section for a cumulative changelog since 0.24.8.
+  - [2014-xx-xx] -
+    - System EnvironmentVariable updates now take effect.
+    - LiteStep now runs as a per-monitor DPI aware process.
+    - Added a command line switch, -closeexplorer, with the same effect as
+      LSCloseExplorer.
+    
   - [2014-09-02] -
     - Changed the settings file parsing mode to utf-8, allowing for unicode
       literals while maintaining backwards compatibility.
