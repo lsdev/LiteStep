@@ -22,7 +22,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "COMService.h"
 #include "../utility/common.h"
-#include <ShlObj.h>
+#include "../utility/shlobjwrapper.h"
 #include "IDesktopWallpaper.h"
 #include "COMFactory.h"
 #include "../utility/debug.hpp"

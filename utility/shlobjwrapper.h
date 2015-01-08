@@ -19,38 +19,13 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#if !defined(CORE_HPP)
-#define CORE_HPP
+#if !defined(SHLOBJ_WRAPPER_H)
+#define SHLOBJ_WRAPPER_H
 
-#include "common.h"
+// ShlObj.h is throwing warnings, remove this file when it's fixed.
+#pragma warning(push) 
+#pragma warning(disable: 4091)
+#include <ShlObj.h>
+#pragma warning(pop)
 
-//
-// The "backbone" (aka essential tools).
-// Mostly included by .cpp files
-//
-
-#include <shellapi.h>
-
-#define STRICT_TYPED_ITEMIDS
-#include "shlobjwrapper.h"
-
-// mainly used for Path helper functions
-#define STRICT_CONST
-#define NO_SHLWAPI_STRFCNS
-#include <shlwapi.h>
-
-#define STRSAFE_NO_DEPRECATE
-#include <strsafe.h>
-
-// Now first thing after system includes, is our fixup for
-// the system headers.
-#include "fixup.h"
-
-// Add in debugging support for the rest of our files
-#include "debug.hpp"
-
-// Now items that generally most files should have.
-#include "../lsapi/lsapi.h"
-#include "shellhlp.h"
-
-#endif // CORE_HPP
+#endif

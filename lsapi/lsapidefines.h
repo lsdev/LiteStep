@@ -33,7 +33,7 @@
 */
 
 #include "../utility/common.h"
-#include <ShlObj.h>
+#include "../utility/shlobjwrapper.h"
 
 
 //-----------------------------------------------------------------------------

@@ -353,9 +353,9 @@ static void BangRun(HWND /* hCaller */, LPCWSTR pwzArgs)
                                         if (pwzText[0] == L'!')
                                         {
                                             WCHAR wzCommand[MAX_BANGCOMMAND];
-                                            LPCWSTR pwzArgs = nullptr;
-                                            GetTokenW(pwzText, wzCommand, &pwzArgs, TRUE);
-                                            LSExecuteExW(nullptr, nullptr, wzCommand, pwzArgs, nullptr, 0);
+                                            LPCWSTR pwzBangArgs = nullptr;
+                                            GetTokenW(pwzText, wzCommand, &pwzBangArgs, TRUE);
+                                            LSExecuteExW(nullptr, nullptr, wzCommand, pwzBangArgs, nullptr, 0);
                                             wParam = MAKEWPARAM(2, 0); // Click on cancel
                                         }
                                         free(pwzText);
