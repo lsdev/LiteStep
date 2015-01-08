@@ -108,14 +108,16 @@ UINT GetWindowsVersion();
 #define WINVER_WIN7         8
 #define WINVER_WIN8         9
 #define WINVER_WIN81        10
+#define WINVER_WIN10        11
 
 // Windows NT Server
-#define WINVER_WIN2003      11
-#define WINVER_WHS          12
-#define WINVER_WIN2008      13
-#define WINVER_WIN2008R2    14
-#define WINVER_WIN2012      15
-#define WINVER_WIN2012R2    16
+#define WINVER_WIN2003      12
+#define WINVER_WHS          13
+#define WINVER_WIN2008      14
+#define WINVER_WIN2008R2    15
+#define WINVER_WIN2012      16
+#define WINVER_WIN2012R2    17
+#define WINVER_WINSERVER10  18
 
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

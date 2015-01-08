@@ -793,26 +793,29 @@ UINT GetWindowsVersion()
     }
     versions[] = \
     {
-        { 6,  3, WINVER_METRIC::SERVER,      WINVER_WIN2012R2 },
-        { 6,  3, WINVER_METRIC::WORKSTATION, WINVER_WIN81     },
+        { 6,  4, WINVER_METRIC::SERVER,      WINVER_WINSERVER10  },
+        { 6,  4, WINVER_METRIC::WORKSTATION, WINVER_WIN10        },
 
-        { 6,  2, WINVER_METRIC::SERVER,      WINVER_WIN2012   },
-        { 6,  2, WINVER_METRIC::WORKSTATION, WINVER_WIN8      },
+        { 6,  3, WINVER_METRIC::SERVER,      WINVER_WIN2012R2    },
+        { 6,  3, WINVER_METRIC::WORKSTATION, WINVER_WIN81        },
+
+        { 6,  2, WINVER_METRIC::SERVER,      WINVER_WIN2012      },
+        { 6,  2, WINVER_METRIC::WORKSTATION, WINVER_WIN8         },
             
-        { 6,  1, WINVER_METRIC::SERVER,      WINVER_WIN2008R2 },
-        { 6,  1, WINVER_METRIC::WORKSTATION, WINVER_WIN7      },
+        { 6,  1, WINVER_METRIC::SERVER,      WINVER_WIN2008R2    },
+        { 6,  1, WINVER_METRIC::WORKSTATION, WINVER_WIN7         },
 
-        { 6,  0, WINVER_METRIC::SERVER,      WINVER_WIN2008   },
-        { 6,  0, WINVER_METRIC::WORKSTATION, WINVER_VISTA     },
+        { 6,  0, WINVER_METRIC::SERVER,      WINVER_WIN2008      },
+        { 6,  0, WINVER_METRIC::WORKSTATION, WINVER_VISTA        },
             
         // WVM_HOMESERVER should also match WVM_SERVER, so list it first
-        { 5,  2, WINVER_METRIC::HOMESERVER,  WINVER_WHS       },
-        { 5,  2, WINVER_METRIC::SERVER,      WINVER_WIN2003   },
-        { 5,  2, WINVER_METRIC::WORKSTATION, WINVER_WINXP     }, // 64-Bit
+        { 5,  2, WINVER_METRIC::HOMESERVER,  WINVER_WHS          },
+        { 5,  2, WINVER_METRIC::SERVER,      WINVER_WIN2003      },
+        { 5,  2, WINVER_METRIC::WORKSTATION, WINVER_WINXP        }, // 64-Bit
 
-        { 5,  1, WINVER_METRIC::ANY,         WINVER_WINXP     }, // 32-Bit
-        { 5,  0, WINVER_METRIC::ANY,         WINVER_WIN2000   },
-        { 4,  0, WINVER_METRIC::ANY,         WINVER_WINNT4    }
+        { 5,  1, WINVER_METRIC::ANY,         WINVER_WINXP        }, // 32-Bit
+        { 5,  0, WINVER_METRIC::ANY,         WINVER_WIN2000      },
+        { 4,  0, WINVER_METRIC::ANY,         WINVER_WINNT4       }
     };
         
     for (VerStringTable &version : versions)
