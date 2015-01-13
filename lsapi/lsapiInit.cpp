@@ -43,7 +43,6 @@ LSAPIInit::LSAPIInit()
 
 LSAPIInit::~LSAPIInit()
 {
-    m_bmBangManager->ClearBangCommands();
     m_bIsInitialized = false;
     delete m_bmBangManager;
     delete m_smSettingsManager;

@@ -24,7 +24,7 @@
 #define COMFACTORY_H
 
 #include "../utility/common.h"
-#include "../utility/shlobjwrapper.h"
+#include <ShlObj.h>
 
 class COMFactory : public IClassFactory
 {

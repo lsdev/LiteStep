@@ -32,7 +32,7 @@
 #include <shellapi.h>
 
 #define STRICT_TYPED_ITEMIDS
-#include "shlobjwrapper.h"
+#include <ShlObj.h>
 
 // mainly used for Path helper functions
 #define STRICT_CONST
