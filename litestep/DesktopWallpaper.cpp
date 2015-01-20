@@ -24,17 +24,17 @@
 #include "DesktopWallpaper.h"
 #include <Shlwapi.h>
 #include "../utility/shellhlp.h"
-
+#include <WinCrypt.h>
 
 //
 // Wrapper around SHCreateShellItemArrayFromIDLists.
 // Until we drop XP support.
 //
-HRESULT LSCreateShellItemArrayFromIDLists(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgpidl,
+static HRESULT LSCreateShellItemArrayFromIDLists(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgpidl,
                                           IShellItemArray **ppsiItemArray)
 {
     typedef HRESULT (WINAPI* PROCTYPE)(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgpidl,
-                                          IShellItemArray **ppsiItemArray);
+                                       IShellItemArray **ppsiItemArray);
     static PROCTYPE proc = nullptr;
 
     if (proc == nullptr)
@@ -49,6 +49,16 @@ HRESULT LSCreateShellItemArrayFromIDLists(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgp
     }
 
     return proc(cidl, rgpidl, ppsiItemArray);
+}
+
+
+//
+// Wrapper around SHGetValue to avoid having to declare extra variables.
+//
+static LSTATUS GetRegValue(HKEY key, LPCWSTR pszSubKey, LPCWSTR pszValue, DWORD dwType,
+                           LPVOID pvData, DWORD cbData)
+{
+    return SHGetValue(key, pszSubKey, pszValue, &dwType, pvData, &cbData);
 }
 
 
@@ -164,17 +174,37 @@ HRESULT DesktopWallpaper::SetWallpaper(LPCWSTR pwzMonitorID, LPCWSTR pwzWallpape
         return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
     }
 
+    WCHAR wzThemeFile[MAX_PATH];
+    GetRegValue(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes",
+        L"CurrentTheme", REG_SZ, wzThemeFile, sizeof(wzThemeFile));
+
     // TODO::Handle the case where this is not null
-    if (pwzMonitorID != nullptr)
-    {
-        // Find the monitor and apply the wallpaper to only that monitor
-    }
-    else
+    if (pwzMonitorID == nullptr)
     {
         SHSetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ,
             pwzWallpaper, (DWORD)wcslen(pwzWallpaper)*sizeof(pwzWallpaper[0]));
-        SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+        WritePrivateProfileStringW(
+            L"Control Panel\\Desktop", L"MultimonBackgrounds", L"0", wzThemeFile);
+        WritePrivateProfileStringW(
+            L"Control Panel\\Desktop", L"Wallpaper", pwzWallpaper, wzThemeFile);
     }
+    else
+    {
+        UINT uMonitor;
+        if (!SUCCEEDED(GetMonitorNumber(pwzMonitorID, &uMonitor)))
+        {
+            return E_INVALIDARG;
+        }
+
+        WritePrivateProfileStringW(
+            L"Control Panel\\Desktop", L"MultimonBackgrounds", L"1", wzThemeFile);
+        WCHAR wzWallPaperKey[32];
+        StringCchPrintf(wzWallPaperKey, 32, L"Wallpaper%u", uMonitor);
+        WritePrivateProfileStringW(
+            L"Control Panel\\Desktop", wzWallPaperKey, pwzWallpaper, wzThemeFile);
+    }
+
+    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
 
     return S_OK;
 }
@@ -191,19 +221,40 @@ HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpap
         return E_POINTER;
     }
 
-    // TODO::Handle the case where this is not null
-    if (pwzMonitorID != nullptr)
+    WCHAR wzThemeFile[MAX_PATH];
+    GetRegValue(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes",
+        L"CurrentTheme", REG_SZ, wzThemeFile, sizeof(wzThemeFile));
+
+    bool bMultimonBackgrounds = GetPrivateProfileIntW(
+        L"Control Panel\\Desktop", L"MultimonBackgrounds", 0, wzThemeFile) != 0;
+
+    if (!bMultimonBackgrounds)
     {
+        // TODO::Slideshow
+        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
+        GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ,
+            *ppwzWallpaper, MAX_PATH*sizeof(WCHAR));
+    }
+    else if (pwzMonitorID == nullptr)
+    {
+        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(1 * sizeof(WCHAR));
+        **ppwzWallpaper = L'\0';
+        return S_FALSE;
     }
     else
     {
-        // If we are displaying wallpapers per-monitor, or a slideshow is running...
-
+        UINT uMonitor;
+        if (!SUCCEEDED(GetMonitorNumber(pwzMonitorID, &uMonitor)))
+        {
+            return E_INVALIDARG;
+        }
         *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
-        DWORD dwType = REG_SZ;
-        DWORD dwSize = MAX_PATH*sizeof(WCHAR);
-        SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", &dwType, *ppwzWallpaper, &dwSize);
+        WCHAR wzWallPaperKey[32];
+        StringCchPrintf(wzWallPaperKey, 32, L"Wallpaper%u", uMonitor);
+        GetPrivateProfileStringW(L"Control Panel\\Desktop", wzWallPaperKey, L"", *ppwzWallpaper,
+            MAX_PATH*sizeof(WCHAR), wzThemeFile);
     }
+
     return S_OK;
 }
 
@@ -304,20 +355,16 @@ HRESULT DesktopWallpaper::GetBackgroundColor(PULONG puColor)
         return E_POINTER;
     }
 
-    // Get the current color from the registry
     WCHAR wzColor[64];
-    DWORD dwType = REG_SZ;
-    DWORD dwSize = sizeof(wzColor);
-    SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Colors", L"Background", &dwType, wzColor, &dwSize);
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Colors", L"Background", REG_SZ, wzColor,
+        sizeof(wzColor));
 
-    // Parse the registry value
     ULONG uRed, uGreen, uBlue;
     LPWSTR pEndPtr;
     uRed = wcstoul(wzColor, &pEndPtr, 10);
     uGreen = wcstoul(pEndPtr, &pEndPtr, 10);
     uBlue = wcstoul(pEndPtr, &pEndPtr, 10);
 
-    // Return the color :)
     *puColor = (uBlue << 16) | (uGreen << 8) | uRed;
     return S_OK;
 }
@@ -397,10 +444,10 @@ HRESULT DesktopWallpaper::GetPosition(DESKTOP_WALLPAPER_POSITION* pPosition)
     }
 
     WCHAR wzStyle[64], wzTiling[64];
-    DWORD dwType = REG_SZ;
-    DWORD dwSize = sizeof(wzStyle);
-    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"WallpaperStyle", &dwType, wzStyle, &dwSize);
-    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"TileWallpaper", &dwType, wzTiling, &dwSize);
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"WallpaperStyle", REG_SZ, wzStyle,
+        sizeof(wzStyle));
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"TileWallpaper", REG_SZ, wzTiling,
+        sizeof(wzTiling));
 
     if (*wzTiling == L'\1')
     {
@@ -441,6 +488,7 @@ HRESULT DesktopWallpaper::GetPosition(DESKTOP_WALLPAPER_POSITION* pPosition)
 //
 HRESULT DesktopWallpaper::SetSlideshow(IShellItemArray* pItems)
 {
+    UNREFERENCED_PARAMETER(pItems);
     return S_OK;
 }
 
@@ -456,10 +504,9 @@ HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
         return E_POINTER;
     }
 
-    DWORD dwType = REG_SZ;
-    DWORD dwSize = MAX_PATH*sizeof(WCHAR);
     WCHAR wallpaper[MAX_PATH];
-    SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", &dwType, wallpaper, &dwSize);
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ, wallpaper,
+        sizeof(wallpaper));
 
     HRESULT hr;
 
@@ -500,9 +547,9 @@ HRESULT DesktopWallpaper::SetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS options,
     DWORD shuffle = options & DSO_SHUFFLEIMAGES ? 1 : 0;
 
     SHSetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
-      L"Interval", REG_DWORD, &uSlideshowTick, sizeof(DWORD));
+        L"Interval", REG_DWORD, &uSlideshowTick, sizeof(DWORD));
     SHSetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
-      L"Shuffle", REG_DWORD, &shuffle, sizeof(DWORD));
+        L"Shuffle", REG_DWORD, &shuffle, sizeof(DWORD));
 
     return S_OK;
 }
@@ -519,12 +566,11 @@ HRESULT DesktopWallpaper::GetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS *pOption
         return E_POINTER;
     }
 
-    DWORD dwType = REG_DWORD, dwSize = sizeof(DWORD);
     DWORD interval, shuffle;
-    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
-      L"Interval", &dwType, &interval, &dwSize);
-    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
-      L"Shuffle", &dwType, &shuffle, &dwSize);
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
+        L"Interval", REG_DWORD, &interval, sizeof(DWORD));
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
+        L"Shuffle", REG_DWORD, &shuffle, sizeof(DWORD));
 
     *pOptions = shuffle ? DSO_SHUFFLEIMAGES : DESKTOP_SLIDESHOW_OPTIONS(0);
     *puSlideshowTick = interval;
@@ -539,6 +585,10 @@ HRESULT DesktopWallpaper::GetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS *pOption
 //
 HRESULT DesktopWallpaper::AdvanceSlideshow(LPCWSTR pwzMonitorID, DESKTOP_SLIDESHOW_DIRECTION direction)
 {
+    UNREFERENCED_PARAMETER(pwzMonitorID);
+    UNREFERENCED_PARAMETER(direction);
+
+    // TODO:Implement this.
     return S_OK;
 }
 
@@ -605,9 +655,8 @@ HRESULT DesktopWallpaper::GetWallpaperColor(PULONG puColor)
     }
 
     DWORD dwColor;
-    DWORD dwType = REG_DWORD;
-    DWORD dwSize = sizeof(dwColor);
-    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"ImageColor", &dwType, &dwColor, &dwSize);
+    GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"ImageColor", REG_DWORD, &dwColor,
+        sizeof(DWORD));
     *puColor = dwColor;
 
     return S_OK;
