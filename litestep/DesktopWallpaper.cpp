@@ -36,7 +36,7 @@ HRESULT LSCreateShellItemArrayFromIDLists(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgp
     typedef HRESULT (WINAPI* PROCTYPE)(UINT cidl, PCIDLIST_ABSOLUTE_ARRAY rgpidl,
                                           IShellItemArray **ppsiItemArray);
     static PROCTYPE proc = nullptr;
-    
+
     if (proc == nullptr)
     {
         proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")),
@@ -198,7 +198,7 @@ HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpap
     else
     {
         // If we are displaying wallpapers per-monitor, or a slideshow is running...
-        
+
         *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
         DWORD dwType = REG_SZ;
         DWORD dwSize = MAX_PATH*sizeof(WCHAR);
@@ -309,7 +309,7 @@ HRESULT DesktopWallpaper::GetBackgroundColor(PULONG puColor)
     DWORD dwType = REG_SZ;
     DWORD dwSize = sizeof(wzColor);
     SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Colors", L"Background", &dwType, wzColor, &dwSize);
-    
+
     // Parse the registry value
     ULONG uRed, uGreen, uBlue;
     LPWSTR pEndPtr;
@@ -437,7 +437,7 @@ HRESULT DesktopWallpaper::GetPosition(DESKTOP_WALLPAPER_POSITION* pPosition)
 
 //
 // IDesktopWallpaper::SetSlideshow
-// 
+//
 //
 HRESULT DesktopWallpaper::SetSlideshow(IShellItemArray* pItems)
 {
@@ -447,7 +447,7 @@ HRESULT DesktopWallpaper::SetSlideshow(IShellItemArray* pItems)
 
 //
 // IDesktopWallpaper::GetSlideshow
-// 
+//
 //
 HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
 {
@@ -471,12 +471,12 @@ HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
     {
         hr = pRootFolder->ParseDisplayName(nullptr, nullptr, wallpaper, nullptr, &idList, NULL);
     }
-        
+
     if (SUCCEEDED(hr))
     {
         hr = LSCreateShellItemArrayFromIDLists(1, (LPCITEMIDLIST*)&idList, ppItems);
     }
-    
+
     if (idList)
     {
         CoTaskMemFree(idList);
@@ -493,17 +493,24 @@ HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
 
 //
 // IDesktopWallpaper::SetSlideshowOptions
-// 
+//
 //
 HRESULT DesktopWallpaper::SetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS options, UINT uSlideshowTick)
 {
+    DWORD shuffle = options & DSO_SHUFFLEIMAGES ? 1 : 0;
+
+    SHSetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
+      L"Interval", REG_DWORD, &uSlideshowTick, sizeof(DWORD));
+    SHSetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
+      L"Shuffle", REG_DWORD, &shuffle, sizeof(DWORD));
+
     return S_OK;
 }
 
 
 //
 // IDesktopWallpaper::GetSlideshowOptions
-// 
+//
 //
 HRESULT DesktopWallpaper::GetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS *pOptions, LPUINT puSlideshowTick)
 {
@@ -512,14 +519,23 @@ HRESULT DesktopWallpaper::GetSlideshowOptions(DESKTOP_SLIDESHOW_OPTIONS *pOption
         return E_POINTER;
     }
 
-    *pOptions = DESKTOP_SLIDESHOW_OPTIONS(0);
+    DWORD dwType = REG_DWORD, dwSize = sizeof(DWORD);
+    DWORD interval, shuffle;
+    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
+      L"Interval", &dwType, &interval, &dwSize);
+    SHGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Personalization\\Desktop Slideshow",
+      L"Shuffle", &dwType, &shuffle, &dwSize);
+
+    *pOptions = shuffle ? DSO_SHUFFLEIMAGES : DESKTOP_SLIDESHOW_OPTIONS(0);
+    *puSlideshowTick = interval;
+
     return S_OK;
 }
 
 
 //
 // IDesktopWallpaper::AdvanceSlideshow
-// 
+//
 //
 HRESULT DesktopWallpaper::AdvanceSlideshow(LPCWSTR pwzMonitorID, DESKTOP_SLIDESHOW_DIRECTION direction)
 {
@@ -529,7 +545,7 @@ HRESULT DesktopWallpaper::AdvanceSlideshow(LPCWSTR pwzMonitorID, DESKTOP_SLIDESH
 
 //
 // IDesktopWallpaper::GetStatus
-// 
+//
 //
 HRESULT DesktopWallpaper::GetStatus(DESKTOP_SLIDESHOW_STATE* pState)
 {
@@ -545,7 +561,7 @@ HRESULT DesktopWallpaper::GetStatus(DESKTOP_SLIDESHOW_STATE* pState)
 
 //
 // IDesktopWallpaper::Enable
-// 
+//
 //
 HRESULT DesktopWallpaper::Enable(BOOL /* bEnable */)
 {
