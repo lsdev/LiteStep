@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@
 // This is backport of the IDesktopWallpaper class, and related types, since
 // they do not exist in the XP toolkit (and LS will not run on XP if compiled
 // with the post-XP toolkit).
-// 
+//
 
 #include <ShlObj.h>
 

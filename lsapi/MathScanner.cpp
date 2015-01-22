@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -81,7 +81,7 @@ MathToken MathScanner::NextToken()
 {
     // Skip past whitespace
     SkipSpace();
-    
+
     if (mLookahead[0] == WEOF)
     {
         // End of input
@@ -102,12 +102,12 @@ MathToken MathScanner::NextToken()
         // String literal
         return ScanString();
     }
-    
+
     // Operators and punctuation symbols
     for (int i = 0; i < gNumSymbols; ++i)
     {
         bool match = true;
-        
+
         for (int j = 0; j < gSymbols[i].length; ++j)
         {
             if (mLookahead[j] != gSymbols[i].str[j])
@@ -116,14 +116,14 @@ MathToken MathScanner::NextToken()
                 break;
             }
         }
-        
+
         if (match)
         {
             Next(gSymbols[i].length);
             return MathToken(gSymbols[i].type);
         }
     }
-    
+
     // Error
     throw MathException(L"Illegal character");
 }
@@ -137,7 +137,7 @@ MathToken MathScanner::CheckReservedWord(const wstring& identifier)
         // It's a reserved word
         return MathToken(reserverdWord->second);
     }
-    
+
     // It's just an identifier
     return MathToken(TT_ID, identifier);
 }
@@ -151,7 +151,7 @@ void MathScanner::Next(int count)
         {
             mLookahead[j] = mLookahead[j + 1];
         }
-        
+
         if (!mStream.get(mLookahead[LOOKAHEAD - 1]))
         {
             mLookahead[LOOKAHEAD - 1] = WEOF;
@@ -163,13 +163,13 @@ void MathScanner::Next(int count)
 MathToken MathScanner::ScanIdentifier()
 {
     wostringstream value;
-    
+
     while (IsNameChar(mLookahead[0]))
     {
         value.put(mLookahead[0]);
         Next();
     }
-    
+
     return CheckReservedWord(value.str());
 }
 
@@ -177,25 +177,25 @@ MathToken MathScanner::ScanIdentifier()
 MathToken MathScanner::ScanNumber()
 {
     wostringstream value;
-    
+
     while (IsDigit(mLookahead[0]))
     {
         value.put(mLookahead[0]);
         Next();
     }
-    
+
     if (mLookahead[0] == L'.')
     {
         value.put(mLookahead[0]);
         Next();
-        
+
         while (IsDigit(mLookahead[0]))
         {
             value.put(mLookahead[0]);
             Next();
         }
     }
-    
+
     return MathToken(TT_NUMBER, value.str());
 }
 
@@ -205,28 +205,28 @@ MathToken MathScanner::ScanString()
     wostringstream value;
     wchar_t quote = mLookahead[0];
     Next();
-    
+
     while (mLookahead[0] != WEOF && mLookahead[0] != quote)
     {
         if (mLookahead[0] == L'\\')
         {
             // Escape sequence
             Next();
-            
+
             switch (mLookahead[0])
             {
             case L'\\':
                 value.put(L'\\');
                 break;
-                
+
             case L'\"':
                 value.put(L'\"');
                 break;
-                
+
             case L'\'':
                 value.put(L'\'');
                 break;
-                
+
             default:
                 throw MathException(L"Illegal string escape sequence");
             }
@@ -236,15 +236,15 @@ MathToken MathScanner::ScanString()
             // Just a character
             value.put(mLookahead[0]);
         }
-        
+
         Next();
     }
-    
+
     if (mLookahead[0] == WEOF)
     {
         throw MathException(L"Unterminated string literal");
     }
-    
+
     Next();
     return MathToken(TT_STRING, value.str());
 }
@@ -277,7 +277,7 @@ bool MathScanner::IsNameChar(wchar_t ch)
     {
         return false;
     }
-    
+
     switch (ch)
     {
     case L'!':
@@ -303,7 +303,7 @@ bool MathScanner::IsNameChar(wchar_t ch)
     case L'/':
         return false;
     }
-    
+
     return true;
 }
 

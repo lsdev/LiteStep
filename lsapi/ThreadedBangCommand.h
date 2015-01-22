@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,10 +33,10 @@ public:
     :m_hCaller(hCaller)
     {
         ASSERT(NULL != pwzName);
-        
+
         // pszName is guaranteed to be non-NULL
         StringCchCopyW(m_wzName, MAX_BANGCOMMAND, pwzName);
-        
+
         if (pwzParams)
         {
             StringCchCopyW(m_wzParams, MAX_BANGARGS, pwzParams);
@@ -46,7 +46,7 @@ public:
             m_wzParams[0] = L'\0';
         }
     }
-    
+
     void Execute()
     {
         // Cannot use ParseBangCommand here because that would expand variables
@@ -54,7 +54,7 @@ public:
         // once. Besides, it would create inconsistent behavior.
         InternalExecuteBangCommand(m_hCaller, m_wzName, m_wzParams);
     }
-    
+
 private:
     wchar_t m_wzName[MAX_BANGCOMMAND];
     wchar_t m_wzParams[MAX_BANGARGS];

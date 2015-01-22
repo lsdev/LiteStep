@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -92,16 +92,16 @@ static void BangAlert(HWND hCaller, LPCWSTR pwzArgs)
     wchar_t wzMessage[MAX_LINE_LENGTH] = { 0 };
     wchar_t wzTitle[MAX_LINE_LENGTH] = { 0 };
     LPWSTR awzTokens[] = { wzMessage, wzTitle };
-    
+
     int nTokenCount = LCTokenizeW(pwzArgs, awzTokens, 2, 0);
-    
+
     if (nTokenCount >= 1)
     {
         if (nTokenCount == 1)
         {
             StringCchCopyW(wzTitle, MAX_PATH, L"LiteStep !Alert");
         }
-        
+
         MessageBoxW(hCaller, wzMessage, wzTitle, MB_OK | MB_TOPMOST);
     }
 }
@@ -126,21 +126,21 @@ static void BangConfirm(HWND hCaller, LPCWSTR pwzArgs)
     wchar_t wzThird[MAX_LINE_LENGTH] = { 0 };
     wchar_t wzFourth[MAX_LINE_LENGTH] = { 0 };
     LPWSTR awzTokens[] = { wzFirst, wzSecond, wzThird, wzFourth };
-    
+
     int nTokenCount = CommandTokenizeW(pwzArgs, awzTokens, 4, 0);
-    
+
     if (nTokenCount >= 3)
     {
         if (nTokenCount == 3)
         {
             StringCchCopyW(wzFourth, MAX_LINE_LENGTH, L"LiteStep !Confirm");
         }
-    
+
         LPCWSTR pwzTitle = (nTokenCount == 3) ? wzFourth : wzSecond;
-        
+
         INT idConfirm = MessageBoxW(hCaller,
             wzFirst, pwzTitle, MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
-        
+
         if (idConfirm == IDYES)
         {
             LSExecuteW(hCaller,
@@ -162,7 +162,7 @@ static void BangExecute(HWND hCaller, LPCWSTR pwzArgs)
 {
     LPCWSTR pszNextToken = pwzArgs;
     wchar_t wzCommand[MAX_LINE_LENGTH];
-    
+
     while (GetTokenW(pszNextToken, wzCommand, &pszNextToken, TRUE))
     {
         LSExecuteW(hCaller, wzCommand, SW_SHOWDEFAULT);
@@ -176,7 +176,7 @@ static void BangExecute(HWND hCaller, LPCWSTR pwzArgs)
 static void BangLogoff(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     if (hLiteStep)
     {
         PostMessage(hLiteStep, LM_RECYCLE, LR_LOGOFF, 0);
@@ -200,7 +200,7 @@ BOOL CALLBACK WindowsEnumProc(HWND hWnd, LPARAM lParam)
             PostMessage(hWnd, WM_SYSCOMMAND, lParam, 0);
         }
     }
-    
+
     return TRUE;
 }
 
@@ -220,7 +220,7 @@ static void BangMinimizeWindows(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 static void BangQuit(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     if (hLiteStep)
     {
         PostMessage(hLiteStep, LM_RECYCLE, LR_QUIT, 0);
@@ -234,7 +234,7 @@ static void BangQuit(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 static void BangRecycle(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     if (hLiteStep)
     {
         PostMessage(hLiteStep, LM_RECYCLE, LR_RECYCLE, 0);
@@ -248,9 +248,9 @@ static void BangRecycle(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 static void BangRefresh(HWND hCaller, LPCWSTR pwzArgs)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     BangReload(hCaller, pwzArgs);
-    
+
     if (hLiteStep)
     {
         SendMessage(hLiteStep, LM_REFRESH, 0, 0);
@@ -270,12 +270,12 @@ static void BangReload(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 static void BangReloadModule(HWND /* hCaller */, LPCWSTR pwzArgs)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     if (hLiteStep)
     {
         LPCWSTR pwzNextToken = pwzArgs;
         wchar_t wzModuleString[MAX_LINE_LENGTH] = { 0 };
-        
+
         while (GetTokenW(pwzNextToken, wzModuleString, &pwzNextToken, TRUE))
         {
             SendMessage(hLiteStep, LM_RELOADMODULEW, (WPARAM)wzModuleString, 0);
@@ -310,7 +310,7 @@ static void BangRun(HWND /* hCaller */, LPCWSTR pwzArgs)
     wchar_t wzX[MAX_LINE_LENGTH] = { 0 };
     wchar_t wzY[MAX_LINE_LENGTH] = { 0 };
     LPWSTR aszTokens[] = { wzX, wzY };
-    
+
     int nTokenCount = CommandTokenizeW(pwzArgs, aszTokens, 2, NULL);
     int nX = nTokenCount == 2 ? _wtoi(wzX) : GetRCIntW(L"LSRunX", 0);
     int nY = nTokenCount == 2 ? _wtoi(wzY) : GetRCIntW(L"LSRunY", 0);
@@ -388,7 +388,7 @@ static void BangRun(HWND /* hCaller */, LPCWSTR pwzArgs)
 static void BangShutdown(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     if (hLiteStep)
     {
         PostMessage(hLiteStep, LM_RECYCLE, LR_MSSHUTDOWN, 0);
@@ -402,10 +402,10 @@ static void BangShutdown(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 static void BangSwitchUser(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
     typedef BOOL (WINAPI* LockWorkStationType)(VOID);
-    
+
     LockWorkStationType LockWorkStation = (LockWorkStationType)GetProcAddress(
         GetModuleHandleW(L"USER32.DLL"), "LockWorkStation");
-    
+
     if (LockWorkStation)
     {
         LockWorkStation();
@@ -437,12 +437,12 @@ static void BangTileWindowsV(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 static void BangUnloadModule(HWND /* hCaller */, LPCWSTR pwzArgs)
 {
     HWND hLiteStep = GetLitestepWnd();
-    
+
     if (hLiteStep)
     {
         LPCWSTR pwzNextToken = pwzArgs;
         wchar_t wzPath[MAX_LINE_LENGTH] = { 0 };
-        
+
         while (GetTokenW(pwzNextToken, wzPath, &pwzNextToken, TRUE))
         {
             SendMessage(hLiteStep, LM_UNLOADMODULEW, (WPARAM)wzPath, 0);
@@ -469,7 +469,7 @@ static void EMPHandler(HWND hWnd, PEMPCONFIG pEMPCfg)
     if (IsWindow(hWnd))
     {
         LONG_PTR lUserData = GetWindowLongPtr(hWnd, GWLP_USERDATA);
-        
+
         if ((lUserData == magicDWord) && IsWindowVisible(hWnd) &&
             (pEMPCfg->uMode == EMP_HIDE || pEMPCfg->uMode == EMP_TOGGLE))
         {
@@ -524,7 +524,7 @@ static BOOL CALLBACK EnumModulesProc(HWND hWnd, LPARAM lParam)
 static void BangHideModules(HWND hCaller, LPCWSTR /* pwzArgs */)
 {
     EMPCONFIG EMPCfg = { 0 };
-    
+
     // A hack to support hiding modules on a specific monitor.
     if (NULL != hCaller && !IsWindow(hCaller))
     {
@@ -536,7 +536,7 @@ static void BangHideModules(HWND hCaller, LPCWSTR /* pwzArgs */)
             EMPCfg.hMon = (HMONITOR)hCaller;
         }
     }
-    
+
     EMPCfg.uMode = EMP_HIDE;
     EMPCfg.hDwp = BeginDeferWindowPos(10);
     EnumWindows(EnumModulesProc, (LPARAM)&EMPCfg);
@@ -550,7 +550,7 @@ static void BangHideModules(HWND hCaller, LPCWSTR /* pwzArgs */)
 static void BangShowModules(HWND hCaller, LPCWSTR /* pwzArgs */)
 {
     EMPCONFIG EMPCfg = { 0 };
-    
+
     // A hack to support showing modules on a specific monitor.
     if (NULL != hCaller && !IsWindow(hCaller))
     {
@@ -576,7 +576,7 @@ static void BangShowModules(HWND hCaller, LPCWSTR /* pwzArgs */)
 static void BangToggleModules(HWND /* hCaller */, LPCWSTR /* pwzArgs */)
 {
     EMPCONFIG EMPCfg = { 0 };
-    
+
     EMPCfg.uMode = EMP_TOGGLE;
     EMPCfg.hDwp = BeginDeferWindowPos(10);
     EnumWindows(EnumModulesProc, (LPARAM)&EMPCfg);

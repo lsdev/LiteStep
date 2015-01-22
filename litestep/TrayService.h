@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -78,14 +78,14 @@ typedef struct _SHELLAPPBARDATA
     {
         // do nothing
     }
-    
+
     const APPBARDATAV1& abd;
     /**/
     DWORD  dwMessage;
     HANDLE hSharedMemory;
     DWORD  dwSourceProcessId;
     /**/
-    
+
 private:
     // Not implemented
     _SHELLAPPBARDATA(const _SHELLAPPBARDATA&);
@@ -119,48 +119,48 @@ class TrayService : public IService
 public:
     ~TrayService();
     TrayService();
-    
+
     //
     // IService methods
     //
     virtual HRESULT Start() override;
     virtual HRESULT Stop() override;
     virtual HRESULT Recycle() override;
-    
+
     // resend all icon data
     HWND SendSystemTray();
-    
+
     // Notify TrayService of full screen app change
     void NotifyRudeApp(HMONITOR hFullScreenMonitor) const;
-    
+
     // Message Handler
     static LRESULT CALLBACK WindowTrayProc(HWND, UINT, WPARAM, LPARAM);
     static LRESULT CALLBACK WindowNotifyProc(HWND, UINT, WPARAM, LPARAM);
-    
+
 private:
     HRESULT createWindows();
     void destroyWindows();
-    
+
     //
     // manage COM based shell services
     //
     HRESULT loadShellServiceObject(REFCLSID rclsid);
     void loadShellServiceObjects();
     void unloadShellServiceObjects();
-    
+
     // Handlers for AppBar messages
     LRESULT HandleAppBarCopydata(DWORD cbData, LPVOID lpData);
     LRESULT HandleAppBarMessage(PSHELLAPPBARDATA psad);
-    
+
     // Handler for tray info event
     LRESULT TrayInfoEvent(DWORD cbData, LPVOID lpData);
-    
+
     // Handler for system tray notifications
     BOOL HandleNotification(PSHELLTRAYDATA pstd);
-    
+
     // Handler for LoadInProc messages
     HRESULT HandleLoadInProc(REFCLSID clsid, DWORD dwMessage);
-    
+
     //
     // ABM_* Notification handlers
     //
@@ -175,7 +175,7 @@ private:
     LRESULT barSetAutoHide(const APPBARDATAV1& abd);
     LRESULT barPosChanged(const APPBARDATAV1& abd);
     LRESULT barSetTaskBarState(const APPBARDATAV1& abd);
-    
+
     //
     // barSetPos and barQueryPos helpers
     //
@@ -185,16 +185,16 @@ private:
     void modifyBarBreadth(RECT& rcDst, const RECT& rcOrg, UINT uEdge);
     void adjustWorkArea(HMONITOR hMon);
     void setWorkArea(LPRECT prcWorkArea);
-    
+
     // Remove any "dead" appbars
     void removeDeadAppBars();
-    
+
     //
     // AppBar Un/Lock handlers for shared data
     //
     PAPPBARDATAV1 ABLock(PSHELLAPPBARDATA psad);
     void ABUnLock(PAPPBARDATAV1 pabd);
-    
+
     //
     // findBar variants and wrappers
     //
@@ -203,7 +203,7 @@ private:
     bool isBar(HWND hWnd);
     bool getBar(HWND hWnd, BarVector::iterator& itAppBar);
     bool getBar(HWND hWnd, AppBar*& pBarRef);
-    
+
     //
     // NIM_* Notification handlers
     //
@@ -212,21 +212,21 @@ private:
     bool deleteIcon(const NID_XX& nid);     // NIM_DELETE
     bool setFocusIcon(const NID_XX& nid);   // NIM_SETFOCUS
     bool setVersionIcon(const NID_XX& nid); // NIM_SETVERSION
-    
+
     //
     // Send icon notifications on to LiteStep (thus systray modules)
     //
     bool notify(DWORD dwMessage, PCLSNOTIFYICONDATA pclsnid) const;
     bool extendNIDCopy(LSNOTIFYICONDATA& lsnid, const NID_XX& nid) const;
-    
+
     // Remove any "dead" icons
     void removeDeadIcons();
-    
+
     //
     // finds the icon which matches the specified nid
     //
     IconVector::iterator findIcon(const NID_XX& nid);
-    
+
     //
     //
     //
@@ -237,7 +237,7 @@ private:
     HWND m_hTrayWnd;
     HWND m_hLiteStep;
     HINSTANCE m_hInstance;
-    
+
     SsoVector m_ssoVector;
     IconVector m_siVector;
     BarVector m_abVector;

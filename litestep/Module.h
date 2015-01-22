@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -36,40 +36,40 @@ class Module
 private:
     /** Instance handle of module's DLL */
     HINSTANCE m_hInstance;
-    
+
     /** Thread handle */
     HANDLE m_hThread;
-    
+
     /** LiteStep's main window handle */
     HWND m_hMainWindow;
-    
+
     /** Thread ID */
     DWORD m_dwThreadID;
-    
+
     /** Path to module's DLL */
     std::basic_string<WCHAR> m_wzLocation;
-    
+
     /** Path to LiteStep's root directory */
     std::basic_string<WCHAR> m_wzAppPath;
-    
+
     /** Pointer to <code>initModuleEx</code> function */
     std::function<int __cdecl (HWND, HINSTANCE, LPCWSTR)> m_pInit;
-    
+
     /** Pointer to <code>quitModule</code> function */
     quitModuleProc m_pQuit;
-    
+
     /** Flags used to load module */
     DWORD m_dwFlags;
 
     /** The amount of time it took to load the module */
     DWORD m_dwLoadTime;
-    
+
     /**
      * Event that is triggered when a threaded module completes initialization
      */
     HANDLE m_hInitEvent;
     HANDLE m_hInitCopyEvent;
-    
+
 public:
     /**
      * Constructor.
@@ -78,12 +78,12 @@ public:
      * @param  dwFlags    set of flags that control how the module is loaded
      */
     Module(const std::wstring& sLocation, DWORD dwFlags);
-    
+
     /**
      * Destructor.
      */
     virtual ~Module();
-    
+
     /**
      * Loads and initializes the module. If the module is loaded in its own
      * thread then initialization is done asynchronously. Use the event handle
@@ -96,14 +96,14 @@ public:
      * @return <code>true</code> if successful or <code>false</code> otherwise
      */
     bool Init(HWND hMainWindow, const std::wstring& sAppPath);
-    
+
     /**
      * Shuts down the module and unloads it. If the module was loaded in its
      * own thread then shutdown is done asynchronously. Use event handle
      * returned by <code>GetQuitEvent</code> to wait for shutdown to complete.
      */
     void Quit();
-    
+
     /**
      * Entry point for the module's main thread.
      *
@@ -111,14 +111,14 @@ public:
      * @return unused
      */
     static UINT __stdcall ThreadProc(void* dllModPtr);
-    
+
     /**
      * Handles messages sent to the module's main thread.
      *
      * @param  msg  message information
      */
     static void HandleThreadMessage(MSG &msg);
-    
+
     /**
      * Returns this module's DLL instance handle.
      */
@@ -126,7 +126,7 @@ public:
     {
         return m_hInstance;
     }
-    
+
     /**
      * Returns this module's thread handle. Returns <code>NULL</code> if the
      * module was not loaded in its own thread.
@@ -135,7 +135,7 @@ public:
     {
         return m_hThread;
     }
-    
+
     /**
      * Returns this module's thread handle. Returns <code>NULL</code> if the
      * module was not loaded in its own thread.
@@ -147,10 +147,10 @@ public:
     {
         HANDLE hTemp = m_hThread;
         m_hThread = nullptr;
-        
+
         return hTemp;
     }
-    
+
     /**
      * Returns an event that is set once this module has been initialized.
      */
@@ -158,7 +158,7 @@ public:
     {
         return m_hInitEvent;
     }
-    
+
     /**
      * Returns an event that is set once this module has been initialized.
      *
@@ -170,10 +170,10 @@ public:
     {
         HANDLE hTemp = m_hInitEvent;
         m_hInitEvent = nullptr;
-        
+
         return hTemp;
     }
-    
+
     /**
      * Returns the path to this module's DLL.
      */
@@ -181,7 +181,7 @@ public:
     {
         return m_wzLocation.c_str();
     }
-    
+
     /**
      * Returns the set of flags used to load this module.
      */
@@ -205,7 +205,7 @@ public:
     {
         return m_pQuit;
     }
-    
+
     /**
      * Returns a pointer to this module's <code>initModuleEx</code> function.
      */
@@ -213,7 +213,7 @@ public:
     {
         return m_pInit;
     }
-    
+
 private:
     /**
      * Loads this module's DLL.
@@ -222,14 +222,14 @@ private:
      *         <code>false</code> if an error occurs
      */
     bool _LoadDll();
-    
+
     /**
      * Calls this module's <code>initModuleEx</code> function.
      *
      * @return return value from <code>initModuleEx</code>
      */
     int CallInit();
-    
+
     /**
      * Calls this module's <code>quitModule</code> function.
      */

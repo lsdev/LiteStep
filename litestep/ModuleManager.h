@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -42,12 +42,12 @@ public:
      * Constructor.
      */
     ModuleManager();
-    
+
     /**
      * Destructor.
      */
     virtual ~ModuleManager();
-    
+
     /**
      * Starts the module manager and loads all the modules specified in
      * <code>step.rc</code>.
@@ -56,28 +56,28 @@ public:
      * @return <code>S_OK</code> if successful or an error code
      */
     HRESULT Start(ILiteStep *pILiteStep);
-    
+
     /**
      * Unloads all modules and stops the module manager.
      *
      * @return <code>S_OK</code> if successful or an error code
      */
     HRESULT Stop();
-    
+
     /**
      * Loads all the modules specified in <code>step.rc</code>.
      *
      * @return <code>S_OK</code> if successful or an error code
      */
     HRESULT rStart();
-    
+
     /**
      * Unloads all modules.
      *
      * @return <code>S_OK</code> if successful or an error code
      */
     HRESULT rStop();
-    
+
     /**
      * Loads a module.
      *
@@ -87,7 +87,7 @@ public:
      *         error occurs
      */
     BOOL LoadModule(LPCWSTR pwzLocation, DWORD dwFlags);
-    
+
     /**
      * Unloads a module given its instance handle.
      *
@@ -96,7 +96,7 @@ public:
      *         error occurs
      */
     BOOL QuitModule(HINSTANCE hModule);
-    
+
     /**
      * Unloads a module given the path to its DLL.
      *
@@ -105,7 +105,7 @@ public:
      *         error occurs
      */
     BOOL QuitModule(LPCWSTR pwzLocation);
-    
+
     /**
      * Reloads a module given its instance handle
      *
@@ -114,7 +114,7 @@ public:
      *         error occurs
      */
     BOOL ReloadModule(HINSTANCE hModule);
-    
+
     /**
      * Enumerates loaded modules. Calls the callback function once for each
      * loaded module. Continues until all modules have been enumerated or the
@@ -128,7 +128,7 @@ public:
      *         <code>FALSE</code>, or an error code
      */
     HRESULT EnumModules(LSENUMMODULESPROCW pfnCallback, LPARAM lParam) const;
-    
+
     /**
      * Enumerates performance statistics for loaded modules. Calls the callback
      * function once for each loaded module. Continues until all modules have
@@ -142,7 +142,7 @@ public:
      *         <code>FALSE</code>, or an error code
      */
     HRESULT EnumPerformance(LSENUMPERFORMANCEPROCW pfnCallback, LPARAM lParam) const;
-    
+
 private:
     /**
      * Loads all the modules specified in <code>step.rc</code>.
@@ -150,7 +150,7 @@ private:
      * @return number of modules loaded
      */
     UINT _LoadModules();
-    
+
     /**
      * Initializes the modules in the specified list.
      *
@@ -158,26 +158,26 @@ private:
      * @return number of modules initialized
      */
     UINT _StartModules(ModuleQueue& mqModules);
-    
+
     /**
      * Unloads all loaded modules.
      */
     void _QuitModules();
-    
+
     /**
      * Finds a module in the loaded module list based on the path to its DLL.
      *
      * @return iterator that points to the module or the end of the list
      */
     ModuleQueue::iterator _FindModule(LPCWSTR pwzLocation);
-    
+
     /**
      * Finds a module in the loaded module list based on its instance handle.
      *
      * @return iterator that points to the module or the end of the list
      */
     ModuleQueue::iterator _FindModule(HINSTANCE hModule);
-    
+
     /**
      * Allocates a module object.
      *
@@ -186,7 +186,7 @@ private:
      * @return pointer to the module object
      */
     Module* _MakeModule(LPCWSTR pwzLocation, DWORD dwFlags);
-    
+
     /**
      * Waits for an array of events to all be set while remaining responsive
      * to user input.
@@ -195,19 +195,19 @@ private:
      * @param  dwCount   number of handles in the array
      */
     void _WaitForModules(const HANDLE* pHandles, size_t stCount) const;
-    
+
     /** List of loaded modules */
     ModuleQueue m_ModuleQueue;
-    
+
     /** Pointer to LiteStep's core interface */
     ILiteStep *m_pILiteStep;
-    
+
     /** LiteStep's main window handle */
     HWND m_hLiteStep;
-    
+
     /** Path to LiteStep's root directory */
     std::wstring m_sAppPath;
-    
+
     /**
      * Predicate used by <code>_FindModule</code> to locate a loaded module
      * given the path to its DLL.
@@ -221,7 +221,7 @@ private:
         {
             // do nothing
         }
-        
+
         /**
          * Returns <code>true</code> if specified module's DLL path matches
          * the path passed to the constructor.
@@ -230,12 +230,12 @@ private:
         {
             return (_wcsicmp(m_pwzLocation, pModule->GetLocation()) == 0);
         }
-        
+
     private:
         /** Path to match */
         LPCWSTR m_pwzLocation;
     };
-    
+
     /**
      * Predicate used by <code>_FindModule</code> to locate a loaded module
      * given its DLL instance handle.
@@ -249,7 +249,7 @@ private:
         {
             // do nothing
         }
-        
+
         /**
          * Returns <code>true</code> if specified module's DLL instance handle
          * matches the handle passed to the constructor.
@@ -258,7 +258,7 @@ private:
         {
             return (pModule->GetInstance() == m_hInstance);
         }
-        
+
     private:
         /** Instance handle to match */
         HINSTANCE m_hInstance;

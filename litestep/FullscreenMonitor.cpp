@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -51,21 +51,21 @@ HMONITOR FullscreenMonitor::_FullScreenGetMonitorHelper(HWND hWnd)
     {
         return nullptr;
     }
-    
+
     HMONITOR hMonFS = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONULL);
-    
+
     if (nullptr == hMonFS)
     {
         return nullptr;
     }
-    
+
     RECT rScreen = { 0 };
-    
+
     if (nullptr != hMonFS)
     {
         MONITORINFO miFS;
         miFS.cbSize = sizeof(MONITORINFO);
-        
+
         if (GetMonitorInfo(hMonFS, &miFS))
         {
             VERIFY(CopyRect(&rScreen, &miFS.rcMonitor));
@@ -76,32 +76,32 @@ HMONITOR FullscreenMonitor::_FullScreenGetMonitorHelper(HWND hWnd)
             rScreen.top = 0;
             rScreen.right = GetSystemMetrics(SM_CXSCREEN);
             rScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-            
+
             hMonFS = MonitorFromRect(&rScreen, MONITOR_DEFAULTTOPRIMARY);
         }
     }
-    
+
     RECT rWnd;
     VERIFY(GetClientRect(hWnd, &rWnd));
-    
+
     LONG width = rWnd.right - rWnd.left;
     LONG height = rWnd.bottom - rWnd.top;
-    
+
     POINT pt = { rWnd.left, rWnd.top };
     VERIFY(ClientToScreen(hWnd, &pt));
-    
+
     rWnd.left = pt.x;
     rWnd.top = pt.y;
     rWnd.right = pt.x + width;
     rWnd.bottom = pt.y + height;
-    
+
     // If the client area is the size of the screen, then consider it to be
     // a full screen window.
     if (EqualRect(&rScreen, &rWnd))
     {
         return hMonFS;
     }
-    
+
     DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
 
     // Check Window Rect if WS_CAPTION or WS_THICKFRAME is part of the style.
@@ -111,13 +111,13 @@ HMONITOR FullscreenMonitor::_FullScreenGetMonitorHelper(HWND hWnd)
         WS_THICKFRAME != (WS_THICKFRAME & dwStyle))
     {
         VERIFY(GetWindowRect(hWnd, &rWnd));
-        
+
         if (EqualRect(&rScreen, &rWnd))
         {
             return hMonFS;
         }
     }
-    
+
     return nullptr;
 }
 
@@ -128,30 +128,30 @@ HMONITOR FullscreenMonitor::_FullScreenGetMonitorHelper(HWND hWnd)
 BOOL CALLBACK FullscreenMonitor::_EnumThreadFSWnd(HWND hWnd, LPARAM lParam)
 {
     HMONITOR hMonFS = _FullScreenGetMonitorHelper(hWnd);
-    
+
     if (nullptr != hMonFS)
     {
         *(HMONITOR*)lParam = hMonFS;
         return FALSE;
     }
-    
+
     return TRUE;
 }
 
 
 //
 // IsFullscreenWindow
-// 
+//
 HMONITOR FullscreenMonitor::IsFullscreenWindow(HWND hWnd)
 {
     if (!IsWindow(hWnd))
     {
         return nullptr;
     }
-    
+
     HMONITOR hMonFS = nullptr;
     EnumThreadWindows(GetWindowThreadProcessId(hWnd, nullptr), _EnumThreadFSWnd, (LPARAM)&hMonFS);
-    
+
     return hMonFS;
 }
 
@@ -187,7 +187,7 @@ void FullscreenMonitor::HideModules(HMONITOR hMonitor, HWND hWnd)
 //
 void FullscreenMonitor::ThreadProc()
 {
-    
+
 #if defined(_DEBUG)
     DbgSetCurrentThreadName("LS FullscreenMonitor Service");
 #endif
@@ -266,7 +266,7 @@ void FullscreenMonitor::ThreadProc()
                 bCheckedForeGround = true;
             }
 
-            // 
+            //
             if (hNewMonitor != iter->hMonitor)
             {
                 hiddenMonitors.erase(iter->hMonitor);
@@ -375,7 +375,7 @@ HRESULT FullscreenMonitor::Recycle()
     // We need to show the modules that were hidden before
     if (bAlreadyHidden && !m_bAutoHideModules)
     {
-        // TODO::We could possibly just show the modules on monitors with fullscreen windows. 
+        // TODO::We could possibly just show the modules on monitors with fullscreen windows.
         ParseBangCommandW(nullptr, L"!ShowModules", nullptr);
     }
 

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -67,15 +67,15 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
 {
     ASSERT(nullptr == m_phFile);
     ASSERT(nullptr != ptzFileName);
-    
+
     TCHAR tzExpandedPath[MAX_PATH_LENGTH];
-    
+
     VarExpansionExW(tzExpandedPath, ptzFileName, MAX_PATH_LENGTH);
     PathUnquoteSpaces(tzExpandedPath);
-    
+
     DWORD dwLen = GetFullPathName(
         tzExpandedPath, MAX_PATH_LENGTH, m_tzFullPath, nullptr);
-    
+
     if (0 == dwLen || dwLen > MAX_PATH_LENGTH)
     {
         TRACE("Error: Can not get full path for \"%ls\"", tzExpandedPath);
@@ -109,41 +109,41 @@ void FileParser::ParseFile(LPCTSTR ptzFileName)
             resourceTextBuffer, MAX_LINE_LENGTH,
             L"Error: Reursive include detected!\n %ls.",
             trail);
-                            
+
         RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
 
         return;
     }
-    
+
     _tfopen_s(&m_phFile, m_tzFullPath, _T("rt, ccs=UTF-8"));
-    
+
     if (nullptr == m_phFile)
     {
         TRACE("Error: Can not open file \"%ls\" (Defined as \"%ls\").",
             m_tzFullPath, ptzFileName);
         return;
     }
-    
+
     TRACE("Parsing \"%ls\"", m_tzFullPath);
     m_trail.push_back(TrailItem(0, m_tzFullPath));
-    
+
     fseek(m_phFile, 0, SEEK_SET);
-    
+
     TCHAR tzKey[MAX_RCCOMMAND] = { 0 };
     TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
-    
+
     m_uLineNumber = 0;
-    
+
     _ReadNextLine(m_tzReadAhead);
     while (_ReadLineFromFile(tzKey, tzValue))
     {
         _ProcessLine(tzKey, tzValue);
     }
-    
+
     fclose(m_phFile);
     m_phFile = nullptr;
     m_trail.pop_back();
-    
+
     TRACE("Finished Parsing \"%ls\"", m_tzFullPath);
 }
 
@@ -171,20 +171,20 @@ bool FileParser::_ReadNextLine(LPTSTR ptzBuffer)
             // End Of File or an Error occured. We don't care which.
             break;
         }
-        
+
         ++m_uLineNumber;
 
         LPTSTR ptzCurrent = tzBuffer;
 
         // Jump over any initial whitespace
         ptzCurrent += _tcsspn(ptzCurrent, WHITESPACE);
-        
+
         // Ignore empty lines, and comments
         if (ptzCurrent[0] != '\0' && ptzCurrent[0] != _T(';'))
         {
             // End on first reserved character or whitespace
             size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE RESERVEDCHARS);
-            
+
             // If the character is not whitespace or a comment
             // then the line has an invalid format.  Ignore it.
             if (_tcschr(WHITESPACE _T(";"), ptzCurrent[stEndConfig]) == NULL)
@@ -214,7 +214,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 {
     ASSERT(NULL != m_phFile);
     ASSERT(NULL != ptzName);
-    
+
     bool bReturn = false;
 
     if (m_tzReadAhead[0] == '}')
@@ -228,7 +228,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
         {
             m_stPrefixes.pop_front();
         }
-        
+
         // Skip this line
         _ReadNextLine(m_tzReadAhead);
         bReturn = _ReadLineFromFile(ptzName, ptzValue);
@@ -239,7 +239,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 
         // End on first reserved character or whitespace
         size_t stEndConfig = _tcscspn(ptzCurrent, WHITESPACE RESERVEDCHARS);
-        
+
         if (stEndConfig != 0)
         {
             ptzName[0] = _T('\0');
@@ -283,11 +283,11 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                 if (ptzValue != NULL)
                 {
                     LPTSTR ptzValueStart = ptzCurrent + stEndConfig;
-                    
+
                     // Avoid expensive in-place copy from _StripString
                     // Simply increment passed any whitespace, here.
                     ptzValueStart += _tcsspn(ptzValueStart, WHITESPACE);
-                    
+
                     // Removing trailing whitespace and comments
                     _StripString(ptzValueStart);
 
@@ -314,7 +314,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                                     ++prefix;
                                 }
                             }
-                            
+
                             // Copy over the prefix.
                             if (prefix != m_stPrefixes.end())
                             {
@@ -330,7 +330,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
                     }
                     StringCchCopy(ptzValue, cchRemaining, ptzValueStart);
                 }
-                
+
                 bReturn = true;
 
                 // Reads the next line
@@ -348,7 +348,7 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
             }
         }
     }
-    
+
     return bReturn;
 }
 
@@ -360,13 +360,13 @@ bool FileParser::_ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue)
 void FileParser::_StripString(LPTSTR ptzString)
 {
     ASSERT(NULL != ptzString);
-    
+
     LPTSTR ptzCurrent = ptzString;
     LPTSTR ptzStart = NULL;
     LPTSTR ptzLast = NULL;
     size_t stQuoteLevel = 0;
     TCHAR tLastQuote = _T('\0');
-    
+
     while (*ptzCurrent != _T('\0'))
     {
         if (wcschr(WHITESPACE, *ptzCurrent) == NULL)
@@ -375,14 +375,14 @@ void FileParser::_StripString(LPTSTR ptzString)
             {
                 ptzStart = ptzCurrent;
             }
-            
+
             ptzLast = NULL;
         }
         else if (ptzLast == NULL)
         {
             ptzLast = ptzCurrent;
         }
-        
+
         if (ptzStart != NULL)
         {
             if (*ptzCurrent == '[')
@@ -419,20 +419,20 @@ void FileParser::_StripString(LPTSTR ptzString)
                 }
             }
         }
-        
+
         ++ptzCurrent;
     }
-    
+
     if (ptzLast != NULL)
     {
         while (ptzLast > ptzString && wcschr(WHITESPACE, *(ptzLast-1)))
         {
             --ptzLast;
         }
-        
+
         *ptzLast = '\0';
     }
-    
+
     if (ptzStart != NULL && ptzStart != ptzString)
     {
         StringCchCopy(ptzString, wcslen(ptzString) + 1, ptzStart);
@@ -448,7 +448,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
 {
     ASSERT(NULL != m_pSettingsMap);
     ASSERT(NULL != ptzName); ASSERT(NULL != ptzValue);
-    
+
     if (_wcsicmp(ptzName, _T("if")) == 0)
     {
         _ProcessIf(ptzValue);
@@ -469,17 +469,17 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     else if (_wcsicmp(ptzName, L"include") == 0)
     {
         TCHAR tzPath[MAX_PATH_LENGTH] = { 0 };
-        
+
         if (!GetTokenW(ptzValue, tzPath, NULL, FALSE))
         {
             TRACE("Syntax Error (%ls, %d): Empty \"Include\" directive",
                 m_tzFullPath, m_uLineNumber);
             return;
         }
-        
+
         TRACE("Include (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, tzPath);
-        
+
         m_trail.back().uLine = m_uLineNumber;
         FileParser fpParser(m_pSettingsMap, m_trail);
         fpParser.ParseFile(tzPath);
@@ -489,24 +489,24 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
     {
         TCHAR tzPath[MAX_PATH_LENGTH]; // path+pattern
         TCHAR tzFilter[MAX_PATH_LENGTH]; // path only
-          
+
         // expands string in ptzValue to tzPath
         // buffer size defined by MAX_PATH_LENGTH
         VarExpansionExW(tzPath, ptzValue, MAX_PATH_LENGTH);
-        
+
         PathUnquoteSpaces(tzPath); // strips quotation marks from string
-        
+
         TRACE("Searching IncludeFolder (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, tzPath);
-        
+
         // Hard-coded filter for *.rc files to limit search operation.
         //
         // Create tzFilter as tzPath appended with *.rc
         //  - the API takes care of trailing slash handling thankfully.
         PathCombine(tzFilter, tzPath, _T("*.rc"));
-        
+
         WIN32_FIND_DATA findData; // defining variable for filename
-        
+
         // Looking in tzFilter for data :)
         HANDLE hSearch = FindFirstFile(tzFilter, &findData);
 
@@ -517,7 +517,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         auto fileComparer = [] (const std::wstring s1, const std::wstring s2) -> bool {
             return (_wcsicmp(s1.c_str(), s2.c_str()) > 0);
         };
-        
+
         if (INVALID_HANDLE_VALUE != hSearch)
         {
             do
@@ -528,14 +528,14 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
                 const DWORD dwAttrib = (FILE_ATTRIBUTE_DIRECTORY |
                                         FILE_ATTRIBUTE_HIDDEN |
                                         FILE_ATTRIBUTE_SYSTEM);
-                
+
                 if (0 == (dwAttrib & findData.dwFileAttributes))
                 {
                     foundFiles.push_back(findData.cFileName);
                     std::push_heap(foundFiles.begin(), foundFiles.end(), fileComparer);
                 }
             } while (FindNextFile(hSearch, &findData) != FALSE);
-            
+
             FindClose(hSearch);
         }
 
@@ -543,14 +543,14 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
         {
             // Processing the valid cFileName data now.
             TCHAR tzFile[MAX_PATH_LENGTH];
-                    
+
             // adding (like above) filename to tzPath to set tzFile
             // for opening.
             m_trail.back().uLine = m_uLineNumber;
             if (tzFile == PathCombine(tzFile, tzPath, foundFiles.begin()->c_str()))
             {
                 TRACE("Found and including: \"%ls\"", tzFile);
-                
+
                 FileParser fpParser(m_pSettingsMap, m_trail);
                 fpParser.ParseFile(tzFile);
             }
@@ -558,7 +558,7 @@ void FileParser::_ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue)
             std::pop_heap(foundFiles.begin(), foundFiles.end(), fileComparer);
             foundFiles.pop_back();
         }
-        
+
         TRACE("Done searching IncludeFolder (%ls, line %d): \"%ls\"",
             m_tzFullPath, m_uLineNumber, tzPath);
     }
@@ -578,26 +578,26 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 {
     ASSERT(NULL != m_pSettingsMap);
     ASSERT(NULL != ptzExpression);
-    
+
     bool result = false;
-    
+
     if (!MathEvaluateBool(*m_pSettingsMap, ptzExpression, result))
     {
         TRACE("Error parsing expression \"%ls\" (%ls, line %d)",
             ptzExpression, m_tzFullPath, m_uLineNumber);
-        
+
         // Invalid syntax, so quit processing entire conditional block
         _SkipIf();
         return;
     }
-    
+
     TRACE("Expression (%ls, line %d): \"%ls\" evaluated to %s",
         m_tzFullPath, m_uLineNumber,
         ptzExpression, result ? "TRUE" : "FALSE");
-    
+
     TCHAR tzName[MAX_RCCOMMAND] = { 0 };
     TCHAR tzValue[MAX_LINE_LENGTH] = { 0 };
-    
+
     if (result)
     {
         // When the If expression evaluates true, process lines until we find
@@ -652,7 +652,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
                         TRACE("Syntax Error (%ls, %d): "
                               "\"ElseIf\" directive after \"Else\"",
                             m_tzFullPath, m_uLineNumber);
-                        
+
                         // Invalid syntax, so quit processing conditional block
                         _SkipIf();
                         break;
@@ -688,7 +688,7 @@ void FileParser::_ProcessIf(LPCTSTR ptzExpression)
 void FileParser::_SkipIf()
 {
     TCHAR tzName[MAX_RCCOMMAND];
-    
+
     while (_ReadLineFromFile(tzName, NULL))
     {
         if (_tcsicmp(tzName, _T("if")) == 0)

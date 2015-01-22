@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -41,68 +41,68 @@ public:
         NUMBER,
         STRING
     };
-    
+
 public:
     /**
      * Constructs an undefined value.
      */
     MathValue();
-    
+
     /**
      * Constructs a Boolean value.
      */
     MathValue(bool value);
-    
+
     /**
      * Constructs a numeric value from an integer.
      */
     MathValue(int value);
-    
+
     /**
      * Constructs a numeric value from a floating point number.
      */
     MathValue(double value);
-    
+
     /**
      * Constructs a string value.
      */
     MathValue(const std::wstring& value);
-    
+
     /**
      * Constructs a string value.
      */
     MathValue(const wchar_t *value);
-    
+
     /**
      * Assigns a Boolean to this value.
      */
     MathValue& operator=(bool value);
-    
+
     /**
      * Assigns an integer to this value.
      */
     MathValue& operator=(int value);
-    
+
     /**
      * Assigns a floating point number to this value.
      */
     MathValue& operator=(double value);
-    
+
     /**
      * Assigns a string to this value.
      */
     MathValue& operator=(const std::wstring& value);
-    
+
     /**
      * Assigns a string to this value.
      */
     MathValue& operator=(const wchar_t *value);
-    
+
     /**
      * Returns a string description of this value's type.
      */
     std::wstring GetTypeName() const;
-    
+
     /**
      * Returns <code>true</code> if this value is undefined.
      */
@@ -110,7 +110,7 @@ public:
     {
         return (mType == UNDEFINED);
     }
-    
+
     /**
      * Returns <code>true</code> if this value is a Boolean.
      */
@@ -118,7 +118,7 @@ public:
     {
         return (mType == BOOLEAN);
     }
-    
+
     /**
      * Returns <code>true</code> if this value is a number.
      */
@@ -126,7 +126,7 @@ public:
     {
         return (mType == NUMBER);
     }
-    
+
     /**
      * Returns <code>true</code> if this value is a string.
      */
@@ -134,33 +134,33 @@ public:
     {
         return (mType == STRING);
     }
-    
+
     /**
      * Converts this value to a Boolean.
      */
     bool ToBoolean() const;
-    
+
     /**
      * Converts this value to an integer.
      */
     int ToInteger() const;
-    
+
     /**
      * Converts this value to a number.
      */
     double ToNumber() const;
-    
+
     /**
      * Converts this value to a string.
      */
     std::wstring ToString() const;
-    
+
     /**
      * Converts this value to a string using integer representation
      * for any NUMBER type.
      */
     std::wstring ToCompatibleString() const;
-    
+
     /** Operators */
     friend MathValue operator+ (const MathValue& a, const MathValue& b);
     friend MathValue operator+ (const MathValue& a);
@@ -178,17 +178,17 @@ public:
     friend MathValue operator<=(const MathValue& a, const MathValue& b);
     friend MathValue operator> (const MathValue& a, const MathValue& b);
     friend MathValue operator>=(const MathValue& a, const MathValue& b);
-    
+
 private:
     /** Type */
     int mType;
-    
+
     /** Boolean value */
     bool mBoolean;
-    
+
     /** Numeric value */
     double mNumber;
-    
+
     /** String value */
     std::wstring mString;
 };

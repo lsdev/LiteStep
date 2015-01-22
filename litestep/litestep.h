@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -66,76 +66,76 @@ class CLiteStep: public ILiteStep
 public:
     CLiteStep();
     ~CLiteStep();
-    
+
     HRESULT Start(HINSTANCE hInstance, WORD wStartFlags);
     HRESULT Stop();
-    
+
     int Run();
-    
+
     static LRESULT CALLBACK ExternalWndProc(
         HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    
+
     // ILiteStep
     void PeekAllMsgs();
-    
+
 private:
     void MessageHandler(MSG &message);
-    
+
     HRESULT CreateMainWindow();
     HRESULT DestroyMainWindow();
-    
+
     void _RegisterShellNotifications(HWND hWnd);
     void _UnregisterShellNotifications(HWND hWnd);
-    
+
     LRESULT InternalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT _HandleSessionChange(DWORD dwCode, DWORD dwSession);
-    
+
     void _Recycle();
     HRESULT _EnumRevIDs(LSENUMREVIDSPROCW pfnCallback, LPARAM lParam) const;
     static BOOL _SetShellWindow(HWND hWnd);
-    
+
     // Application instance
     HINSTANCE m_hInstance;
-    
+
     // Recovery Menu
     // This is a special service that is not kept in the services array
     IService* m_pRecoveryMenu;
-    
+
     // Windows
     HWND m_hMainWindow; // = NULL;
-    
+
     // Notifications (Shell Hooks + WTS notifications)
     typedef BOOL (WINAPI* RSHPROC)(HWND, DWORD);
-    
+
     RSHPROC m_pRegisterShellHook;
     UINT WM_ShellHook; // = 0;
     HMODULE m_hWtsDll;
-    
+
     // Function blocks
     UINT m_BlockRecycle; // = 0
-    
+
     //
     // Manager Related
     //
     ModuleManager* m_pModuleManager; // = NULL;
     DataStore* m_pDataStoreManager; // = NULL;
     MessageManager* m_pMessageManager; // = NULL;
-    
+
     HRESULT _InitManagers();
     HRESULT _StartManagers();
     HRESULT _StopManagers();
     void _CleanupManagers();
-    
+
     bool m_bSignalExit; // = false
     int m_nQuitMsg;
-    
+
     //
     // Service Related
     //
     TrayService* m_pTrayService; // = NULL;
     FullscreenMonitor* m_pFullscreenMonitor; // = nullptr;
     std::vector<IService*> m_Services;
-    
+
     HRESULT _InitServices(bool bSetAsShell);
     HRESULT _StartServices();
     HRESULT _StopServices();

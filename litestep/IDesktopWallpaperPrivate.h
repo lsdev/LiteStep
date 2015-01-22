@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@
 //
 // The functions listed here, and their functionality are guesses, which were
 // obtained by examining how explorer handles these calls.
-// 
+//
 
 const GUID IID_IDesktopWallpaperPrivate = { 0xC182461F, 0xDFAC, 0x4375, { 0xAB, 0x6E, 0x4C, 0xC4, 0x5A, 0xA7, 0xF9, 0xCC } };
 class IDesktopWallpaperPrivate : public IDesktopWallpaper

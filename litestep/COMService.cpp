@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -57,7 +57,7 @@ void COMService::ThreadProc()
 #endif
 
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-    
+
     COMFactory *pFactory = new COMFactory();
 
     // C2CF3110-460E-4fc1-B9D0-8A1C0C9CC4BD

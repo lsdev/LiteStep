@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -44,25 +44,25 @@ public:
      * Constructor.
      */
     MessageManager();
-    
+
     /**
      * Destructor.
      */
     ~MessageManager();
-    
+
     /** Set of window handles */
     typedef std::set<HWND> windowSetT;
-    
+
 private:
     /** Maps message numbers to sets of window handles */
     typedef std::map<UINT, windowSetT> messageMapT;
-    
+
     /** Message map */
     messageMapT m_MessageMap;
-    
+
     /** Critical section used to serialize access to data members */
     mutable CriticalSection m_cs;
-    
+
 public:
     /**
      * Registers a window as a handler for a message.
@@ -71,7 +71,7 @@ public:
      * @param  message  message number
      */
     void AddMessage(HWND window, UINT message);
-    
+
     /**
      * Registers a window as a handler for multiple messages.
      *
@@ -79,7 +79,7 @@ public:
      * @param  pMessages  <code>NULL</code>-terminated array of message numbers
      */
     void AddMessages(HWND window, UINT *pMessages);
-    
+
     /**
      * Unregisters a window as a handler for a message.
      *
@@ -87,7 +87,7 @@ public:
      * @param  message  message number
      */
     void RemoveMessage(HWND window, UINT message);
-    
+
     /**
      * Unregisters a window as a handler for multiple messages.
      *
@@ -95,12 +95,12 @@ public:
      * @param  pMessages  <code>NULL</code>-terminated array of message numbers
      */
     void RemoveMessages(HWND window, UINT *pMessages);
-    
+
     /**
      * Clears all registrations from the message map.
      */
     void ClearMessages();
-    
+
     /**
      * Sends a message to all windows that have registered for it. Does
      * not return until all windows have processed the message.
@@ -112,7 +112,7 @@ public:
      *          registered window
      */
     LRESULT SendMessage(UINT message, WPARAM wParam, LPARAM lParam);
-    
+
     /**
      * Posts a message to all windows that have registered for it. Returns
      * as soon as the messages have been placed in the message queue. Does
@@ -125,7 +125,7 @@ public:
      *          <code>FALSE</code> otherwise
      */
     BOOL PostMessage(UINT message, WPARAM wParam, LPARAM lParam);
-    
+
     /**
      * Returns <code>TRUE</code> if at least one window is registered for
      * the specified message.
@@ -135,7 +135,7 @@ public:
      *         message, <code>FALSE</code> otherwise
      */
     BOOL HandlerExists(UINT message);
-    
+
     /**
      * Fills in a window set with the handles of all the windows that are
      * registered for a message.

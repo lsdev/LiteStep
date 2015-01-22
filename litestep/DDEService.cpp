@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -51,11 +51,11 @@ DDEService::~DDEService()
 DWORD WINAPI DDEService::_DDEThreadProc(LPVOID pvService)
 {
     DDEService* pService = (DDEService*)pvService;
-    
+
     bool bStarted = pService->_DoStart();
-    
+
     SetEvent(pService->m_hStartEvent);
-    
+
     if (bStarted)
     {
         MSG msg;
@@ -66,16 +66,16 @@ DWORD WINAPI DDEService::_DDEThreadProc(LPVOID pvService)
             DispatchMessage(&msg);
         }
     }
-    
+
     pService->_DoStop();
-    
+
     return 0;
 }
 
 HRESULT DDEService::Start()
 {
     HRESULT hr = E_FAIL;
-    
+
     // If m_dwDDEInst is not NULL, then we have already been started, just
     // return S_FALSE which will still pass SUCCEEDED()
     if (!m_dwDDEInst)
@@ -83,10 +83,10 @@ HRESULT DDEService::Start()
         if (FindWindow(_T("Progman"), NULL) == NULL)
         {
             m_hStartEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-            
+
             m_hThread = LSCreateThread(
                 "DDEService", _DDEThreadProc, this, &m_idThread);
-            
+
             WaitForSingleObject(m_hStartEvent, INFINITE);
             CloseHandle(m_hStartEvent);
             hr = S_OK;
@@ -96,7 +96,7 @@ HRESULT DDEService::Start()
     {
         hr = S_FALSE;
     }
-    
+
     return hr;
 }
 
@@ -104,20 +104,20 @@ HRESULT DDEService::Start()
 HRESULT DDEService::Stop()
 {
     HRESULT hr = S_OK;
-    
+
     if (m_hThread)
     {
         PostThreadMessage(m_idThread, WM_QUIT, 0, 0);
-        
+
         if (WaitForSingleObject(m_hThread, 3000) == WAIT_TIMEOUT)
         {
             TerminateThread(m_hThread, 0);
             hr = S_FALSE;
         }
-        
+
         CloseHandle(m_hThread);
     }
-    
+
     return hr;
 }
 
@@ -131,21 +131,21 @@ HRESULT DDEService::Recycle()
 bool DDEService::_DoStart()
 {
     bool bReturn = false;
-    
+
     if (!m_dwDDEInst)
     {
         CoInitialize(NULL);
-        
+
         UINT uInitReturn = DdeInitialize(&m_dwDDEInst, (PFNCALLBACK)DdeCallback,
             APPCLASS_STANDARD | CBF_FAIL_POKES | CBF_FAIL_SELFCONNECTIONS |
             CBF_SKIP_ALLNOTIFICATIONS, 0L);
-        
+
         if (uInitReturn == DMLERR_NO_ERROR)
         {
             bReturn = SUCCEEDED(_RegisterDDE());
         }
     }
-    
+
     return bReturn;
 }
 
@@ -170,9 +170,9 @@ void DDEService::_DoStop()
         DdeFreeStringHandle(m_dwDDEInst, m_hszAppProperties);
     }
     DdeUninitialize(m_dwDDEInst);
-    
+
     m_dwDDEInst = 0;
-    
+
     CoUninitialize();
 }
 
@@ -188,7 +188,7 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
     DWORD /* lData2 */)
 {
     HDDEDATA hReturn = (HDDEDATA)FALSE;
-    
+
     switch (wType)
     {
     case XTYP_CONNECT:
@@ -196,18 +196,18 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
             hReturn = (HDDEDATA)TRUE;
         }
         break;
-        
+
     case XTYP_WILDCONNECT:
         {
             HSZPAIR FAR *phszp;
             DWORD cb;
-            
+
             if ((!hszTopic || hszTopic == m_hszProgman) &&
                 (!hszItem || hszItem == m_hszProgman))
             {
                 HDDEDATA hData = DdeCreateDataHandle(m_dwDDEInst, NULL,
                     2 * sizeof(HSZPAIR), 0L, 0, 0, 0);
-                
+
                 if (hData)
                 {
                     phszp = (HSZPAIR FAR *)DdeAccessData(hData, &cb);
@@ -220,7 +220,7 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
             }
         }
         break;
-        
+
     case XTYP_EXECUTE:
         {
             if ((hszTopic == m_hszGroups) || (hszTopic == m_hszAppProperties))
@@ -235,7 +235,7 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
             }
         }
         break;
-        
+
     case XTYP_ADVSTART:
     case XTYP_ADVSTOP:
         {
@@ -245,7 +245,7 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
             }
         }
         break;
-        
+
     case XTYP_REQUEST:
     case XTYP_ADVREQ:
         {
@@ -254,25 +254,25 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
             {
                 LPVOID pList = NULL;
                 UINT ulLen = 0;
-                
+
                 if (m_DDEWorker.ListGroups(pList, ulLen))
                 {
                     hReturn = DdeCreateDataHandle(m_dwDDEInst, (LPBYTE)pList,
                         ulLen, 0L, m_hszGroups, CF_TEXT, 0);
-                    
+
                     HeapFree(GetProcessHeap(), 0, pList);
                 }
             }
         }
         break;
-        
+
     default:
         {
             // do nothing
         }
         break;
     }
-    
+
     return hReturn;
 }
 
@@ -285,7 +285,7 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
 HRESULT DDEService::_RegisterDDE()
 {
     HRESULT hr = E_FAIL;
-    
+
     m_hszProgman = DdeCreateStringHandle(m_dwDDEInst, _T("PROGMAN"), DDE_CP);
     if (m_hszProgman != 0L)
     {
@@ -309,6 +309,6 @@ HRESULT DDEService::_RegisterDDE()
             }
         }
     }
-    
+
     return hr;
 }

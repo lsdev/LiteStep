@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,10 +29,10 @@ class StartupRunner
 public:
     StartupRunner();
     virtual ~StartupRunner();
-    
+
     static void Run(BOOL bForce);
     static bool IsFirstRunThisSession(LPCTSTR pszSubkey);
-    
+
 public:
     static DWORD WINAPI _ThreadProc(LPVOID lpData);
     static HKEY _CreateSessionInfoKey();

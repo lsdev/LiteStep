@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,22 +26,22 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
 {
 #if defined(LS_COMPAT_LOGGING)
     wchar_t wzLogFile[MAX_PATH] = { 0 };
-    
+
     int nLogLevel = GetRCIntW(L"LSLogLevel", 2);
-    
+
     // Should this message be logged?
     if (!pszModule || !pszMessage ||
         (nLevel > nLogLevel) || (nLevel < 1) || (nLevel > 4))
     {
         return FALSE;
     }
-    
+
     // Has a log file been assigned?
     if (!GetRCStringW(L"LSLogFile", wzLogFile, NULL, MAX_PATH))
     {
         return FALSE;
     }
-    
+
     // If so, open it
     HANDLE hLogFile = CreateFile(wzLogFile,
         GENERIC_WRITE,
@@ -50,27 +50,27 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
         OPEN_ALWAYS,
         FILE_ATTRIBUTE_NORMAL,
         NULL);
-    
+
     // Did open succeed?
     if (hLogFile == INVALID_HANDLE_VALUE)
     {
         return FALSE;
     }
-    
+
     // Move to the end of the file
     SetFilePointer(hLogFile, 0, NULL, FILE_END);
-    
+
     // Get timestamp
     SYSTEMTIME st = { 0 };
     GetLocalTime(&st);
-    
+
     // Add timestamp and module name to message
     LPCSTR rszLevel[4] = { "Error", "Warning", "Notice", "Debug" };
-    
+
     CHAR szLine[MAX_LINE_LENGTH] = { 0 };
     size_t cbLine = sizeof(szLine);
     size_t cbRemaining = 0;
-    
+
     if (SUCCEEDED(StringCbPrintfExA(szLine, cbLine, NULL, &cbRemaining,
         STRSAFE_IGNORE_NULLS, "%02d-%02d-%04d %02d:%02d:%02d - %s - %s: %s\r\n",
         st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute, st.wSecond,
@@ -83,11 +83,11 @@ BOOL WINAPI LSLog(int nLevel, LPCSTR pszModule, LPCSTR pszMessage)
         DWORD dwCount = 0;
         WriteFile(hLogFile, szLine, (DWORD)cbToWrite, &dwCount, NULL);
     }
-    
+
     // Close the log
     CloseHandle(hLogFile);
 #endif // LS_COMPAT_LOGGING
-    
+
     return TRUE;
 }
 
@@ -98,21 +98,21 @@ BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
     {
         return FALSE;
     }
-    
+
     BOOL bReturn = FALSE;
     char szMessage[MAX_LINE_LENGTH];
-    
+
     va_list argList;
     va_start(argList, pszFormat);
-    
+
     if (SUCCEEDED(StringCchVPrintfA(szMessage, MAX_LINE_LENGTH,
         pszFormat, argList)))
     {
         bReturn = LSLog(nLevel, pszModule, szMessage);
     }
-    
+
     va_end(argList);
-    
+
     return bReturn;
 #else
     return TRUE;
@@ -122,12 +122,12 @@ BOOL WINAPIV LSLogPrintf(int nLevel, LPCSTR pszModule, LPCSTR pszFormat, ...)
 int GetRCCoordinate(LPCSTR pszKeyName, int nDefault, int nMaxVal)
 {
     char strVal[MAX_LINE_LENGTH];
-    
+
     if (!GetRCStringA(pszKeyName, strVal, NULL, MAX_LINE_LENGTH))
     {
         return nDefault;
     }
-    
+
     return ParseCoordinate(strVal, nDefault, nMaxVal);
 }
 
@@ -136,14 +136,14 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     BOOL negative = false;
     BOOL center = false;
     BOOL percentual = false;
-    
+
     int value = 0;
-    
+
     if (!szString || !szString[0])
     {
         return nDefault;
     }
-    
+
     if (szString[0] == '-')
     {
         negative = true;
@@ -153,27 +153,27 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     {
         ++szString;
     }
-    
+
     size_t length = strlen(szString);
     size_t i = 0;
-    
+
     while (i < length)
     {
         if (szString[i] < '0' || szString[i] > '9')
         {
             break;
         }
-        
+
         value = (value * 10) + (szString[i] - '0');
-        
+
         ++i;
     }
-    
+
     if (i == 0)
     {
         return nDefault;
     }
-    
+
     while (i < length)
     {
         if ((szString[i] == 'c' || szString[i] == 'C') && !center)
@@ -188,15 +188,15 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
         {
             break;
         }
-        
+
         ++i;
     }
-    
+
     if (percentual)
     {
         value = nMaxVal * value / 100;
     }
-    
+
     if (center)
     {
         if (negative)
@@ -212,7 +212,7 @@ int ParseCoordinate(LPCSTR szString, int nDefault, int nMaxVal)
     {
         value = nMaxVal - value;
     }
-    
+
     return value;
 }
 
@@ -430,11 +430,11 @@ extern "C"
     {
         char szFormat[MAX_LINE_LENGTH];
         va_list vargs;
-    
+
         if (pszText != NULL && cchText > 0)
         {
             GetResStrA(hInstance, uIDText, szFormat, MAX_LINE_LENGTH, pszDefText);
-        
+
             va_start(vargs, pszDefText);
             StringCchVPrintfA(pszText, cchText, szFormat, vargs);
             va_end(vargs);

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, const wstring& sPa
     {
         m_pSettingsMap = pSettingsMap;
         m_pFileIterator = m_pSettingsMap->begin();
-        
+
         if (sPath.length())
         {
             m_sPath = sPath;
@@ -45,7 +45,7 @@ SettingsIterator::SettingsIterator(SettingsMap* pSettingsMap, const wstring& sPa
 BOOL SettingsIterator::ReadNextLine(LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (pwzValue != nullptr && cchValue > 0)
     {
         if (m_pFileIterator != m_pSettingsMap->end())
@@ -61,7 +61,7 @@ BOOL SettingsIterator::ReadNextLine(LPWSTR pwzValue, size_t cchValue)
             pwzValue[0] = L'\0';
         }
     }
-    
+
     return bReturn;
 }
 
@@ -69,7 +69,7 @@ BOOL SettingsIterator::ReadNextLine(LPWSTR pwzValue, size_t cchValue)
 BOOL SettingsIterator::ReadNextCommand(LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     while (!bReturn && m_pFileIterator != m_pSettingsMap->end())
     {
         if (!ispunct(*(m_pFileIterator->first.c_str())))
@@ -79,10 +79,10 @@ BOOL SettingsIterator::ReadNextCommand(LPWSTR pwzValue, size_t cchValue)
             StringCchCatW(pwzValue, cchValue, m_pFileIterator->second.sValue.c_str());
             bReturn = TRUE;
         }
-        
+
         ++m_pFileIterator;
     }
-    
+
     return bReturn;
 }
 
@@ -90,16 +90,16 @@ BOOL SettingsIterator::ReadNextCommand(LPWSTR pwzValue, size_t cchValue)
 BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (pwzValue != nullptr && cchValue > 0 && pwzConfig != nullptr)
     {
         SettingsMap::iterator itSettings;
-        
+
         pwzValue[0] = L'\0';
-        
+
 #if defined(LS_COMPAT_LCREADNEXTCONFIG)
         string sConfig;
-        
+
         if(L'*' != *pwzConfig)
         {
             sConfig = L"*";
@@ -109,13 +109,13 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
         {
             sConfig = pwzConfig;
         }
-        
+
         pwzConfig = sConfig.c_str();
 #endif // defined(LS_COMPAT_LCREADNEXTCONFIG)
-        
+
         // Has ReadNextConfig been used before for pszConfig?
         IteratorMap::iterator it = m_Iterators.find(pwzConfig);
-        
+
         if (it == m_Iterators.end())
         {
             // No, so find the first item with a key of pszConfig
@@ -127,7 +127,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
                 it = (m_Iterators.insert(
                     IteratorMap::value_type(pwzConfig, itSettings)
                 ));
-                
+
                 bReturn = TRUE;
             }
         }
@@ -135,7 +135,7 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
         {
             // Yes so find the last item with a matching key
             itSettings = m_pSettingsMap->upper_bound(pwzConfig);
-            
+
             // Loop until we either find an item with a matching key or the
             // last matching item
             do
@@ -143,14 +143,14 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
                 ++it->second;
             } while ((_wcsicmp(pwzConfig, it->first.c_str()) != 0) &&
                      (it->second != itSettings));
-            
+
             // If we found a valid item, return it
             if (it->second != itSettings)
             {
                 bReturn = TRUE;
             }
         }
-        
+
         if (bReturn)
         {
             StringCchCopyW(pwzValue, cchValue, it->second->first.c_str());
@@ -158,6 +158,6 @@ BOOL SettingsIterator::ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pwzValue, size_t
             StringCchCatW(pwzValue, cchValue, it->second->second.sValue.c_str());
         }
     }
-    
+
     return bReturn;
 }

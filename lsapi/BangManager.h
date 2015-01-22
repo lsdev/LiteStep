@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -36,24 +36,24 @@ class BangManager
 private:
     /** Maps bang command names to Bang objects. */
     typedef StringKeyedMaps<LPCWSTR, Bang*>::UnorderedMap BangMap;
-    
+
     /** List of bang commands indexed by name */
     BangMap bang_map;
-    
+
     /** Critical section for serializing access to data members */
     mutable CriticalSection m_cs;
-    
+
     // Not implemented
     BangManager(const BangManager& rhs);
     BangManager& operator=(const BangManager& rhs);
-    
+
 public:
     /** Constructor */
     BangManager();
-    
+
     /** Destructor */
     virtual ~BangManager();
-    
+
     /**
      * Adds a bang command to the list.
      *
@@ -63,7 +63,7 @@ public:
      *         <code>FALSE</code> otherwise
      */
     BOOL AddBangCommand(Bang *pbbBang);
-    
+
     /**
      * Removes a bang command from the list.
      *
@@ -72,12 +72,12 @@ public:
      *          <code>FALSE</code> otherwise
      */
     BOOL RemoveBangCommand(LPCWSTR pwzName);
-    
+
     /**
      * Removes all bang commands from the list.
      */
     void ClearBangCommands();
-    
+
     /**
      * Executes a bang command with the specified parameters.
      *
@@ -88,7 +88,7 @@ public:
      *         <code>FALSE</code> otherwise
      */
     BOOL ExecuteBangCommand(LPCWSTR pwzName, HWND hCaller, LPCWSTR pwzParams);
-    
+
     /**
      * Calls a callback function once for each bang command in the list.
      * Continues so long as the callback function returns <code>TRUE</code>.

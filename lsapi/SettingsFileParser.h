@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ public:
      * @param  pSettingsMap  SettingsMap to receive settings from files
      */
     FileParser(SettingsMap* pSettingsMap);
-    
+
     /**
      * Destructor.
      */
@@ -84,7 +84,7 @@ public:
      * @param  ptzFileName  path to file
      */
     void ParseFile(LPCTSTR ptzFileName);
-    
+
 private:
     /** Settings map to receive settings read from file */
     SettingsMap* m_pSettingsMap;
@@ -94,16 +94,16 @@ private:
 
     /** Where the trail is actually stored, in the top-level parser */
     std::list<TrailItem> m_baseTrail;
-    
+
     /** Handle to current file */
     FILE* m_phFile;
-    
+
     /** Current Line Number */
     unsigned int m_uLineNumber;
-    
+
     /** Full path to configuration file */
     TCHAR m_tzFullPath[MAX_PATH_LENGTH];
-    
+
     /** Contains an RC key */
     struct TCStack {
         TCStack(LPCTSTR ptzString) {
@@ -122,7 +122,7 @@ private:
      * Reads the next line from the current file.
      */
     bool _ReadNextLine(LPTSTR ptzBuffer);
-    
+
     /**
      * Reads the next line from current file. The line is split into a setting
      * name and a setting value and the value is stripped of extraneous space
@@ -134,13 +134,13 @@ private:
      *         if end of file was reached or an I/O error occurred.
      */
     bool _ReadLineFromFile(LPTSTR ptzName, LPTSTR ptzValue);
-    
+
     /**
      * Strips leading and trailing whitespace and comments from a string. The
      * string is modified in place.
      */
     void _StripString(LPTSTR ptzString);
-    
+
     /**
      * Processes a line read from a file. If the line is a preprocessor
      * directive then it is handled appropriately, otherwise it is added to the
@@ -150,14 +150,14 @@ private:
      * @param  ptzValue  setting value
      */
     void _ProcessLine(LPCTSTR ptzName, LPCTSTR ptzValue);
-    
+
     /**
      * Processes an 'If' preprocessor directive.
      *
      * @param  ptzExpression  conditional expression
      */
     void _ProcessIf(LPCTSTR ptzExpression);
-    
+
     /**
      * Recursively skips over an 'If' preprocessor directive.
      */

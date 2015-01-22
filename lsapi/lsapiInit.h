@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -49,7 +49,7 @@ public:
     {
         return m_et;
     }
-    
+
 private:
     ErrorType m_et;
 };
@@ -60,66 +60,66 @@ private:
     bool setShellFolderVariable(LPCWSTR pwzVariable, int nFolder);
     void setLitestepVars();
     void getCompileTime(LPWSTR pwzValue, size_t cchValue);
-    
+
 public:
     LSAPIInit();
     ~LSAPIInit();
-    
+
     BangManager* GetBangManager() const
     {
         if (!IsInitialized())
         {
             throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
         }
-        
+
         return m_bmBangManager;
     }
-    
+
     SettingsManager* GetSettingsManager() const
     {
         if (!IsInitialized())
         {
             throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
         }
-        
+
         return m_smSettingsManager;
     }
-    
+
     HWND GetLitestepWnd() const
     {
         return m_hLitestepWnd;
     }
-    
+
     DWORD GetMainThreadID() const
     {
         return m_dwMainThreadID;
     }
-    
+
     void Initialize(LPCWSTR pszLitestepPath, LPCWSTR pszRcPath);
-    
+
     bool IsInitialized() const
     {
         return m_bIsInitialized;
     }
-    
+
     void ReloadBangs();
     void ReloadSettings();
-    
+
     void SetLitestepWindow(HWND hLitestepWnd)
     {
         m_hLitestepWnd = hLitestepWnd;
     }
-    
+
 private:
     DWORD m_dwMainThreadID;
-    
+
     BangManager* m_bmBangManager;
     SettingsManager* m_smSettingsManager;
-    
+
     HWND m_hLitestepWnd;
     wchar_t m_wzLitestepPath[MAX_PATH];
     wchar_t m_wzRcPath[MAX_PATH];
-    
+
     bool m_bIsInitialized;
 };
 

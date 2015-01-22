@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -39,18 +39,18 @@ BangManager::~BangManager()
 BOOL BangManager::AddBangCommand(Bang *pbbBang)
 {
     Lock lock(m_cs);
-    
+
     BangMap::iterator iter = bang_map.find(pbbBang->GetCommand());
-    
+
     if (iter != bang_map.end())
     {
         iter->second->Release();
         bang_map.erase(iter);
     }
-    
+
     bang_map.emplace(pbbBang->GetCommand(), pbbBang);
     pbbBang->AddRef();
-    
+
     return TRUE;
 }
 
@@ -60,19 +60,19 @@ BOOL BangManager::RemoveBangCommand(LPCWSTR pwzName)
 {
     Lock lock(m_cs);
     BOOL bReturn = FALSE;
-    
+
     ASSERT(pwzName != nullptr);
     BangMap::iterator iter = bang_map.find(pwzName);
-    
+
     if (iter != bang_map.end())
     {
         Bang * bang = iter->second;
         bang_map.erase(iter);
         bang->Release(); // We must erase before we release since the key is stored inside the Bang.
-        
+
         bReturn = TRUE;
     }
-    
+
     return bReturn;
 }
 
@@ -82,30 +82,30 @@ BOOL BangManager::ExecuteBangCommand(LPCWSTR pszName, HWND hCaller, LPCWSTR pwzP
 {
     BOOL bReturn = FALSE;
     Bang* pToExec = nullptr;
-    
+
     // Acquiring lock manually to allow manual release below
     m_cs.Acquire();
-    
+
     BangMap::const_iterator iter = bang_map.find(pszName);
-    
+
     if (iter != bang_map.end())
     {
         pToExec = iter->second;
         pToExec->AddRef();
     }
-    
+
     // Release lock before executing the !bang since the BangProc might
     // (recursively) enter this function again
     m_cs.Release();
-    
+
     if (pToExec)
     {
         pToExec->Execute(hCaller, pwzParams);
         pToExec->Release();
-        
+
         bReturn = TRUE;
     }
-    
+
     return bReturn;
 }
 
@@ -113,15 +113,15 @@ BOOL BangManager::ExecuteBangCommand(LPCWSTR pszName, HWND hCaller, LPCWSTR pwzP
 void BangManager::ClearBangCommands()
 {
     Lock lock(m_cs);
-    
+
     BangMap::iterator iter = bang_map.begin();
-    
+
     while (iter != bang_map.end())
     {
         iter->second->Release();
         ++iter;
     }
-    
+
     bang_map.clear();
 }
 
@@ -129,9 +129,9 @@ void BangManager::ClearBangCommands()
 HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROCW pfnCallback, LPARAM lParam) const
 {
     Lock lock(m_cs);
-    
+
     HRESULT hr = S_OK;
-    
+
     for (const BangMap::value_type & value : bang_map)
     {
         if (!pfnCallback(value.second->GetModule(), value.first, lParam))
@@ -140,6 +140,6 @@ HRESULT BangManager::EnumBangs(LSENUMBANGSV2PROCW pfnCallback, LPARAM lParam) co
             break;
         }
     }
-    
+
     return hr;
 }

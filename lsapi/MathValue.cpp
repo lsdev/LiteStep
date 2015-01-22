@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -76,7 +76,7 @@ MathValue& MathValue::operator=(bool value)
 {
     mType = BOOLEAN;
     mBoolean = value;
-    
+
     return *this;
 }
 
@@ -85,7 +85,7 @@ MathValue& MathValue::operator=(int value)
 {
     mType = NUMBER;
     mNumber = value;
-    
+
     return *this;
 }
 
@@ -94,7 +94,7 @@ MathValue& MathValue::operator=(double value)
 {
     mType = NUMBER;
     mNumber = value;
-    
+
     return *this;
 }
 
@@ -103,7 +103,7 @@ MathValue& MathValue::operator=(const wstring& value)
 {
     mType = STRING;
     mString = value;
-    
+
     return *this;
 }
 
@@ -112,7 +112,7 @@ MathValue& MathValue::operator=(const wchar_t *value)
 {
     mType = STRING;
     mString = value;
-    
+
     return *this;
 }
 
@@ -123,17 +123,17 @@ wstring MathValue::GetTypeName() const
     {
     case UNDEFINED:
         return L"undefined";
-        
+
     case BOOLEAN:
         return L"boolean";
-        
+
     case NUMBER:
         return L"number";
-        
+
     case STRING:
         return L"string";
     }
-    
+
     // Should never happen
     ASSERT(false);
     return wstring();
@@ -146,17 +146,17 @@ bool MathValue::ToBoolean() const
     {
     case UNDEFINED:
         return false;
-        
+
     case BOOLEAN:
         return mBoolean;
-        
+
     case NUMBER:
         return (mNumber != 0.0 && !_isnan(mNumber));
-        
+
     case STRING:
         return (!mString.empty() && _wcsicmp(mString.c_str(), L"false") != 0);
     }
-    
+
     // Should never happen
     ASSERT(false);
     return false;
@@ -176,17 +176,17 @@ double MathValue::ToNumber() const
     {
     case UNDEFINED:
         return numeric_limits<double>::quiet_NaN();
-        
+
     case BOOLEAN:
         return (mBoolean ? 1.0 : 0.0);
-        
+
     case NUMBER:
         return mNumber;
-        
+
     case STRING:
         return MathStringToNumber(mString);
     }
-    
+
     // Should never happen
     ASSERT(false);
     return 0.0;
@@ -199,17 +199,17 @@ wstring MathValue::ToString() const
     {
     case UNDEFINED:
         return L"undefined";
-        
+
     case BOOLEAN:
         return mBoolean ? L"true" : L"false";
-        
+
     case NUMBER:
         return MathNumberToString(mNumber);
-        
+
     case STRING:
         return mString;
     }
-    
+
     // Should never happen
     ASSERT(false);
     return wstring();
@@ -225,12 +225,12 @@ wstring MathValue::ToCompatibleString() const
     if (NUMBER == mType)
     {
         wostringstream stream;
-        
+
         stream << ToInteger();
-        
+
         return stream.str();
     }
-    
+
     // All other values, let the default handler deal with the
     // conversion process.
     return ToString();
@@ -244,7 +244,7 @@ MathValue operator+(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return (a.ToNumber() + b.ToNumber());
 }
 
@@ -256,7 +256,7 @@ MathValue operator+(const MathValue& a)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return a.ToNumber();
 }
 
@@ -268,7 +268,7 @@ MathValue operator-(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return (a.ToNumber() - b.ToNumber());
 }
 
@@ -280,7 +280,7 @@ MathValue operator-(const MathValue& a)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return -a.ToNumber();
 }
 
@@ -292,7 +292,7 @@ MathValue operator*(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return (a.ToNumber() * b.ToNumber());
 }
 
@@ -304,7 +304,7 @@ MathValue operator/(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return (a.ToNumber() / b.ToNumber());
 }
 
@@ -316,15 +316,15 @@ MathValue operator%(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     double divisor = b.ToNumber();
-    
+
     if (divisor == 0.0)
     {
         // Modulus by zero generates a NaN
         return numeric_limits<double>::quiet_NaN();
     }
-    
+
     return fmod(a.ToNumber(), divisor);
 }
 
@@ -490,7 +490,7 @@ MathValue MathConcatenate(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     return (a.ToString() + b.ToString());
 }
 
@@ -502,15 +502,15 @@ MathValue MathIntDivide(const MathValue& a, const MathValue& b)
         // Undefined operands always generate an undefined result
         return MathValue();
     }
-    
+
     int divisor = b.ToInteger();
-    
+
     if (divisor == 0)
     {
         // Division by zero results in an Infinity of the appropriate sign
         return _copysign(numeric_limits<double>::infinity(), a.ToNumber());
     }
-    
+
     return (a.ToInteger() / divisor);
 }
 
@@ -521,10 +521,10 @@ wstring MathNumberToString(double number)
     {
         // Number
         wostringstream stream;
-        
+
         stream.precision(numeric_limits<double>::digits10 + 1);
         stream << number;
-        
+
         return stream.str();
     }
     else if (number == numeric_limits<double>::infinity())
@@ -549,7 +549,7 @@ double MathStringToNumber(const wstring& str)
 {
     wistringstream stream(str);
     double number;
-    
+
     if (stream >> number)
     {
         // Number

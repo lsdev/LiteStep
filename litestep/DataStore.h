@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -35,17 +35,17 @@ private:
 
     /** Size of data in bytes */
     WORD m_wLength;
-    
+
     /** Pointer to data */
     BYTE* m_pvData;
-    
+
 public:
 
     /**
      * Constructs an empty DataHolder.
      */
     DataHolder();
-    
+
     /**
      * Constructs a DataHolder containing a copy of the specified data.
      *
@@ -53,12 +53,12 @@ public:
      * @param  wLength  size of data in bytes
      */
     DataHolder(void *pvData, WORD wLength);
-    
+
     /**
      * Destructor.
      */
     virtual ~DataHolder();
-    
+
     /**
      * Copies the data into the supplied buffer.
      *
@@ -67,7 +67,7 @@ public:
      * @return  number of bytes copied
      */
     int GetData(void *pvData, WORD wLength);
-    
+
     /**
      * Replaces the current data with a copy of the specified data.
      *
@@ -86,32 +86,32 @@ class DataStore
 {
     /** Maps data identifiers to DataHolders */
     typedef std::map<WORD, DataHolder*> DataHolderMap;
-    
+
     /** List of data item index by identifier */
     DataHolderMap m_dhmData;
-    
+
 public:
 
     /**
      * Constructor.
      */
     DataStore();
-    
+
     /**
      * Destructor.
      */
     virtual ~DataStore();
-    
+
     /**
      * Returns the number of items in the data store.
      */
     size_t Count();
-        
+
     /**
      * Removes all data from the data store.
      */
     void Clear();
-    
+
     /**
      * Retrieves a stored data item and removes it from the data store.
      *
@@ -123,7 +123,7 @@ public:
      *          identifier exists
      */
     BOOL ReleaseData(WORD wIdent, void *pvData, WORD wLength);
-    
+
     /**
      * Adds a data item to the data store.
      *

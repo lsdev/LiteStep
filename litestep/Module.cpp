@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -87,7 +87,7 @@ void AssignToFunction(std::function<T> &func, T* value)
 bool Module::_LoadDll()
 {
     bool bReturn = false;
-    
+
     if (!m_hInstance)
     {
         // Modules like popup2 like to call SetErrorMode. While that may not be
@@ -124,16 +124,16 @@ bool Module::_LoadDll()
                     };
                 }
             }
-            
+
             m_pQuit = (quitModuleProc)GetProcAddress(
                 m_hInstance, "quitModule");
-            
+
             if (!m_pQuit)   // Might be a BC module, check for underscore
             {
                 m_pQuit = (quitModuleProc)GetProcAddress(
                     m_hInstance, "_quitModule");
             }
-            
+
             if (m_pInit == nullptr)
             {
                 RESOURCE_STR(nullptr, IDS_INITMODULEEXNOTFOUND_ERROR,
@@ -201,13 +201,13 @@ bool Module::_LoadDll()
 
         // Second, restore the old state
         SetErrorMode(uOldMode);
-        
+
         if (!bReturn)
         {
             LPCWSTR pwzFileName = PathFindFileNameW(m_wzLocation.c_str());
-            
+
             RESOURCE_MSGBOX_F(pwzFileName, MB_ICONERROR);
-            
+
             if (m_hInstance)
             {
                 FreeLibrary(m_hInstance);
@@ -215,7 +215,7 @@ bool Module::_LoadDll()
             }
         }
     }
-    
+
     return bReturn;
 }
 
@@ -241,14 +241,14 @@ Module::~Module()
             CloseHandle(m_hInitEvent);
             m_hInitEvent = NULL;
         }
-        
+
         if (m_hThread)
         {
             CloseHandle(m_hThread);
             m_hThread = NULL;
         }
     }
-    
+
     if (m_hInstance)
     {
         FreeLibrary(m_hInstance);
@@ -260,7 +260,7 @@ Module::~Module()
 bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
 {
     ASSERT(NULL == m_hInstance);
-    
+
     DWORD dwStartTime = 0;
     __int64 iStartTime, iEndTime, iFrequency;
 
@@ -268,25 +268,25 @@ bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
     {
         dwStartTime = GetTickCount();
     }
-    
+
     // delaying the LoadLibrary call until this point is necessary to make
     // grdtransparent work (it hooks LoadLibrary)
     if (_LoadDll())
     {
         ASSERT(nullptr != m_pInit);
         ASSERT(nullptr != m_pQuit);
-        
+
         m_hMainWindow = hMainWindow;
         m_wzAppPath = sAppPath;
-        
+
         if (m_dwFlags & LS_MODULE_THREADED)
         {
             SECURITY_ATTRIBUTES sa;
-            
+
             sa.nLength = sizeof(SECURITY_ATTRIBUTES);
             sa.lpSecurityDescriptor = nullptr;
             sa.bInheritHandle = FALSE;
-            
+
             m_hInitCopyEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
             m_hInitEvent = m_hInitCopyEvent;
             // using _beginthreadex instead of CreateThread because modules
@@ -298,7 +298,7 @@ bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
         {
             CallInit();
         }
-        
+
         if (QueryPerformanceCounter((LARGE_INTEGER*)&iEndTime) == FALSE ||
             QueryPerformanceFrequency((LARGE_INTEGER*)&iFrequency) == FALSE)
         {
@@ -308,10 +308,10 @@ bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
         {
             m_dwLoadTime = (DWORD)((iEndTime - iStartTime)*1000/iFrequency);
         }
-        
+
         return true;
     }
-    
+
     return false;
 }
 
@@ -349,20 +349,20 @@ void Module::Quit()
 UINT __stdcall Module::ThreadProc(void* dllModPtr)
 {
     Module* dllMod = (Module*)dllModPtr;
-    
+
 #if defined(MSVC_DEBUG)
     LPCTSTR pszFileName = PathFindFileName(dllMod->m_wzLocation.c_str());
     DbgSetCurrentThreadName(WCSTOMBS(pszFileName));
 #endif
-    
+
     dllMod->CallInit();
-    
+
     // We must use a copy of our event, and hope no one has closed it before
     // waiting for it to be signaled.  See: TakeThread() member function.
     SetEvent(dllMod->m_hInitCopyEvent);
-    
+
     MSG msg;
-    
+
     while (GetMessage(&msg, 0, 0, 0) > 0)
     {
         if (msg.hwnd == NULL)
@@ -377,7 +377,7 @@ UINT __stdcall Module::ThreadProc(void* dllModPtr)
             DispatchMessage(&msg);
         }
     }
-    
+
     return 0;
 }
 
@@ -389,7 +389,7 @@ void Module::HandleThreadMessage(MSG &msg)
     case LM_THREAD_BANGCOMMAND:
         {
             ThreadedBangCommand * pInfo = (ThreadedBangCommand*)msg.wParam;
-            
+
             if (pInfo != NULL)
             {
                 pInfo->Execute();
@@ -397,11 +397,11 @@ void Module::HandleThreadMessage(MSG &msg)
             }
         }
         break;
-        
+
     case WM_DESTROY:
         {
             Module *dll_mod = (Module*)msg.lParam;
-            
+
             if (dll_mod)
             {
                 dll_mod->CallQuit();
@@ -409,7 +409,7 @@ void Module::HandleThreadMessage(MSG &msg)
             }
         }
         break;
-        
+
     default:
         {
             // do nothing

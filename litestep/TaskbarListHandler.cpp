@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -44,7 +44,7 @@ TaskbarListHandler::TaskbarListHandler() :
 //
 HRESULT TaskbarListHandler::Start(HWND hWndTray) {
     HRESULT hr = E_FAIL;
-    
+
     m_hLiteStep = GetLitestepWnd();
     GetWindowThreadProcessId(m_hLiteStep, &m_dwLiteStepProc);
     m_hInstance = GetModuleHandle(NULL);
@@ -89,7 +89,7 @@ HRESULT TaskbarListHandler::Stop() {
     if (m_hWndTaskband != nullptr) {
         DestroyWindow(m_hWndTaskband);
     }
-    
+
     if (m_aWndClass != 0) {
         UnregisterClass((LPCTSTR)m_aWndClass, m_hInstance);
     }
@@ -150,7 +150,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             SendMessage(m_hLiteStep, LM_TASK_REGISTERTAB, wParam, lParam);
         }
         return 0;
-        
+
         // Sent by ITaskbarList3::UnregisterTab
     case WM_USER + 68:
         {
@@ -200,7 +200,7 @@ LRESULT WINAPI TaskbarListHandler::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
             SHUnlockShared(pData);
         }
         return 0;
-        
+
         // Sent by ITaskbarList3::ThumbBarUpdateButtons
     case WM_USER + 77:
         {

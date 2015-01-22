@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -31,27 +31,27 @@ class DDEService: public IService
 public:
     DDEService();
     ~DDEService();
-    
+
     HRESULT Start() override;
     HRESULT Stop() override;
     HRESULT Recycle() override;
-    
+
     static HDDEDATA CALLBACK DdeCallback(
         UINT wType, UINT wFmt, HCONV hConv, HSZ hszTopic,
         HSZ hszItem, HDDEDATA hData, DWORD lData1, DWORD lData2);
-    
+
 private:
     HRESULT _RegisterDDE();
-    
+
     bool _DoStart();
     void _DoStop();
-    
+
     static DWORD WINAPI _DDEThreadProc(LPVOID pvService);
-    
+
     static DWORD m_idThread;
     static HANDLE m_hThread;
     static HANDLE m_hStartEvent;
-    
+
     static DDEWorker m_DDEWorker;
     static HSZ m_hszProgman;
     static HSZ m_hszGroups;

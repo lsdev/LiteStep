@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 LPVOID LCOpenW(LPCWSTR pwzPath)
 {
     LPVOID pFile = nullptr;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pwzPath)
@@ -43,7 +43,7 @@ LPVOID LCOpenW(LPCWSTR pwzPath)
             pFile = g_LSAPIManager.GetSettingsManager()->LCOpen(nullptr);
         }
     }
-    
+
     return pFile;
 }
 
@@ -57,7 +57,7 @@ LPVOID LCOpenA(LPCSTR pszPath)
 BOOL LCClose(LPVOID pFile)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr)
@@ -65,7 +65,7 @@ BOOL LCClose(LPVOID pFile)
             bReturn = g_LSAPIManager.GetSettingsManager()->LCClose(pFile);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -73,7 +73,7 @@ BOOL LCClose(LPVOID pFile)
 BOOL LCReadNextCommandW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr && pwzValue != nullptr && cchValue > 0)
@@ -82,7 +82,7 @@ BOOL LCReadNextCommandW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
                 pFile, pwzValue, cchValue);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -90,7 +90,7 @@ BOOL LCReadNextCommandW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
 BOOL LCReadNextCommandA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr && pszValue != nullptr && cchValue > 0)
@@ -101,7 +101,7 @@ BOOL LCReadNextCommandA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
             WideCharToMultiByte(CP_ACP, 0, temp.get(), -1, pszValue, (int)cchValue, "?", nullptr);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -109,7 +109,7 @@ BOOL LCReadNextCommandA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 BOOL LCReadNextConfigW(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr && pwzConfig != nullptr &&
@@ -119,7 +119,7 @@ BOOL LCReadNextConfigW(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzValue, size_t 
                 pFile, pwzConfig, pwzValue, cchValue);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -127,7 +127,7 @@ BOOL LCReadNextConfigW(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzValue, size_t 
 BOOL LCReadNextConfigA(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr && pszConfig != nullptr &&
@@ -139,7 +139,7 @@ BOOL LCReadNextConfigA(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cc
             WideCharToMultiByte(CP_ACP, 0, temp.get(), -1, pszValue, (int)cchValue, "?", nullptr);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -147,7 +147,7 @@ BOOL LCReadNextConfigA(LPVOID pFile, LPCSTR pszConfig, LPSTR pszValue, size_t cc
 BOOL LCReadNextLineW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr && pwzValue != nullptr && cchValue > 0)
@@ -156,7 +156,7 @@ BOOL LCReadNextLineW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
                 pFile, pwzValue, cchValue);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -164,7 +164,7 @@ BOOL LCReadNextLineW(LPVOID pFile, LPWSTR pwzValue, size_t cchValue)
 BOOL LCReadNextLineA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
 {
     BOOL bReturn = FALSE;
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         if (pFile != nullptr && pszValue != nullptr && cchValue > 0)
@@ -175,7 +175,7 @@ BOOL LCReadNextLineA(LPVOID pFile, LPSTR pszValue, size_t cchValue)
             WideCharToMultiByte(CP_ACP, 0, value.get(), -1, pszValue, (int)cchValue, "?", nullptr);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -187,7 +187,7 @@ __int64 GetRCInt64W(LPCWSTR pwzKeyName, __int64 nDefault)
         return g_LSAPIManager.GetSettingsManager()->GetRCInt64(
             pwzKeyName, nDefault);
     }
-    
+
     return nDefault;
 }
 
@@ -205,7 +205,7 @@ int GetRCIntW(LPCWSTR pwzKeyName, int nDefault)
         return g_LSAPIManager.GetSettingsManager()->GetRCInt(
             pwzKeyName, nDefault);
     }
-    
+
     return nDefault;
 }
 
@@ -223,7 +223,7 @@ float GetRCFloatW(LPCWSTR pwzKeyName, float fDefault)
         return g_LSAPIManager.GetSettingsManager()->GetRCFloat(
             pwzKeyName, fDefault);
     }
-    
+
     return fDefault;
 }
 
@@ -241,7 +241,7 @@ double GetRCDoubleW(LPCWSTR pwzKeyName, double dDefault)
         return g_LSAPIManager.GetSettingsManager()->GetRCDouble(
             pwzKeyName, dDefault);
     }
-    
+
     return dDefault;
 }
 
@@ -259,7 +259,7 @@ BOOL GetRCBoolW(LPCWSTR pwzKeyName, BOOL ifFound)
         return g_LSAPIManager.GetSettingsManager()->GetRCBool(
             pwzKeyName, ifFound);
     }
-    
+
     return !ifFound;
 }
 
@@ -277,7 +277,7 @@ BOOL GetRCBoolDefW(LPCWSTR pwzKeyName, BOOL bDefault)
         return g_LSAPIManager.GetSettingsManager()->GetRCBoolDef(
             pwzKeyName, bDefault);
     }
-    
+
     return bDefault;
 }
 
@@ -299,7 +299,7 @@ BOOL GetRCStringW(LPCWSTR pwzKeyName, LPWSTR pwzValue, LPCWSTR pwzDefStr, int ma
     {
         StringCchCopyW(pwzValue, maxLen, pwzDefStr);
     }
-    
+
     return FALSE;
 }
 
@@ -328,7 +328,7 @@ BOOL GetRCStringA(LPCSTR pszKeyName, LPSTR pszValue, LPCSTR pszDefStr, int maxLe
     {
         StringCchCopyA(pszValue, maxLen, pszDefStr);
     }
-    
+
     return FALSE;
 }
 
@@ -340,7 +340,7 @@ COLORREF GetRCColorW(LPCWSTR pwzKeyName, COLORREF colDef)
         return g_LSAPIManager.GetSettingsManager()->GetRCColor(
             pwzKeyName, colDef);
     }
-    
+
     return colDef;
 }
 
@@ -362,7 +362,7 @@ BOOL GetRCLineW(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, UINT nBufLen, LPCWSTR pwzD
     {
         StringCchCopyW(pwzBuffer, nBufLen, pwzDefault);
     }
-    
+
     return FALSE;
 }
 
@@ -391,7 +391,7 @@ BOOL GetRCLineA(LPCSTR pszKeyName, LPSTR pszBuffer, UINT nBufLen, LPCSTR pszDefa
     {
         StringCchCopyA(pszBuffer, nBufLen, pszDefault);
     }
-    
+
     return FALSE;
 }
 
@@ -403,7 +403,7 @@ BOOL LSGetVariableExW(LPCWSTR pszKeyName, LPWSTR pszValue, DWORD dwLength)
         return g_LSAPIManager.GetSettingsManager()->GetVariable(
             pszKeyName, pszValue, dwLength);
     }
-    
+
     return FALSE;
 }
 
@@ -421,7 +421,7 @@ BOOL LSGetVariableExA(LPCSTR pszKeyName, LPSTR pszValue, DWORD dwLength)
 
         return bRet;
     }
-    
+
     return FALSE;
 }
 
@@ -430,23 +430,23 @@ BOOL LSGetVariableW(LPCWSTR pszKeyName, LPWSTR pszValue)
 {
     BOOL bReturn = FALSE;
     wchar_t szTempValue[MAX_LINE_LENGTH];
-    
+
     if (pszValue)
     {
         pszValue[0] = L'\0';
     }
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         bReturn = g_LSAPIManager.GetSettingsManager()->GetVariable(
             pszKeyName, szTempValue, MAX_LINE_LENGTH);
-        
+
         if (bReturn && pszValue)
         {
             StringCchCopy(pszValue, wcslen(szTempValue) + 1, szTempValue);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -455,23 +455,23 @@ BOOL LSGetVariableA(LPCSTR pszKeyName, LPSTR pszValue)
 {
     BOOL bReturn = FALSE;
     wchar_t szTempValue[MAX_LINE_LENGTH];
-    
+
     if (pszValue)
     {
         pszValue[0] = '\0';
     }
-    
+
     if (g_LSAPIManager.IsInitialized())
     {
         bReturn = g_LSAPIManager.GetSettingsManager()->GetVariable(
             MBSTOWCS(pszKeyName), szTempValue, MAX_LINE_LENGTH);
-        
+
         if (bReturn && pszValue)
         {
             StringCchCopyA(pszValue, _countof(szTempValue), WCSTOMBS(szTempValue));
         }
     }
-    
+
     return bReturn;
 }
 

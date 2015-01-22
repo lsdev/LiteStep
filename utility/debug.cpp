@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -30,19 +30,19 @@
 void DbgTraceMessage(const char* pszFormat, ...)
 {
     ASSERT(NULL != pszFormat);
-    
+
     va_list args;
     va_start(args, pszFormat);
-    
+
     char szBuffer[512];
     StringCchVPrintfExA(szBuffer, 512,
         NULL, NULL, STRSAFE_NULL_ON_FAILURE,
         pszFormat, args);
-    
+
     va_end(args);
-    
+
     OutputDebugStringA(szBuffer);
-    
+
 #if !defined(__GNUC__)
     // This just outputs a blank line in gdb
     OutputDebugStringA("\n");
@@ -76,7 +76,7 @@ void DbgTraceWindowMessage(const char* pszPrefix, unsigned int uMsg,
     else if (uMsg >= MAXINTATOM)
     {
         TCHAR szMsgName[MAX_PATH] = { 0 };
-        
+
         // GetClipboardFormatName retrieves the name of
         // registered window messages too!
         if (GetClipboardFormatName(
@@ -134,7 +134,7 @@ void DbgSetCurrentThreadName(const char* pszThreadName)
     info.szName = pszThreadName;
     info.dwThreadID = (DWORD)-1;
     info.dwFlags = 0;
-    
+
     __try
     {
         RaiseException(MS_VC_EXCEPTION, 0,

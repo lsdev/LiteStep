@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -89,7 +89,7 @@ void Bang::Execute(HWND hCaller, LPCWSTR pwzParams) const
     {
         ThreadedBangCommand * pInfo = new ThreadedBangCommand(hCaller,
             m_pwzCommand, pwzParams);
-        
+
         if (pInfo != nullptr)
         {
             // target thread releases pInfo
@@ -121,12 +121,12 @@ HINSTANCE Bang::GetModule() const
     //
     MEMORY_BASIC_INFORMATION mbi = { 0 };
     size_t cbBuffer = sizeof(mbi);
-    
+
     if (VirtualQuery(m_pAddress, &mbi, cbBuffer) == cbBuffer)
     {
         hModule = (HINSTANCE)mbi.AllocationBase;
     }
-    
+
     return hModule;
 }
 

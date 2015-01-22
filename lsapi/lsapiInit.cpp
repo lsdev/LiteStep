@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ LSAPIInit::LSAPIInit()
 ,m_bIsInitialized(false)
 {
     m_dwMainThreadID = GetCurrentThreadId();
-    
+
     m_wzLitestepPath[0] = L'\0';
     m_wzRcPath[0] = L'\0';
 }
@@ -58,50 +58,50 @@ void LSAPIInit::Initialize(LPCWSTR pwzLitestepPath, LPCWSTR pwzRcPath)
         {
             throw LSAPIException(LSAPI_ERROR_RECURRENT);
         }
-        
+
         // Do not allow any thread but the original to load us
         if (GetCurrentThreadId() != GetMainThreadID())
         {
             throw LSAPIException(LSAPI_ERROR_INVALIDTHREAD);
         }
-        
+
         // Copy over the strings
         if (FAILED(StringCchCopyW(m_wzLitestepPath, MAX_PATH, pwzLitestepPath)))
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
-        
+
         if (FAILED(StringCchCopyW(m_wzRcPath, MAX_PATH, pwzRcPath)))
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
-        
+
         // Create the Bang Manager
         m_bmBangManager = new BangManager;
-        
+
         if (!m_bmBangManager)
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
-        
+
         // Create the Settings Manager
         m_smSettingsManager = new SettingsManager();
-        
+
         if (!m_smSettingsManager)
         {
             throw LSAPIException(LSAPI_ERROR_GENERAL);
         }
-        
+
         // Signal that we are initialized before continuing, so that
         // the LSAPI is available during setup
         m_bIsInitialized = true;
-        
+
         // Initialize default variables
         setLitestepVars();
-        
+
         // Load the default RC config file
         m_smSettingsManager->ParseFile(m_wzRcPath);
-        
+
         // Add our internal bang commands to the Bang Manager.
         SetupBangs();
     }
@@ -110,13 +110,13 @@ void LSAPIInit::Initialize(LPCWSTR pwzLitestepPath, LPCWSTR pwzRcPath)
         if (LSAPI_ERROR_RECURRENT != lse.Type())
         {
             m_bIsInitialized = false;
-            
+
             delete m_smSettingsManager;
             m_smSettingsManager = nullptr;
             delete m_bmBangManager;
             m_bmBangManager = nullptr;
         }
-        
+
         throw; //rethrow
     }
 }
@@ -128,7 +128,7 @@ void LSAPIInit::ReloadBangs()
     {
         throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
     }
-    
+
     m_bmBangManager->ClearBangCommands();
     SetupBangs();
 }
@@ -140,24 +140,24 @@ void LSAPIInit::ReloadSettings()
     {
         throw LSAPIException(LSAPI_ERROR_NOTINITIALIZED);
     }
-    
+
     m_bIsInitialized = false;
-    
+
     delete m_smSettingsManager;
     m_smSettingsManager = NULL;
-    
+
     m_smSettingsManager = new SettingsManager();
-    
+
     if (!m_smSettingsManager)
     {
         throw LSAPIException(LSAPI_ERROR_GENERAL);
     }
-    
+
     m_bIsInitialized = true;
-    
+
     // Reinitialize default variables
     setLitestepVars();
-    
+
     // Reload the default RC config file
     m_smSettingsManager->ParseFile(m_wzRcPath);
 }
@@ -167,10 +167,10 @@ void LSAPIInit::setLitestepVars()
 {
     wchar_t wzTemp[MAX_PATH];
     DWORD dwLength = MAX_PATH;
-    
+
     // just using a shorter name, no real reason to re-assign.
     SettingsManager *pSM = m_smSettingsManager;
-    
+
     // Set the variable "litestepdir" since it was never set
     if (SUCCEEDED(StringCchCopyW(wzTemp, MAX_PATH, m_wzLitestepPath)))
     {
@@ -178,13 +178,13 @@ void LSAPIInit::setLitestepVars()
         PathQuoteSpacesW(wzTemp);
         pSM->SetVariable(L"litestepdir", wzTemp);
     }
-    
+
     if (GetWindowsDirectoryW(wzTemp, MAX_PATH))
     {
         PathAddBackslashEx(wzTemp, MAX_PATH);
         pSM->SetVariable(L"windir", wzTemp);
     }
-    
+
     if (GetUserNameW(wzTemp, &dwLength))
     {
         PathQuoteSpacesW(wzTemp);
@@ -195,7 +195,7 @@ void LSAPIInit::setLitestepVars()
     pSM->SetVariable(L"cr", L"\r", true);
     pSM->SetVariable(L"dollar", L"$", true);
     pSM->SetVariable(L"at", L"@", true);
-    
+
     pSM->SetVariable(L"bitbucket", L"::{645FF040-5081-101B-9F08-00AA002F954E}");
     pSM->SetVariable(L"documents", L"::{450D8FBA-AD25-11D0-98A8-0800361B1103}");
     pSM->SetVariable(L"drives", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
@@ -206,7 +206,7 @@ void LSAPIInit::setLitestepVars()
     pSM->SetVariable(L"printers", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{2227A280-3AEA-1069-A2DE-08002B30309D}");
     pSM->SetVariable(L"scheduled", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}");
     pSM->SetVariable(L"admintools", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{D20EA4E1-3957-11d2-A40B-0C5020524153}");
-    
+
     setShellFolderVariable(L"quicklaunch", LS_CSIDL_QUICKLAUNCH);
     setShellFolderVariable(L"commondesktopdir", CSIDL_COMMON_DESKTOPDIRECTORY);
     setShellFolderVariable(L"commonfavorites", CSIDL_COMMON_FAVORITES);
@@ -232,7 +232,7 @@ void LSAPIInit::setLitestepVars()
     setShellFolderVariable(L"templates", CSIDL_TEMPLATES);
     setShellFolderVariable(L"commonadmintoolsdir", CSIDL_COMMON_ADMINTOOLS);
     setShellFolderVariable(L"admintoolsdir", CSIDL_ADMINTOOLS);
-    
+
     //
     // Set version identification variables
     //
@@ -246,7 +246,7 @@ void LSAPIInit::setLitestepVars()
         { WINVER_WIN95,     L"Win95"      },
         { WINVER_WIN98,     L"Win98"      },
         { WINVER_WINME,     L"WinME"      },
-        
+
         { WINVER_WINNT4,    L"WinNT4"     },
         { WINVER_WIN2000,   L"Win2000"    },
         { WINVER_WINXP,     L"WinXP"      },
@@ -254,7 +254,7 @@ void LSAPIInit::setLitestepVars()
         { WINVER_WIN7,      L"Win7"       },
         { WINVER_WIN8,      L"Win8"       },
         { WINVER_WIN81,     L"Win81"      },
-        
+
         { WINVER_WIN2003,   L"Win2003"    },
         { WINVER_WHS,       L"Win2003"    },  // WHS is Win2003 in disguise
         { WINVER_WIN2008,   L"Win2008"    },
@@ -262,9 +262,9 @@ void LSAPIInit::setLitestepVars()
         { WINVER_WIN2012,   L"Win2012"    },
         { WINVER_WIN2012R2, L"Win2012R2"  }
     };
-    
+
     UINT uVersion = GetWindowsVersion();
-    
+
     for (size_t idx = 0; idx < COUNTOF(versions); ++idx)
     {
         if (versions[idx].uVersion == uVersion)
@@ -276,7 +276,7 @@ void LSAPIInit::setLitestepVars()
             pSM->SetVariable(versions[idx].pszVariable, L"false");
         }
     }
-    
+
     if (IsOS(OS_NT))
     {
         pSM->SetVariable(L"Win9x", L"false");
@@ -300,18 +300,18 @@ void LSAPIInit::setLitestepVars()
         pSM->SetVariable(L"Win64", L"false");
     }
 #endif
-    
+
     // screen resolution
     StringCchPrintfW(wzTemp, MAX_PATH, L"%d", GetSystemMetrics(SM_CXSCREEN));
     pSM->SetVariable(L"ResolutionX", wzTemp);
-    
+
     StringCchPrintfW(wzTemp, MAX_PATH, L"%d", GetSystemMetrics(SM_CYSCREEN));
     pSM->SetVariable(L"ResolutionY", wzTemp);
-    
+
     // build date/time from PE headers
     getCompileTime(wzTemp, MAX_PATH);
     pSM->SetVariable(L"CompileDate", wzTemp);
-    
+
 #if defined(LS_CUSTOM_INCLUDEFOLDER)
     pSM->SetVariable(L"IncludeFolder", L"1");
 #endif // LS_CUSTOM_INCLUDEFOLDER
@@ -322,16 +322,16 @@ bool LSAPIInit::setShellFolderVariable(LPCWSTR pwzVariable, int nFolder)
 {
     bool bSuccess = false;
     wchar_t wzPath[MAX_PATH] = { 0 };
-    
+
     if (GetShellFolderPath(nFolder, wzPath, MAX_PATH))
     {
         PathAddBackslashEx(wzPath, MAX_PATH);
         PathQuoteSpacesW(wzPath);
-        
+
         m_smSettingsManager->SetVariable(pwzVariable, wzPath);
         bSuccess = true;
     }
-    
+
     return bSuccess;
 }
 
@@ -347,7 +347,7 @@ void LSAPIInit::getCompileTime(LPWSTR pwzValue, size_t cchValue)
     time_t lsexetime;
     time_t lsapitime;
     time_t compiletime;
-    
+
     // Get the litestep.exe build time.
     dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(NULL);
     ASSERT(dosheader);
@@ -355,7 +355,7 @@ void LSAPIInit::getCompileTime(LPWSTR pwzValue, size_t cchValue)
     ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
     ASSERT(ntheader);
     lsexetime = (time_t)(ntheader->FileHeader.TimeDateStamp);
-    
+
     // Get the lsapi.dll build time (TODO: don't hardcode "lsapi.dll")
     dosheader = (IMAGE_DOS_HEADER*)GetModuleHandle(_T("lsapi.dll"));
     ASSERT(dosheader);
@@ -363,10 +363,10 @@ void LSAPIInit::getCompileTime(LPWSTR pwzValue, size_t cchValue)
     ntheader = MakePtr(IMAGE_NT_HEADERS*, dosheader, dosheader->e_lfanew);
     ASSERT(ntheader);
     lsapitime = (time_t)(ntheader->FileHeader.TimeDateStamp);
-    
+
     compiletime = std::max(lsexetime, lsapitime);
     tm timeStruct;
-    
+
     if (gmtime_s(&timeStruct, &compiletime) == 0)
     {
         wcsftime(pwzValue, cchValue,

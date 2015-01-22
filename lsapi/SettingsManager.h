@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@ struct FileInfo
 {
     /** Local settings map for this file */
     SettingsMap* m_pSettingsMap;
-    
+
     /** Reference count */
     UINT m_Count;
 };
@@ -61,20 +61,20 @@ class SettingsManager
 {
     /** Iterators for doing LCReadNextConfig/Line */
     IteratorSet m_Iterators;
-    
+
     /** Global settings map */
     SettingsMap m_SettingsMap;
-    
+
     /** Files opened through LCOpen */
     FileMap m_FileMap;
-    
+
     /** Critical section for serializing access to members */
     CriticalSection m_CritSection;
-    
+
     // Not implemented
     SettingsManager(const SettingsManager&);
     SettingsManager& operator=(const SettingsManager&);
-    
+
 protected:
     /**
      * Searches for a global setting by name.
@@ -85,25 +85,25 @@ protected:
      *          otherwise
      */
     BOOL _FindLine(LPCWSTR pwzName, SettingsMap::iterator &it);
-    
+
 public:
     /**
      * Constructor.
      */
     SettingsManager();
-    
+
     /**
      * Destructor.
      */
     ~SettingsManager();
-    
+
     /**
      * Parses a configuration file and adds its contents to the global settings.
      *
      * @param  pwzFileName  path to configuration file
      */
     void ParseFile(LPCWSTR pwzFileName);
-    
+
     /**
      * Retrieves a Boolean value from the global settings. Returns
      * <code>fIfFound</code> if the setting exists and <code>!fIfFound</code>
@@ -114,7 +114,7 @@ public:
      * @return  setting value
      */
     BOOL GetRCBool(LPCWSTR pwzKeyName, BOOL fIfFound);
-    
+
     /**
      * Retrieves a Boolean value from the global settings. Returns
      * <code>fDefault</code> if the setting does not exist.
@@ -124,7 +124,7 @@ public:
      * @return  setting value
      */
     BOOL GetRCBoolDef(LPCWSTR pszKeyName, BOOL fDefault);
-    
+
     /**
      * Retrieves a color value from the global settings. Returns
      * <code>crDefault</code> if the setting does not exist.
@@ -144,7 +144,7 @@ public:
      * @return  setting value
      */
     __int64 GetRCInt64(LPCWSTR pwzKeyName, __int64 nDefault);
-    
+
     /**
      * Retrieves an integer value from the global settings. Returns
      * <code>nDefault</code> if the setting does not exist.
@@ -175,7 +175,7 @@ public:
      * @return  setting value
      */
     double GetRCDouble(LPCWSTR pwzKeyName, double dDefault);
-    
+
     /**
      * Retrieves a raw string value from the global settings. If setting does
      * not exist, copies <code>pszDefault</code> into the buffer and returns
@@ -194,7 +194,7 @@ public:
      *          otherwise
      */
     BOOL GetRCLine(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, int cchBufferLen, LPCWSTR pwzDefault);
-    
+
     /**
      * Retreives a string value from the global settings. If the setting does
      * not exist, copies <code>pwzDefault</code> into the buffer and returns
@@ -212,7 +212,7 @@ public:
      *          otherwise
      */
     BOOL GetRCString(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, LPCWSTR pwzDefault, int cchBufferLen);
-    
+
     /**
      * Retrieves a string value from the global settings. Returns
      * <code>FALSE</code> if the setting does not exist. Performs the same
@@ -225,7 +225,7 @@ public:
      *          otherwise
      */
     BOOL GetVariable(LPCWSTR pwzKeyName, LPWSTR pwzBuffer, DWORD cchBufferLen);
-    
+
     /**
      * Assigns a new value to a global setting. If the setting already exists
      * its previous value is overwritten, otherwise a new setting is created.
@@ -235,7 +235,7 @@ public:
      * @param  bTerminal   whether or not this is a terminal value
      */
     void SetVariable(LPCWSTR pwzKeyName, LPCWSTR pwzValue, bool bTerminal = false);
-    
+
     /**
      * Opens a configuration file for sequential access to its contents. The
      * file contents can be read with {@link #LCReadNextConfig} or
@@ -252,7 +252,7 @@ public:
      * @return  file handle or <code>NULL</code> if the file could not be opened
      */
     LPVOID LCOpen(LPCWSTR pwzPath);
-    
+
     /**
      * Closes a configuration file opened with {@link #LCOpen}.
      *
@@ -261,7 +261,7 @@ public:
      *          <code>FALSE</code> otherwise
      */
     BOOL LCClose(LPVOID pFile);
-    
+
     /**
      * Retrieves the next config line (one that starts with a '*') that begins
      * with the specified setting name from a configuration file. The entire
@@ -279,7 +279,7 @@ public:
      *          occurred
      */
     BOOL LCReadNextConfig(LPVOID pFile, LPCWSTR pwzConfig, LPWSTR pwzBuffer, size_t cchBufferLen);
-    
+
     /**
      * Retrieves the next none config line (one that does not start with a '*'
      * from a configuration file. The entire line (including the setting name)
@@ -296,7 +296,7 @@ public:
      *          occurred
      */
     BOOL LCReadNextCommand(LPVOID pFile, LPWSTR pwzBuffer, size_t cchBufferLen);
-    
+
     /**
      * Retrieves the next line from a configuration file. The entire line
      * (including the setting name) is placed in the buffer.
@@ -312,7 +312,7 @@ public:
      *          occurred
      */
     BOOL LCReadNextLine(LPVOID pFile, LPWSTR pszBuffer, size_t cchBufferLen);
-    
+
     /**
      * Expands variable references. The template string is copied into the
      * buffer with all variable references (<code>$var$</code>) replaced by the
@@ -323,7 +323,7 @@ public:
      * @param  cchBufferLen  size of the buffer
      */
     void VarExpansionEx(LPWSTR pszBuffer, LPCWSTR pszTemplate, size_t cchBufferLen);
-    
+
     /**
      * Expands variable references. The template string is copied into the
      * buffer with all variable references (<code>$var$</code>) replaced by the

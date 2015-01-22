@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -72,17 +72,17 @@ public:
      * Constructs a token with type <code>TT_INVALID</code>.
      */
     MathToken();
-    
+
     /**
      * Constructs a token with the specified type.
      */
     MathToken(int type);
-    
+
     /**
      * Constructs a token with the specified type and lexical value.
      */
     MathToken(int type, const std::wstring& value);
-    
+
     /**
      * Returns the type of this token.
      */
@@ -90,17 +90,17 @@ public:
     {
         return mType;
     }
-    
+
     /**
      * Returns a string description of this token's type.
      */
     std::wstring GetTypeName() const;
-    
+
     /**
      * Sets the type of this token.
      */
     void SetType(int type);
-    
+
     /**
      * Returns the lexical value of this token.
      */
@@ -108,16 +108,16 @@ public:
     {
         return mValue;
     }
-    
+
     /**
      * Sets the lexical value of this token.
      */
     void SetValue(const std::wstring& value);
-    
+
 private:
     /** Token type */
     int mType;
-    
+
     /** Lexical value */
     std::wstring mValue;
 };

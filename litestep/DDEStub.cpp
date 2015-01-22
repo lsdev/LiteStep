@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,7 +40,7 @@ DDEStub::~DDEStub()
 HRESULT DDEStub::Start()
 {
     HRESULT hr = S_FALSE;
-    
+
     if (FindWindow(_T("Progman"), NULL) == NULL)
     {
         if (!m_hShDocVw)
@@ -48,7 +48,7 @@ HRESULT DDEStub::Start()
             m_hShDocVw = LoadLibrary(_T("SHDOCVW.DLL"));
             //m_hShDocVw = GetModuleHandle("shell32.dll"); // win2k
         }
-        
+
         if (m_hShDocVw && !m_pShellDDEInit)
         {
             // Ordinal 0x00BC in shell32.dll
@@ -56,7 +56,7 @@ HRESULT DDEStub::Start()
             m_pShellDDEInit = (ShellDDEFunc)
                 GetProcAddress(m_hShDocVw, (LPCSTR)((long)0x0076));
         }
-        
+
         if (m_pShellDDEInit)
         {
             m_pShellDDEInit(TRUE);
@@ -67,7 +67,7 @@ HRESULT DDEStub::Start()
             hr = E_FAIL;
         }
     }
-    
+
     return hr;
 }
 
@@ -78,12 +78,12 @@ HRESULT DDEStub::Stop()
     {
         m_pShellDDEInit(FALSE);
     }
-    
+
     if (m_hShDocVw)
     {
         FreeLibrary(m_hShDocVw);
     }
-    
+
     return S_OK;
 }
 

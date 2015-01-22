@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -39,7 +39,7 @@ COMFactory::COMFactory()
 
 //
 // ~COMFactory
-// 
+//
 COMFactory::~COMFactory()
 {
 }
@@ -104,7 +104,7 @@ HRESULT COMFactory::QueryInterface(REFIID riid, void **ppvObject)
 //
 // IClassFactory::CreateInstance
 // Creates an instance of the specified objet
-// 
+//
 HRESULT COMFactory::CreateInstance(IUnknown *pUnkOuter, REFIID riid, void **ppvObject)
 {
     if (ppvObject == nullptr)
@@ -117,7 +117,7 @@ HRESULT COMFactory::CreateInstance(IUnknown *pUnkOuter, REFIID riid, void **ppvO
     {
         return CLASS_E_NOAGGREGATION;
     }
-    
+
     if (riid == IID_IUnknown)
     {
         *ppvObject = (IUnknown*)(new DesktopWallpaper());
@@ -158,7 +158,7 @@ HRESULT COMFactory::LockServer(BOOL)
 
 //
 // IClassFactory::IsLocked
-// 
+//
 //
 bool COMFactory::IsLocked()
 {

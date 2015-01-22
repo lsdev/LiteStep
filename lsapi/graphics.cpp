@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -45,21 +45,21 @@ HRGN BitmapToRegion(
     // start with a completely transparent rgn
     // this is more correct as no bmp, should render a transparent background
     HRGN hRgn = CreateRectRgn(0, 0, 0, 0);
-    
+
     if (hbm)
     {
         // create a dc for the 32 bit dib
         HDC hdcMem = CreateCompatibleDC(NULL);
-        
+
         if (hdcMem)
         {
             VOID *pbits32;
             HBITMAP hbm32;
             BITMAP bm;
-            
+
             // get the size
             GetObject(hbm, sizeof(BITMAP), &bm);
-            
+
             BITMAPINFOHEADER bmpInfo32;
             bmpInfo32.biSize          = sizeof(BITMAPINFOHEADER);
             bmpInfo32.biWidth         = bm.bmWidth;
@@ -72,14 +72,14 @@ HRGN BitmapToRegion(
             bmpInfo32.biYPelsPerMeter = 0;
             bmpInfo32.biClrUsed       = 0;
             bmpInfo32.biClrImportant  = 0;
-            
+
             hbm32 = CreateDIBSection(hdcMem, (BITMAPINFO*)&bmpInfo32,
                 DIB_RGB_COLORS, &pbits32, NULL, 0);
-            
+
             if (hbm32)
             {
                 HBITMAP hbmOld32 = (HBITMAP)SelectObject(hdcMem, hbm32);
-                
+
                 // Create a DC just to copy the bitmap into the memory D
                 HDC hdcTmp = CreateCompatibleDC(hdcMem);
                 if (hdcTmp)
@@ -92,7 +92,7 @@ HRGN BitmapToRegion(
                     {
                         ++bm32.bmWidthBytes;
                     }
-                    
+
 #if defined(LS_COMPAT_TRANSPTOL)
                     // get the limits for the colors
                     BYTE clrHiR = (0xff - GetRValue(clrTolerance)) > GetRValue(clrTransp) ?
@@ -101,7 +101,7 @@ HRGN BitmapToRegion(
                         GetGValue(clrTransp) + GetGValue(clrTolerance) : 0xff;
                     BYTE clrHiB = (0xff - GetBValue(clrTolerance)) > GetBValue(clrTransp) ?
                         GetBValue(clrTransp) + GetBValue(clrTolerance) : 0xff;
-                    
+
                     BYTE clrLoR = GetRValue(clrTolerance) < GetRValue(clrTransp) ?
                         GetRValue(clrTransp) - GetRValue(clrTolerance) : 0x00;
                     BYTE clrLoG = GetGValue(clrTolerance) < GetGValue(clrTransp) ?
@@ -109,13 +109,13 @@ HRGN BitmapToRegion(
                     BYTE clrLoB = GetBValue(clrTolerance) < GetBValue(clrTransp) ?
                         GetBValue(clrTransp) - GetBValue(clrTolerance) : 0x00;
 #endif // LS_COMPAT_TRANSPTOL
-                    
+
                     // Copy the bitmap into the memory D
                     HBITMAP hbmOld = (HBITMAP)SelectObject(hdcTmp, hbm);
-                    
+
                     BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight,
                         hdcTmp, 0, 0, SRCCOPY);
-                    
+
                     // Scan each bitmap row from bottom to top
                     // (the bitmap is inverted vertically)
 #if defined(LS_COMPAT_TRANSPTOL)
@@ -125,13 +125,13 @@ HRGN BitmapToRegion(
 #endif // LS_COMPAT_TRANSPTOL
                     BYTE *p32 = (BYTE *)bm32.bmBits + \
                         (bm32.bmHeight - 1) * bm32.bmWidthBytes;
-                    
+
                     int y = 0;
-                    
+
                     while (y < bm.bmHeight)
                     {
                         int x = 0, x0;
-                        
+
                         while (x < bm.bmWidth)
                         {
                             // loop through all transparent pixels...
@@ -139,7 +139,7 @@ HRGN BitmapToRegion(
                             {
 #if defined(LS_COMPAT_TRANSPTOL)
                                 p = p32 + 4 * x;
-                                
+
                                 // if the pixel is non-transparent, then break
                                 if (*p < clrLoB || *p > clrHiB)
                                 {
@@ -162,19 +162,19 @@ HRGN BitmapToRegion(
                                     break;
                                 }
 #endif // LS_COMPAT_TRANSPTOL
-                                
+
                                 ++x;
                             }
-                            
+
                             // save first non transparent pixel offset
                             x0 = x;
-                            
+
                             // loop through all non transparent pixels
                             while (x < bm.bmWidth)
                             {
 #if defined(LS_COMPAT_TRANSPTOL)
                                 p = p32 + 4 * x;
-                                
+
                                 // if the pixel is transparent, then break
                                 if (*p >= clrLoB && *p <= clrHiB)
                                 {
@@ -195,10 +195,10 @@ HRGN BitmapToRegion(
                                     break;
                                 }
 #endif // LS_COMPAT_TRANSPTOL
-                                
+
                                 ++x;
                             }
-                            
+
                             // if found one or more non-transparent pixels in a
                             // row, add them to the rgn...
                             if ((x - x0) > 0)
@@ -209,27 +209,27 @@ HRGN BitmapToRegion(
                                 CombineRgn(hRgn, hRgn, hTempRgn, RGN_OR);
                                 DeleteObject(hTempRgn);
                             }
-                            
+
                             ++x;
                         }
-                        
+
                         ++y;
                         p32 -= bm32.bmWidthBytes;
                     }
-                    
+
                     // Clean up
                     SelectObject(hdcTmp, hbmOld);
                     DeleteDC(hdcTmp);
                 }
-                
+
                 SelectObject(hdcMem, hbmOld32);
                 DeleteObject(hbm32);
             }
-            
+
             DeleteDC(hdcMem);
         }
     }
-    
+
     return hRgn;
 }
 
@@ -244,14 +244,14 @@ HRGN BitmapToRegion(
 HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
 {
     HBITMAP hbmReturn = NULL;
-    
+
     if (pwzImage != NULL)
     {
         if (_wcsicmp(pwzImage, L".none") != 0)
         {
             wchar_t wzImage[MAX_PATH];
             StringCchCopyW(wzImage, _countof(wzImage), pwzImage);
-            
+
             // Bitmap merging by Thedd
             //  Thedd - pic1.bmp|pic2.bmp merges the images. Works recursively,
             //  so pic1.bmp|.extract=whatever.dll,3|pic2.bmp also works etc...
@@ -268,60 +268,60 @@ HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
                 int wdtFirst, hgtFirst;
                 int wdtSecond, hgtSecond;
                 int wdtResult, hgtResult;
-                
+
                 // get the position after the [|] character
                 *pszSecondImage = '\0';
                 ++pszSecondImage;
-                
+
                 // load the two bitmaps
                 hbmFirst = LoadLSImageW(wzImage, pwzFile);
                 hbmSecond = LoadLSImageW(pszSecondImage, pwzFile);
-                
+
                 // if the second one is NULL, then there's no merging to do and
                 if (hbmSecond != NULL)
                 {
                     // create mem dcs for the bitmaps
                     hdcFirst = CreateCompatibleDC(NULL);
                     hdcSecond = CreateCompatibleDC(NULL);
-                    
+
                     // select the bitmaps
                     hbmFirstOld = (HBITMAP)SelectObject(hdcFirst, hbmFirst);
                     hbmSecondOld = (HBITMAP)SelectObject(hdcSecond, hbmSecond);
-                    
+
                     // get the bitmap sizes..
                     GetLSBitmapSize(hbmFirst, &wdtFirst, &hgtFirst);
                     GetLSBitmapSize(hbmSecond, &wdtSecond, &hgtSecond);
-                    
+
                     // in earlier version of bitmap merge, those were painted on
                     // to each other now let's paint both images to a new one
-                    
+
                     // and we support different sized images!! therefore:
                     wdtResult = std::max(wdtFirst, wdtSecond);
                     hgtResult = std::max(hgtFirst, hgtSecond);
-                    
+
                     // create another dc, compatible with second dc
                     hdcResult = CreateCompatibleDC(hdcSecond);
-                    
+
                     // create a new bitmap for the new dc and select it
                     hbmResult = CreateCompatibleBitmap(hdcSecond,
                         wdtResult, hgtResult);
                     hbmResultOld = (HBITMAP)SelectObject(hdcResult, hbmResult);
-                    
+
                     rc.top = 0;
                     rc.left = 0;
                     rc.right = wdtResult;
                     rc.bottom = hgtResult;
-                    
+
                     // paint the background in transparent color...
                     hbrTransparent = CreateSolidBrush(RGB(255, 0, 255));
                     FillRect(hdcResult, &rc, hbrTransparent);
                     DeleteObject(hbrTransparent);
-                    
+
                     // first "standard blit" the second image into the new one:
                     BitBlt(hdcResult, (wdtResult - wdtSecond) / 2,
                         (hgtResult - hgtSecond) / 2, wdtSecond, hgtSecond,
                         hdcSecond, 0, 0, SRCCOPY);
-                    
+
                     // Secondly "tranparent blit" the first image over the
                     // second one Since TransparentBltLS double buffers the
                     // painting to reduce flicker and we are using only memory
@@ -329,21 +329,21 @@ HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
                     // TransparentBltLSWorker and shave off a few BitBlt calls
                     TransparentBltLSWorker(hdcResult, wdtFirst, hgtFirst,
                         hdcFirst, 0, 0, RGB(255, 0, 255));
-                    
+
                     // deselect the bitmap from the dc and delete the dc to get
                     // the image
                     SelectObject(hdcResult, hbmResultOld);
                     DeleteDC(hdcResult);
-                    
+
                     // delete all used objects
                     SelectObject(hdcFirst, hbmFirstOld);
                     DeleteObject(hbmFirst);
                     DeleteDC(hdcFirst);
-                    
+
                     SelectObject(hdcSecond, hbmSecondOld);
                     DeleteObject(hbmSecond);
                     DeleteDC(hdcSecond);
-                    
+
                     hbmReturn = hbmResult;
                 }
                 else
@@ -356,9 +356,9 @@ HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
                 if (!_wcsnicmp(wzImage, L".extract", 8 /*wcslen(L".extract")*/))
                 {
                     HICON hIcon = NULL;
-                    
+
                     hIcon = LoadLSIconW(wzImage, pwzFile);
-                    
+
                     if (hIcon)
                     {
                         hbmReturn = BitmapFromIcon(hIcon);
@@ -370,11 +370,11 @@ HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
                     // Append the image name to the LiteStep image path and
                     // attempt to load the image.
                     wchar_t wzExpandedImage[MAX_PATH];
-                    
+
                     VarExpansionExW(wzExpandedImage, wzImage, _countof(wzExpandedImage));
                     LSGetImagePathW(wzImage, _countof(wzImage));
                     PathAppendW(wzImage, wzExpandedImage);
-                    
+
                     if (PathMatchSpecW(wzImage, L"*.png"))
                     {
                         hbmReturn = LoadFromPNG(wzImage);
@@ -385,7 +385,7 @@ HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
                             NULL, wzImage, IMAGE_BITMAP, 0, 0,
                             LR_DEFAULTCOLOR | LR_LOADFROMFILE);
                     }
-                    
+
                     // If that fails, treat the image as a fully qualified path
                     // and try loading it
                     if (hbmReturn == NULL)
@@ -405,7 +405,7 @@ HBITMAP LoadLSImageW(LPCWSTR pwzImage, LPCWSTR pwzFile)
             }
         }
     }
-    
+
     return hbmReturn;
 }
 
@@ -429,13 +429,13 @@ HBITMAP LoadLSImageA(LPCSTR pszImage, LPCSTR pszFile)
 HBITMAP BitmapFromIcon(HICON hIcon)
 {
     ICONINFO infoIcon;
-    
+
     if (GetIconInfo(hIcon, &infoIcon))
     {
         HDC hDC;
         HBITMAP hOldBMP;
         HBRUSH hBrush;
-        
+
         hDC = CreateCompatibleDC(NULL);
         hOldBMP = (HBITMAP)SelectObject(hDC, infoIcon.hbmColor);
         hBrush = CreateSolidBrush(RGB (255, 0, 255));
@@ -444,10 +444,10 @@ HBITMAP BitmapFromIcon(HICON hIcon)
         DeleteObject(infoIcon.hbmMask);
         SelectObject(hDC, hOldBMP);
         DeleteDC(hDC);
-        
+
         return infoIcon.hbmColor;
     }
-    
+
     return NULL;
 }
 
@@ -464,7 +464,7 @@ HBITMAP BitmapFromIcon(HICON hIcon)
 HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
 {
     HICON hIcon = NULL;
-    
+
     if (pwzIconPath != NULL)
     {
         if (_wcsicmp(pwzIconPath, L".none") != 0)
@@ -473,10 +473,10 @@ HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
             wchar_t wzIconLSImagePath[MAX_PATH];
             LPWSTR pwzIconFile = (LPWSTR)pwzIconPath;
             int nIcon = 0;
-            
+
             // here comes a large block which does nothing but turning it into
             // the form <absolute path>[,<iconIndex>]
-            
+
             // if .extract but nothing else is there...
             // then take the file specified as an icon (could probably be done
             // earlier, but anyhow)
@@ -489,9 +489,9 @@ HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
                 // remove ".extract=" (as we won't use it anyway)
                 pwzIconFile = (LPWSTR)pwzIconPath + 9;
             }
-            
+
             VarExpansionExW(wzIconPath, pwzIconFile, _countof(wzIconPath));
-            
+
             if (PathIsRelativeW(wzIconPath))
             {
                 LSGetImagePathW(wzIconLSImagePath, _countof(wzIconLSImagePath));
@@ -502,11 +502,11 @@ HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
             {
                 pwzIconFile = wzIconPath;
             }
-            
+
             // large block ends here, now time to separate path and index (if we
             // have an index)
             nIcon = PathParseIconLocationW(pwzIconFile);
-            
+
             // now we have the two vars we would like, and the loading can begin
             // well not really, if it's a path, where we're going to get the
             // icon form desktop.ini there is just a little bit more we have to
@@ -514,16 +514,16 @@ HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
             if (PathIsDirectoryW(pwzIconFile))
             {
                 wchar_t wzTemp[MAX_PATH];
-                
+
                 PathAppendW(pwzIconFile, L"desktop.ini");
                 nIcon = GetPrivateProfileIntW(L".ShellClassInfo", L"IconIndex",
                     0, pwzIconFile);
-                
+
                 GetPrivateProfileStringW(L".ShellClassInfo", L"IconFile",
                     L"", wzTemp, _countof(wzTemp), pwzIconFile);
                 StringCchCopyW(pwzIconFile, MAX_PATH, wzTemp);
             }
-            
+
             // okay, now it's really time to load the icon... if it's an .ico
             // file we want to do an LoadImage() thing, otherwise it's
             // extracticon so lets find out the extension
@@ -535,7 +535,7 @@ HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
             else
             {
                 hIcon = ExtractIconW(GetModuleHandle(NULL), pwzIconFile, nIcon);
-                
+
                 if (hIcon == (HICON)1)
                 {
                     hIcon = NULL;
@@ -543,7 +543,7 @@ HICON LoadLSIconW(LPCWSTR pwzIconPath, LPCWSTR pwzFile)
             }
         }
     }
-    
+
     return hIcon;
 }
 
@@ -566,7 +566,7 @@ HICON LoadLSIconA(LPCSTR pszIconPath, LPCSTR pszFile)
 void GetLSBitmapSize(HBITMAP hBitmap, LPINT nWidth, LPINT nHeight)
 {
     BITMAP hbmBitmap;
-    
+
     if (!GetObject(hBitmap, sizeof(hbmBitmap), (LPSTR) & hbmBitmap))
     {
         if (nWidth)
@@ -600,22 +600,22 @@ void TransparentBltLS(
     HDC hdcDstCpy;
     HBITMAP hbmDstCpy;
     HBITMAP hbmOldDstCpy;
-    
+
     // create a destination compatble dc containing
     // a copy of the destination dc
     hdcDstCpy = CreateCompatibleDC(hdcDst);
     hbmDstCpy = CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
     hbmOldDstCpy = (HBITMAP)SelectObject(hdcDstCpy, hbmDstCpy);
-    
+
     BitBlt(hdcDstCpy, 0, 0, nWidth, nHeight, hdcDst, nXDest, nYDest, SRCCOPY);
-    
+
     TransparentBltLSWorker(hdcDstCpy, nWidth, nHeight,
         hdcSrc, nXSrc, nYSrc, colorTransparent);
-    
+
     // now we have created the image we want to blt
     // in the destination copy dc
     BitBlt(hdcDst, nXDest, nYDest, nWidth, nHeight, hdcDstCpy, 0, 0, SRCCOPY);
-    
+
     SelectObject(hdcDstCpy, hbmOldDstCpy);
     DeleteObject(hbmDstCpy);
     DeleteDC(hdcDstCpy);
@@ -630,37 +630,37 @@ static void TransparentBltLSWorker(
     HDC hdcMem, hdcMask;
     HBITMAP hbmMask, hbmMem;
     HBITMAP hbmOldMem, hbmOldMask;
-    
+
     // create a destination compatble dc containing a copy of the source dc
     hdcMem = CreateCompatibleDC(hdcDst);
     hbmMem = CreateCompatibleBitmap(hdcDst, nWidth, nHeight);
     hbmOldMem = (HBITMAP)SelectObject(hdcMem, hbmMem);
-    
+
     BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, SRCCOPY);
-    
+
     // Create monochrome bitmap for the mask
     hdcMask = CreateCompatibleDC(hdcDst);
     hbmMask = CreateBitmap(nWidth, nHeight, 1, 1, NULL);
     hbmOldMask = (HBITMAP)SelectObject(hdcMask, hbmMask);
-    
+
     // pixels matching the hdcMem bkcolor are white in the mask,
     // while all others are black.
     SetBkColor(hdcMem, colorTransparent);
     // Create the mask from the memory dc holding the source image
     BitBlt(hdcMask, 0, 0, nWidth, nHeight, hdcMem, 0, 0, SRCCOPY);
-    
+
     // Mask off source (XOR - hdcMem bkcolor is still the transparent color)
     BitBlt(hdcMem, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCINVERT);
     // Mask off dest (assumption is made that hdcDest bkcolor is white)
     BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMask, 0, 0, SRCAND);
-    
+
     // Combine the foreground with the background
     BitBlt(hdcDst, 0, 0, nWidth, nHeight, hdcMem, 0, 0, SRCPAINT);
-    
+
     SelectObject(hdcMask, hbmOldMask);
     DeleteObject(hbmMask);
     DeleteDC(hdcMask);
-    
+
     SelectObject(hdcMem, hbmOldMem);
     DeleteObject(hbmMem);
     DeleteDC(hdcMem);
@@ -671,18 +671,18 @@ void Frame3D(
     HDC hdc, RECT rect, COLORREF TopColor, COLORREF BottomColor, int Width)
 {
     HPEN hPen1, hPen2, hOldPen;
-    
+
     --rect.bottom;
     --rect.right;
-    
+
     hPen1 = CreatePen(PS_SOLID, 1, TopColor);
     hPen2 = CreatePen(PS_SOLID, 1, BottomColor);
     hOldPen = (HPEN)SelectObject(hdc, hPen1);
-    
+
     while (Width-- > 0)
     {
         POINT points[3];
-        
+
         // left, top borders (do not draw corners)
         points[0].x = rect.left;
         points[0].y = rect.bottom-1;
@@ -690,22 +690,22 @@ void Frame3D(
         points[1].y = rect.top;
         points[2].x = rect.right; // end point is not filled
         points[2].y = rect.top;
-        
+
         SelectObject(hdc, hPen1);
         Polyline(hdc, points, 3);
-        
+
         // bottom, right borders (draw corners)
         points[0].y = rect.bottom;
         points[1].x = rect.right;
         points[1].y = rect.bottom;
         points[2].y -= 1; // end point is not filled
-        
+
         SelectObject(hdc, hPen2);
         Polyline(hdc, points, 3);
-        
+
         InflateRect(&rect, -1, -1);
     }
-    
+
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen2);
     DeleteObject(hPen1);

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -58,7 +58,7 @@
 // 0.25.0 default: ENABLED
 #define LS_USE_PICOPNG
 
-// Makes LiteStep run Explorer's window procedure when set as shell. 
+// Makes LiteStep run Explorer's window procedure when set as shell.
 // 0.25.0 default: ENABLED
 //#define LS_USE_EXPLORER_SERVICE
 

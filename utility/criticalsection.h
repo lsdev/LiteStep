@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,25 +33,25 @@ class CriticalSection
 {
     CriticalSection(const CriticalSection& rhs);
     CriticalSection& operator=(const CriticalSection& rhs);
-    
+
     CRITICAL_SECTION m_CritSection;
-    
+
 public:
     CriticalSection()
     {
         InitializeCriticalSection(&m_CritSection);
     }
-    
+
     ~CriticalSection()
     {
         DeleteCriticalSection (&m_CritSection);
     }
-    
+
     void Acquire()
     {
         EnterCriticalSection(&m_CritSection);
     }
-    
+
     void Release()
     {
         LeaveCriticalSection(&m_CritSection);
@@ -70,15 +70,15 @@ public:
     {
         m_cs.Acquire();
     }
-    
+
     ~Lock()
     {
         m_cs.Release();
     }
-    
+
 protected:
     CriticalSection& m_cs;
-    
+
 private:
     // not implemented
     Lock(const Lock& rhs);
@@ -105,10 +105,10 @@ public:
     {
         return m_Count > 1;
     }
-    
+
 protected:
     UINT& m_Count;
-    
+
 private:
     // not implemented
     Block(const Block& rhs);

@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,7 +40,7 @@ public:
      * @param  sPath        Path to configuration file
      */
     SettingsIterator(SettingsMap* pSettingsMap, const std::wstring& sPath);
-    
+
     /**
      * Retrieve the next value.
      *
@@ -50,7 +50,7 @@ public:
      *          if there are no more values to retrieve
      */
     BOOL ReadNextLine(LPWSTR pwzValue, size_t cchValue);
-    
+
     /**
      * Retrieve the next value that does not start with an '*'.
      *
@@ -60,7 +60,7 @@ public:
      *          if there are no more values to retrieve
      */
     BOOL ReadNextCommand(LPWSTR pwzValue, size_t cchValue);
-    
+
     /**
      * Retrieve the next value with the specified setting name that starts
      * with an '*'.
@@ -72,7 +72,7 @@ public:
      *          if there are no more values to retrieve
      */
     BOOL ReadNextConfig(LPCWSTR pwzConfig, LPWSTR pszValue, size_t cchValue);
-    
+
     /**
      * Returns path to configuration file.
      */
@@ -80,17 +80,17 @@ public:
     {
         return m_sPath;
     }
-    
+
 private:
     /** Settings map to iterate */
     SettingsMap* m_pSettingsMap;
-    
+
     /** Iterator for LCReadNextLine */
     SettingsMap::iterator m_pFileIterator;
-    
+
     /** Iterators for each setting name used with LCReadNextConfig. */
     IteratorMap m_Iterators;
-    
+
     /** Path to configuration file */
     std::wstring m_sPath;
 };

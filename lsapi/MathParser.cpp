@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -175,7 +175,7 @@ MathValue MathParser::Evaluate()
 {
     MathValue value = ParseExpression();
     Match(TT_END);
-    
+
     return value;
 }
 
@@ -189,17 +189,17 @@ MathValue MathParser::CallFunction(const wstring& name, const MathValueList& arg
         {
             // Incorrect number of arguments
             wostringstream message;
-                
+
             message << L"Error: Function " << name << L" requires ";
             message << entry->second.numArgs << L" argument(s).";
-                
+
             throw MathException(message.str());
         }
-            
+
         // Call it
         return entry->second.function(argList);
     }
-    
+
     // No such function
     throw MathException(L"Error: " + name + L" is not a function");
 }
@@ -222,13 +222,13 @@ MathValue MathParser::GetVariable(const wstring& name) const
 
     // Look up variable name
     SettingsMap::const_iterator it = mContext.find(name);
-    
+
     if (it == mContext.end())
     {
         // Variable is undefined
         return MathValue();
     }
-    
+
     StringSet newRecursiveVarSet(mRecursiveVarSet);
     newRecursiveVarSet.insert(name);
 
@@ -236,7 +236,7 @@ MathValue MathParser::GetVariable(const wstring& name) const
     wchar_t value[MAX_LINE_LENGTH];
     g_LSAPIManager.GetSettingsManager()->VarExpansionEx(
         value, (*it).second.sValue.c_str(), MAX_LINE_LENGTH, newRecursiveVarSet);
-    
+
     if (_wcsicmp(value, L"false") == 0 ||
         _wcsicmp(value, L"off") == 0 ||
         _wcsicmp(value, L"no") == 0)
@@ -257,7 +257,7 @@ MathValue MathParser::GetVariable(const wstring& name) const
         // an empty value may be from an undefined or recursive variable.
         // Therefor when an error dialog has been presented, it would be
         // optimal to not evaluate to true. Currently that is not possible.
-        
+
         // A setting with an empty value is true
         return true;
     }
@@ -275,7 +275,7 @@ MathValue MathParser::GetVariable(const wstring& name) const
             GetTokenW(value, unquoted, NULL, FALSE);
             StringCchCopy(value, MAX_LINE_LENGTH, unquoted);
         }
-        
+
         // String
         return value;
     }
@@ -302,18 +302,18 @@ MathValue MathParser::ParsePrimaryExpression()
         // Function Call
         wstring name;
         MathValueList argList;
-        
+
         // Get name
         name = mLookahead[0].GetValue();
         Match(TT_ID);
         Match(TT_LPAREN);
-        
+
         if (mLookahead[0].GetType() != TT_RPAREN)
         {
             // Get argument list
             ParseExpressionList(argList);
         }
-        
+
         Match(TT_RPAREN);
         return CallFunction(name, argList);
     }
@@ -322,7 +322,7 @@ MathValue MathParser::ParsePrimaryExpression()
         // Identifier
         wstring name = mLookahead[0].GetValue();
         MathValue value = GetVariable(name);
-        
+
         if ((mFlags & MATH_EXCEPTION_ON_UNDEFINED) && value.IsUndefined())
         {
             // Reference to undefined variable
@@ -330,7 +330,7 @@ MathValue MathParser::ParsePrimaryExpression()
             message << "Error: Variable " << name << " is not defined.";
             throw MathException(message.str());
         }
-        
+
         Match(TT_ID);
         return value;
     }
@@ -391,12 +391,12 @@ MathValue MathParser::ParsePrimaryExpression()
         Match(TT_RPAREN);
         return !GetVariable(name).IsUndefined();
     }
-    
+
     wostringstream message;
-    
+
     message << L"Syntax Error: Expected identifier, literal, or subexpression,";
     message << L" but found " << mLookahead[0].GetTypeName();
-    
+
     throw MathException(message.str());
 }
 
@@ -444,7 +444,7 @@ MathValue MathParser::ParseUnaryExpression()
 MathValue MathParser::ParseMultiplicativeExpression()
 {
     MathValue value = ParseUnaryExpression();
-    
+
     for (;;)
     {
         if (mLookahead[0].GetType() == TT_STAR)
@@ -476,7 +476,7 @@ MathValue MathParser::ParseMultiplicativeExpression()
             break;
         }
     }
-    
+
     return value;
 }
 
@@ -489,7 +489,7 @@ MathValue MathParser::ParseMultiplicativeExpression()
 MathValue MathParser::ParseAdditiveExpression()
 {
     MathValue value = ParseMultiplicativeExpression();
-    
+
     for (;;)
     {
         if (mLookahead[0].GetType() == TT_PLUS)
@@ -509,7 +509,7 @@ MathValue MathParser::ParseAdditiveExpression()
             break;
         }
     }
-    
+
     return value;
 }
 
@@ -521,14 +521,14 @@ MathValue MathParser::ParseAdditiveExpression()
 MathValue MathParser::ParseConcatenationExpression()
 {
     MathValue value = ParseAdditiveExpression();
-    
+
     while (mLookahead[0].GetType() == TT_AMPERSAND)
     {
         // Concatenate
         Match(TT_AMPERSAND);
         value = MathConcatenate(value, ParseAdditiveExpression());
     }
-    
+
     return value;
 }
 
@@ -546,7 +546,7 @@ MathValue MathParser::ParseConcatenationExpression()
 MathValue MathParser::ParseRelationalExpression()
 {
     MathValue value = ParseConcatenationExpression();
-    
+
     for (;;)
     {
         if (mLookahead[0].GetType() == TT_EQUAL)
@@ -590,7 +590,7 @@ MathValue MathParser::ParseRelationalExpression()
             break;
         }
     }
-    
+
     return value;
 }
 
@@ -602,14 +602,14 @@ MathValue MathParser::ParseRelationalExpression()
 MathValue MathParser::ParseLogicalANDExpression()
 {
     MathValue value = ParseRelationalExpression();
-    
+
     while (mLookahead[0].GetType() == TT_AND)
     {
         // Logical AND
         Match(TT_AND);
         value = value && ParseRelationalExpression();
     }
-    
+
     return value;
 }
 
@@ -621,14 +621,14 @@ MathValue MathParser::ParseLogicalANDExpression()
 MathValue MathParser::ParseLogicalORExpression()
 {
     MathValue value = ParseLogicalANDExpression();
-    
+
     while (mLookahead[0].GetType() == TT_OR)
     {
         // Logical OR
         Match(TT_OR);
         value = value || ParseLogicalANDExpression();
     }
-    
+
     return value;
 }
 
@@ -650,7 +650,7 @@ void MathParser::ParseExpressionList(MathValueList& valueList)
 {
     valueList.clear();
     valueList.push_back(ParseExpression());
-    
+
     while (mLookahead[0].GetType() == TT_COMMA)
     {
         Match(TT_COMMA);
@@ -664,14 +664,14 @@ void MathParser::Match(int type)
     if (mLookahead[0].GetType() != type)
     {
         wostringstream message;
-        
+
         message << L"Syntax Error: Expected ";
         message << MathToken(type).GetTypeName();
         message << L", but found " << mLookahead[0].GetTypeName();
-        
+
         throw MathException(message.str());
     }
-    
+
     Next();
 }
 
@@ -684,7 +684,7 @@ void MathParser::Next(int count)
         {
             mLookahead[j] = mLookahead[j + 1];
         }
-        
+
         mLookahead[LOOKAHEAD - 1] = mScanner.NextToken();
     }
 }
@@ -728,13 +728,13 @@ MathValue Math_endsWith(const MathValueList& argList)
 {
     wstring toSearch = argList[0].ToString();
     wstring toFind = argList[1].ToString();
-    
+
     if (toFind.empty())
     {
         // An empty string is a prefix of all strings
         return true;
     }
-    
+
     return (toSearch.find(toFind) == toSearch.length() - toFind.length());
 }
 
@@ -788,12 +788,12 @@ MathValue Math_max(const MathValueList& argList)
 {
     double a = argList[0].ToNumber();
     double b = argList[1].ToNumber();
-    
+
     if (_isnan(a) || _isnan(b))
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    
+
     return (a > b) ? a : b;
 }
 
@@ -803,12 +803,12 @@ MathValue Math_min(const MathValueList& argList)
 {
     double a = argList[0].ToNumber();
     double b = argList[1].ToNumber();
-    
+
     if (_isnan(a) || _isnan(b))
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    
+
     return (a < b) ? a : b;
 }
 
@@ -894,13 +894,13 @@ MathValue Math_startsWith(const MathValueList& argList)
 {
     wstring toSearch = argList[0].ToString();
     wstring toFind = argList[1].ToString();
-    
+
     if (toFind.empty())
     {
         // An empty string is a prefix of all strings
         return true;
     }
-    
+
     return (toSearch.find(toFind) == 0);
 }
 

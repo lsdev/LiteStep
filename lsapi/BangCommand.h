@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -73,12 +73,12 @@ public:
      * @param  pwzCommand  bang command name
      */
     Bang(DWORD dwThread, BangCommandExW pfnBang, LPCWSTR pwzCommand);
-    
+
     /**
      * Destructor.
      */
     ~Bang();
-    
+
     /**
      * Executes this bang command. This bang command is scheduled for
      * execution on the thread that owns it, unless the current thread
@@ -91,17 +91,17 @@ public:
     void Execute(HWND hCaller, LPCWSTR pwzParams) const;
 
     LPCWSTR GetCommand() const;
-    
+
     HINSTANCE GetModule() const;
 
 private:
     Bang(const Bang &) = delete;
     Bang & operator=(const Bang &) = delete;
-    
+
 private:
     /** Thread that owns this bang command */
     const DWORD m_dwThreadID;
-    
+
     /**
      * <code>true</code> if the bang command name is passed to the callback
      * function
@@ -110,13 +110,13 @@ private:
 
     /** The address of the callback function, inside the module */
     const LPVOID m_pAddress;
-    
+
     /** Callback function */
     const std::function<void (HWND hwndOwner, LPCWSTR pwzArgs)> m_bBang;
-    
+
     /** Callback function that takes the bang command name as a parameter */
     const std::function<void (HWND hwndOwner, LPCWSTR pwzBangCommandName, LPCWSTR pwzArgs)> m_bBangEX;
-    
+
     /** Name of this bang command */
     const LPCWSTR m_pwzCommand;
 };

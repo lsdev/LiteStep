@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,13 +37,13 @@ DataStore::~DataStore()
 void DataStore::Clear()
 {
     DataHolderMap::iterator iter = m_dhmData.begin();
-    
+
     while (iter != m_dhmData.end())
     {
         delete iter->second;
         ++iter;
     }
-    
+
     m_dhmData.clear();
 }
 
@@ -57,15 +57,15 @@ size_t DataStore::Count()
 BOOL DataStore::StoreData(WORD wIdent, void *pvData, WORD wLength)
 {
     BOOL bReturn = FALSE;
-    
+
     if (pvData != NULL && wLength > 0)
     {
         DataHolderMap::iterator iter = m_dhmData.find(wIdent);
-        
+
         if (iter == m_dhmData.end())
         {
             DataHolder* pdhData = new DataHolder(pvData, wLength);
-            
+
             if (pdhData != NULL)
             {
                 m_dhmData[wIdent] = pdhData;
@@ -73,7 +73,7 @@ BOOL DataStore::StoreData(WORD wIdent, void *pvData, WORD wLength)
             }
         }
     }
-    
+
     return bReturn;
 }
 
@@ -81,26 +81,26 @@ BOOL DataStore::StoreData(WORD wIdent, void *pvData, WORD wLength)
 BOOL DataStore::ReleaseData(WORD wIdent, void *pvData, WORD wLength)
 {
     BOOL bReturn = FALSE;
-    
+
     if (pvData != NULL && wLength > 0)
     {
         DataHolderMap::iterator iter = m_dhmData.find(wIdent);
-        
+
         if (iter != m_dhmData.end())
         {
             DataHolder* pdhData = iter->second;
-            
+
             if (pdhData != NULL)
             {
                 pdhData->GetData(pvData, wLength);
                 delete pdhData;
                 bReturn = TRUE;
             }
-            
+
             m_dhmData.erase(iter);
         }
     }
-    
+
     return bReturn;
 }
 
@@ -122,7 +122,7 @@ DataHolder::DataHolder(void *pvData, WORD wLength)
     else
     {
         m_pvData = new BYTE[wLength];
-        
+
         if (m_pvData != NULL)
         {
             m_wLength = wLength;
@@ -144,7 +144,7 @@ DataHolder::~DataHolder()
 int DataHolder::GetData(void *pvData, WORD wLength)
 {
     int nReturn = 0;
-    
+
     if (pvData != NULL && wLength > 0 &&
         m_pvData != NULL && m_wLength > 0)
     {
@@ -152,11 +152,11 @@ int DataHolder::GetData(void *pvData, WORD wLength)
         {
             wLength = m_wLength;
         }
-        
+
         memcpy(pvData, m_pvData, wLength);
         nReturn = wLength;
     }
-    
+
     return nReturn;
 }
 
@@ -164,7 +164,7 @@ int DataHolder::GetData(void *pvData, WORD wLength)
 int DataHolder::SetData(void *pvData, WORD wLength)
 {
     int nReturn = 0;
-    
+
     if ((pvData == NULL) || (wLength == 0))
     {
         if (m_pvData)
@@ -185,7 +185,7 @@ int DataHolder::SetData(void *pvData, WORD wLength)
             delete [] m_pvData;
             m_pvData = new BYTE[wLength];
         }
-        
+
         if (m_pvData != NULL)
         {
             memcpy(m_pvData, pvData, wLength);
@@ -193,6 +193,6 @@ int DataHolder::SetData(void *pvData, WORD wLength)
             nReturn = m_wLength;
         }
     }
-    
+
     return nReturn;
 }

@@ -2,7 +2,7 @@
 //
 // This is a part of the LiteStep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -129,16 +129,16 @@ template <class Function>
 class DynamicFunction
 {
     Function m_pFunction;
-    
+
 public:
     DynamicFunction(LPCSTR pszDll, LPCSTR pszExport)
     {
         m_pFunction = \
             (Function)GetProcAddress(GetModuleHandle(pszDll), pszExport);
-        
+
         ASSERT(m_pFunction != NULL);
     }
-    
+
     operator Function() const
     {
         return m_pFunction;

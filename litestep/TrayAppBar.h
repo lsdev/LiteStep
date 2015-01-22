@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -116,76 +116,76 @@ public:
     {
         // do nothing
     }
-    
+
     inline HWND hWnd() const
     {
         return m_hWnd;
     }
-    
+
     inline LPARAM lParam() const
     {
         return m_lParam;
     }
-    
+
     inline void lParam(LPARAM lParam)
     {
         m_lParam = lParam;
     }
-    
+
     inline UINT uEdge() const
     {
         return m_uEdge;
     }
-    
+
     inline void uEdge(UINT uEdge)
     {
         m_uEdge = uEdge;
     }
-    
+
     inline HMONITOR hMon() const
     {
         return m_hMon;
     }
-    
+
     inline void hMon(HMONITOR hMon)
     {
         m_hMon = hMon;
     }
-    
+
     inline UINT uMsg() const
     {
         return m_uCallbackMessage;
     }
-    
+
     inline bool IsAutoHide() const
     {
         return ABS_AUTOHIDE == (m_lParam & ABS_AUTOHIDE);
     }
-    
+
     inline bool IsOverLap() const
     {
         return ABS_OVERLAPAUTOHIDE == (m_lParam & ABS_OVERLAPAUTOHIDE);
     }
-    
+
     inline const RECT& GetRectRef() const
     {
         return m_rc;
     }
-    
+
     inline RECT& GetRectRef()
     {
         return m_rc;
     }
-    
+
 private:
     const HWND m_hWnd;
     const UINT m_uCallbackMessage;
-    
+
     LPARAM   m_lParam;
     RECT     m_rc;
     UINT     m_uEdge;
     HMONITOR m_hMon;
-    
+
     // not implemented
     AppBar(const AppBar& rhs);
     AppBar& operator=(const AppBar& rhs);

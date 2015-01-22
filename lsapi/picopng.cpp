@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -54,14 +54,14 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
   //     2. Altered source versions must be plainly marked as such, and must not be
   //     misrepresented as being the original software.
   //     3. This notice may not be removed or altered from any source distribution.
-  
+
   // picoPNG is a PNG decoder in one C++ function of around 500 lines. Use picoPNG for
   // programs that need only 1 .cpp file. Since it's a single function, it's very limited,
   // it can convert a PNG to raw pixel data either converted to 32-bit RGBA color or
   // with no color conversion at all. For anything more complex, another tiny library
   // is available: LodePNG (lodepng.c(pp)), which is a single source and header file.
   // Apologies for the compact code style, it's to make this tiny.
-  
+
   struct Zlib //nested functions for zlib decompression
   {
     static unsigned long readBitFromStream(size_t& bitp, const unsigned char* bits) { unsigned long result = (bits[bitp >> 3] >> (bitp & 0x7)) & 1; bitp++; return result;}
@@ -198,7 +198,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
         error = tree.makeFromLengths(bitlen, 15); if(error) return; //now we've finally got HLIT and HDIST, so generate the code trees, and the function is done
         error = treeD.makeFromLengths(bitlenD, 15); if(error) return;
       }
-      void inflateHuffmanBlock(std::vector<unsigned char>& out, const unsigned char* in, size_t& bp, size_t& pos, size_t inlength, unsigned long btype) 
+      void inflateHuffmanBlock(std::vector<unsigned char>& out, const unsigned char* in, size_t& bp, size_t& pos, size_t inlength, unsigned long btype)
       {
         if(btype == 1) { generateFixedTrees(codetree, codetreeD); }
         else if(btype == 2) { getTreeInflateDynamic(codetree, codetreeD, in, bp, inlength); if(error) return; }

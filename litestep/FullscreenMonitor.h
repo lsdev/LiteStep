@@ -3,7 +3,7 @@
 // This is a part of the Litestep Shell source code.
 //
 // Copyright (C) 1998 (e)
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@ class FullscreenMonitor: public IService
 public:
     FullscreenMonitor();
     ~FullscreenMonitor();
-    
+
     HRESULT Start() override;
     HRESULT Stop() override;
     HRESULT Recycle() override;
@@ -50,7 +50,7 @@ private:
     // LS thread only
 private:
     std::thread m_fullscreenMonitorThread;
-    
+
     // Shared
 private:
     std::atomic<bool> m_bRun;

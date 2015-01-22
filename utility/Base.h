@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -28,23 +28,23 @@ class Base
 {
 protected:
     ULONG __BaseRefCount;
-    
+
     virtual ~Base()
     {
         // do nothing
     }
-    
+
     inline ULONG BaseAddRef()
     {
         InterlockedIncrement((LONG *) & __BaseRefCount);
         return (ULONG)__BaseRefCount;
     }
-    
+
     inline ULONG BaseRelease()
     {
         return (ULONG)InterlockedDecrement((LONG *) & __BaseRefCount);
     }
-    
+
 public:
     Base()
     {
@@ -63,12 +63,12 @@ public:
     ULONG Release()
     {
         ULONG cRefs = BaseRelease();
-        
+
         if (cRefs == 0)
         {
             delete this;
         }
-        
+
         return cRefs;
     };
 };

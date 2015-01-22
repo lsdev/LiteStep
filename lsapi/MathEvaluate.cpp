@@ -2,7 +2,7 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1997-2013  LiteStep Development Team
+// Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -43,12 +43,12 @@ bool MathEvaluateBool(const SettingsMap& context, const wstring& expression,
             resourceTextBuffer, MAX_LINE_LENGTH,
             L"Error in Expression:\n  %ls\n\nDescription:\n  %ls",
             expression.c_str(), e.GetException().c_str());
-        
+
         RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
-        
+
         return false;
     }
-    
+
     return true;
 }
 
@@ -59,7 +59,7 @@ bool MathEvaluateString(const SettingsMap& context, const wstring& expression,
     try
     {
         MathParser mathParser(context, expression, recursiveVarSet, flags);
-        
+
         if (MATH_VALUE_TO_COMPATIBLE_STRING & flags)
         {
             result = mathParser.Evaluate().ToCompatibleString();
@@ -76,11 +76,11 @@ bool MathEvaluateString(const SettingsMap& context, const wstring& expression,
             resourceTextBuffer, MAX_LINE_LENGTH,
             L"Error in Expression:\n  %ls\n\nDescription:\n  %ls",
             expression.c_str(), e.GetException().c_str());
-        
+
         RESOURCE_MSGBOX_F(L"LiteStep", MB_ICONERROR);
-        
+
         return false;
     }
-    
+
     return true;
 }
