@@ -43,6 +43,8 @@ private:
     void ThreadProc();
 
 private:
+    COMFactory *m_pFactory;
+
     // COM worker thread
     std::thread m_COMThread;
 

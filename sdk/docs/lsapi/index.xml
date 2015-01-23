@@ -57,6 +57,7 @@
       <link>EnumPerformanceProc</link>
       <link>EnumRevIDsProc</link>
       <link>GetLitestepWnd</link>
+      <link>LSCoCreateInstance</link>
       <link>LSExecute</link>
       <link>LSExecuteEx</link>
       <link>LSLog</link>

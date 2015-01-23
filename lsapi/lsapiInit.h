@@ -110,6 +110,16 @@ public:
         m_hLitestepWnd = hLitestepWnd;
     }
 
+    void SetCOMFactory(IClassFactory *pFactory)
+    {
+        m_pComFactory = pFactory;
+    }
+
+    IClassFactory *GetCOMFactory() const
+    {
+        return m_pComFactory;
+    }
+
 private:
     DWORD m_dwMainThreadID;
 
@@ -117,6 +127,7 @@ private:
     SettingsManager* m_smSettingsManager;
 
     HWND m_hLitestepWnd;
+    IClassFactory *m_pComFactory;
     wchar_t m_wzLitestepPath[MAX_PATH];
     wchar_t m_wzRcPath[MAX_PATH];
 

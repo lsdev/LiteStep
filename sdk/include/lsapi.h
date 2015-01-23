@@ -282,6 +282,7 @@ EXTERN_CDECL(HICON) LoadLSIconA(LPCSTR pszPath, LPVOID pReserved);
 EXTERN_CDECL(HICON) LoadLSIconW(LPCWSTR pszPath, LPVOID pReserved);
 EXTERN_CDECL(HBITMAP) LoadLSImageA(LPCSTR pszPath, LPVOID pReserved);
 EXTERN_CDECL(HBITMAP) LoadLSImageW(LPCWSTR pszPath, LPVOID pReserved);
+EXTERN_CDECL(HRESULT) LSCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID *ppv);
 EXTERN_CDECL(HINSTANCE) LSExecuteA(HWND hwndOwner, LPCSTR pszCommandLine, INT nShowCmd);
 EXTERN_CDECL(HINSTANCE) LSExecuteW(HWND hwndOwner, LPCWSTR pszCommandLine, INT nShowCmd);
 EXTERN_CDECL(HINSTANCE) LSExecuteExA(HWND hwndOwner, LPCSTR pszOperation, LPCSTR pszCommand, LPCSTR pszArgs, LPCSTR pszDirectory, INT nShowCmd);

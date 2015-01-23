@@ -74,6 +74,12 @@ void LSAPISetLitestepWindow(HWND hLitestepWnd)
 }
 
 
+void LSAPISetCOMFactory(IClassFactory *pFactory)
+{
+    g_LSAPIManager.SetCOMFactory(pFactory);
+}
+
+
 template<typename BangType>
 static BOOL AddBangCommandWorker(LPCWSTR pwzCommand, BangType pfnBangCommand)
 {
@@ -1274,5 +1280,21 @@ HRESULT EnumLSDataA(UINT uInfo, FARPROC pfnCallback, LPARAM lParam)
         hr = E_POINTER;
     }
 
+    return hr;
+}
+
+
+HRESULT LSCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter,
+    DWORD dwClsContext, REFIID riid, LPVOID *ppv)
+{
+    HRESULT hr = E_NOINTERFACE;
+    if (g_LSAPIManager.GetCOMFactory() != nullptr)
+    {
+        hr = g_LSAPIManager.GetCOMFactory()->CreateInstance(pUnkOuter, riid, ppv);
+    }
+    if (hr == E_NOINTERFACE)
+    {
+        hr = CoCreateInstance(rclsid, pUnkOuter, dwClsContext, riid, ppv);
+    }
     return hr;
 }

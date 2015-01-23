@@ -158,11 +158,15 @@ extern "C"
     LSAPI HRESULT EnumLSDataA(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
     LSAPI HRESULT EnumLSDataW(UINT uInfo, FARPROC pfnCallback, LPARAM lParam);
 
+    LSAPI HRESULT LSCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext,
+        REFIID riid, LPVOID *ppv);
+
 #if defined(LSAPI_PRIVATE)
     LSAPI BOOL LSAPIInitialize(LPCWSTR pwzLitestepPath, LPCWSTR pwzRcPath);
     LSAPI void LSAPIReloadBangs(void);
     LSAPI void LSAPIReloadSettings(void);
     LSAPI void LSAPISetLitestepWindow(HWND hLitestepWnd);
+    LSAPI void LSAPISetCOMFactory(IClassFactory *pFactory);
     LSAPI BOOL InternalExecuteBangCommand(HWND hCaller, LPCWSTR pszCommand, LPCWSTR pwzArgs);
 #endif /* LSAPI_PRIVATE */
 

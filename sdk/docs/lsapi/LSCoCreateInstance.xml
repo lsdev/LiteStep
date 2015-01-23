@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="lsapi.xslt"?>
+
+<function>
+  <name>LSCoCreateInstance</name>
+  <description>
+    Wrapper around CoCreateInstance. LiteStep implements some interfaces which
+    were normally implemented by explorer. Since modules run in the same process
+    as LiteStep, attempting to call CoCreateInstance for those interfaces can
+    result in weird behavior. This function is meant to solve that.
+  </description>
+  <parameters>
+    <parameter>
+      <name>rclsid</name>
+      <description>
+      </description>
+      <type>REFCLSID</type>
+    </parameter>
+    <parameter>
+      <name>pUnkOuter</name>
+      <description>
+      </description>
+      <type>LPUNKNOWN</type>
+    </parameter>
+    <parameter>
+      <name>dwClsContext</name>
+      <description>
+      </description>
+      <type>DWORD</type>
+    </parameter>
+    <parameter>
+      <name>riid</name>
+      <description>
+      </description>
+      <type>REFIID</type>
+    </parameter>
+    <parameter>
+      <name>ppv</name>
+      <description>
+      </description>
+      <type>LPVOID</type>
+    </parameter>
+  </parameters>
+  <return>
+    <description>
+    </description>
+    <type>HRESULT</type>
+  </return>
+</function>
