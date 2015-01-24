@@ -263,6 +263,7 @@ bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
 
     DWORD dwStartTime = 0;
     __int64 iStartTime, iEndTime, iFrequency;
+    bool bResult = false;
 
     if (QueryPerformanceCounter((LARGE_INTEGER*)&iStartTime) == FALSE)
     {
@@ -293,10 +294,11 @@ bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
             // might use CRT functions
             m_hThread = (HANDLE)_beginthreadex(&sa, 0, Module::ThreadProc,
                 this, 0, (UINT*)&m_dwThreadID);
+            bResult = true;
         }
         else
         {
-            CallInit();
+            bResult = CallInit() == 0;
         }
 
         if (QueryPerformanceCounter((LARGE_INTEGER*)&iEndTime) == FALSE ||
@@ -308,11 +310,9 @@ bool Module::Init(HWND hMainWindow, const std::wstring& sAppPath)
         {
             m_dwLoadTime = (DWORD)((iEndTime - iStartTime)*1000/iFrequency);
         }
-
-        return true;
     }
 
-    return false;
+    return bResult;
 }
 
 
