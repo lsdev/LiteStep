@@ -177,6 +177,7 @@
 #define LM_GETREVIDW                  33283
 #define LM_BANGCOMMANDW               33284
 #define LM_SYSTRAYW                   33285
+#define LM_WALLPAPERCHANGE            33286
 
 
 //-----------------------------------------------------------------------------

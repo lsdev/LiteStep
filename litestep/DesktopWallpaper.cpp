@@ -204,7 +204,7 @@ HRESULT DesktopWallpaper::SetWallpaper(LPCWSTR pwzMonitorID, LPCWSTR pwzWallpape
             L"Control Panel\\Desktop", wzWallPaperKey, pwzWallpaper, wzThemeFile);
     }
 
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+    PostMessage(GetLitestepWnd(), LM_WALLPAPERCHANGE, NULL, NULL);
 
     return S_OK;
 }
@@ -228,12 +228,12 @@ HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpap
     bool bMultimonBackgrounds = GetPrivateProfileIntW(
         L"Control Panel\\Desktop", L"MultimonBackgrounds", 0, wzThemeFile) != 0;
 
+    WCHAR wallpaperPath[MAX_PATH];
     if (!bMultimonBackgrounds)
     {
         // TODO::Slideshow
-        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
         GetRegValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ,
-            *ppwzWallpaper, MAX_PATH*sizeof(WCHAR));
+            wallpaperPath, MAX_PATH*sizeof(WCHAR));
     }
     else if (pwzMonitorID == nullptr)
     {
@@ -248,12 +248,13 @@ HRESULT DesktopWallpaper::GetWallpaper(LPCWSTR pwzMonitorID, LPWSTR* ppwzWallpap
         {
             return E_INVALIDARG;
         }
-        *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
         WCHAR wzWallPaperKey[32];
         StringCchPrintf(wzWallPaperKey, 32, L"Wallpaper%u", uMonitor);
-        GetPrivateProfileStringW(L"Control Panel\\Desktop", wzWallPaperKey, L"", *ppwzWallpaper,
+        GetPrivateProfileStringW(L"Control Panel\\Desktop", wzWallPaperKey, L"", wallpaperPath,
             MAX_PATH*sizeof(WCHAR), wzThemeFile);
     }
+    *ppwzWallpaper = (LPWSTR)CoTaskMemAlloc(MAX_PATH*sizeof(WCHAR));
+    ExpandEnvironmentStrings(wallpaperPath, *ppwzWallpaper, MAX_PATH);
 
     return S_OK;
 }
@@ -338,7 +339,7 @@ HRESULT DesktopWallpaper::SetBackgroundColor(ULONG uColor)
     StringCchPrintfW(wzColor, _countof(wzColor), L"%d %d %d", uColor & 0xFF, (uColor >> 8) & 0xFF, (uColor >> 16) & 0xFF);
     SHSetValue(HKEY_CURRENT_USER, L"Control Panel\\Colors", L"Background", REG_SZ,
         wzColor, (DWORD)wcslen(wzColor)*sizeof(wzColor[0]));
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+    PostMessage(GetLitestepWnd(), LM_WALLPAPERCHANGE, NULL, NULL);
 
     return S_OK;
 }
@@ -426,7 +427,7 @@ HRESULT DesktopWallpaper::SetPosition(DESKTOP_WALLPAPER_POSITION position)
         pwzStyle, (DWORD)wcslen(pwzStyle)*sizeof(pwzStyle[0]));
     SHSetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"TileWallpaper", REG_SZ,
         pwzTile, (DWORD)wcslen(pwzTile)*sizeof(pwzTile[0]));
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+    PostMessage(GetLitestepWnd(), LM_WALLPAPERCHANGE, NULL, NULL);
 
     return S_OK;
 }

@@ -164,6 +164,7 @@ typedef struct _SYSTRAYINFOEVENT {
 #define LM_RELOADMODULEW              33282 // Module -> Core
 #define LM_GETREVIDW                  33283 // Core   -> Module
 #define LM_SYSTRAYW                   33285 // Core   -> Module
+#define LM_WALLPAPERCHANGE            33286 // Core   -> Module
 
 #if defined(_UNICODE)
 #   define LM_UNLOADMODULE LM_UNLOADMODULEW
