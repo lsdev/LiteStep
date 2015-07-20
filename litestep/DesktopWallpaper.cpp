@@ -514,7 +514,7 @@ HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
     IShellFolder *pRootFolder = nullptr;
     hr = SHGetDesktopFolder(&pRootFolder);
 
-    LPITEMIDLIST idList = nullptr;
+    PIDLIST_RELATIVE idList = nullptr;
     if (SUCCEEDED(hr))
     {
         hr = pRootFolder->ParseDisplayName(nullptr, nullptr, wallpaper, nullptr, &idList, NULL);
@@ -522,7 +522,7 @@ HRESULT DesktopWallpaper::GetSlideshow(IShellItemArray** ppItems)
 
     if (SUCCEEDED(hr))
     {
-        hr = LSCreateShellItemArrayFromIDLists(1, (LPCITEMIDLIST*)&idList, ppItems);
+        hr = LSCreateShellItemArrayFromIDLists(1, (PCIDLIST_ABSOLUTE_ARRAY)&idList, ppItems);
     }
 
     if (idList)

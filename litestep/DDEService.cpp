@@ -205,17 +205,17 @@ HDDEDATA CALLBACK DDEService::DdeCallback(
             if ((!hszTopic || hszTopic == m_hszProgman) &&
                 (!hszItem || hszItem == m_hszProgman))
             {
-                HDDEDATA hData = DdeCreateDataHandle(m_dwDDEInst, NULL,
+                HDDEDATA hDdeData = DdeCreateDataHandle(m_dwDDEInst, NULL,
                     2 * sizeof(HSZPAIR), 0L, 0, 0, 0);
 
-                if (hData)
+                if (hDdeData)
                 {
-                    phszp = (HSZPAIR FAR *)DdeAccessData(hData, &cb);
+                    phszp = (HSZPAIR FAR *)DdeAccessData(hDdeData, &cb);
                     phszp[0].hszSvc = m_hszProgman;
                     phszp[0].hszTopic = m_hszProgman;
                     phszp[1].hszSvc = phszp[1].hszTopic = 0;
-                    DdeUnaccessData(hData);
-                    hReturn = hData;
+                    DdeUnaccessData(hDdeData);
+                    hReturn = hDdeData;
                 }
             }
         }

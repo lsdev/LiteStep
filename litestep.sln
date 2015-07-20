@@ -1,12 +1,12 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "litestep", "litestep\litestep_vc12.vcxproj", "{994556EE-2F21-4811-A85D-6925F7F84B0D}"
+Microsoft Visual Studio Solution File, Format Version 14.00
+# Visual Studio 2015
+VisualStudioVersion = 14.0.22310.1
+MinimumVisualStudioVersion = 14.0.22310.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "litestep", "litestep\litestep.vcxproj", "{994556EE-2F21-4811-A85D-6925F7F84B0D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utility", "utility\utility_vc12.vcxproj", "{2213036F-018C-416A-8A6A-7934C936CFFC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utility", "utility\utility.vcxproj", "{2213036F-018C-416A-8A6A-7934C936CFFC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lsapi", "lsapi\lsapi_vc12.vcxproj", "{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lsapi", "lsapi\lsapi.vcxproj", "{2FECA0A4-CB2F-44CA-97AB-DE78EBBDECFA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDK", "SDK", "{0CB7B995-8934-4494-8EB9-968D5407C6E5}"
 EndProject

@@ -28,6 +28,7 @@
 #include <docobj.h>
 #include <regstr.h>
 
+#pragma warning(disable : 4312)
 
 #if !defined(REGSTR_PATH_SHELLSERVICEOBJECTDELAYED)
 #define REGSTR_PATH_SHELLSERVICEOBJECTDELAYED \

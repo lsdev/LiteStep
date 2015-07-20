@@ -29,7 +29,7 @@
 // with the post-XP toolkit).
 //
 
-#include <ShlObj.h>
+#include "../utility/shlobj.h"
 
 enum DESKTOP_SLIDESHOW_DIRECTION
 {

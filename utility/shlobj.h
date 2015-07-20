@@ -2,7 +2,6 @@
 //
 // This is a part of the Litestep Shell source code.
 //
-// Copyright (C) 1998 (e)
 // Copyright (C) 1997-2015  LiteStep Development Team
 //
 // This program is free software; you can redistribute it and/or
@@ -20,37 +19,14 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#if !defined(COMFACTORY_H)
-#define COMFACTORY_H
+#if !defined(SHLOBJ_H)
+#define SHLOBJ_H
 
-#include "../utility/common.h"
-#include "../utility/shlobj.h"
+// ShlObj.h spits warning 4091 with VS 2015, disable it for that file until fixed.
+#define STRICT_TYPED_ITEMIDS
+#pragma warning(push)
+#pragma warning(disable : 4091)
+#include <ShlObj.h>
+#pragma warning(pop) 
 
-class COMFactory : public IClassFactory
-{
-    // Constructor
-public:
-    COMFactory();
-
-    // Destructor
-private:
-    virtual ~COMFactory();
-
-public:
-    // IUnknown
-    ULONG STDMETHODCALLTYPE AddRef();
-    STDMETHOD(QueryInterface) (REFIID, void**);
-    ULONG STDMETHODCALLTYPE Release();
-
-    // IClassFactory
-    STDMETHOD(CreateInstance) (IUnknown*, REFIID, void**);
-    STDMETHOD(LockServer) (BOOL);
-
-    // Utility
-    bool IsLocked();
-
-private:
-    ULONG m_uRefCount;
-};
-
-#endif // COMFACTORY_H
+#endif // SHLOBJ_H

@@ -22,6 +22,8 @@
 #include "TrayNotifyIcon.h"
 #include "../utility/core.hpp"
 
+#pragma warning(disable : 4312)
+
 NotifyIcon::IcVtr NotifyIcon::s_icVtr;
 
 //

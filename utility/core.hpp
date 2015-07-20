@@ -31,8 +31,7 @@
 
 #include <shellapi.h>
 
-#define STRICT_TYPED_ITEMIDS
-#include <ShlObj.h>
+#include "shlobj.h"
 
 // mainly used for Path helper functions
 #define STRICT_CONST
