@@ -152,6 +152,10 @@ UINT ModuleManager::_LoadModules()
                 {
                     dwFlags |= LS_MODULE_THREADED;
                 }
+				else if (_wcsicmp(wzToken2, L"clr") == 0)
+				{
+					dwFlags |= LS_MODULE_CLR;
+				}
 
                 Module* pModule = _MakeModule(wzToken1, dwFlags);
 
@@ -189,7 +193,7 @@ BOOL ModuleManager::LoadModule(LPCWSTR pwzLocation, DWORD dwFlags)
 
 Module* ModuleManager::_MakeModule(LPCWSTR pwzLocation, DWORD dwFlags)
 {
-    return new Module(pwzLocation, dwFlags);
+    return Module::CreateInstance(pwzLocation, dwFlags);
 }
 
 

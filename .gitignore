@@ -1,10 +1,13 @@
-Release_*
-Debug_*
-*/Debug_*
-*/Release_*
+Release*
+Debug*
+*/Debug*
+*/Release*
 *.user
 *.opensdf
 *.sdf
 *.suo
 *.ncb
 *.aps
+.vs
+*.VC*
+packages

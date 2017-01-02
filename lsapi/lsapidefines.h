@@ -326,6 +326,7 @@ typedef struct LSDESKTOPINFO
 // ELD_MODULES: possible dwFlags values
 #define LS_MODULE_THREADED          0x0001
 //      LS_MODULE_NOTPUMPED         0x0002    no longer used
+#define LS_MODULE_CLR				0x0003 
 
 typedef BOOL (CALLBACK* LSENUMBANGSPROCA)(LPCSTR, LPARAM);
 typedef BOOL (CALLBACK* LSENUMBANGSPROCW)(LPCWSTR, LPARAM);

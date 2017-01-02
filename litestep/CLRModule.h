@@ -19,13 +19,33 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include "CLRModule.h"
-#include "NativeModule.h"
+#if !defined(CLRMODULE_H)
+#define CLRMODULE_H
 
-Module * Module::CreateInstance(const std::wstring & sLocation, DWORD dwFlags)
+#include "Module.h"
+#include <string>
+
+#include <metahost.h>
+
+class CLRModule : public Module
 {
-	if (dwFlags & LS_MODULE_CLR)
-		return new CLRModule(sLocation, dwFlags);
+private:
+	ICorRuntimeHost *m_pCorRuntimeHost;
+	ICLRMetaHost	*m_pMetaHost;
+	ICLRRuntimeInfo *m_pRuntimeInfo;
+
+public:
+	CLRModule(const std::wstring& sLocation, DWORD dwFlags);
+	~CLRModule();
+
+	bool Init(HWND hMainWindow, const std::wstring& sAppPath);
+	void Quit();
+	HINSTANCE  GetInstance() const;
 	
-	return new NativeModule(sLocation, dwFlags);
-}
+private:
+	bool _Initialize();
+	void _Dispose();
+	HRESULT _InvokeMethod(LPCWSTR szMethodName, SAFEARRAY * pArgs);
+};
+
+#endif
