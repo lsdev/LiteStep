@@ -34,8 +34,9 @@ namespace LsapiSharp.Test
 {
     [TestFixture]
     [Author("Donelle Sanders Jr", "donelle@donellesandersjr.com")]
-    public class LsapiSharpTest 
+    public class LsapiSharpTest
     {
+        const int MAX_PATH = 256;
         const int MAX_LINE_LENGTH = 4096;
         const int MAX_COMMAND = 64;
 
@@ -66,13 +67,10 @@ namespace LsapiSharp.Test
         {
             const string LINE = "*Setting option1 option2 option3 option4 somemore stuff";
 
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             string[] tokens = new string[5];
             StringBuilder extraConfig = new StringBuilder(25);
 
-            int len = Tokenize(LINE, tokens, extraConfig);
+            int len = Tokenize(LCTokenize, LINE, tokens, extraConfig);
             string extraParams = extraConfig.ToString();
 
             Assert.AreEqual(tokens.Length, len);
@@ -82,9 +80,55 @@ namespace LsapiSharp.Test
             Assert.AreEqual("option3", tokens[3]);
             Assert.AreEqual("option4", tokens[4]);
             Assert.IsTrue(extraParams.StartsWith("somemore"));
+        }
 
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
+        [TestCase]
+        [Category("Configuration")]
+        public void CommandTokenize_Test()
+        {
+            const string LINE = "*Setting !commandA [!command1][!command2] somemore stuff";
+
+            string[] tokens = new string[4];
+            StringBuilder extraConfig = new StringBuilder(25);
+
+            int len = Tokenize(CommandTokenize, LINE, tokens, extraConfig);
+            string extraParams = extraConfig.ToString();
+
+            Assert.AreEqual(tokens.Length, len);
+            Assert.AreEqual("*Setting", tokens[0]);
+            Assert.AreEqual("!commandA", tokens[1]);
+            Assert.AreEqual("!command1", tokens[2]);
+            Assert.AreEqual("!command2", tokens[3]);
+            Assert.IsTrue(extraParams.StartsWith("somemore"));
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void CommandParse_Test()
+        {
+            string line = "[!command1][!command2][!command3 !command4]";
+
+            string cmd = "!command1";
+            StringBuilder cmdbuffer = new StringBuilder(cmd.Length + 1),
+                          argbuffer = new StringBuilder(line.Length + 1);
+
+            CommandParse(line, cmdbuffer, argbuffer, cmdbuffer.Capacity, argbuffer.Capacity);
+            Assert.AreEqual(cmd, cmdbuffer.ToString());
+
+            line = argbuffer.ToString();
+            cmd = "!command2";
+            cmdbuffer = new StringBuilder(cmd.Length + 1);
+            argbuffer = new StringBuilder(line.Length + 1);
+
+            CommandParse(line, cmdbuffer, argbuffer, cmdbuffer.Capacity, argbuffer.Capacity);
+            Assert.AreEqual(cmd, cmdbuffer.ToString());
+
+            line = argbuffer.ToString();
+            cmd = "!command3 !command4";
+            cmdbuffer = new StringBuilder(cmd.Length + 1);
+
+            CommandParse(line, cmdbuffer, null, cmdbuffer.Capacity, 0);
+            Assert.AreEqual(cmd, cmdbuffer.ToString());
         }
 
         [TestCase]
@@ -95,12 +139,12 @@ namespace LsapiSharp.Test
             Assert.AreNotEqual(0, hfile.ToInt64());
 
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = LCReadNextCommand(hfile, buffer, MAX_LINE_LENGTH);
+            bool retval = LCReadNextCommand(hfile, buffer, buffer.Capacity);
             string line = buffer.ToString();
 
             Assert.IsTrue(retval);
             Assert.NotZero(line.Length);
-            
+
             var closed = LCClose(hfile);
             Assert.IsTrue(closed);
         }
@@ -113,12 +157,12 @@ namespace LsapiSharp.Test
             Assert.AreNotEqual(0, hfile.ToInt64());
 
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = LCReadNextConfig(hfile, "*Config", buffer, MAX_LINE_LENGTH);
+            bool retval = LCReadNextConfig(hfile, "*Config", buffer, buffer.Capacity);
             Assert.IsTrue(retval);
 
             string line = buffer.ToString();
-            string [] tokens = new string[4];
-            int len = Tokenize(line, tokens);
+            string[] tokens = new string[4];
+            int len = Tokenize(LCTokenize, line, tokens);
 
             Assert.AreEqual(tokens.Length, len);
             Assert.AreEqual("*Config", tokens[0]);
@@ -128,16 +172,16 @@ namespace LsapiSharp.Test
 
             tokens = new string[2];
 
-            retval = LCReadNextConfig(hfile, "*Config", buffer, MAX_LINE_LENGTH);
+            retval = LCReadNextConfig(hfile, "*Config", buffer, buffer.Capacity);
             Assert.IsTrue(retval);
 
             line = buffer.ToString();
-            len = Tokenize(line, tokens);
+            len = Tokenize(LCTokenize, line, tokens);
 
             Assert.AreEqual(tokens.Length, len);
             Assert.AreEqual("*Config", tokens[0]);
             Assert.AreEqual("option1", tokens[1]);
-            
+
             var closed = LCClose(hfile);
             Assert.IsTrue(closed);
         }
@@ -150,7 +194,7 @@ namespace LsapiSharp.Test
             Assert.AreNotEqual(0, hfile.ToInt64());
 
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = LCReadNextLine(hfile, buffer, MAX_LINE_LENGTH);
+            bool retval = LCReadNextLine(hfile, buffer, buffer.Capacity);
             string line = buffer.ToString();
 
             Assert.IsTrue(retval);
@@ -265,13 +309,13 @@ namespace LsapiSharp.Test
             Assert.AreNotEqual(0, hfile.ToInt64());
 
             StringBuilder buffer = new StringBuilder(MAX_COMMAND);
-            bool retval = GetRCString("VarC", buffer, "Test", MAX_COMMAND);
+            bool retval = GetRCString("VarC", buffer, "Test", buffer.Capacity);
             string rcVal = buffer.ToString();
 
             Assert.IsTrue(retval);
             Assert.AreEqual("Command3", rcVal);
 
-            retval = GetRCString("SomeSetting", buffer, "Test", MAX_COMMAND);
+            retval = GetRCString("SomeSetting", buffer, "Test", buffer.Capacity);
             rcVal = buffer.ToString();
 
             Assert.IsFalse(retval);
@@ -289,12 +333,12 @@ namespace LsapiSharp.Test
             Assert.AreNotEqual(0, hfile.ToInt64());
 
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = GetRCLine("*Script", buffer, MAX_LINE_LENGTH, null);
+            bool retval = GetRCLine("*Script", buffer, buffer.Capacity, null);
 
             Assert.IsTrue(retval);
 
             string[] tokens = new string[6];
-            Tokenize(buffer.ToString(), tokens);
+            Tokenize(LCTokenize, buffer.ToString(), tokens);
 
             Assert.AreEqual("exec", tokens[0]);
             Assert.AreEqual("!LabelSetAlpha", tokens[1]);
@@ -314,8 +358,8 @@ namespace LsapiSharp.Test
             IntPtr hfile = LCOpen(stepRCPath);
             Assert.AreNotEqual(0, hfile.ToInt64());
 
-            var defaultVal = new COLORREF(0);
-            COLORREF retval = GetRCColor("VarJ", defaultVal);
+            var defaultVal = new LSColorRef(0);
+            LSColorRef retval = GetRCColor("VarJ", defaultVal);
 
             Assert.AreEqual(70, retval.R);
             Assert.AreEqual(130, retval.G);
@@ -330,25 +374,236 @@ namespace LsapiSharp.Test
             Assert.IsTrue(closed);
         }
 
-        private static int Tokenize(string line, string [] tokens, StringBuilder extra = null)
+        [TestCase]
+        [Category("Configuration")]
+        public void LSGetVariable_Test()
+        {
+            IntPtr hfile = LCOpen(stepRCPath);
+            Assert.AreNotEqual(0, hfile.ToInt64());
+
+            StringBuilder value = new StringBuilder(MAX_LINE_LENGTH);
+            var retval = LSGetVariable("VarJ", value);
+
+            Assert.IsTrue(retval);
+            Assert.AreEqual("4682B4", value.ToString());
+
+            value = new StringBuilder(2);
+            retval = LSGetVariable("at", value, value.Capacity);
+
+            Assert.IsTrue(retval);
+            Assert.AreEqual("@", value.ToString());
+
+            var closed = LCClose(hfile);
+            Assert.IsTrue(closed);
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void LSSetVariable_Test()
+        {
+            string val = "1234";
+            LSSetVariable("Test", val);
+
+            StringBuilder value = new StringBuilder(4);
+            var retval = LSGetVariable("Test", value);
+
+            Assert.IsTrue(retval);
+            Assert.AreEqual(val, value.ToString());
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void VarExpansion_Test()
+        {
+            IntPtr hfile = LCOpen(stepRCPath);
+            Assert.AreNotEqual(0, hfile.ToInt64());
+
+            StringBuilder buffer = new StringBuilder(10);
+            VarExpansion(buffer, "$VarA$");
+
+            Assert.AreEqual("TRUE", buffer.ToString());
+
+            buffer = new StringBuilder(MAX_COMMAND);
+            VarExpansion(buffer, "$VarB$", buffer.Capacity);
+
+            Assert.AreEqual("15", buffer.ToString());
+
+            var closed = LCClose(hfile);
+            Assert.IsTrue(closed);
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void GetToken_Test()
+        {
+            string line = "*Script exec !LabelSetAlpha Initialising 250 3 10";
+            string[] tokens = line.Split(' ');
+
+            foreach (var token in tokens)
+            {
+                StringBuilder buffer = new StringBuilder(token.Length);
+
+                IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(char)) * line.Length);
+                IntPtr nextToken = Marshal.AllocHGlobal(Marshal.SizeOf(ptr));
+                Marshal.WriteIntPtr(nextToken, ptr);
+
+                var retval = GetToken(line, buffer, nextToken, false);
+
+                Assert.IsTrue(retval);
+                Assert.AreEqual(token, buffer.ToString());
+
+                ptr = Marshal.ReadIntPtr(nextToken);
+                line = Marshal.PtrToStringAuto(ptr);
+
+                Marshal.FreeHGlobal(nextToken);
+            }
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void Match_Test()
+        {
+            var retval = Match("ex?c", "exec");
+            Assert.IsTrue(retval);
+
+            retval = Match("ex*", "exec");
+            Assert.IsTrue(retval);
+
+            retval = Match("exec", "exec ");
+            Assert.IsFalse(retval);
+
+            var iretval = MatchE("[A-Z", "exec");
+            Assert.AreEqual(MATCH_PATTERN, iretval);
+
+            iretval = MatchE("exec", "exec ");
+            Assert.AreEqual(MATCH_END, iretval);
+
+            iretval = MatchE("[0-9]", "exec");
+            Assert.AreEqual(MATCH_RANGE, iretval);
+
+            iretval = MatchE("'exec", "exec");
+            Assert.AreEqual(MATCH_LITERAL, iretval);
+
+            iretval = MatchE("exe* ", "exec");
+            Assert.AreEqual(MATCH_ABORT, iretval);
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void IsPatternValid_Test()
+        {
+            int errorCode = 0;
+
+            var retval = IsPatternValid("exec\\", ref errorCode);
+
+            Assert.IsFalse(retval);
+            Assert.AreEqual(PATTERN_ESC, errorCode);
+
+            retval = IsPatternValid("[]", ref errorCode);
+
+            Assert.IsFalse(retval);
+            Assert.AreEqual(PATTERN_EMPTY, errorCode);
+
+            retval = IsPatternValid("[a-z][", ref errorCode);
+
+            Assert.IsFalse(retval);
+            Assert.AreEqual(PATTERN_CLOSE, errorCode);
+
+            retval = IsPatternValid("[a-]", ref errorCode);
+
+            Assert.IsFalse(retval);
+            Assert.AreEqual(PATTERN_RANGE, errorCode);
+
+            retval = IsPatternValid("[a-zA-Z_0-9]", ref errorCode);
+
+            Assert.IsTrue(retval);
+            Assert.AreEqual(PATTERN_VALID, errorCode);
+        }
+
+        [TestCase]
+        [Category("Diagnostics")]
+        public void LSLog_Test()
+        {
+            IntPtr hfile = LCOpen(stepRCPath);
+            Assert.AreNotEqual(0, hfile.ToInt64());
+
+            Assert.IsTrue(GetRCBool("LSLogFile", true));
+
+            var loglevel = GetRCInt("LSLogLevel", LS_LOG_DEBUG);
+            
+            var retval = LSLog(loglevel, "LsapiSharpTest", "Logging test");
+            Assert.IsTrue(retval);
+
+            retval = LSLog(loglevel, "LsapiSharpTest", "Logging Test with logging level %i", loglevel);
+            Assert.IsTrue(retval);
+
+            var closed = LCClose(hfile);
+            Assert.IsTrue(closed);
+        }
+
+        [TestCase]
+        [Category("Configuration")]
+        public void EnumLSData_Test()
+        {
+            IntPtr hfile = LCOpen(stepRCPath);
+            Assert.AreNotEqual(0, hfile.ToInt64());
+
+            EnumBangDelegate bangCb = (cmd, lparam) =>
+            {
+                LSLog(LS_LOG_DEBUG, "LsapiSharpTest", "Enum Bang command: " + cmd);
+                return true;
+            };
+
+            EnumBangV2Delegate bangV2Cb = (hInst, cmd, lparam) =>
+            {
+                LSLog(LS_LOG_DEBUG, "LsapiSharpTest", "Enum Bang V2 command: " + cmd);
+                return true;
+            };
+
+            EnumRevIdsDelegate revIdCb = (revId, lparam) =>
+            {
+                LSLog(LS_LOG_DEBUG, "LsapiSharpTest", "Enum RevId: " + revId);
+                return true;
+            };
+
+            var retval = EnumLSData(ELD_BANGS, bangCb, IntPtr.Zero);
+            Assert.AreEqual(HResult.S_OK, retval.Value);
+
+            retval = EnumLSData(ELD_BANGS_V2, bangV2Cb, IntPtr.Zero);
+            Assert.AreEqual(HResult.S_OK, retval.Value);
+
+            retval = EnumLSData(ELD_REVIDS, revIdCb, IntPtr.Zero);
+            Assert.AreEqual(HResult.S_OK, retval.Value);
+
+            var closed = LCClose(hfile);
+            Assert.IsTrue(closed);
+        }
+
+        private static int Tokenize(
+            Func<string, IntPtr, int, StringBuilder, int> tokenize,
+            string line, 
+            string [] tokens, 
+            StringBuilder extra = null)
         {
             int intPtrSize = Marshal.SizeOf(typeof(IntPtr));
             IntPtr tokensPtr = Marshal.AllocHGlobal(intPtrSize * tokens.Length);
+
             for (int i = 0; i < tokens.Length; i++)
             {
                 IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(char)) * MAX_COMMAND);
                 Marshal.WriteIntPtr(tokensPtr, i * intPtrSize, ptr);
             }
 
-            int tokenLen = LCTokenize(line, tokensPtr, tokens.Length, extra);
+            int tokenLen = tokenize(line, tokensPtr, tokens.Length, extra);
 
             for (int i = 0; i < tokens.Length; i++)
             {
                 IntPtr ptr = Marshal.ReadIntPtr(tokensPtr, i * intPtrSize);
-                tokens[i] = Marshal.PtrToStringUni(ptr);
+                tokens[i] = Marshal.PtrToStringAuto(ptr);
                 Marshal.FreeHGlobal(ptr);
             }
 
+            Marshal.FreeHGlobal(tokensPtr);
             return tokenLen;
         }
     }

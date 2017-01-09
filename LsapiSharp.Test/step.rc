@@ -17,3 +17,7 @@ VarJ 4682B4
 ; GetRCLine test configurations
 
 *Script exec !LabelSetAlpha Initialising 250 3 10
+
+; LSLog test
+LSLogFile $LiteStepDir$log.txt
+LSLogLevel 4
