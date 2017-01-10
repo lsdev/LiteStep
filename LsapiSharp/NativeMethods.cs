@@ -170,8 +170,8 @@ namespace LsapiSharp
         /// <summary>
         /// Win32 representation of the HRESULT value
         /// </summary>
-        [StructLayout(LayoutKind.Sequential, Size = 4)]   
-        public struct HResult
+        [StructLayout(LayoutKind.Sequential)]   
+        public struct LSHResult
         {
             ///<summary>
             ///Success code
@@ -203,21 +203,129 @@ namespace LsapiSharp
             ///</summary>
             public const int E_FAIL = unchecked((int)0x80004005);
 
+            /// <summary>
+            /// No such interface supported
+            /// </summary>
+            public const int E_NOINTERFACE = unchecked((int)0x80004002);
+
+            /// <summary>
+            /// Class not registered
+            /// </summary>
+            public const int REGDB_E_CLASSNOTREG = unchecked((int)0x80040154);
+
+            /// <summary>
+            ///  Class does not support aggregation (or class object is remote)
+            /// </summary>
+            public const int CLASS_E_NOAGGREGATION = unchecked((int)0x80040110);
+
             public int Value;
 
-            public HResult(int value)
+            public LSHResult(int value)
             {
                 this.Value = value;
             }
 
-            public static implicit operator int(HResult hr)
+            public static implicit operator int(LSHResult hr)
             {
                 return hr.Value;
             }
 
-            public static implicit operator HResult(int hr)
+            public static implicit operator LSHResult(int hr)
             {
-                return new HResult(hr);
+                return new LSHResult(hr);
+            }
+        }
+
+        /// <summary>
+        /// Win32 representation of the RECT structure
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSRect
+        {
+            int Left, Top, Right, Bottom;
+
+            public LSRect(int left, int top, int right, int bottom)
+            {
+                Left = left;
+                Top = top;
+                Right = right;
+                Bottom = bottom;
+            }
+
+            public int X
+            {
+                get { return Left; }
+                set { Right -= (Left - value); Left = value; }
+            }
+
+            public int Y
+            {
+                get { return Top; }
+                set { Bottom -= (Top - value); Top = value; }
+            }
+
+            public int Height
+            {
+                get { return Bottom - Top; }
+                set { Bottom = value + Top; }
+            }
+
+            public int Width
+            {
+                get { return Right - Left; }
+                set { Right = value + Left; }
+            }
+        }
+
+        /// <summary>
+        /// Win32 representation of the POINT structure
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSPoint
+        {
+            int X;
+            int Y;
+
+            public LSPoint(int x, int y)
+            {
+                this.X = x;
+                this.Y = y;
+            }
+        }
+
+        /// <summary>
+        /// Win32 representation of the MONITORINFO structure
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSMonitorInfo
+        {
+            int Size;
+            LSRect Monitor;
+            LSRect Work;
+            int flags;
+
+            public static LSMonitorInfo Create()
+            {
+                return new LSMonitorInfo { Size = Marshal.SizeOf(typeof(LSMonitorInfo)) };
+            }
+        }
+
+        /// <summary>
+        /// Win32 representation of the DISPLAY_DEVICEW structure
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct LSDisplayDevice
+        {
+            int cb;
+            string DeviceName;
+            string DeviceString;
+            int StateFlags;
+            string DeviceID;
+            string DeviceKey;
+
+            public static LSDisplayDevice Create()
+            {
+                return new LSDisplayDevice { cb = Marshal.SizeOf(typeof(LSDisplayDevice)) };
             }
         }
 
@@ -229,6 +337,18 @@ namespace LsapiSharp
         /// <returns></returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         public static extern bool LSAPIInitialize(string litestepPath, string steprcPath);
+
+        /// <summary>
+        /// Refreshes the list of bang commands
+        /// </summary>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void LSAPIReloadBangs();
+
+        /// <summary>
+        /// Refreshes the settings
+        /// </summary>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void LSAPIReloadSettings();
 
         /// <summary>
         /// Opens a configuration file for sequential access to its contents. 
@@ -586,17 +706,29 @@ namespace LsapiSharp
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode, EntryPoint = "is_valid_patternW")]
         public static extern bool IsPatternValid(string pattern, ref int errorCode);
-        
+
         /// <summary>
         /// Bang command callback
         /// </summary>
+        /// <remarks>
+        /// typedef void (__cdecl *BangCommandW)(HWND hSender, LPCWSTR pszArgs);
+        /// </remarks>
         /// <param name="hWndSender">The window handle sent the command</param>
         /// <param name="args">The arguments associated with the command</param>
-        /// <code>
-        /// typedef void (__cdecl *BangCommandW)(HWND hSender, LPCWSTR pszArgs);
-        /// </code>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public delegate void BangCommandDelegate(int hWndSender, string args);
+        public delegate void BangCommandDelegate(IntPtr hWndSender, string args);
+
+        /// <summary>
+        /// Bang command callback
+        /// </summary>
+        /// <remarks>
+        /// typedef void (__cdecl *BangCommandExW)(HWND hSender, LPCWSTR pszCommand, LPCWSTR pszArgs);
+        /// </remarks>
+        /// <param name="hWndSender">The window handle sent the command</param>
+        /// <param name="command"></param>
+        /// <param name="args">The arguments associated with the command</param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        public delegate void BangCommandDelegate2(IntPtr hWndSender, string command, string args);
 
         /// <summary>
         /// Registers bang commands
@@ -605,7 +737,7 @@ namespace LsapiSharp
         /// <param name="commandDelegate">the callback method associated with the command</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern bool AddBangCommand(string command, [MarshalAs(UnmanagedType.FunctionPtr)] BangCommandDelegate commandDelegate);
+        public static extern bool AddBangCommand(string command, [MarshalAs(UnmanagedType.FunctionPtr)] Delegate commandDelegate);
 
         /// <summary>
         /// Removes a bang command from the list.
@@ -623,7 +755,7 @@ namespace LsapiSharp
         /// <param name="args">The arguments associated with the command</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode, EntryPoint = "ParseBangCommandW")]
-        public static extern bool ExecuteBangCommand(int hwndCaller, string command, string args);
+        public static extern bool ExecuteBangCommand(IntPtr hwndCaller, string command, string args);
 
         /// <summary>
         /// Self explanatory :-)
@@ -755,6 +887,321 @@ namespace LsapiSharp
         ///   S_FALSE      - Enumeration successful, but cancelled by callback
         /// </returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern HResult EnumLSData(int eldInfo, [MarshalAs(UnmanagedType.FunctionPtr)] Delegate callback, IntPtr lparam);
+        public static extern LSHResult EnumLSData(int eldInfo, [MarshalAs(UnmanagedType.FunctionPtr)] Delegate callback, IntPtr lparam);
+
+        /// <summary>
+        /// Performs an operation on a specified file.
+        /// </summary>
+        /// <param name="hOwnerWnd">A handle to the parent window used for displaying a UI or error messages.</param>
+        /// <param name="command">A pointer to a null-terminated string that specifies the !bang command on which to execute the </param>
+        /// <param name="showCommand">
+        /// The flags that specify how an application is to be displayed when it is opened. If lpFile specifies a 
+        /// document file, the flag is simply passed to the associated application. It is up to the application to 
+        /// decide how to handle it. 
+        /// </param>
+        /// <returns>
+        /// If the function succeeds, it returns a value greater than 32. If the function fails, 
+        /// it returns an error value that indicates the cause of the failure.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        public static extern IntPtr LSExecute(IntPtr hOwnerWnd, string command, int showCommand);
+
+        /// <summary>
+        /// Performs an operation on a specified file.
+        /// </summary>
+        /// <param name="hOwnerWnd">A handle to the parent window used for displaying a UI or error messages.</param>
+        /// <param name="operation">
+        /// A pointer to a null-terminated string, referred to in this case as a verb, that specifies the action to 
+        /// be performed. The set of available verbs depends on the particular file or folder. Generally, the actions 
+        /// available from an object's shortcut menu are available verbs.
+        /// </param>
+        /// <param name="command">
+        /// A pointer to a null-terminated string that specifies the file or !bang command on which to execute the 
+        /// specified verb. 
+        /// </param>
+        /// <param name="args">
+        /// If lpFile specifies an executable file, this parameter is a pointer to a null-terminated string that specifies the parameters to be passed to 
+        /// the application. The format of this string is determined by the verb that is to be invoked. 
+        /// </param>
+        /// <param name="directory">A pointer to a null-terminated string that specifies the default (working) directory for the action. </param>
+        /// <param name="nShowCmd">
+        /// The flags that specify how an application is to be displayed when it is opened. If lpFile specifies a 
+        /// document file, the flag is simply passed to the associated application. It is up to the application to 
+        /// decide how to handle it. 
+        /// </param>
+        /// <returns>
+        /// If the function succeeds, it returns a value greater than 32. If the function fails, 
+        /// it returns an error value that indicates the cause of the failure.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode, EntryPoint = "LSExecuteExW")]
+        public static extern IntPtr LSExecute(IntPtr hOwnerWnd, string operation, string command, string args, string directory, int nShowCmd);
+
+        /// <summary>
+        /// Sets the main litestep window
+        /// </summary>
+        /// <param name="hWnd">The handle to the window</param>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void LSAPISetLitestepWindow(IntPtr hWnd);
+
+        /// <summary>
+        /// Gets the litestep main window
+        /// </summary>
+        /// <returns>Returns a handle to the litestep main window on success</returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode, EntryPoint = "GetLitestepWnd")]
+        public static extern IntPtr GetLitestepWindow();
+
+        /// <summary>
+        /// Gets the path to the litestep directory
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="size"></param>
+        /// <returns>Returns to true on success otherwise false</returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, EntryPoint = "LSGetLitestepPathW")]
+        public static extern bool LSGetLitestepPath(StringBuilder path, int size);
+
+        /// <summary>
+        /// Gets the path to the image directory
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="size"></param>
+        /// <returns>Returns to true on success otherwise false</returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, EntryPoint = "LSGetImagePathW")]
+        public static extern bool LSGetImagePath(StringBuilder path, int size);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="hDC"></param>
+        /// <param name="rect"></param>
+        /// <param name="topColor"></param>
+        /// <param name="bottomColor"></param>
+        /// <param name="width"></param>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void Frame3D(IntPtr hDC, LSRect rect, LSColorRef topColor, LSColorRef bottomColor, int width);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="hBmp"></param>
+        /// <param name="transparent"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="xoffset"></param>
+        /// <param name="yoffset"></param>
+        /// <returns></returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr BitmapToRegion(IntPtr hBmp, LSColorRef transparent, LSColorRef tolerance, int xoffset, int yoffset);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="hIcon"></param>
+        /// <returns></returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr BitmapFromIcon(IntPtr hIcon);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="image"></param>
+        /// <returns></returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        public static extern IntPtr LoadLSImage(string file, string image);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        public static extern IntPtr LoadLSIcon(string image, string file);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="hBitmap"></param>
+        /// <param name="nWidth"></param>
+        /// <param name="nHeight"></param>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void GetLSBitmapSize(
+            IntPtr hBitmap, 
+            [MarshalAs(UnmanagedType.LPStruct)] out int width, 
+            [MarshalAs(UnmanagedType.LPStruct)] out int height);
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        /// <param name="hDC"></param>
+        /// <param name="xDest"></param>
+        /// <param name="yDest"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="tempDC"></param>
+        /// <param name="xSrc"></param>
+        /// <param name="ySrc"></param>
+        /// <param name="transparent"></param>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void TransparentBltLS(IntPtr hDC, int xDest, int yDest, int width, int height, IntPtr tempDC, int xSrc, int ySrc, LSColorRef transparent);
+
+        /// <summary>
+        /// Sets the size of the work area.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        /// <param name="right"></param>
+        /// <param name="bottom"></param>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SetDesktopArea(int left, int top, int right, int bottom);
+
+        /// <summary>
+        /// Retrieves the specified system metric or system configuration setting.
+        /// </summary>
+        /// <remarks>See <see cref="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724385(v=vs.85).aspx"/> 
+        /// for details on <paramref name="index"/> values</remarks>
+        /// <param name="index">The system metric or configuration setting to be retrieved</param>
+        /// <returns>
+        /// If the function succeeds, the return value is the requested system metric or configuration setting.
+        /// If the function fails, the return value is 0. GetLastError does not provide extended error information. 
+        ///</returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int LSGetSystemMetrics(int index);
+
+        /// <summary>
+        /// The MonitorFromWindow function retrieves a handle to the display monitor that has 
+        /// the largest area of intersection with the bounding rectangle of a specified window.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window of interest.</param>
+        /// <param name="flags">Determines the function's return value if the window does not intersect any display monitor.</param>
+        /// <returns>
+        /// If the window intersects one or more display monitor rectangles, the return value is an HMONITOR handle to the display monitor
+        /// that has the largest area of intersection with the window.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr LSMonitorFromWindow(IntPtr hWnd, int flags);
+
+        /// <summary>
+        /// The MonitorFromRect function retrieves a handle to the display monitor that has the 
+        /// largest area of intersection with a specified rectangle.
+        /// </summary>
+        /// <param name="coordinates">A pointer to a RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</param>
+        /// <param name="flags">Determines the function's return value if the rectangle does not intersect any display monitor.</param>
+        /// <returns></returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr LSMonitorFromRect([In, MarshalAs(UnmanagedType.LPStruct)] LSRect coordinates, int flags);
+
+        /// <summary>
+        /// The MonitorFromPoint function retrieves a handle to the display monitor that contains a specified point.
+        /// </summary>
+        /// <param name="coordinates">A POINT structure that specifies the point of interest in virtual-screen coordinates.</param>
+        /// <param name="flags">Determines the function's return value if the point is not contained within any display monitor.</param>
+        /// <returns>
+        /// If the point is contained by a display monitor, the return value is an HMONITOR handle to that display monitor.
+        /// If the point is not contained by a display monitor, the return value depends on the value of <paramref name="flags"/>.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr LSMonitorFromPoint(LSPoint coordinates, int flags);
+
+        /// <summary>
+        /// Retrieves information about a display monitor.
+        /// </summary>
+        /// <param name="hMonitor">A handle to the display monitor of interest.</param>
+        /// <param name="info">A pointer to a MONITORINFO or MONITORINFOEX structure that receives information 
+        /// about the specified display monitor.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is nonzero.
+        /// If the function fails, the return value is zero.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool LSGetMonitorInfo(IntPtr hMonitor, [In, Out, MarshalAs(UnmanagedType.LPStruct)] LSMonitorInfo info);
+
+        /// <summary>
+        /// A MonitorEnumProc function is an application-defined callback function that 
+        /// is called by the EnumDisplayMonitors function.
+        /// </summary>
+        /// <remarks>typedef BOOL (CALLBACK* MONITORENUMPROC)(HMONITOR, HDC, LPRECT, LPARAM)</remarks>
+        /// <param name="hMonitor">A handle to the display monitor.</param>
+        /// <param name="hDC">A handle to a device context.</param>
+        /// <param name="area">A pointer to a RECT structure.</param>
+        /// <param name="lparam">Application-defined data that EnumDisplayMonitors passes directly to the enumeration function.</param>
+        /// <returns>To continue the enumeration, return TRUE otherise FALSE.</returns>
+        [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+        public delegate bool EnumMonitorDelegate(IntPtr hMonitor, IntPtr hDC, LSRect area, IntPtr lparam);
+
+        /// <summary>
+        /// Enumerates display monitors (including invisible pseudo-monitors associated with the mirroring drivers) that 
+        /// intersect a region formed by the intersection of a specified clipping rectangle and the visible region of a device context.
+        /// </summary>
+        /// <param name="hDC">A handle to a display device context that defines the visible region of interest.</param>
+        /// <param name="clip">A pointer to a RECT structure that specifies a clipping rectangle. The region of interest is the intersection 
+        /// of the clipping rectangle with the visible region specified by hdc.</param>
+        /// <param name="callback">A pointer to a MonitorEnumProc application-defined callback function.</param>
+        /// <param name="lparam">Application-defined data that EnumDisplayMonitors passes directly to the MonitorEnumProc function.</param>
+        /// <returns>If the function succeeds, the return value is nonzero otherwise zero</returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool LSEnumDisplayMonitors(
+            IntPtr hDC, 
+            [In, MarshalAs(UnmanagedType.LPStruct)] LSRect clip, 
+            [MarshalAs(UnmanagedType.FunctionPtr)] EnumMonitorDelegate callback, 
+            IntPtr lparam);
+
+        /// <summary>
+        /// Obtains information about the display devices in the current session.
+        /// </summary>
+        /// <param name="device">A pointer to the device name. </param>
+        /// <param name="index">An index value that specifies the display device of interest.</param>
+        /// <param name="displayInfo">A pointer to a <seealso cref="LSDisplayDevice"/> structure that 
+        /// receives information about the display device specified by <paramref name="index"/>. </param>
+        /// <param name="flags">Set this flag to EDD_GET_DEVICE_INTERFACE_NAME (0x00000001) to retrieve 
+        /// the device interface name for GUID_DEVINTERFACE_MONITOR, which is registered by the operating 
+        /// system on a per monitor basis. </param>
+        /// <returns>
+        /// If the function succeeds, the return value is nonzero. If the function fails, the return value is zero. 
+        /// The function fails if <paramref name="index"/> is greater than the largest device index.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool LSEnumDisplayDevices(
+            string device, 
+            int index, 
+            [In, MarshalAs(UnmanagedType.LPStruct)] LSDisplayDevice displayInfo, 
+            int flags);
+
+        /// <summary>
+        /// Creates a single uninitialized object of the class associated with a specified CLSID.
+        /// </summary>
+        /// <param name="rclsid">The CLSID associated with the data and code that will be used to create the object.</param>
+        /// <param name="pUnkOuter">
+        /// If NULL, indicates that the object is not being created as part of an aggregate. If non-NULL, 
+        /// pointer to the aggregate object's IUnknown interface (the controlling IUnknown).
+        /// </param>
+        /// <param name="dwClsContext">Context in which the code that manages the newly created object will run.</param>
+        /// <param name="riid">A reference to the identifier of the interface to be used to communicate with the object.</param>
+        /// <param name="ppv">
+        /// Address of pointer variable that receives the interface pointer requested in riid. 
+        /// Upon successful return, *ppv contains the requested interface pointer. 
+        /// </param>
+        /// <returns>
+        /// This function can return the following values
+        ///   E_NOINTERFACE          - The specified class does not implement the requested interface, or the controlling IUnknown does not expose the requested interface
+        ///   E_POINTER              - The ppv parameter is NULL.
+        ///   CLASS_E_NOAGGREGATION  - This class cannot be created as part of an aggregate.
+        ///   REGDB_E_CLASSNOTREG    - A specified class is not registered in the registration database. 
+        ///   S_OK                   - An instance of the specified object class was successfully created.
+        /// </returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern LSHResult LSCoCreateInstance(
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid rclsid,
+            IntPtr pUnkOuter, 
+            int dwClsContext,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
+
+
+        /// <summary>
+        /// Sets the COM interface factory for this API
+        /// </summary>
+        /// <param name="factory">Factory object</param>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void LSAPISetCOMFactory([In, MarshalAs(UnmanagedType.IUnknown)] object factory);
     }
 }

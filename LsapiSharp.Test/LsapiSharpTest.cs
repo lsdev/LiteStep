@@ -567,13 +567,13 @@ namespace LsapiSharp.Test
             };
 
             var retval = EnumLSData(ELD_BANGS, bangCb, IntPtr.Zero);
-            Assert.AreEqual(HResult.S_OK, retval.Value);
+            Assert.AreEqual(LSHResult.S_OK, retval.Value);
 
             retval = EnumLSData(ELD_BANGS_V2, bangV2Cb, IntPtr.Zero);
-            Assert.AreEqual(HResult.S_OK, retval.Value);
+            Assert.AreEqual(LSHResult.S_OK, retval.Value);
 
             retval = EnumLSData(ELD_REVIDS, revIdCb, IntPtr.Zero);
-            Assert.AreEqual(HResult.S_OK, retval.Value);
+            Assert.AreEqual(LSHResult.S_OK, retval.Value);
 
             var closed = LCClose(hfile);
             Assert.IsTrue(closed);
