@@ -26,9 +26,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 
 using static LsapiSharp.NativeMethods;
+
 
 namespace LsapiSharp.Test
 {
@@ -41,25 +43,26 @@ namespace LsapiSharp.Test
         const int MAX_COMMAND = 64;
 
         static string stepRCPath;
+        static SafeFileHandle hstepRCFile;
 
         [OneTimeSetUp()]
-        public static void Initialize()
+        public static void InitializeTest()
         {
             var location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var initialized = LSAPIInitialize(location, stepRCPath = Path.Combine(location, "step.rc"));
             Assert.IsTrue(initialized);
+
+            hstepRCFile = LCOpen(stepRCPath);
+            Assert.IsFalse(hstepRCFile.IsClosed);
         }
 
-        [TestCase]
-        [Category("Configuration")]
-        public void LCOpen_LCClose_Test()
+        [OneTimeTearDown]
+        public static void FinalizeTest()
         {
-            IntPtr hfile = LCOpen(null);
-            Assert.NotZero(hfile.ToInt64());
-
-            var closed = LCClose(hfile);
+            var closed = LCClose(hstepRCFile);
             Assert.IsTrue(closed);
         }
+        
 
         [TestCase]
         [Category("Configuration")]
@@ -135,29 +138,20 @@ namespace LsapiSharp.Test
         [Category("Configuration")]
         public void LCReadNextCommand_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = LCReadNextCommand(hfile, buffer, buffer.Capacity);
+            bool retval = LCReadNextCommand(hstepRCFile, buffer, buffer.Capacity);
             string line = buffer.ToString();
 
             Assert.IsTrue(retval);
             Assert.NotZero(line.Length);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void LCReadNextConfig_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = LCReadNextConfig(hfile, "*Config", buffer, buffer.Capacity);
+            bool retval = LCReadNextConfig(hstepRCFile, "*Config", buffer, buffer.Capacity);
             Assert.IsTrue(retval);
 
             string line = buffer.ToString();
@@ -172,7 +166,7 @@ namespace LsapiSharp.Test
 
             tokens = new string[2];
 
-            retval = LCReadNextConfig(hfile, "*Config", buffer, buffer.Capacity);
+            retval = LCReadNextConfig(hstepRCFile, "*Config", buffer, buffer.Capacity);
             Assert.IsTrue(retval);
 
             line = buffer.ToString();
@@ -181,36 +175,24 @@ namespace LsapiSharp.Test
             Assert.AreEqual(tokens.Length, len);
             Assert.AreEqual("*Config", tokens[0]);
             Assert.AreEqual("option1", tokens[1]);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void LCReadNextLine_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
-            bool retval = LCReadNextLine(hfile, buffer, buffer.Capacity);
+            bool retval = LCReadNextLine(hstepRCFile, buffer, buffer.Capacity);
             string line = buffer.ToString();
 
             Assert.IsTrue(retval);
             Assert.NotZero(line.Length);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCInt_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             int retval = GetRCInt("VarB", 0);
             Assert.AreEqual(15, retval);
 
@@ -222,52 +204,34 @@ namespace LsapiSharp.Test
 
             retval64 = GetRCInt("SomeSetting", 0);
             Assert.AreEqual(0, retval64);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCFloat_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             float retval = GetRCFloat("VarF", 0);
             Assert.AreEqual(53.675f, retval);
 
             retval = GetRCFloat("SomeSetting", 0);
             Assert.AreEqual(0, retval);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCDouble_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             double retval = GetRCDouble("VarG", 0);
             Assert.AreEqual(1.7E+3d, retval);
 
             retval = GetRCFloat("SomeSetting", 0);
             Assert.AreEqual(0, retval);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCBoolDef_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             bool retval = GetRCBoolDef("VarA", false);
             Assert.IsTrue(retval);
 
@@ -276,18 +240,12 @@ namespace LsapiSharp.Test
 
             retval = GetRCBoolDef("SomeSetting", false);
             Assert.IsFalse(retval);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCBool_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             bool retval = GetRCBool("VarA", false);
             Assert.IsFalse(retval);
 
@@ -296,18 +254,12 @@ namespace LsapiSharp.Test
 
             retval = GetRCBool("SomeSetting", false);
             Assert.IsTrue(retval);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCString_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder buffer = new StringBuilder(MAX_COMMAND);
             bool retval = GetRCString("VarC", buffer, "Test", buffer.Capacity);
             string rcVal = buffer.ToString();
@@ -320,18 +272,12 @@ namespace LsapiSharp.Test
 
             Assert.IsFalse(retval);
             Assert.AreEqual("Test", rcVal);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCLine_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder buffer = new StringBuilder(MAX_LINE_LENGTH);
             bool retval = GetRCLine("*Script", buffer, buffer.Capacity, null);
 
@@ -346,18 +292,12 @@ namespace LsapiSharp.Test
             Assert.AreEqual("250", tokens[3]);
             Assert.AreEqual("3", tokens[4]);
             Assert.AreEqual("10", tokens[5]);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void GetRCColor_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             var defaultVal = new LSColorRef(0);
             LSColorRef retval = GetRCColor("VarJ", defaultVal);
 
@@ -369,18 +309,29 @@ namespace LsapiSharp.Test
             retval = GetRCColor("SomethingElse", defaultVal);
 
             Assert.AreEqual(defaultVal.Value, retval.Value);
+        }
 
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
+        [TestCase]
+        [Category("Configuration")]
+        public void GetRCCoordinate_Test()
+        {
+            var retval = GetRCCoordinate("VarK", 0, 0);
+            Assert.AreEqual(100, retval);
+
+            retval = GetRCCoordinate("VarL", 0, 100);
+            Assert.AreEqual(20, retval);
+
+            retval = GetRCCoordinate("SomethingElse", 50, 50);
+            Assert.AreEqual(50, retval);
+
+            retval = ParseCoordinate("1000", 50, 0);
+            Assert.AreEqual(1000, retval);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void LSGetVariable_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder value = new StringBuilder(MAX_LINE_LENGTH);
             var retval = LSGetVariable("VarJ", value);
 
@@ -392,9 +343,6 @@ namespace LsapiSharp.Test
 
             Assert.IsTrue(retval);
             Assert.AreEqual("@", value.ToString());
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
@@ -415,9 +363,6 @@ namespace LsapiSharp.Test
         [Category("Configuration")]
         public void VarExpansion_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             StringBuilder buffer = new StringBuilder(10);
             VarExpansion(buffer, "$VarA$");
 
@@ -427,9 +372,6 @@ namespace LsapiSharp.Test
             VarExpansion(buffer, "$VarB$", buffer.Capacity);
 
             Assert.AreEqual("15", buffer.ToString());
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
@@ -524,9 +466,6 @@ namespace LsapiSharp.Test
         [Category("Diagnostics")]
         public void LSLog_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             Assert.IsTrue(GetRCBool("LSLogFile", true));
 
             var loglevel = GetRCInt("LSLogLevel", LS_LOG_DEBUG);
@@ -536,18 +475,12 @@ namespace LsapiSharp.Test
 
             retval = LSLog(loglevel, "LsapiSharpTest", "Logging Test with logging level %i", loglevel);
             Assert.IsTrue(retval);
-
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
         }
 
         [TestCase]
         [Category("Configuration")]
         public void EnumLSData_Test()
         {
-            IntPtr hfile = LCOpen(stepRCPath);
-            Assert.AreNotEqual(0, hfile.ToInt64());
-
             EnumBangDelegate bangCb = (cmd, lparam) =>
             {
                 LSLog(LS_LOG_DEBUG, "LsapiSharpTest", "Enum Bang command: " + cmd);
@@ -574,9 +507,66 @@ namespace LsapiSharp.Test
 
             retval = EnumLSData(ELD_REVIDS, revIdCb, IntPtr.Zero);
             Assert.AreEqual(LSHResult.S_OK, retval.Value);
+        }
 
-            var closed = LCClose(hfile);
-            Assert.IsTrue(closed);
+        [TestCase]
+        public void GetLitestepPath_Test()
+        {
+            StringBuilder path = new StringBuilder(MAX_PATH);
+            string lspath = Path.GetDirectoryName(stepRCPath) + @"\";
+
+            var retval = LSGetLitestepPath(path, MAX_PATH);
+            Assert.IsTrue(retval);
+            Assert.AreEqual(lspath, path.ToString());
+        }
+
+        [TestCase]
+        public void LSGetImagePath_Test()
+        {
+            StringBuilder path = new StringBuilder(MAX_PATH);
+            string imgpath = Path.GetDirectoryName(stepRCPath) + @"\images\";
+
+            var retval = LSGetImagePath(path, MAX_PATH);
+            Assert.IsTrue(retval);
+            Assert.AreEqual(imgpath, path.ToString());
+        }
+
+        [TestCase]
+        public void Bang_Test()
+        {
+            const string TEST_ARGS = "testarg";
+
+            BangCommandDelegate bang = (sender, args) => Assert.AreEqual(TEST_ARGS, args);
+
+            BangCommandDelegate2 bang2 = (sender, cmd, args) =>
+            {
+                Assert.AreEqual("!Test2", cmd);
+                Assert.AreEqual(TEST_ARGS, args);
+            };
+
+            var retval = AddBangCommand("!Test1", bang);
+            Assert.IsTrue(retval);
+
+            retval = AddBangCommand("!Test2", bang2);
+            Assert.IsTrue(retval);
+
+            retval = ExecuteBangCommand(IntPtr.Zero, "!Test1", TEST_ARGS);
+            Assert.IsTrue(retval);
+
+            retval = ExecuteBangCommand(IntPtr.Zero, "!Test2", TEST_ARGS);
+            Assert.IsTrue(retval);
+
+            retval = RemoveBangCommand("!Test1");
+            Assert.IsTrue(retval);
+
+            retval = RemoveBangCommand("!Test2");
+            Assert.IsTrue(retval);
+
+            retval = ExecuteBangCommand(IntPtr.Zero, "!Test1", TEST_ARGS);
+            Assert.IsFalse(retval);
+
+            retval = ExecuteBangCommand(IntPtr.Zero, "!Test2", TEST_ARGS);
+            Assert.IsFalse(retval);
         }
 
         private static int Tokenize(

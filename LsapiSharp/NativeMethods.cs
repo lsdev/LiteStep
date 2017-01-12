@@ -24,6 +24,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using Microsoft.Win32.SafeHandles;
+
 [assembly: CLSCompliant(true)]
 
 namespace LsapiSharp
@@ -108,29 +110,129 @@ namespace LsapiSharp
         public const int PATTERN_EMPTY = -4;
 
         /// <summary>
-        /// 
+        /// FILL ME IN
         /// </summary>
         public const int ELD_BANGS = 1;
 
         /// <summary>
-        /// 
+        /// FILL ME IN
         /// </summary>
         public const int ELD_MODULES = 2;
 
         /// <summary>
-        /// 
+        /// FILL ME IN
         /// </summary>
         public const int ELD_REVIDS = 3;
 
         /// <summary>
-        /// 
+        /// FILL ME IN
         /// </summary>
         public const int ELD_BANGS_V2 = 4;
 
         /// <summary>
-        /// 
+        /// FILL ME IN
         /// </summary>
         public const int ELD_PERFORMANCE = 5;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SHUTDOWN = 8889;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_REPAINT = 8890;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_BRINGTOFRONT = 8891;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SAVEDATA = 8892;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_RESTOREDATA = 8893;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_POPUP = 9182;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_HIDEPOPUP = 9183;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_LSSELECT = 9185;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SENDSYSTRAY = 9213;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SYSTRAYA = 9214;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SYSTRAYREADY = 9215;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SYSTRAYINFOEVENT = 9216;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_RECYCLE = 9260;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_REGISTERMESSAGE = 9263;
+
+        /// <summary>
+        /// FILL ME IN 
+        /// </summary>
+        public const int LM_UNREGISTERMESSAGE = 9264;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_GETREVIDA = 9265;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_UNLOADMODULEA = 9266;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_RELOADMODULEA = 9267;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SHADETOGGLE = 9300;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_REFRESH = 9305;
 
         /// <summary>
         /// Win32 representation of DWORD value
@@ -363,7 +465,7 @@ namespace LsapiSharp
         /// <param name="filePath">Full path to the file to open</param>
         /// <returns>File handle on success or <code>NULL</code> if the file could not be opened</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern IntPtr LCOpen(string filePath);
+        public static extern SafeFileHandle LCOpen(string filePath);
 
         /// <summary>
         /// Closes a configuration file opened with {@link #LCOpen}.
@@ -371,7 +473,7 @@ namespace LsapiSharp
         /// <param name="hFile">A valid file handle reference</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool LCClose(IntPtr hFile);
+        public static extern bool LCClose(SafeFileHandle hFile);
 
         /// <summary>
         /// Retrieves the next none config line (one that does not start with a '*' from a 
@@ -385,7 +487,7 @@ namespace LsapiSharp
         /// <param name="size">Size of buffer</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern bool LCReadNextCommand(IntPtr hFile, StringBuilder buffer, int size);
+        public static extern bool LCReadNextCommand(SafeFileHandle hFile, StringBuilder buffer, int size);
 
         /// <summary>
         /// Retrieves the next config line (one that starts with a '*') that begins with the 
@@ -402,7 +504,7 @@ namespace LsapiSharp
         /// <param name="size">Size of buffer</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern bool LCReadNextConfig(IntPtr hFile, string config, StringBuilder buffer, int size);
+        public static extern bool LCReadNextConfig(SafeFileHandle hFile, string config, StringBuilder buffer, int size);
 
         /// <summary>
         /// Retrieves the next line from a configuration file. The entire line (including the setting name) is placed in the buffer.
@@ -415,7 +517,7 @@ namespace LsapiSharp
         /// <param name="size">Size of buffer</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern bool LCReadNextLine(IntPtr hFile, StringBuilder buffer, int size);
+        public static extern bool LCReadNextLine(SafeFileHandle hFile, StringBuilder buffer, int size);
 
         /// <summary>
         /// Parses and retrieves the values in a config line (one that starts with a '*') that begins with the 
@@ -580,7 +682,7 @@ namespace LsapiSharp
         /// <param name="defaultVal">Default value</param>
         /// <param name="maxVal">Max value</param>
         /// <returns></returns>
-        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
         public static extern int GetRCCoordinate(string settingName, int defaultVal, int maxVal);
 
         /// <summary>
@@ -590,7 +692,7 @@ namespace LsapiSharp
         /// <param name="defaultVal">Default value</param>
         /// <param name="maxVal">Max value</param>
         /// <returns></returns>
-        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl)]
         public static extern int ParseCoordinate(string line, int defaultVal, int maxVal);
 
         /// <summary>
@@ -737,7 +839,16 @@ namespace LsapiSharp
         /// <param name="commandDelegate">the callback method associated with the command</param>
         /// <returns>Returns true on success otherwise false</returns>
         [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        public static extern bool AddBangCommand(string command, [MarshalAs(UnmanagedType.FunctionPtr)] Delegate commandDelegate);
+        public static extern bool AddBangCommand(string command, [MarshalAs(UnmanagedType.FunctionPtr)] BangCommandDelegate commandDelegate);
+
+        /// <summary>
+        /// Registers bang commands
+        /// </summary>
+        /// <param name="command">the command identifier that starts with an exclamation point (!)</param>
+        /// <param name="commandDelegate">the callback method associated with the command</param>
+        /// <returns>Returns true on success otherwise false</returns>
+        [DllImport(LSAPI, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode, EntryPoint = "AddBangCommandExW")]
+        public static extern bool AddBangCommand(string command, [MarshalAs(UnmanagedType.FunctionPtr)] BangCommandDelegate2 commandDelegate);
 
         /// <summary>
         /// Removes a bang command from the list.
