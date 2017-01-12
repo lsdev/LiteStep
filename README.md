@@ -1,7 +1,7 @@
 # LiteStep
 LiteStep Alternative Shell is a replacement shell for the standard Windows® Explorer shell originally created by Francis Gastellu. 
 
-This fork focuses on the interoperability of Litestep and the [.NET Framework].(https://www.microsoft.com/net/framework)
+This fork focuses on the interoperability of Litestep and the [.NET Framework](https://www.microsoft.com/net/framework).
 
 ## Installation
 
