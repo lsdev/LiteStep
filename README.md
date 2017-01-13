@@ -9,7 +9,16 @@ Please refer to the official [installation guide](http://litestep.info/overview/
 
 ## Documentation
 
-Coming Soon
+As mentioned above this version of Litestep is focused on the .NET Framework and the following are descriptions of the configurations that should be present in the **step.rc** in order to use .NET.
+
+    ; Set the version of the .NET Runtime that Litestep will use to load modules
+    ; If the setting is omitted the default runtime is v2.0.50727
+    LSCLRVersion v4.0.30319 
+    
+    ; Loading modules are the same as described in the Litestep manual
+    ; To load a module built using the .NET Framework append the "clr" token after the module path 
+    LoadModule $LiteStepDir$HelloCLR.dll clr
+    
 
 ## LICENSE
 
