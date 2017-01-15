@@ -35,6 +35,11 @@ namespace LsapiSharp
         private const string LSAPI = "lsapi.dll";
 
         /// <summary>
+        /// Some "magical" shit that the main litestep window uses
+        /// </summary>
+        public const int MagicDword = 0x49474541;
+
+        /// <summary>
         /// Logging Level Error
         /// </summary>
         public const int LS_LOG_ERROR = 1;
@@ -233,6 +238,286 @@ namespace LsapiSharp
         /// FILL ME IN
         /// </summary>
         public const int LM_REFRESH = 9305;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_VWMUP = 9350;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_VWMDOWN = 9351;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_VWMLEFT = 9352;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_VWMRIGHT = 9353;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_VWMNAV = 9354;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SWITCHTON = 9355;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_ISSTICKY = 9356;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_STICK = 9357;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_UNSTICK = 9358;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_LISTDESKTOPS = 9359;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_DESKTOPINFO = 9360;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_GETDESKTOPOF = 9361;
+
+        /// <summary>
+        /// Internal 
+        /// </summary>
+        private const int LM_SHELLHOOK = 9500;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_WINDOWCREATED = LM_SHELLHOOK + 1 /*HSHELL_WINDOWCREATED*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_WINDOWDESTROYED = LM_SHELLHOOK + 2 /*HSHELL_WINDOWDESTROYED*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_ACTIVATESHELLWINDOW = LM_SHELLHOOK + 3 /*HSHELL_ACTIVATESHELLWINDOW*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_WINDOWACTIVATED = LM_SHELLHOOK + 4 /*HSHELL_WINDOWACTIVATED*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_GETMINRECT = LM_SHELLHOOK + 5 /*HSHELL_GETMINRECT*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_REDRAW = LM_SHELLHOOK + 6 /*HSHELL_REDRAW*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASKMAN = LM_SHELLHOOK + 7 /*HSHELL_TASKMAN*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_LANGUAGE = LM_SHELLHOOK + 8 /*HSHELL_LANGUAGE*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_ACCESSIBILITYSTATE = LM_SHELLHOOK + 11 /*HSHELL_ACCESSIBILITYSTATE*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_APPCOMMAND = LM_SHELLHOOK + 12 /*HSHELL_APPCOMMAND*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_WINDOWREPLACED = LM_SHELLHOOK + 13 /*HSHELL_WINDOWREPLACED*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_WINDOWREPLACING = LM_SHELLHOOK + 14 /*HSHELL_WINDOWREPLACING*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_MONITORCHANGED = LM_SHELLHOOK + 16 /*HSHELL_MONITORCHANGED*/;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_FULLSCREENACTIVATED = 32768;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_FULLSCREENDEACTIVATED = 32769;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETPROGRESSSTATE = 33024;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETPROGRESSVALUE = 33025;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_MARKASACTIVE = 33026;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_REGISTERTAB = 33027;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_UNREGISTERTAB = 33028;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETACTIVETAB = 33029;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETTABORDER = 33030;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETTABPROPERTIES = 33031;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETOVERLAYICON = 33032;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETOVERLAYICONDESC = 33033;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETTHUMBNAILTOOLTIP = 33034;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_SETTHUMBNAILCLIP = 33035;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_THUMBBARADDBUTTONS = 33036;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_THUMBBARUPDATEBUTTONS = 33037;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_TASK_THUMBBARSETIMAGELIST = 33038;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_UNLOADMODULEW = 33281;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_RELOADMODULEW = 33282;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_GETREVIDW = 33283;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_BANGCOMMANDW = 33284;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_SYSTRAYW = 33285;
+
+        /// <summary>
+        /// FILL ME IN
+        /// </summary>
+        public const int LM_WALLPAPERCHANGE = 33286;
+
+        /// <summary>
+        /// Win32 representation of THUMBBUTTON value
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Unicode)]
+        public struct LSThumbButton
+        {
+            /// <summary>
+            /// THUMBBUTTONMASK
+            /// </summary>
+            public int Mask;
+            public int Id;
+            public int Bitmap;
+            public IntPtr hIcon;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 259)]
+            public string Tip;
+
+            /// <summary>
+            /// THUMBBUTTONFLAGS
+            /// </summary>
+            public int Flags;
+        }
+
+        /// <summary>
+        /// Win32 representation of THUMBBUTTONLIST value
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSThumbButtonList
+        {
+            int Buttons;
+
+            [MarshalAs(UnmanagedType.LPStruct)]
+            LSThumbButton Button;
+        }
 
         /// <summary>
         /// Win32 representation of DWORD value
