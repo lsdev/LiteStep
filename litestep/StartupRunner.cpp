@@ -431,15 +431,15 @@ void StartupRunner::_RunRegKeysWorker(HKEY hkParent,
             {
                 TCHAR szName[MAX_PATH] = { 0 };
 
-                LONG lResult = RegEnumKey(
+                LONG lResult2 = RegEnumKey(
                     hkey, dwLoop, szName, COUNTOF(szName));
 
-                if (lResult == ERROR_MORE_DATA)
+                if (lResult2 == ERROR_MORE_DATA)
                 {
                     // szName too small?
                     continue;
                 }
-                else if (lResult == ERROR_SUCCESS)
+                else if (lResult2 == ERROR_SUCCESS)
                 {
                     _RunRegKeys(hkey, szName, dwFlags);
 
