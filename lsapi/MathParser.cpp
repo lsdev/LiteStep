@@ -778,7 +778,7 @@ MathValue Math_length(const MathValueList& argList)
 MathValue Math_lowerCase(const MathValueList& argList)
 {
     wstring str = argList[0].ToString();
-    transform(str.begin(), str.end(), str.begin(), ::tolower);
+    transform(str.begin(), str.end(), str.begin(), ::towlower);
     return str;
 }
 
@@ -923,6 +923,6 @@ MathValue Math_sqrt(const MathValueList& argList)
 MathValue Math_upperCase(const MathValueList& argList)
 {
     wstring str = argList[0].ToString();
-    transform(str.begin(), str.end(), str.begin(), ::toupper);
+    transform(str.begin(), str.end(), str.begin(), ::towupper);
     return str;
 }

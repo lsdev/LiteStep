@@ -44,8 +44,9 @@ BOOL BangManager::AddBangCommand(Bang *pbbBang)
 
     if (iter != bang_map.end())
     {
-        iter->second->Release();
+        Bang * bang = iter->second;
         bang_map.erase(iter);
+        bang->Release(); // We must erase before we release since the key is stored inside the Bang.
     }
 
     bang_map.emplace(pbbBang->GetCommand(), pbbBang);
