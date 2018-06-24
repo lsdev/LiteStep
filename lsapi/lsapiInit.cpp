@@ -254,6 +254,7 @@ void LSAPIInit::setLitestepVars()
         { WINVER_WIN7,      L"Win7"       },
         { WINVER_WIN8,      L"Win8"       },
         { WINVER_WIN81,     L"Win81"      },
+		{ WINVER_WIN10,		L"Win10"	  },
 
         { WINVER_WIN2003,   L"Win2003"    },
         { WINVER_WHS,       L"Win2003"    },  // WHS is Win2003 in disguise

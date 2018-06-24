@@ -87,6 +87,7 @@
     <ClInclude Include="IManager.h" />
     <ClInclude Include="IService.h" />
     <ClInclude Include="macros.h" />
+    <ClInclude Include="safeutility.h" />
     <ClInclude Include="shellhlp.h" />
     <ClInclude Include="shlobj.h" />
     <ClInclude Include="stringutility.h" />

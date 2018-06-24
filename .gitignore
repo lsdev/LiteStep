@@ -1,7 +1,7 @@
-Release_*
-Debug_*
-*/Debug_*
-*/Release_*
+Release*
+Debug*
+*/Debug*
+*/Release*
 *.user
 *.opensdf
 *.sdf
@@ -9,3 +9,6 @@ Debug_*
 *.ncb
 *.aps
 .vs
+*.VC*
+packages
+obj

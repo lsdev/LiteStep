@@ -1,0 +1,25 @@
+﻿; test configurations
+
+VarA TRUE
+VarB 15
+VarC "Command3"
+VarD 9223372036854775800
+VarF 53.675
+VarG 1.7E+3
+VarH 1
+VarJ 4682B4
+VarK 100C
+VarL -80%
+
+; LCReadNextConfig test configurations
+
+*Config option1 option2 option3
+*Config option1
+
+; GetRCLine test configurations
+
+*Script exec !LabelSetAlpha Initialising 250 3 10
+
+; LSLog test
+LSLogFile $LiteStepDir$log.txt
+LSLogLevel 4

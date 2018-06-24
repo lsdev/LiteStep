@@ -23,6 +23,7 @@
     <ProjectGuid>{994556EE-2F21-4811-A85D-6925F7F84B0D}</ProjectGuid>
     <RootNamespace>litestep</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>"Windows"</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -63,12 +64,17 @@
     <Import Project="..\litestep.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>LSAPI_PRIVATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;oleaut32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;mscoree.lib;comsuppw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -77,10 +83,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>LSAPI_PRIVATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LSAPI_PRIVATE;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;oleaut32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;mscoree.lib;comsuppw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -102,9 +110,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>LSAPI_PRIVATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;oleaut32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;mscoree.lib;comsuppw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -112,8 +121,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CLRModule.cpp" />
     <ClCompile Include="COMFactory.cpp" />
     <ClCompile Include="COMService.cpp" />
+    <ClCompile Include="CoreCLRModule.cpp" />
     <ClCompile Include="DataStore.cpp" />
     <ClCompile Include="DDEService.cpp" />
     <ClCompile Include="DDEStub.cpp" />
@@ -125,6 +136,7 @@
     <ClCompile Include="MessageManager.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="ModuleManager.cpp" />
+    <ClCompile Include="NativeModule.cpp" />
     <ClCompile Include="RecoveryMenu.cpp" />
     <ClCompile Include="ShellDesktopTray.cpp" />
     <ClCompile Include="StartupRunner.cpp" />
@@ -136,7 +148,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buildoptions.h" />
+    <ClInclude Include="CLRModule.h" />
     <ClInclude Include="COMService.h" />
+    <ClInclude Include="CoreCLRModule.h" />
     <ClInclude Include="DataStore.h" />
     <ClInclude Include="DDEService.h" />
     <ClInclude Include="DDEStub.h" />
@@ -150,6 +164,8 @@
     <ClInclude Include="MessageManager.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleManager.h" />
+    <ClInclude Include="mscoree_core.h" />
+    <ClInclude Include="NativeModule.h" />
     <ClInclude Include="RecoveryMenu.h" />
     <ClInclude Include="ShellDesktopTray.h" />
     <ClInclude Include="StartupRunner.h" />

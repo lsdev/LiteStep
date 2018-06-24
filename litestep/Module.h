@@ -25,8 +25,6 @@
 #include "../lsapi/lsapidefines.h"
 #include "../utility/common.h"
 #include <string>
-#include <functional>
-
 
 /**
  * Dynamically-loadable module.
@@ -34,41 +32,20 @@
 class Module
 {
 private:
-    /** Instance handle of module's DLL */
-    HINSTANCE m_hInstance;
+	/** Flags used to load module */
+	DWORD m_dwFlags;
 
-    /** Thread handle */
-    HANDLE m_hThread;
+	/** Path to module's DLL */
+	std::basic_string<WCHAR> m_wzLocation;
 
-    /** LiteStep's main window handle */
-    HWND m_hMainWindow;
+	/** The amount of time it took to load the module */
+	DWORD m_dwLoadTime;
 
-    /** Thread ID */
-    DWORD m_dwThreadID;
-
-    /** Path to module's DLL */
-    std::basic_string<WCHAR> m_wzLocation;
-
-    /** Path to LiteStep's root directory */
-    std::basic_string<WCHAR> m_wzAppPath;
-
-    /** Pointer to <code>initModuleEx</code> function */
-    std::function<int __cdecl (HWND, HINSTANCE, LPCWSTR)> m_pInit;
-
-    /** Pointer to <code>quitModule</code> function */
-    quitModuleProc m_pQuit;
-
-    /** Flags used to load module */
-    DWORD m_dwFlags;
-
-    /** The amount of time it took to load the module */
-    DWORD m_dwLoadTime;
-
-    /**
-     * Event that is triggered when a threaded module completes initialization
-     */
-    HANDLE m_hInitEvent;
-    HANDLE m_hInitCopyEvent;
+protected:
+	void SetLoadTime(DWORD dwLoadTime) 
+	{
+		m_dwLoadTime = dwLoadTime;
+	}
 
 public:
     /**
@@ -77,12 +54,12 @@ public:
      * @param  sLocation  path to the module's DLL
      * @param  dwFlags    set of flags that control how the module is loaded
      */
-    Module(const std::wstring& sLocation, DWORD dwFlags);
-
-    /**
-     * Destructor.
-     */
-    virtual ~Module();
+	Module(const std::wstring& sLocation, DWORD dwFlags) 
+	{
+		m_wzLocation = sLocation;
+		m_dwFlags = dwFlags;
+		m_dwLoadTime = 0;
+	}
 
     /**
      * Loads and initializes the module. If the module is loaded in its own
@@ -95,47 +72,26 @@ public:
      * @param  sAppPath     path to LiteStep's root directory
      * @return <code>true</code> if successful or <code>false</code> otherwise
      */
-    bool Init(HWND hMainWindow, const std::wstring& sAppPath);
+    virtual bool Init(HWND hMainWindow, const std::wstring& sAppPath) = 0;
 
     /**
      * Shuts down the module and unloads it. If the module was loaded in its
      * own thread then shutdown is done asynchronously. Use event handle
      * returned by <code>GetQuitEvent</code> to wait for shutdown to complete.
      */
-    void Quit();
-
-    /**
-     * Entry point for the module's main thread.
-     *
-     * @param  dllModPtr  pointer to <code>this</code>
-     * @return unused
-     */
-    static UINT __stdcall ThreadProc(void* dllModPtr);
-
-    /**
-     * Handles messages sent to the module's main thread.
-     *
-     * @param  msg  message information
-     */
-    static void HandleThreadMessage(MSG &msg);
+    virtual void Quit() = 0;
 
     /**
      * Returns this module's DLL instance handle.
      */
-    HINSTANCE GetInstance() const
-    {
-        return m_hInstance;
-    }
+	virtual HINSTANCE  GetInstance() const = 0;
 
     /**
      * Returns this module's thread handle. Returns <code>NULL</code> if the
      * module was not loaded in its own thread.
      */
-    HANDLE GetThread() const
-    {
-        return m_hThread;
-    }
-
+	virtual HANDLE GetThread() const { return nullptr; }
+    
     /**
      * Returns this module's thread handle. Returns <code>NULL</code> if the
      * module was not loaded in its own thread.
@@ -143,21 +99,12 @@ public:
      * Caller is responsible for calling CloseHandle() on the return value.
      * Caller must NOT call CloseHandle() until the thread has an exit signal.
      */
-    HANDLE TakeThread()
-    {
-        HANDLE hTemp = m_hThread;
-        m_hThread = nullptr;
-
-        return hTemp;
-    }
-
+	virtual HANDLE TakeThread() { return nullptr; };
+    
     /**
      * Returns an event that is set once this module has been initialized.
      */
-    HANDLE GetInitEvent() const
-    {
-        return m_hInitEvent;
-    }
+	virtual HANDLE GetInitEvent() const { return nullptr; }
 
     /**
      * Returns an event that is set once this module has been initialized.
@@ -166,21 +113,7 @@ public:
      * Caller must NOT call CloseHandle() until the event has been set to
      * signaled.
      */
-    HANDLE TakeInitEvent()
-    {
-        HANDLE hTemp = m_hInitEvent;
-        m_hInitEvent = nullptr;
-
-        return hTemp;
-    }
-
-    /**
-     * Returns the path to this module's DLL.
-     */
-    LPCWSTR GetLocation() const
-    {
-        return m_wzLocation.c_str();
-    }
+	virtual HANDLE TakeInitEvent() { return nullptr; }
 
     /**
      * Returns the set of flags used to load this module.
@@ -190,51 +123,26 @@ public:
         return m_dwFlags;
     }
 
-    /**
-     * Returns how long this module took to load.
-     */
-    DWORD GetLoadTime() const
-    {
-        return m_dwLoadTime;
-    }
+	/**
+	* Returns the path to this module's DLL.
+	*/
+	LPCWCHAR GetLocation() const
+	{
+		return m_wzLocation.c_str();
+	}
 
-    /**
-     * Returns a pointer to this module's <code>quitModule</code> function.
-     */
-    decltype(m_pQuit) GetQuit() const
-    {
-        return m_pQuit;
-    }
+	/**
+	* Returns how long this module took to load.
+	*/
+	DWORD GetLoadTime() const
+	{
+		return m_dwLoadTime;
+	}
 
-    /**
-     * Returns a pointer to this module's <code>initModuleEx</code> function.
-     */
-    decltype(m_pInit) GetInit() const
-    {
-        return m_pInit;
-    }
-
-private:
-    /**
-     * Loads this module's DLL.
-     *
-     * @return <code>true</code> if successful or
-     *         <code>false</code> if an error occurs
-     */
-    bool _LoadDll();
-
-    /**
-     * Calls this module's <code>initModuleEx</code> function.
-     *
-     * @return return value from <code>initModuleEx</code>
-     */
-    int CallInit();
-
-    /**
-     * Calls this module's <code>quitModule</code> function.
-     */
-    void CallQuit();
+	/**
+	 * Module factory 
+	 */
+	static Module * CreateInstance(const std::wstring& sLocation, DWORD dwFlags);
 };
-
 
 #endif // MODULE_H
