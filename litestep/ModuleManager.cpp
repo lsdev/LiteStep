@@ -156,6 +156,10 @@ UINT ModuleManager::_LoadModules()
 				{
 					dwFlags |= LS_MODULE_CLR;
 				}
+                else if (_wcsicmp(wzToken2, L"coreclr") == 0)
+                {
+                    dwFlags |= LS_MODULE_CORECLR;
+                }
 
                 Module* pModule = _MakeModule(wzToken1, dwFlags);
 

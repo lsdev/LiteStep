@@ -11,3 +11,4 @@ Debug*
 .vs
 *.VC*
 packages
+obj

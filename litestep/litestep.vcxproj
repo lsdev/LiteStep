@@ -83,8 +83,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>LSAPI_PRIVATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LSAPI_PRIVATE;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <AdditionalDependencies>advapi32.lib;gdi32.lib;ole32.lib;oleaut32.lib;shell32.lib;shlwapi.lib;userenv.lib;uuid.lib;mscoree.lib;comsuppw.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -123,6 +124,7 @@
     <ClCompile Include="CLRModule.cpp" />
     <ClCompile Include="COMFactory.cpp" />
     <ClCompile Include="COMService.cpp" />
+    <ClCompile Include="CoreCLRModule.cpp" />
     <ClCompile Include="DataStore.cpp" />
     <ClCompile Include="DDEService.cpp" />
     <ClCompile Include="DDEStub.cpp" />
@@ -148,6 +150,7 @@
     <ClInclude Include="buildoptions.h" />
     <ClInclude Include="CLRModule.h" />
     <ClInclude Include="COMService.h" />
+    <ClInclude Include="CoreCLRModule.h" />
     <ClInclude Include="DataStore.h" />
     <ClInclude Include="DDEService.h" />
     <ClInclude Include="DDEStub.h" />
@@ -161,6 +164,7 @@
     <ClInclude Include="MessageManager.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleManager.h" />
+    <ClInclude Include="mscoree_core.h" />
     <ClInclude Include="NativeModule.h" />
     <ClInclude Include="RecoveryMenu.h" />
     <ClInclude Include="ShellDesktopTray.h" />

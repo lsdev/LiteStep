@@ -22,17 +22,19 @@
 #if !defined(CLRMODULE_H)
 #define CLRMODULE_H
 
+#include "../utility/Base.h"
 #include "Module.h"
-#include <string>
-
 #include <metahost.h>
+
+#import "mscorlib.tlb" raw_interfaces_only				\
+    high_property_prefixes("_get","_put","_putref")		\
+    rename("ReportEvent", "InteropServices_ReportEvent")
 
 class CLRModule : public Module
 {
 private:
-	ICorRuntimeHost *m_pCorRuntimeHost;
-	ICLRMetaHost	*m_pMetaHost;
-	ICLRRuntimeInfo *m_pRuntimeInfo;
+    HINSTANCE   m_Instance;
+    mscorlib::_TypePtr    m_pModuleInstance;
 
 public:
 	CLRModule(const std::wstring& sLocation, DWORD dwFlags);
@@ -43,9 +45,29 @@ public:
 	HINSTANCE  GetInstance() const;
 	
 private:
-	bool _Initialize();
-	void _Dispose();
-	HRESULT _InvokeMethod(LPCWSTR szMethodName, SAFEARRAY * pArgs);
+    friend class CLRManager;
 };
+
+
+
+class CLRManager : CountedBase
+{
+private:
+    ICorRuntimeHost*    m_pCorRuntimeHost;
+    ICLRMetaHost*       m_pMetaHost;
+    ICLRRuntimeInfo*    m_pRuntimeInfo;
+    
+public:
+    CLRManager();
+    ~CLRManager();
+
+    bool LoadRuntime();
+    HRESULT LoadModule(CLRModule * module, HWND hWnd, TCHAR * appPath);
+    HRESULT UnloadModule(CLRModule * module);
+
+private:
+    void _Dispose();
+};
+
 
 #endif

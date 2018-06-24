@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>LsapiSharp</RootNamespace>
+    <Version>1.0.0.0</Version>
+    <Authors>Donelle Sanders Jr</Authors>
+    <PackageTags>Lsapi , LsapiSharp-Core, Litestep</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/lsdev/LiteStep/master/litestep/litestep.bmp</PackageIconUrl>
+    <RepositoryUrl>"https://github.com/Donelle/LiteStep.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>http://www.lsdev.org</PackageProjectUrl>
+    <PackageLicenseUrl>ttps://github.com/Donelle/LiteStep/blob/master/docs/0.24.7/license.txt</PackageLicenseUrl>
+    <PackageReleaseNotes>Version 1.0.0.0</PackageReleaseNotes>
+    <Product>LsapiSharp Core</Product>
+    <Company />
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>LsapiSharp.snk</AssemblyOriginatorKeyFile>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\LsapiSharp\NativeMethods.cs" />
+  </ItemGroup>
+</Project>

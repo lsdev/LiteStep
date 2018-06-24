@@ -20,27 +20,29 @@
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #include "CLRModule.h"
-#include <Shlwapi.h>
 #include "../utility/core.hpp"
+#include "../utility/safeutility.h"
+#include <Shlwapi.h>
 
-#import "mscorlib.tlb" raw_interfaces_only				\
-    high_property_prefixes("_get","_put","_putref")		\
-    rename("ReportEvent", "InteropServices_ReportEvent")
 using namespace mscorlib;
+
+
+#define DEFAULT_CLRVERSION  _T("v2.0.50727")
+static CLRManager g_clrManager;
+
 
 
 CLRModule::CLRModule(const std::wstring& sLocation, DWORD dwFlags)
 	: Module(sLocation, dwFlags)
 {
-	m_pCorRuntimeHost = nullptr;
-	m_pMetaHost = nullptr;
-	m_pRuntimeInfo = nullptr;
+    m_pModuleInstance = nullptr;
+    m_Instance = nullptr;
 }
 
 
 CLRModule::~CLRModule()
 {
-	_Dispose();
+	
 }
 
 
@@ -48,34 +50,14 @@ bool CLRModule::Init(HWND hMainWindow, const std::wstring& sAppPath)
 {
 	HRESULT hr = E_FAIL;
 
-	if (_Initialize())
+	if (g_clrManager.LoadRuntime())
 	{
-		SAFEARRAY *args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-		variant_t vtWndArg, vtAppPathArg(sAppPath.c_str());
-		
-		do {
-			LONG index = 0;
-			
-			V_VT(&vtWndArg) = VT_INT;
-			vtWndArg.byref = hMainWindow;
-			hr = SafeArrayPutElement(args, &index, &vtWndArg);
-			if (FAILED(hr))
-			{
-				break;
-			}
-			
-			index = 1;
-			hr = SafeArrayPutElement(args, &index, &vtAppPathArg);
-			if (FAILED(hr))
-			{
-				break;
-			}
-			
-			hr = _InvokeMethod(L"initModule", args);
-		} while (false);
-		
-		SafeArrayDestroy(args);
-		args = nullptr;
+        TCHAR wzAppPath[MAX_PATH];
+        StringCchCopy(wzAppPath, MAX_PATH, sAppPath.c_str());
+
+        hr = g_clrManager.LoadModule(this, hMainWindow, wzAppPath);
+        if (SUCCEEDED(hr))
+            m_Instance = HINSTANCE();
 	}
 
 	return SUCCEEDED(hr);
@@ -84,177 +66,198 @@ bool CLRModule::Init(HWND hMainWindow, const std::wstring& sAppPath)
 
 void CLRModule::Quit()
 {
-	SAFEARRAY * args = SafeArrayCreateVector(VT_VARIANT, 0, 0);
-
-	_InvokeMethod(L"quitModule", args);
-	_Dispose();
-
-	SafeArrayDestroy(args);
-	args = nullptr;
+    g_clrManager.UnloadModule(this);
+    m_pModuleInstance = nullptr;
+    m_Instance = nullptr;
 }
 
 
 HINSTANCE CLRModule::GetInstance() const
 {
-	return HINSTANCE();
+	return m_Instance;
 }
 
 
-bool CLRModule::_Initialize()
+CLRManager::CLRManager()
 {
-	static const WCHAR DEFAULT_CLRVERSION[] = L"v2.0.50727";
-
-	HRESULT hr;
-	
-	do {
-		hr = CLRCreateInstance(CLSID_CLRMetaHost, IID_PPV_ARGS(&m_pMetaHost));
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "CLRCreateInstance failed w/hr 0x%08lx\n", hr);
-			break;
-		}
-
-		wchar_t clrVersion[MAX_PATH];
-		GetRCStringW(L"LSCLRVersion", clrVersion, DEFAULT_CLRVERSION, MAX_PATH);
-
-		hr = m_pMetaHost->GetRuntime(clrVersion, IID_PPV_ARGS(&m_pRuntimeInfo));
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "ICLRMetaHost::GetRuntime failed w/hr 0x%08lx\n", hr);
-			break;
-		}
-
-		BOOL fLoadable;
-		hr = m_pRuntimeInfo->IsLoadable(&fLoadable);
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "ICLRRuntimeInfo::IsLoadable failed w/hr 0x%08lx\n", hr);
-			break;
-		}
-
-		if (!fLoadable)
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", ".NET runtime %s cannot be loaded\n", clrVersion);
-			break;
-		}
-
-		hr = m_pRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_PPV_ARGS(&m_pCorRuntimeHost));
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "ICLRRuntimeInfo::GetInterface failed w/hr 0x%08lx\n", hr);
-			break;
-		}
-
-		hr = m_pCorRuntimeHost->Start();
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "CLR failed to start w/hr 0x%08lx\n", hr);
-			break;
-		}
-	} while (false);
-
-	//
-	// If we fail for any reason then cleanup
-	//
-	if (FAILED(hr))
-	{
-		_Dispose();
-	}
-
-	return m_pCorRuntimeHost != nullptr;
+    m_pCorRuntimeHost = nullptr;
+    m_pMetaHost = nullptr;
+    m_pRuntimeInfo = nullptr;
 }
 
 
-void CLRModule::_Dispose()
+CLRManager::~CLRManager()
 {
-	if (m_pMetaHost)
-	{
-		m_pMetaHost->Release();
-		m_pMetaHost = NULL;
-	}
-
-	if (m_pRuntimeInfo)
-	{
-		m_pRuntimeInfo->Release();
-		m_pRuntimeInfo = NULL;
-	}
-
-	if (m_pCorRuntimeHost)
-	{
-		m_pCorRuntimeHost->Release();
-		m_pCorRuntimeHost = NULL;
-	}
+    _Dispose();
 }
 
 
-HRESULT CLRModule::_InvokeMethod(LPCWSTR szMethodName, SAFEARRAY * pArgs)
+bool CLRManager::LoadRuntime()
 {
-	HRESULT hr;
+    if (m_pCorRuntimeHost != nullptr)
+        return true;
 
-	IUnknownPtr  pAppDomainThunk = NULL;
-	_AppDomainPtr pDefaultAppDomain = NULL;
+    HRESULT hr;
 
-	do {
-		hr = m_pCorRuntimeHost->GetDefaultDomain(&pAppDomainThunk);
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "ICorRuntimeHost::GetDefaultDomain failed w/hr 0x%08lx\n", hr);
-			break;
-		}
+    do {
+        hr = CLRCreateInstance(CLSID_CLRMetaHost, IID_PPV_ARGS(&m_pMetaHost));
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "CLRCreateInstance failed w/hr 0x%08lx\n", hr);
+            break;
+        }
 
-		hr = pAppDomainThunk->QueryInterface(IID_PPV_ARGS(&pDefaultAppDomain));
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to get default AppDomain w/hr 0x%08lx\n", hr);
-			break;
-		}
-				
-		__wchar_t * location = (__wchar_t *) malloc(sizeof(__wchar_t) * MAX_PATH_LENGTH);
-		ZeroMemory(location, sizeof(__wchar_t) * MAX_PATH_LENGTH);
-		StringCchCopy(location, MAX_PATH, GetLocation());
+        TCHAR clrVersion[MAX_PATH];
+        GetRCStringW(L"LSCLRVersion", clrVersion, DEFAULT_CLRVERSION, MAX_PATH);
 
-		__wchar_t * classlibrary = PathFindFileName(location);
-		PathRemoveExtension(classlibrary);
+        hr = m_pMetaHost->GetRuntime(clrVersion, IID_PPV_ARGS(&m_pRuntimeInfo));
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "ICLRMetaHost::GetRuntime failed w/hr 0x%08lx\n", hr);
+            break;
+        }
 
-		bstr_t bstrAssemblyName(classlibrary);
-		_AssemblyPtr pAssembly = NULL;
-		free(location);
+        BOOL fLoadable;
+        hr = m_pRuntimeInfo->IsLoadable(&fLoadable);
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "ICLRRuntimeInfo::IsLoadable failed w/hr 0x%08lx\n", hr);
+            break;
+        }
 
-		hr = pDefaultAppDomain->Load_2(bstrAssemblyName, &pAssembly);
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to load the assembly w/hr 0x%08lx\n", hr);
-			break;
-		}
+        if (!fLoadable)
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", ".NET runtime %s cannot be loaded\n", clrVersion);
+            break;
+        }
 
-		// Get the Type of ClassLibrary.LSModule
-		bstr_t bstrClassName(bstrAssemblyName + L".LSModule");
-		_TypePtr pType = NULL;
+        hr = m_pRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_PPV_ARGS(&m_pCorRuntimeHost));
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "ICLRRuntimeInfo::GetInterface failed w/hr 0x%08lx\n", hr);
+            break;
+        }
 
-		hr = pAssembly->GetType_2(bstrClassName, &pType);
-		if (FAILED(hr))
-		{
-			LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to get the Type interface w/hr 0x%08lx\n", hr);
-			break;
-		}
+        hr = m_pCorRuntimeHost->Start();
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "CLR failed to start w/hr 0x%08lx\n", hr);
+            break;
+        }
+    } while (false);
 
-		bstr_t bstrStaticMethodName(szMethodName);
-		variant_t vtEmpty, vtRetVal;
+    //
+    // If we fail for any reason then cleanup
+    //
+    if (FAILED(hr))
+    {
+        _Dispose();
+    }
 
-		try {
-			hr = pType->InvokeMember_3(bstrStaticMethodName, static_cast<BindingFlags>(
-				BindingFlags_InvokeMethod | BindingFlags_Static | BindingFlags_Public),
-				NULL, vtEmpty, pArgs, &vtRetVal);
-			if (FAILED(hr))
-			{
-				LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to invoke %s w/hr 0x%08lx\n", szMethodName, hr);
-			}
-		}
-		catch (...) {
-			LSLogPrintf(LOG_ERROR, "CLRModule", "A fatal error occured invoking %s\n", szMethodName);
-		}
+    return SUCCEEDED(hr);
+}
 
-	} while (false);
+HRESULT CLRManager::LoadModule(CLRModule * module, HWND hWnd, TCHAR * appPath)
+{
+    HRESULT hr;
 
-	return hr;
+    do {
+        IUnknownPtr pAppDomainThunk = nullptr;
+        hr = m_pCorRuntimeHost->GetDefaultDomain(&pAppDomainThunk);
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "ICorRuntimeHost::GetDefaultDomain failed w/hr 0x%08lx\n", hr);
+            break;
+        }
+
+        mscorlib::_AppDomainPtr pDefaultAppDomain = nullptr;
+        hr = pAppDomainThunk->QueryInterface(IID_PPV_ARGS(&pDefaultAppDomain));
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to get default AppDomain w/hr 0x%08lx\n", hr);
+            break;
+        }
+
+        TCHAR assemblyName[MAX_PATH];
+        StringCchCopy(assemblyName, MAX_PATH, PathFindFileName(module->GetLocation()));
+        PathRemoveExtension(assemblyName);
+
+        _AssemblyPtr pAssembly = nullptr;
+        bstr_t bstrAssemblyName(assemblyName);
+
+        hr = pDefaultAppDomain->Load_2(bstrAssemblyName, &pAssembly);
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to load the assembly w/hr 0x%08lx\n", hr);
+            break;
+        }
+
+        bstr_t bstrClassName(bstrAssemblyName + _T(".LSModule"));
+        hr = pAssembly->GetType_2(bstrClassName, &module->m_pModuleInstance);
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to get the Type interface w/hr 0x%08lx\n", hr);
+            break;
+        }
+
+        bstr_t bstrStaticMethodName(_T("initModule"));
+        SAFEARRAY *args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
+        LONG index[] = { 0, 1 };
+
+        variant_t vtWndArg;
+        V_VT(&vtWndArg) = VT_INT;
+        vtWndArg.byref = hWnd;
+        SafeArrayPutElement(args, &index[0], &vtWndArg);
+
+        variant_t vtAppPathArg(appPath);
+        SafeArrayPutElement(args, &index[1], &vtAppPathArg);
+
+        variant_t vtEmpty, vtRetVal;
+        auto bindings = BindingFlags_InvokeMethod | BindingFlags_Static | BindingFlags_Public;
+
+        hr = module->m_pModuleInstance->InvokeMember_3(bstrStaticMethodName, static_cast<BindingFlags>(bindings), NULL, vtEmpty, args, &vtRetVal);
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to invoke initModule w/hr 0x%08lx\n", hr);
+        }
+
+        SafeArrayDestroy(args);
+    } while (false);
+
+    return hr;
+}
+
+HRESULT CLRManager::UnloadModule(CLRModule * module)
+{
+    HRESULT hr = S_OK;
+
+    if (module->m_pModuleInstance != nullptr) {
+        bstr_t bstrStaticMethodName(_T("quitModule"));
+        SAFEARRAY * args = SafeArrayCreateVector(VT_VARIANT, 0, 0);
+
+        variant_t vtEmpty, vtRetVal;
+        auto bindings = BindingFlags_InvokeMethod | BindingFlags_Static | BindingFlags_Public;
+
+        hr = module->m_pModuleInstance->InvokeMember_3(bstrStaticMethodName, static_cast<BindingFlags>(bindings), NULL, vtEmpty, args, &vtRetVal);
+        if (FAILED(hr))
+        {
+            LSLogPrintf(LOG_ERROR, "CLRModule", "Failed to invoke quitModule w/hr 0x%08lx\n", hr);
+        }
+
+        SafeArrayDestroy(args);
+    }
+
+    return hr;
+}
+
+void CLRManager::_Dispose()
+{
+    if (m_pCorRuntimeHost)
+    {
+        m_pCorRuntimeHost->Stop();
+        SafeRelease(m_pCorRuntimeHost);
+    }
+
+    SafeRelease(m_pMetaHost);
+    SafeRelease(m_pRuntimeInfo);
 }

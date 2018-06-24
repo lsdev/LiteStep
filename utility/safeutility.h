@@ -19,16 +19,41 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include "CLRModule.h"
-#include "CoreCLRModule.h"
-#include "NativeModule.h"
+#if !defined(SAFEUTILITY_H)
+#define SAFEUTILITY_H
 
-Module * Module::CreateInstance(const std::wstring & sLocation, DWORD dwFlags)
+//
+// Typesafe method for releasing interface pointers and setting them
+// to NULL.
+//
+template <class T> inline LONG SafeRelease(T *&pUnk)
 {
-    if (dwFlags & LS_MODULE_CLR)
-        return new CLRModule(sLocation, dwFlags);
-    else if (dwFlags & LS_MODULE_CORECLR)
-        return new CoreCLRModule(sLocation, dwFlags);
+    LONG lr;
+
+    if (pUnk != NULL)
+    {
+        lr = pUnk->Release();
+        pUnk = nullptr;
+    }
     else
-	    return new NativeModule(sLocation, dwFlags);
+    {
+        lr = 0;
+    }
+
+    return lr;
 }
+
+//
+// Typesafe method for deleting things created with "new" and setting
+// them to NULL.
+//
+template <class T> inline void SafeDelete(T *&pT)
+{
+    if (pT != NULL)
+    {
+        delete pT;
+        pT = nullptr;
+    }
+}
+
+#endif
