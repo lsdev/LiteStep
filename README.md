@@ -24,7 +24,7 @@ As mentioned above this version of Litestep is focused on the .NET Framework and
 
     ; OR to set the version of the .NET Core Runtime. This version represents
     ; the actual folder name on the file system located in %PROGRAMFILES%\dotnet\shared\Microsoft.NETCore.App
-    LSCLRVersion 2.0.0
+    LSCoreCLRVersion 2.0.0
 
     ; Loading modules are the same as described in the Litestep manual
     ; To load a module built using the .NET Framework append the "coreclr" token after the module path 
