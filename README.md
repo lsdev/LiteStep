@@ -27,7 +27,7 @@ As mentioned above this version of Litestep is focused on the .NET Framework and
     LSCoreCLRVersion 2.0.0
 
     ; Loading modules are the same as described in the Litestep manual
-    ; To load a module built using the .NET Framework append the "coreclr" token after the module path 
+    ; To load a module built using the .NET Core append the "coreclr" token after the module path 
     LoadModule $LiteStepDir$HelloCoreCLR.dll coreclr
     
 #### .NET Module
